@@ -1,0 +1,57 @@
+:root {
+	--towers-height: 50px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	overflow: hidden;
+}
+
+.webgl {
+	position: fixed;
+	top: 0;
+	left: 0;
+	outline: none;
+}
+
+/**
+UI ELEMENTS
+*/
+.ui {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	pointer-events: none;
+}
+
+.ui .towers {
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	height: var(--towers-height);
+	text-align: center;
+}
+
+.ui .towers button {
+	border: 1px solid grey;
+	height: var(--towers-height);
+	box-sizing: border-box;
+
+	pointer-events: all;
+}
+
+.ui button[data-selected='true'] {
+	border: 4px solid white;
+}
+
+.ui .towers button img {
+	height: var(--towers-height);
+}
