@@ -82,18 +82,21 @@ export class Main {
 	/**
 	 * Setup a main camera
 	 * */
-	createMainCamera(settings: CameraInterface) {
-		if (settings.perspective) {
-			this.cameraMain = new THREE.PerspectiveCamera(settings.fov, settings.sizes.width / settings.sizes.height, settings.near, settings.far);
-		} else {
-			this.cameraMain = new THREE.OrthographicCamera(
-				settings.sizes.width / 2,
-				settings.sizes.width / -2,
-				settings.sizes.height / 2,
-				settings.sizes.height / -2,
-				settings.near,
-				settings.far
-			);
-		}
+	createPerspectiveMainCamera(settings: CameraInterface) {
+		this.cameraMain = new THREE.PerspectiveCamera(settings.fov, settings.sizes.width / settings.sizes.height, settings.near, settings.far);
+	}
+
+	/**
+	 * Setup a main camera
+	 * */
+	createOrthographicMainCamera(settings: CameraInterface) {
+		this.cameraMain = new THREE.OrthographicCamera(
+			(0.04 * settings.sizes.width) / -2,
+			(0.04 * settings.sizes.width) / 2,
+			(0.04 * settings.sizes.height) / 2,
+			(0.04 * settings.sizes.height) / -2,
+			settings.near,
+			settings.far
+		);
 	}
 }

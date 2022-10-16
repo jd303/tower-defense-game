@@ -47,6 +47,7 @@ export class CreepMVPSquare extends Creep {
 		this.material = new THREE.MeshMatcapMaterial({ color: '#fff' });
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
 
+		// Set Creep States
 		this.states = {
 			moving: {
 				isMoving: true,
@@ -56,6 +57,7 @@ export class CreepMVPSquare extends Creep {
 				hurtStartTime: 0,
 				hurtingStateLength: 750,
 			},
+			hurt: false,
 		};
 
 		super.createCreep(this.mesh);
@@ -86,13 +88,5 @@ export class CreepMVPSquare extends Creep {
 				this.groupStatus.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
 			}
 		}
-	}
-
-	/**
-	 * Creep took damage
-	 * */
-	stateTakeDamage() {
-		this.states.hurting.isHurting = true;
-		this.states.hurting.hurtStartTime = new Date().getTime();
 	}
 }

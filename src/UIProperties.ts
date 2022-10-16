@@ -6,5 +6,5 @@ export interface UIProperties {
 
 export enum UITypes {
 	Tower = 'tower',
-	Hero = 'hero',
+	HeroAbility = 'heroability',
 }

@@ -15,11 +15,19 @@ const debugMode = true;
  * SETUP
  * */
 const main = new Main(canvas, sizes, debugMode);
-main.createMainCamera({
-	perspective: true,
-	fov: 50,
+
+// Create a Perspective Camera
+/*main.createPerspectiveMainCamera({
+	fov: 150,
 	near: 0.1,
 	far: 250,
+	sizes,
+});*/
+
+// Create an orthographic camera
+main.createOrthographicMainCamera({
+	near: 0.01,
+	far: 1000,
 	sizes,
 });
 main.setupWindowSize();

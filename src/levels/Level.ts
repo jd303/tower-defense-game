@@ -4,6 +4,7 @@ import { Tower } from '../towers/Tower';
 import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
+import { LevelPath } from '../LevelPath';
 
 export class Level {
 	/**
@@ -14,7 +15,7 @@ export class Level {
 	/**
 	 * Path
 	 * */
-	paths: any[];
+	levelPaths: LevelPath[] = [];
 
 	/**
 	 * Level Assets
@@ -61,7 +62,9 @@ export class Level {
 	/**
 	 * Adds a prop to the level
 	 * */
-	addProp(prop: Prop) {
+	addProp(prop: Prop, point: THREE.Vector3) {
 		this.props.push(prop);
+		this.main.scene.add(prop.groupMain);
+		prop.groupMain.position.set(point.x, point.y, point.z);
 	}
 }

@@ -3,6 +3,7 @@ import { Tower } from './Tower';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/Tick';
 import { UIProperties, UITypes } from '../UIProperties';
+import { Projectile, ProjectileTypes } from '../attacks/Projectile';
 
 export class TowerCubeMVP extends Tower {
 	/**
@@ -14,14 +15,16 @@ export class TowerCubeMVP extends Tower {
 		icon: 'assets/models/towers/Tower.Slinger.UI.icon.png',
 		clickCallback: this.placeTower,
 	};
+	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
+	projectiles: Projectile[] = [];
 
 	/**
 	 * Stats
 	 * */
-	damage = 20;
+	damage = 3;
 	range = 6;
 	last_attack_time = 0;
-	attack_cooldown = 1000;
+	attack_cooldown = 800;
 
 	/**
 	 * Constructor
@@ -51,6 +54,16 @@ export class TowerCubeMVP extends Tower {
 					this.last_attack_time = new Date().getTime();
 					this.states.attacking.isAttacking = true;
 					this.states.attacking.attackStartTime = new Date().getTime();
+
+					const projectile = new Projectile(
+						this.main,
+						new THREE.Vector3(this.groupMain.position.x, 3.5, this.groupMain.position.z),
+						creep,
+						ProjectileTypes.homing,
+						this.projectileBasis.clone()
+					);
+
+					this.projectiles.push(projectile);
 				}
 			}
 		});
@@ -63,6 +76,9 @@ export class TowerCubeMVP extends Tower {
 				this.groupModel.position.z = Math.sin(timeProperties.elapsedTime * 50) / 20;
 			}
 		}
+
+		// Animate Projectiles
+		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
 	}
 }
 
@@ -74,8 +90,6 @@ export class TowerCubeMVPUI {
 	};
 
 	static placeTower(intersects: THREE.Intersection[], main: Main) {
-		console.log('PLACE', intersects, main);
-		console.log('CHeck that the intersect is correct');
 		const intersect = intersects[0];
 		main.level.addTower(new TowerCubeMVP(main), intersect.point);
 	}

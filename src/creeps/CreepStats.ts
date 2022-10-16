@@ -9,6 +9,9 @@ export class CreepStats {
 	defenses: DamageTypes;
 	damage_taken = 0;
 
+	/**
+	 * Constructor
+	 * */
 	constructor(stats: CreepStatSetup) {
 		this.hp_total = stats.hp_total;
 		this.move_speed = stats.move_speed;
@@ -24,7 +27,8 @@ export class CreepStats {
 		return this;
 	}
 
-	takeDamage(damage: number, damage_type: string) {
+	// Commented as unsure this is the direction
+	/*takeDamage(damage: number, damage_type: string) {
 		switch (damage_type) {
 			case 'piercing':
 				damage = Math.max(0, damage - this.defenses.piercing);
@@ -44,7 +48,7 @@ export class CreepStats {
 		if (this.damage_taken >= this.hp_total) {
 			console.log('DIE');
 		}
-	}
+	}*/
 }
 
 interface CreepStatSetup {
@@ -56,6 +60,7 @@ interface CreepStatSetup {
 export interface CreepStates {
 	moving: CreepMoving;
 	hurting: CreepHurting;
+	hurt: boolean;
 }
 
 export interface CreepMoving {

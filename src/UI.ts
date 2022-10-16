@@ -27,6 +27,11 @@ export class UI {
 	buttonSelectedAttribute: string = 'data-selected';
 
 	/**
+	 * Event Properties
+	 * */
+	lastEvent: Function;
+
+	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
@@ -65,9 +70,9 @@ export class UI {
 					break;
 
 				// Heroes
-				case UITypes.Hero:
+				case UITypes.HeroAbility:
 					this.heroesUIElement.appendChild(button);
-					button.addEventListener('click', () => element.clickCallback());
+					button.addEventListener('click', this.toggleHeroAbility.bind(this, button, element));
 					break;
 			}
 		});
@@ -104,6 +109,11 @@ export class UI {
 		this.main.interactionManager.removeRaycasterSubjects([this.main.level.terrain]);
 		this.main.interactionManager.removeClickHandler(element.clickCallback);
 	}
+
+	/**
+	 * Toggles that we are going to use a hero ability
+	 * */
+	toggleHeroAbility(button: HTMLElement, element: UIProperties, event: MouseEvent) {}
 
 	/**
 	 * Attach the UI to the document

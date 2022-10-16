@@ -36,6 +36,13 @@ export class Creep {
 	states: CreepStates;
 
 	/**
+	 * Prefabs
+	 * */
+	healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
+	healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
+	healthBarName: string = 'healthbar';
+
+	/**
 	 * Construtor
 	 * */
 	constructor(main: Main) {
@@ -55,8 +62,10 @@ export class Creep {
 		this.main.scene.add(this.groupMain);
 	}
 
+	/**
+	 * Resolves when a creep was attacked
+	 * */
 	resolveAttack(damage: number) {
-		console.log('Aw I was attacked', damage);
 		this.stats.damage_taken += damage;
 		if (this.stats.damage_taken >= this.stats.hp_total) {
 			this.main.level.removeCreep(this);
@@ -74,8 +83,49 @@ export class Creep {
 	}
 
 	/**
+	 * Creates a health bar for this creep
+	 * */
+	createHealthBar() {
+		const barBG = new THREE.PlaneBufferGeometry(1, 0.1);
+		const barFG = new THREE.PlaneBufferGeometry(1, 0.1);
+		const healthBarGroup = new THREE.Group();
+		const bgMesh = new THREE.Mesh(barBG, this.healthBarBGMaterial);
+		const fgMesh = new THREE.Mesh(barFG, this.healthBarFGMaterial);
+		fgMesh.name = this.healthBarName;
+		healthBarGroup.add(bgMesh);
+		healthBarGroup.add(fgMesh);
+		healthBarGroup.position.y = 1;
+		this.groupStatus.add(healthBarGroup);
+
+		this.updateHealthBar();
+	}
+
+	/**
+	 * Updates the health bar
+	 * */
+	updateHealthBar() {
+		const healthBar = this.groupStatus.getObjectByName(this.healthBarName);
+		healthBar!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
+		healthBar!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
+	}
+
+	/**
 	 * Overridden functions
 	 * */
 	animate(timeProperties: TickTimeProperties) {}
-	stateTakeDamage() {}
+
+	/**
+	 * Update Creep State: Creep took damage
+	 * */
+	stateTakeDamage() {
+		this.states.hurting.isHurting = true;
+		this.states.hurting.hurtStartTime = new Date().getTime();
+
+		if (!this.states.hurt) {
+			this.createHealthBar();
+			this.states.hurt = true;
+		} else {
+			this.updateHealthBar();
+		}
+	}
 }
