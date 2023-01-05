@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/Tick';
 import { ModelAsset } from '../ModelAsset';
+import { UIProperties, UITypes } from '../UIProperties';
 import { TowerStates } from './TowerStats';
 
 export class Tower extends ModelAsset {
@@ -25,11 +26,31 @@ export class Tower extends ModelAsset {
 	 * Overwriteable animation
 	 * */
 	animate(timeProperties: TickTimeProperties) {}
+}
+
+export class TowerUI {
+	type: UITypes;
+	icon: string;
+	placeCallback: Function | undefined;
 
 	/**
-	 * Places a Tower
+	 * Constructor
 	 * */
-	placeTower() {
-		console.log('PLACE TOWER');
+	constructor(towerDetails: UIProperties) {
+		this.type = towerDetails.type;
+		this.icon = towerDetails.icon;
+		this.placeCallback = towerDetails.placeCallback;
+		return this;
+	}
+
+	/**
+	 * Return properties
+	 * */
+	getProperties() {
+		return {
+			type: this.type,
+			icon: this.icon,
+			placeCallback: this.placeCallback,
+		};
 	}
 }

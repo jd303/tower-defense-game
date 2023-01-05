@@ -54,7 +54,7 @@ export class UI {
 	/**
 	 * Adds towers to the UI
 	 * */
-	addUIElements(elements: UIProperties[]) {
+	addTowerUI(elements: UIProperties[]) {
 		elements.forEach((element) => {
 			const button = document.createElement('button');
 			const icon = document.createElement('img');
@@ -85,29 +85,44 @@ export class UI {
 		event.stopImmediatePropagation();
 		event.stopPropagation();
 
+		const markDeselected = () => button.setAttribute(this.buttonSelectedAttribute, 'false');
+		const markSelected = () => button.setAttribute(this.buttonSelectedAttribute, 'true');
+
 		if (button.getAttribute(this.buttonSelectedAttribute) == 'true') {
-			button.setAttribute(this.buttonSelectedAttribute, 'false');
+			markDeselected();
 			this.cancelCreateRequest(element);
 		} else {
-			button.setAttribute(this.buttonSelectedAttribute, 'true');
-			this.requestCreateAsset(element);
+			markSelected();
+			this.requestCreateAsset(element, markDeselected);
 		}
 	}
 
 	/**
 	 * The UI has triggered an asset creation
 	 * */
-	requestCreateAsset(element: UIProperties) {
+	requestCreateAsset(element: UIProperties, uiOnComplete: Function) {
+		// Start listening to raycasters
 		this.main.interactionManager.addRaycasterSubjects([this.main.level.terrain]);
-		this.main.interactionManager.addClickHandler(element.clickCallback);
+
+		if (element.placeCallback) {
+			// Create an oncomplete function
+			const onComplete = () => {
+				this.cancelCreateRequest(element);
+				uiOnComplete();
+			};
+
+			// Add a click handler
+			this.main.interactionManager.addClickHandler(element.placeCallback, onComplete);
+		}
 	}
 
 	/**
 	 * Cancels the create request
 	 * */
 	cancelCreateRequest(element: UIProperties) {
+		console.log('CANED');
 		this.main.interactionManager.removeRaycasterSubjects([this.main.level.terrain]);
-		this.main.interactionManager.removeClickHandler(element.clickCallback);
+		if (element.placeCallback) this.main.interactionManager.removeClickHandler(element.placeCallback);
 	}
 
 	/**

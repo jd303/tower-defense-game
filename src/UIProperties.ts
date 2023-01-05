@@ -1,7 +1,7 @@
 export interface UIProperties {
 	type: UITypes;
 	icon: string;
-	clickCallback: Function;
+	placeCallback?: Function;
 }
 
 export enum UITypes {

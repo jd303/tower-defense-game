@@ -3,7 +3,6 @@ import { Vector3 } from 'three';
 import { PathTypes } from '../data/PathInterfaces';
 import { Main } from '../core/Main';
 import { OrbitController } from '../core/OrbitController';
-import { TowerCubeMVPUI } from '../towers/Tower_CubeMVP';
 import { Level } from './Level';
 import { LevelPath } from '../LevelPath';
 import { TreeCone1 } from '../environment/nature/TreeCone1';
@@ -11,6 +10,7 @@ import { UI } from '../UI';
 import { Terrain } from '../environment/Terrain';
 import { Mountain_Type1 } from '../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
+import { TowerCubeMVP } from '../towers/Tower_CubeMVP';
 
 const levelDetails = {
 	paths: [
@@ -222,9 +222,11 @@ export class Level0MVP extends Level {
 		/*const helper = new THREE.DirectionalLightHelper(directionalLight, 5);
 		this.main.scene.add(helper);*/
 
-		// Setup a UI
+		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		this.UI = new UI(this.main);
-		this.UI.addUIElements([TowerCubeMVPUI.properties]);
+		console.log(TowerCubeMVP.UI);
+		console.log(TowerCubeMVP.UI.getProperties());
+		this.UI.addTowerUI([TowerCubeMVP.UI.getProperties()]);
 		this.UI.attach();
 
 		// Create a raycast watcher

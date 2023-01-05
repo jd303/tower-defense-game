@@ -15,7 +15,7 @@ export class InteractionManager {
 	raycaster: THREE.Raycaster;
 	clickWatcher: any;
 	raycasterSubjects: (Prop | Creep | Tower | Terrain)[] = [];
-	clickHandlers: Set<Function> = new Set();
+	clickHandlers: ClickHandler[] = [];
 
 	/**
 	 * System Properties
@@ -53,17 +53,21 @@ export class InteractionManager {
 	 * Adds a click handler.
 	 * The click handler will resolve if the returned target is appropriate and act.
 	 * */
-	addClickHandler(newClickHandler: Function) {
-		if (!this.clickHandlers.has(newClickHandler)) {
-			this.clickHandlers.add(newClickHandler);
+	addClickHandler(onClick: Function, onComplete: Function) {
+		const clickHandler: ClickHandler = { onClick: onClick, onComplete: onComplete };
+
+		if (!this.clickHandlers.find((ch) => ch.onClick == onClick)) {
+			this.clickHandlers.push(clickHandler);
 		}
 	}
 
 	/**
 	 * Removes a click handler
 	 * */
-	removeClickHandler(removedClickHandler: Function) {
-		this.clickHandlers.delete(removedClickHandler);
+	removeClickHandler(removedOnClick: Function) {
+		console.log('REMOVE ONCLICK');
+		console.log(this);
+		this.clickHandlers = this.clickHandlers.filter((ch) => ch.onClick != removedOnClick);
 	}
 
 	/**
@@ -95,7 +99,11 @@ export class InteractionManager {
 			console.log(intersects[0]);
 			console.log('Intersects');
 
-			this.clickHandlers.forEach((handler) => handler(intersects, this.main));
+			this.clickHandlers.forEach((handler) => {
+				handler.onClick(intersects, this.main);
+
+				if (handler.onComplete) handler.onComplete();
+			});
 		}
 	}
 
@@ -106,4 +114,9 @@ export class InteractionManager {
 		window.removeEventListener('click', this.handleClickEvent.bind(this));
 		this.clickWatcher = null;
 	}
+}
+
+interface ClickHandler {
+	onClick: Function;
+	onComplete: Function;
 }

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { Tower } from './Tower';
+import { Tower, TowerUI } from './Tower';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/Tick';
-import { UIProperties, UITypes } from '../UIProperties';
+import { UITypes } from '../UIProperties';
 import { Projectile, ProjectileTypes } from '../attacks/Projectile';
 
 export class TowerCubeMVP extends Tower {
@@ -10,13 +10,20 @@ export class TowerCubeMVP extends Tower {
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
-	UI: UIProperties = {
-		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Slinger.UI.icon.png',
-		clickCallback: this.placeTower,
-	};
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
 	projectiles: Projectile[] = [];
+
+	/**
+	 * UI Behaviours
+	 * */
+	static UI: TowerUI = new TowerUI({
+		type: UITypes.Tower,
+		icon: 'assets/models/towers/Tower.Slinger.UI.icon.png',
+		placeCallback: (intersects: THREE.Intersection[], main: Main) => {
+			const intersect = intersects[0];
+			main.level.addTower(new TowerCubeMVP(main), intersect.point);
+		},
+	});
 
 	/**
 	 * Stats
@@ -79,18 +86,5 @@ export class TowerCubeMVP extends Tower {
 
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
-	}
-}
-
-export class TowerCubeMVPUI {
-	static properties: UIProperties = {
-		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Slinger.UI.icon.png',
-		clickCallback: TowerCubeMVPUI.placeTower,
-	};
-
-	static placeTower(intersects: THREE.Intersection[], main: Main) {
-		const intersect = intersects[0];
-		main.level.addTower(new TowerCubeMVP(main), intersect.point);
 	}
 }
