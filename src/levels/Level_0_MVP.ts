@@ -52,6 +52,19 @@ const levelDetails = {
 				},
 			],
 		},
+		{
+			id: 3,
+			segments: [
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-50, 0.5, -3), new Vector3(-5, 0.5, -3)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-5, 0.5, -3), new Vector3(-5, 0.5, -40)],
+				},
+			],
+		},
 	],
 	waves: [
 		{
@@ -89,13 +102,46 @@ const levelDetails = {
 		},
 		{
 			id: 2,
-			delayFromLastWave: 7000,
+			delayFromLastWave: 1000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [
 				{
 					id: '1',
 					creeps: [
+						{
+							id: '1',
+							type: 'CreepMVPSquare',
+						},
+						{
+							id: '2',
+							type: 'CreepMVPSquare',
+						},
+						{
+							id: '3',
+							type: 'CreepMVPSquare',
+						},
+					],
+				},
+			],
+		},
+		{
+			id: 3,
+			delayFromLastWave: 1000,
+			pathID: '3',
+			difficulty: 5,
+			creepGroups: [
+				{
+					id: '1',
+					creeps: [
+						{
+							id: '1',
+							type: 'CreepMVPSquare',
+						},
+						{
+							id: '2',
+							type: 'CreepMVPSquare',
+						},
 						{
 							id: '3',
 							type: 'CreepMVPSquare',
@@ -106,6 +152,10 @@ const levelDetails = {
 						},
 						{
 							id: '5',
+							type: 'CreepMVPSquare',
+						},
+						{
+							id: '6',
 							type: 'CreepMVPSquare',
 						},
 					],
