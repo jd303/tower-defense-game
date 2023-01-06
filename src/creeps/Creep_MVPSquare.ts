@@ -83,9 +83,9 @@ export class CreepMVPSquare extends Creep {
 		if (this.states?.hurting?.isHurting) {
 			if (this.states.hurting.hurtStartTime + this.states.hurting.hurtingStateLength < new Date().getTime()) {
 				this.states.hurting.isHurting = false;
-				this.groupStatus.position.x = 0;
+				this.groupModel.position.x = 0;
 			} else {
-				this.groupStatus.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
+				this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
 			}
 		}
 	}

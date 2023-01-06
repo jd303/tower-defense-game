@@ -25,7 +25,12 @@ const main = new Main(canvas, sizes, debugMode);
 });*/
 
 // Create an orthographic camera
-main.createOrthographicMainCamera({
+/*main.createOrthographicMainCamera({
+	near: 0.01,
+	far: 1000,
+	sizes,
+});*/
+main.createPerspectiveMainCamera({
 	near: 0.01,
 	far: 1000,
 	sizes,

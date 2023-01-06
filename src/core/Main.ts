@@ -8,6 +8,7 @@ import { CameraInterface, SizesInterface } from '../data/Interfaces';
 import { GLTFLoadController } from '../Loaders';
 import { InteractionManager } from '../InteractionManager';
 import { Level } from '../levels/Level';
+import { LightingManager } from '../LightingManager';
 
 export class Main {
 	/**
@@ -17,11 +18,12 @@ export class Main {
 	windowSizer: WindowSizer;
 	canvas: HTMLCanvasElement;
 	scene: THREE.Scene;
-	renderer: THREE.Renderer;
+	renderer: THREE.WebGLRenderer;
 	glTFLoader: GLTFLoadController;
 	cameraMain: THREE.PerspectiveCamera | THREE.OrthographicCamera;
 	tick: Tick;
 	interactionManager: InteractionManager;
+	lightingManager: LightingManager;
 
 	levelManager: LevelManager;
 	level: Level;
@@ -36,13 +38,47 @@ export class Main {
 		this.sizes = sizes;
 		this.tick = new Tick();
 		this.scene = new THREE.Scene();
-		this.renderer = new THREE.WebGLRenderer({ canvas: canvas });
+		this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 		this.glTFLoader = new GLTFLoadController();
 		this.levelManager = new LevelManager(this);
 		this.debugFeatures = new DebugFeatures(debugMode, this.tick);
 		this.interactionManager = new InteractionManager(this);
+		this.lightingManager = new LightingManager(this);
 
 		this.setupMainTick();
+
+		// DEBUG THINGS
+		const mat = new THREE.MeshStandardMaterial();
+		mat.roughness = 0.7;
+		mat.color.set('#888888');
+		const sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere.position.y = 5;
+		sphere.position.z = 2;
+		sphere.castShadow = true;
+		this.scene.add(sphere);
+
+		const sphere2 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere2.scale.set(2, 2, 2);
+		sphere2.position.y = 2;
+		sphere2.position.x = 4;
+		sphere2.castShadow = true;
+		sphere2.receiveShadow = true;
+		this.scene.add(sphere2);
+
+		const sphere3 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere3.scale.set(4, 4, 4);
+		sphere3.position.y = 5;
+		sphere3.position.x = 15;
+		sphere3.castShadow = true;
+		sphere3.receiveShadow = true;
+		this.scene.add(sphere3);
+
+		const plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 50), mat);
+		plane.rotation.x = Math.PI * -0.5;
+		plane.position.y = 0.1;
+		plane.receiveShadow = true;
+		this.scene.add(plane);
+		// END DEBUG THINGS
 
 		return this;
 	}

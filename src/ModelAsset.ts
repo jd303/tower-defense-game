@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Group, Scene } from 'three';
 import { Main } from './core/Main';
 
 export class ModelAsset {
@@ -37,7 +38,7 @@ export class ModelAsset {
 	 * The assets loaded properly
 	 * */
 	loadComplete(gltfAsset: any) {
-		this.groupModel.add(gltfAsset.scene);
+		this.groupModel.add(...gltfAsset.scene.children);
 	}
 
 	/**
@@ -50,5 +51,19 @@ export class ModelAsset {
 	 * */
 	loadError(err: any) {
 		console.log('ERR', err);
+	}
+
+	/**
+	 * Enabled shadows on the model
+	 * */
+	enableShadows(cast: boolean = true, receive: boolean = false) {
+		this.groupModel.children.forEach((child: any) => {
+			if (child.isMesh) {
+				console.log(child);
+				if (cast) child.castShadow = true;
+				if (receive) child.receiveShadow = true;
+				child.material.needsUpdate = true;
+			}
+		});
 	}
 }

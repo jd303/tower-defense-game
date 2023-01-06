@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { PathTypes } from '../data/PathInterfaces';
 import { Main } from '../core/Main';
 import { OrbitController } from '../core/OrbitController';
 import { Level } from './Level';
@@ -12,158 +11,7 @@ import { Mountain_Type1 } from '../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
 import { TowerCubeMVP } from '../towers/Tower_CubeMVP';
 
-const levelDetails = {
-	paths: [
-		{
-			id: 1,
-			segments: [
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(-10, 0.5, 40), new Vector3(-10, 0.5, 20)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(-10, 0.5, 20), new Vector3(5, 0.5, 20)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 20), new Vector3(5, 0.5, 10)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 10), new Vector3(5, 0.5, -40)],
-				},
-			],
-		},
-		{
-			id: 2,
-			segments: [
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 40), new Vector3(5, 0.5, 20)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 20), new Vector3(5, 0.5, 10)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 10), new Vector3(5, 0.5, -40)],
-				},
-			],
-		},
-		{
-			id: 3,
-			segments: [
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(-50, 0.5, -3), new Vector3(-5, 0.5, -3)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(-5, 0.5, -3), new Vector3(-5, 0.5, -40)],
-				},
-			],
-		},
-	],
-	waves: [
-		{
-			id: 1,
-			delayFromLastWave: 0,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '2',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '3',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '4',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '5',
-							type: 'CreepMVPSquare',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 2,
-			delayFromLastWave: 1000,
-			pathID: '2',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '2',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '3',
-							type: 'CreepMVPSquare',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 3,
-			delayFromLastWave: 1000,
-			pathID: '3',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '2',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '3',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '4',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '5',
-							type: 'CreepMVPSquare',
-						},
-						{
-							id: '6',
-							type: 'CreepMVPSquare',
-						},
-					],
-				},
-			],
-		},
-	],
-};
+import { levelDetails } from './Level_0_MVP_JSON';
 
 export class Level0MVP extends Level {
 	/**
@@ -186,11 +34,14 @@ export class Level0MVP extends Level {
 	constructor(main: Main) {
 		super(main);
 
+		console.log('TODO:: Convert Creep to ModelAsset');
+
 		// Set the camera
 		main.cameraMain.position.y = 25;
+		//main.cameraMain.position.z = 50; // Angled
 		main.cameraMain.position.z = 50;
 		//main.cameraMain.zoom = 20;
-		//main.cameraMain.lookAt(new THREE.Vector3(0, 0, 0));
+		main.cameraMain.lookAt(new THREE.Vector3(0, 0, 0));
 
 		// Setup OrbitControls
 		this.orbitController = new OrbitController(main.cameraMain, main.canvas);
@@ -244,7 +95,10 @@ export class Level0MVP extends Level {
 			positionPick.z += rando2;
 
 			tree.groupMain.rotation.y = Math.PI * Math.random();
-			tree.groupMain.rotation.x = Math.PI * -0.07; // Fake an Orgthographic look
+			//tree.groupMain.rotation.x = Math.PI * -0.07; // Fake an Orthographic look
+			//tree.groupMain.rotation.x = Math.PI * -0.35;
+
+			tree.groupMain.traverse((child) => (child.castShadow = true));
 
 			this.addProp(tree, positionPick);
 
@@ -263,14 +117,18 @@ export class Level0MVP extends Level {
 		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
-		const ambientLight = new THREE.AmbientLight('white', 1.2);
+		const ambientLight = this.main.lightingManager.addAmbientLight();
+		const directionalLight = this.main.lightingManager.addDirectionalLight(true);
+		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'x', 'Directional Light X');
+		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'y', 'Directional Light Y');
+		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'z', 'Directional Light Z');
+
+		/*const ambientLight = new THREE.AmbientLight('white', 0.1);
 		this.main.scene.add(ambientLight);
-		const directionalLight = new THREE.DirectionalLight('white', 1);
+		const directionalLight = new THREE.DirectionalLight('white', 1.25);
 		directionalLight.position.z = 30;
 		directionalLight.position.y = 20;
-		this.main.scene.add(directionalLight);
-		/*const helper = new THREE.DirectionalLightHelper(directionalLight, 5);
-		this.main.scene.add(helper);*/
+		this.main.scene.add(directionalLight);*/
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		this.UI = new UI(this.main);
@@ -292,6 +150,25 @@ export class Level0MVP extends Level {
 				main.addTower(newTower);
 			}
 		});*/
+
+		// Enable shadows
+		setTimeout(() => {
+			//this.main.renderer.physicallyCorrectLights = true;
+			//this.main.renderer.outputEncoding = THREE.sRGBEncoding;
+			this.main.renderer.shadowMap.enabled = true;
+			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			this.props.forEach((prop) => prop.enableShadows(true, false));
+			this.towers.forEach((tower) => tower.enableShadows(true, true));
+			this.creeps.forEach((creep) => creep.enableShadows(true, true));
+
+			this.terrain.enableShadows(false, true);
+
+			this.main.lightingManager.addShadowsToLight(directionalLight);
+
+			console.log(this.terrain);
+			console.log(directionalLight);
+		}, 1000);
 	}
 }
 

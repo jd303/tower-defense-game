@@ -15,7 +15,7 @@ export class Creep {
 	 * */
 	groupMain: THREE.Group; // Outermost group - transforms the whole model
 	groupTransforms: THREE.Group; // Inner group - applies minor transformations
-	groupStatus: THREE.Group; // Innermost group - applies status transforms
+	groupModel: THREE.Group; // Innermost group - applies status transforms
 	mesh: THREE.Mesh;
 
 	/**
@@ -49,8 +49,8 @@ export class Creep {
 		this.main = main;
 		this.groupMain = new THREE.Group();
 		this.groupTransforms = new THREE.Group();
-		this.groupStatus = new THREE.Group();
-		this.groupTransforms.add(this.groupStatus);
+		this.groupModel = new THREE.Group();
+		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
 	}
 
@@ -58,7 +58,7 @@ export class Creep {
 	 * Creates and groups the Three objects
 	 * */
 	createCreep(mesh: THREE.Mesh) {
-		this.groupStatus.add(mesh);
+		this.groupModel.add(mesh);
 		this.main.scene.add(this.groupMain);
 	}
 
@@ -95,7 +95,7 @@ export class Creep {
 		healthBarGroup.add(bgMesh);
 		healthBarGroup.add(fgMesh);
 		healthBarGroup.position.y = 1;
-		this.groupStatus.add(healthBarGroup);
+		this.groupModel.add(healthBarGroup);
 
 		this.updateHealthBar();
 	}
@@ -104,7 +104,7 @@ export class Creep {
 	 * Updates the health bar
 	 * */
 	updateHealthBar() {
-		const healthBar = this.groupStatus.getObjectByName(this.healthBarName);
+		const healthBar = this.groupModel.getObjectByName(this.healthBarName);
 		healthBar!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
 		healthBar!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
 	}
@@ -127,5 +127,20 @@ export class Creep {
 		} else {
 			this.updateHealthBar();
 		}
+	}
+
+	/**
+	 * Enabled Shadows
+	 * */
+	enableShadows(cast: boolean = true, receive: boolean = false) {
+		// THis should be replaced when moving to ModelAsset
+		this.groupModel.children.forEach((child: any) => {
+			if (child.isMesh) {
+				console.log(child);
+				if (cast) child.castShadow = true;
+				if (receive) child.receiveShadow = true;
+				child.material.needsUpdate = true;
+			}
+		});
 	}
 }
