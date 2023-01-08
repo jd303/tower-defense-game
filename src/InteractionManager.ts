@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from './core/Main';
+import { OrbitController } from './core/OrbitController';
 import { Creep } from './creeps/Creep';
 import { Prop } from './environment/Prop';
 import { Terrain } from './environment/Terrain';
@@ -16,6 +17,7 @@ export class InteractionManager {
 	clickWatcher: any;
 	raycasterSubjects: (Prop | Creep | Tower | Terrain)[] = [];
 	clickHandlers: ClickHandler[] = [];
+	orbitController: OrbitController;
 
 	/**
 	 * System Properties
@@ -91,7 +93,7 @@ export class InteractionManager {
 		}
 
 		// Set the raycaster
-		this.raycaster.setFromCamera(position, this.main.cameraMain);
+		this.raycaster.setFromCamera(position, this.main.cameraManager.mainCamera.threeCamera);
 		const intersects = this.raycaster.intersectObjects(this.raycasterSubjects.map((subject) => subject.groupMain));
 
 		// If we have intersected
@@ -113,6 +115,28 @@ export class InteractionManager {
 	removeClickWatcher() {
 		window.removeEventListener('click', this.handleClickEvent.bind(this));
 		this.clickWatcher = null;
+	}
+
+	/**
+	 * Sets up orbit handling
+	 * */
+	setupOrbitControls() {
+		this.orbitController = new OrbitController(this.main.cameraManager.mainCamera.threeCamera, this.main.canvas);
+		this.orbitController.controls.enableRotate = false;
+		this.main.tick.registerCallback(() => {
+			this.orbitController.controls.update();
+		}, false);
+		var minPan = new THREE.Vector3(-1, -1, -1);
+		var maxPan = new THREE.Vector3(1, 1, 1);
+		this.orbitController.controls.target = new Vector3(0, 0, 0);
+		this.orbitController.controls.target.clamp(minPan, maxPan);
+	}
+
+	/**
+	 * Deletes and orbit controller
+	 * */
+	removeOrbitControls() {
+		this.orbitController.controls.dispose();
 	}
 }
 

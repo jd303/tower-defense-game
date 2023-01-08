@@ -67,23 +67,23 @@ export const levelDetails = {
 					creeps: [
 						{
 							id: '1',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '2',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '3',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '4',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '5',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 					],
 				},
@@ -100,15 +100,15 @@ export const levelDetails = {
 					creeps: [
 						{
 							id: '1',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '2',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '3',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 					],
 				},
@@ -125,27 +125,27 @@ export const levelDetails = {
 					creeps: [
 						{
 							id: '1',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '2',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '3',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '4',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '5',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 						{
 							id: '6',
-							type: 'CreepMVPSquare',
+							type: 'CreepMVPMonster',
 						},
 					],
 				},

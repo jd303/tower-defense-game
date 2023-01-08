@@ -50,8 +50,6 @@ export class LightingManager {
 		this.lights.push(directionalLight);
 		this.main.scene.add(threeLight);
 
-		//main.cameraMain.lookAt(new THREE.Vector3(0, 0, 0));
-
 		if (main) directionalLight.isMain = true;
 		return directionalLight;
 	}
@@ -75,7 +73,6 @@ export class LightingManager {
 	 * Makes a light cast shadows
 	 * */
 	addShadowsToLight(light: Light) {
-		console.log('TEST', light.threeLight.shadow.camera);
 		light.threeLight.castShadow = true;
 		light.threeLight.shadow.mapSize.width = 1024;
 		light.threeLight.shadow.mapSize.height = 1024;

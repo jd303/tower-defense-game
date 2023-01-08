@@ -27,6 +27,9 @@ export class WaveManager {
 		this.startWaveTimer();
 	}
 
+	/**
+	 * Prepare the assets and requireemnts of the wave
+	 * */
 	prepareWaveDefinitions(waveDefinitions: WaveDefinition[]) {
 		let waves: Wave[] = [];
 

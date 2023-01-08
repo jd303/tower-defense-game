@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from '../core/Main';
-import { OrbitController } from '../core/OrbitController';
 import { Level } from './Level';
 import { LevelPath } from '../LevelPath';
 import { TreeCone1 } from '../environment/nature/TreeCone1';
@@ -17,7 +16,6 @@ export class Level0MVP extends Level {
 	/**
 	 * System Properties
 	 * */
-	orbitController: OrbitController;
 	main: Main;
 	UI: UI;
 
@@ -36,23 +34,8 @@ export class Level0MVP extends Level {
 
 		console.log('TODO:: Convert Creep to ModelAsset');
 
-		// Set the camera
-		main.cameraMain.position.y = 25;
-		//main.cameraMain.position.z = 50; // Angled
-		main.cameraMain.position.z = 50;
-		//main.cameraMain.zoom = 20;
-		main.cameraMain.lookAt(new THREE.Vector3(0, 0, 0));
-
 		// Setup OrbitControls
-		this.orbitController = new OrbitController(main.cameraMain, main.canvas);
-		this.orbitController.controls.enableRotate = false;
-		main.tick.registerCallback(() => {
-			this.orbitController.controls.update();
-		}, false);
-		var minPan = new THREE.Vector3(-1, -1, -1);
-		var maxPan = new THREE.Vector3(1, 1, 1);
-		this.orbitController.controls.target = new Vector3(0, 0, 0);
-		this.orbitController.controls.target.clamp(minPan, maxPan);
+		this.main.interactionManager.setupOrbitControls();
 
 		// Create the environment
 		const terrain = new LevelTerrain(main);
@@ -69,10 +52,10 @@ export class Level0MVP extends Level {
 		this.waveManager = new WaveManager(levelDetails.waves, this);
 
 		// Create 2 tree groups
-		const position1 = { x: -25, z: -25 };
-		const position2 = { x: 25, z: -25 };
-		const position3 = { x: 30, z: 15 };
-		const position4 = { x: -30, z: 25 };
+		const position1 = { x: -35, z: -40 };
+		const position2 = { x: 45, z: -25 };
+		const position3 = { x: 45, z: 15 };
+		const position4 = { x: -35, z: 30 };
 		for (let i = 0; i < 200; i++) {
 			const tree = new TreeCone1(main);
 
@@ -108,20 +91,20 @@ export class Level0MVP extends Level {
 
 		// Create Mountains
 		const mountain1 = new Mountain_Type1(main);
-		this.addProp(mountain1, new Vector3(50, 0, -30));
+		this.addProp(mountain1, new Vector3(40, 0, -60));
 		mountain1.groupMain.rotation.y = Math.PI * 0.75;
 		mountain1.groupMain.scale.set(3, 3, 3);
 		const mountain2 = new Mountain_Type1(main);
-		this.addProp(mountain2, new Vector3(-50, 0, -10));
+		this.addProp(mountain2, new Vector3(-60, 0, -25));
 		mountain2.groupMain.rotation.y = Math.PI * -0.5;
 		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
 		const ambientLight = this.main.lightingManager.addAmbientLight();
 		const directionalLight = this.main.lightingManager.addDirectionalLight(true);
-		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'x', 'Directional Light X');
-		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'y', 'Directional Light Y');
-		this.main.debugFeatures.addGUIDebugProperty(directionalLight.threeLight.position, 'z', 'Directional Light Z');
+		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'x', -50, 50, 0.001, 'Directional Light X');
+		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'y', -50, 50, 0.001, 'Directional Light Y');
+		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'z', -50, 50, 0.001, 'Directional Light Z');
 
 		/*const ambientLight = new THREE.AmbientLight('white', 0.1);
 		this.main.scene.add(ambientLight);
@@ -168,7 +151,42 @@ export class Level0MVP extends Level {
 
 			console.log(this.terrain);
 			console.log(directionalLight);
-		}, 1000);
+		}, 2500);
+
+		/**
+		 * DEBUG THINGS
+		 * */
+		/*const mat = new THREE.MeshStandardMaterial();
+		mat.roughness = 0.7;
+		mat.color.set('#888888');
+		const sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere.position.y = 5;
+		sphere.position.z = 2;
+		sphere.castShadow = true;
+		this.scene.add(sphere);
+
+		const sphere2 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere2.scale.set(2, 2, 2);
+		sphere2.position.y = 2;
+		sphere2.position.x = 4;
+		sphere2.castShadow = true;
+		sphere2.receiveShadow = true;
+		this.scene.add(sphere2);
+
+		const sphere3 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere3.scale.set(4, 4, 4);
+		sphere3.position.y = 5;
+		sphere3.position.x = 15;
+		sphere3.castShadow = true;
+		sphere3.receiveShadow = true;
+		this.scene.add(sphere3);
+
+		const plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 50), mat);
+		plane.rotation.x = Math.PI * -0.5;
+		plane.position.y = 0.1;
+		plane.receiveShadow = true;
+		this.scene.add(plane);
+		// END DEBUG THINGS*/
 	}
 }
 

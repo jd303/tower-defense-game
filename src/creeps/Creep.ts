@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/Tick';
 import { LevelPathDefinition } from '../data/PathInterfaces';
+import { ModelAsset } from '../ModelAsset';
 import { CreepStates, CreepStats } from './CreepStats';
 
-export class Creep {
+export class Creep extends ModelAsset {
 	/**
 	 * Stats
 	 * */
@@ -46,7 +47,8 @@ export class Creep {
 	 * Construtor
 	 * */
 	constructor(main: Main) {
-		this.main = main;
+		super(main);
+		//this.main = main;
 		this.groupMain = new THREE.Group();
 		this.groupTransforms = new THREE.Group();
 		this.groupModel = new THREE.Group();

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Group, Scene } from 'three';
 import { Main } from './core/Main';
 
 export class ModelAsset {
@@ -7,6 +6,7 @@ export class ModelAsset {
 	 * Setup Properties
 	 * */
 	assetPath: string;
+	assetScale: number = 1; // default
 
 	/**
 	 * System Properties
@@ -23,6 +23,9 @@ export class ModelAsset {
 	groupTransforms: THREE.Group; // Inner group - applies minor transformations
 	groupModel: THREE.Group; // Innermost group - applies status transforms
 
+	/**
+	 * Constructor
+	 * */
 	constructor(main: Main) {
 		this.main = main;
 	}
@@ -38,6 +41,7 @@ export class ModelAsset {
 	 * The assets loaded properly
 	 * */
 	loadComplete(gltfAsset: any) {
+		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
 		this.groupModel.add(...gltfAsset.scene.children);
 	}
 
@@ -59,9 +63,8 @@ export class ModelAsset {
 	enableShadows(cast: boolean = true, receive: boolean = false) {
 		this.groupModel.children.forEach((child: any) => {
 			if (child.isMesh) {
-				console.log(child);
-				if (cast) child.castShadow = true;
-				if (receive) child.receiveShadow = true;
+				child.castShadow = cast;
+				child.receiveShadow = receive;
 				child.material.needsUpdate = true;
 			}
 		});
