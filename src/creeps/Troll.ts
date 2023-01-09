@@ -1,12 +1,16 @@
-import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/Tick';
-import { LevelPathDefinition } from '../data/PathInterfaces';
 import { Creep } from './Creep';
-import { CreepStates, CreepStats } from './CreepStats';
+import { CreepStats } from './CreepStats';
 
-export class CreepMVPSquare extends Creep {
+export class Troll extends Creep {
+	/**
+	 * Main
+	 * */
+	assetPath: string = 'assets/models/creeps/creep_troll.glb';
+	assetScale: number = 0.007;
+
 	/**
 	 * Stats
 	 * */
@@ -22,20 +26,7 @@ export class CreepMVPSquare extends Creep {
 			fire: 0,
 		},
 	});
-
-	/**
-	 * Three Assets
-	 * */
-	geometry: any;
-	material: any;
-	mesh: THREE.Mesh;
-
-	/**
-	 * Status
-	 * */
-	states: CreepStates;
-	path: LevelPathDefinition;
-	pathProgress: number = 0;
+	healthBarY: 2;
 
 	/**
 	 * Constructor
@@ -43,9 +34,7 @@ export class CreepMVPSquare extends Creep {
 	constructor(main: Main) {
 		super(main);
 
-		this.geometry = new THREE.BoxGeometry(1, 1, 1);
-		this.material = new THREE.MeshMatcapMaterial({ color: '#fff' });
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
+		this.loadModel();
 
 		// Set Creep States
 		this.states = {

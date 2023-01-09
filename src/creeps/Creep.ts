@@ -37,11 +37,13 @@ export class Creep extends ModelAsset {
 	states: CreepStates;
 
 	/**
-	 * Prefabs
+	 * Health bar
 	 * */
 	healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
 	healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
+	healthBarGroupName: string = 'healthbargroup';
 	healthBarName: string = 'healthbar';
+	healthBarY: number = 1;
 
 	/**
 	 * Construtor
@@ -94,10 +96,12 @@ export class Creep extends ModelAsset {
 		const bgMesh = new THREE.Mesh(barBG, this.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, this.healthBarFGMaterial);
 		fgMesh.name = this.healthBarName;
+		healthBarGroup.name = this.healthBarGroupName;
 		healthBarGroup.add(bgMesh);
 		healthBarGroup.add(fgMesh);
-		healthBarGroup.position.y = 1;
-		this.groupModel.add(healthBarGroup);
+		healthBarGroup.position.y = this.healthBarY;
+		healthBarGroup.position.z = 1;
+		this.groupTransforms.add(healthBarGroup);
 
 		this.updateHealthBar();
 	}
@@ -106,9 +110,12 @@ export class Creep extends ModelAsset {
 	 * Updates the health bar
 	 * */
 	updateHealthBar() {
-		const healthBar = this.groupModel.getObjectByName(this.healthBarName);
-		healthBar!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
-		healthBar!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
+		console.log('UPDATE HEALTH BAR', this.groupTransforms);
+		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
+		const healthBar = healthBarGroup?.getObjectByName(this.healthBarName);
+		console.log('HB', healthBar);
+		healthBarGroup!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
+		healthBarGroup!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
 	}
 
 	/**

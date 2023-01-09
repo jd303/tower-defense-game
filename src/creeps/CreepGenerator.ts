@@ -1,6 +1,6 @@
 import { Main } from '../core/Main';
-import { CreepMVPMonster } from './Creep_MVPMonster';
-import { CreepMVPSquare } from './Creep_MVPSquare';
+import { Troll } from './Troll';
+import { TrollDink } from './TrollDink';
 
 export class CreepGenerator {
 	/**
@@ -8,12 +8,12 @@ export class CreepGenerator {
 	 * */
 	static createCreep(creepDefinition: any, main: Main) {
 		switch (creepDefinition.type) {
-			case 'CreepMVPSquare':
-				return new CreepMVPSquare(main);
-			case 'CreepMVPMonster':
-				return new CreepMVPMonster(main);
+			// Fantasy
+			case 'Troll':
+				return new Troll(main);
+			case 'TrollDink':
 			default:
-				return new CreepMVPSquare(main);
+				return new TrollDink(main);
 		}
 	}
 }

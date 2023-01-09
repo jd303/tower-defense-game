@@ -29,7 +29,7 @@ export class TowerCubeMVP extends Tower {
 	 * Stats
 	 * */
 	damage = 3;
-	range = 6;
+	range = 10;
 	last_attack_time = 0;
 	attack_cooldown = 800;
 

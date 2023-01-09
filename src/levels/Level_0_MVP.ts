@@ -52,10 +52,10 @@ export class Level0MVP extends Level {
 		this.waveManager = new WaveManager(levelDetails.waves, this);
 
 		// Create 2 tree groups
-		const position1 = { x: -35, z: -40 };
-		const position2 = { x: 45, z: -25 };
-		const position3 = { x: 45, z: 15 };
-		const position4 = { x: -35, z: 30 };
+		const position1 = { x: -60, z: -10 };
+		const position2 = { x: 25, z: -25 };
+		const position3 = { x: 30, z: 55 };
+		const position4 = { x: -5, z: 15 };
 		for (let i = 0; i < 200; i++) {
 			const tree = new TreeCone1(main);
 
@@ -91,11 +91,11 @@ export class Level0MVP extends Level {
 
 		// Create Mountains
 		const mountain1 = new Mountain_Type1(main);
-		this.addProp(mountain1, new Vector3(40, 0, -60));
+		this.addProp(mountain1, new Vector3(50, 0, -60));
 		mountain1.groupMain.rotation.y = Math.PI * 0.75;
 		mountain1.groupMain.scale.set(3, 3, 3);
 		const mountain2 = new Mountain_Type1(main);
-		this.addProp(mountain2, new Vector3(-60, 0, -25));
+		this.addProp(mountain2, new Vector3(-80, 0, 0));
 		mountain2.groupMain.rotation.y = Math.PI * -0.5;
 		mountain2.groupMain.scale.set(2, 2, 2);
 

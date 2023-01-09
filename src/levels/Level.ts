@@ -45,7 +45,7 @@ export class Level {
 	 * Removes a creep from the level
 	 * */
 	removeCreep(removedCreep: Creep) {
-		this.creeps = this.creeps.filter((creep) => creep.mesh.uuid !== removedCreep.mesh.uuid);
+		this.creeps = this.creeps.filter((creep) => creep !== removedCreep);
 		this.main.scene.remove(removedCreep.groupMain);
 	}
 

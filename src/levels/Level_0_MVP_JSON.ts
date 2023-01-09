@@ -8,41 +8,36 @@ export const levelDetails = {
 			segments: [
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(-10, 0.5, 40), new Vector3(-10, 0.5, 20)],
+					points: [new Vector3(3, 0.5, 90), new Vector3(3, 0.5, 40)],
 				},
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(-10, 0.5, 20), new Vector3(5, 0.5, 20)],
+					points: [new Vector3(3, 0.5, 40), new Vector3(28, 0.5, 15)],
 				},
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 20), new Vector3(5, 0.5, 10)],
+					points: [new Vector3(28, 0.5, 15), new Vector3(28, 0.5, 0)],
 				},
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 10), new Vector3(5, 0.5, -40)],
+					points: [new Vector3(28, 0.5, 0), new Vector3(-30, 0.5, -10)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-30, 0.5, -10), new Vector3(-30, 0.5, -30)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-30, 0.5, -30), new Vector3(22, 0.5, -48)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(22, 0.5, -48), new Vector3(22, 0.5, -90)],
 				},
 			],
 		},
 		{
 			id: 2,
-			segments: [
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 40), new Vector3(5, 0.5, 20)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 20), new Vector3(5, 0.5, 10)],
-				},
-				{
-					type: PathTypes.straight,
-					points: [new Vector3(5, 0.5, 10), new Vector3(5, 0.5, -40)],
-				},
-			],
-		},
-		{
-			id: 3,
 			segments: [
 				{
 					type: PathTypes.straight,
@@ -67,23 +62,23 @@ export const levelDetails = {
 					creeps: [
 						{
 							id: '1',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '2',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '3',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '4',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '5',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 					],
 				},
@@ -91,7 +86,32 @@ export const levelDetails = {
 		},
 		{
 			id: 2,
-			delayFromLastWave: 1000,
+			delayFromLastWave: 2000,
+			pathID: '1',
+			difficulty: 5,
+			creepGroups: [
+				{
+					id: '1',
+					creeps: [
+						{
+							id: '1',
+							type: 'TrollDink',
+						},
+						{
+							id: '2',
+							type: 'TrollDink',
+						},
+						{
+							id: '3',
+							type: 'Troll',
+						},
+					],
+				},
+			],
+		},
+		{
+			id: 3,
+			delayFromLastWave: 3000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [
@@ -100,52 +120,27 @@ export const levelDetails = {
 					creeps: [
 						{
 							id: '1',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '2',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '3',
-							type: 'CreepMVPMonster',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 3,
-			delayFromLastWave: 1000,
-			pathID: '3',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'CreepMVPMonster',
-						},
-						{
-							id: '2',
-							type: 'CreepMVPMonster',
-						},
-						{
-							id: '3',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '4',
-							type: 'CreepMVPMonster',
+							type: 'TrollDink',
 						},
 						{
 							id: '5',
-							type: 'CreepMVPMonster',
+							type: 'Troll',
 						},
 						{
 							id: '6',
-							type: 'CreepMVPMonster',
+							type: 'Troll',
 						},
 					],
 				},

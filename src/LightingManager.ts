@@ -23,7 +23,7 @@ export class LightingManager {
 	/**
 	 * Adds an ambient light
 	 * */
-	addAmbientLight(main: boolean = false, color: string = '#ffffff', intensity: number = 0.1) {
+	addAmbientLight(main: boolean = false, color: string = '#ffffff', intensity: number = 0.5) {
 		const ambientLight = new Light();
 		const threeLight = new THREE.AmbientLight(color, intensity);
 		ambientLight.threeLight = threeLight;

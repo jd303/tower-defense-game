@@ -49,7 +49,7 @@ export class Main {
 
 		// Create a default camera during initial developemnt
 		this.cameraManager.createPerspectiveCamera(true);
-		this.cameraManager.createOrthographicCamera(true);
+		this.cameraManager.createOrthographicCamera(false);
 		const cameraDebug = {
 			changeMain: this.cameraManager.switchCameras.bind(this.cameraManager),
 		};

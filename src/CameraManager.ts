@@ -17,9 +17,15 @@ export class CameraManager {
 	 * Defaults
 	 * */
 	perspectiveCameraDefaults = {
-		fov: 50,
+		/*fov: 50,
 		near: 0.1,
 		far: 250,
+		x: 0,
+		y: 40,
+		z: 50,*/
+		fov: 25,
+		near: 0.1,
+		far: 350,
 		x: 0,
 		y: 40,
 		z: 50,
@@ -29,7 +35,8 @@ export class CameraManager {
 		far: 1000,
 		x: 0,
 		y: 40,
-		z: 75,
+		//z: 75, // Angled
+		z: 0, // Top down
 	};
 
 	/**
