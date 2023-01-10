@@ -74,8 +74,8 @@ export class LightingManager {
 	 * */
 	addShadowsToLight(light: Light) {
 		light.threeLight.castShadow = true;
-		light.threeLight.shadow.mapSize.width = 1024;
-		light.threeLight.shadow.mapSize.height = 1024;
+		light.threeLight.shadow.mapSize.width = 4096;
+		light.threeLight.shadow.mapSize.height = 4096;
 		(light.threeLight.shadow.camera as any).left = 200;
 		(light.threeLight.shadow.camera as any).right = -200;
 		(light.threeLight.shadow.camera as any).bottom = -200;

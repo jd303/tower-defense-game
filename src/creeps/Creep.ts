@@ -90,8 +90,8 @@ export class Creep extends ModelAsset {
 	 * Creates a health bar for this creep
 	 * */
 	createHealthBar() {
-		const barBG = new THREE.PlaneBufferGeometry(1, 0.1);
-		const barFG = new THREE.PlaneBufferGeometry(1, 0.1);
+		const barBG = new THREE.PlaneBufferGeometry(1, 0.25);
+		const barFG = new THREE.PlaneBufferGeometry(1, 0.25);
 		const healthBarGroup = new THREE.Group();
 		const bgMesh = new THREE.Mesh(barBG, this.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, this.healthBarFGMaterial);

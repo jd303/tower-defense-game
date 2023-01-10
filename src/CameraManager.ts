@@ -26,6 +26,7 @@ export class CameraManager {
 		fov: 25,
 		near: 0.1,
 		far: 350,
+		zoom: 0.5,
 		x: 0,
 		y: 40,
 		z: 50,
@@ -33,10 +34,11 @@ export class CameraManager {
 	orthographicCameraDefaults = {
 		near: 0.01,
 		far: 1000,
+		zoom: 0.6,
 		x: 0,
 		y: 40,
-		//z: 75, // Angled
-		z: 0, // Top down
+		z: 75, // Angled
+		//z: 0, // Top down
 	};
 
 	/**
@@ -62,9 +64,8 @@ export class CameraManager {
 			settings.far
 		);
 
-		console.log(settings);
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
-		//camera.threeCamera.position.y = 100;
+		camera.threeCamera.zoom = settings.zoom;
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
@@ -81,6 +82,7 @@ export class CameraManager {
 		camera.threeCamera = new THREE.PerspectiveCamera(settings.fov, this.main.sizes.width / this.main.sizes.height, settings.near, settings.far);
 
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
+		camera.threeCamera.zoom = settings.zoom;
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
@@ -115,6 +117,12 @@ export class CameraManager {
 			if (cam.threeCamera instanceof THREE.PerspectiveCamera) {
 				cam.threeCamera.aspect = this.main.sizes.width / this.main.sizes.height;
 				cam.threeCamera.updateProjectionMatrix();
+			} else if (cam.threeCamera instanceof THREE.OrthographicCamera) {
+				(cam.threeCamera.left = (0.04 * this.main.sizes.width) / -2),
+					(cam.threeCamera.right = (0.04 * this.main.sizes.width) / 2),
+					(cam.threeCamera.top = (0.04 * this.main.sizes.height) / 2),
+					(cam.threeCamera.bottom = (0.04 * this.main.sizes.height) / -2),
+					cam.threeCamera.updateProjectionMatrix();
 			}
 		});
 	}

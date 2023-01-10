@@ -79,7 +79,7 @@ export class Level0MVP extends Level {
 
 			tree.groupMain.rotation.y = Math.PI * Math.random();
 			//tree.groupMain.rotation.x = Math.PI * -0.07; // Fake an Orthographic look
-			//tree.groupMain.rotation.x = Math.PI * -0.35;
+			//tree.groupMain.rotation.x = Math.PI * -0.35; // Fake an Orthographic look
 
 			tree.groupMain.traverse((child) => (child.castShadow = true));
 
@@ -93,15 +93,19 @@ export class Level0MVP extends Level {
 		const mountain1 = new Mountain_Type1(main);
 		this.addProp(mountain1, new Vector3(50, 0, -60));
 		mountain1.groupMain.rotation.y = Math.PI * 0.75;
+		//mountain1.groupMain.rotation.x = Math.PI * -0.35; // Fake look on orthographic, but it doesn't quite work
+		mountain1.groupMain.position.y = -2;
 		mountain1.groupMain.scale.set(3, 3, 3);
 		const mountain2 = new Mountain_Type1(main);
 		this.addProp(mountain2, new Vector3(-80, 0, 0));
 		mountain2.groupMain.rotation.y = Math.PI * -0.5;
+		//mountain2.groupMain.rotation.x = Math.PI * -0.35;  // Fake look on orthographic, but it doesn't quite work
 		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
 		const ambientLight = this.main.lightingManager.addAmbientLight();
 		const directionalLight = this.main.lightingManager.addDirectionalLight(true);
+		directionalLight.threeLight.position.x = 20;
 		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'x', -50, 50, 0.001, 'Directional Light X');
 		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'y', -50, 50, 0.001, 'Directional Light Y');
 		this.main.debugFeatures.addDebugNumber(directionalLight.threeLight.position, 'z', -50, 50, 0.001, 'Directional Light Z');

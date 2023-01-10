@@ -41,11 +41,23 @@ export const levelDetails = {
 			segments: [
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(-50, 0.5, -3), new Vector3(-5, 0.5, -3)],
+					points: [new Vector3(-75, 0.5, 25), new Vector3(-50, 0.5, 25)],
 				},
 				{
 					type: PathTypes.straight,
-					points: [new Vector3(-5, 0.5, -3), new Vector3(-5, 0.5, -40)],
+					points: [new Vector3(-50, 0.5, 25), new Vector3(-30, 0.5, 5)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-30, 0.5, 5), new Vector3(-30, 0.5, -30)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(-30, 0.5, -30), new Vector3(22, 0.5, -48)],
+				},
+				{
+					type: PathTypes.straight,
+					points: [new Vector3(22, 0.5, -48), new Vector3(22, 0.5, -90)],
 				},
 			],
 		},
@@ -86,7 +98,7 @@ export const levelDetails = {
 		},
 		{
 			id: 2,
-			delayFromLastWave: 2000,
+			delayFromLastWave: 1000,
 			pathID: '1',
 			difficulty: 5,
 			creepGroups: [
@@ -111,7 +123,7 @@ export const levelDetails = {
 		},
 		{
 			id: 3,
-			delayFromLastWave: 3000,
+			delayFromLastWave: 1000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [
