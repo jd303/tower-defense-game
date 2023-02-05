@@ -103,6 +103,7 @@ export class UI {
 	requestCreateAsset(element: UIProperties, uiOnComplete: Function) {
 		// Start listening to raycasters
 		this.main.interactionManager.addRaycasterSubjects([this.main.level.terrain]);
+		this.main.interactionManager.addRaycasterSubjects(this.main.level.levelPaths);
 
 		if (element.placeCallback) {
 			// Create an oncomplete function
@@ -120,8 +121,8 @@ export class UI {
 	 * Cancels the create request
 	 * */
 	cancelCreateRequest(element: UIProperties) {
-		console.log('CANED');
 		this.main.interactionManager.removeRaycasterSubjects([this.main.level.terrain]);
+		this.main.interactionManager.removeRaycasterSubjects(this.main.level.levelPaths);
 		if (element.placeCallback) this.main.interactionManager.removeClickHandler(element.placeCallback);
 	}
 

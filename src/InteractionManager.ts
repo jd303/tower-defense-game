@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from './core/Main';
-import { OrbitController } from './core/OrbitController';
 import { Creep } from './creeps/Creep';
 import { Prop } from './environment/Prop';
 import { Terrain } from './environment/Terrain';
+import { LevelPath } from './LevelPath';
 import { Tower } from './towers/Tower';
 
 export class InteractionManager {
@@ -15,9 +15,8 @@ export class InteractionManager {
 	mousePosition: THREE.Vector2 = new THREE.Vector2();
 	raycaster: THREE.Raycaster;
 	clickWatcher: any;
-	raycasterSubjects: (Prop | Creep | Tower | Terrain)[] = [];
+	raycasterSubjects: (Prop | Creep | Tower | Terrain | LevelPath)[] = [];
 	clickHandlers: ClickHandler[] = [];
-	orbitController: OrbitController;
 
 	/**
 	 * System Properties
@@ -37,14 +36,15 @@ export class InteractionManager {
 	/**
 	 * Adds clickable raycaster subjects
 	 * */
-	addRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain)[]) {
+	addRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
+		console.log('SUB', subjects);
 		this.raycasterSubjects.push(...subjects);
 	}
 
 	/**
 	 * Adds clickable raycaster subjects
 	 * */
-	removeRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain)[]) {
+	removeRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
 		const subjectsSet = new Set(subjects);
 		this.raycasterSubjects = this.raycasterSubjects.filter((subject) => {
 			return !subjectsSet.has(subject);
@@ -115,28 +115,6 @@ export class InteractionManager {
 	removeClickWatcher() {
 		window.removeEventListener('click', this.handleClickEvent.bind(this));
 		this.clickWatcher = null;
-	}
-
-	/**
-	 * Sets up orbit handling
-	 * */
-	setupOrbitControls() {
-		this.orbitController = new OrbitController(this.main.cameraManager.mainCamera.threeCamera, this.main.canvas);
-		this.orbitController.controls.enableRotate = false;
-		this.main.tick.registerCallback(() => {
-			this.orbitController.controls.update();
-		}, false);
-		var minPan = new THREE.Vector3(-1, -1, -1);
-		var maxPan = new THREE.Vector3(1, 1, 1);
-		this.orbitController.controls.target = new Vector3(0, 0, 0);
-		this.orbitController.controls.target.clamp(minPan, maxPan);
-	}
-
-	/**
-	 * Deletes and orbit controller
-	 * */
-	removeOrbitControls() {
-		this.orbitController.controls.dispose();
 	}
 }
 

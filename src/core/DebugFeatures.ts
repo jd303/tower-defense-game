@@ -1,4 +1,5 @@
 import * as lil from 'lil-gui';
+import { Light } from '../LightingManager';
 import { Tick } from './Tick';
 
 export class DebugFeatures {
@@ -24,13 +25,20 @@ export class DebugFeatures {
 	/**
 	 * Adds a debug number control
 	 * */
-	addDebugNumber(objectParent: any, property: string, min: number, max: number, step: number, name: string | null) {
-		this.lilGUI
-			.add(objectParent, property)
-			.min(min)
-			.max(max)
-			.step(step)
-			.name(name || property);
+	addDebugNumber(args: { folder: any; objectParent: any; property: string; min: number; max: number; step: number; name: string | null }) {
+		let parent;
+		if (args.folder) {
+			parent = args.folder;
+		} else {
+			parent = this.lilGUI;
+		}
+
+		parent
+			.add(args.objectParent, args.property)
+			.min(args.min)
+			.max(args.max)
+			.step(args.step)
+			.name(args.name || args.property);
 	}
 
 	addGUIDebugProperty(objectParent: any, property: string, options: any = null) {
@@ -46,5 +54,49 @@ export class DebugFeatures {
 
 	addGUIDebugFunction(objectParent: any, property: string, callback: Function, name: string | null = null) {
 		this.lilGUI.add(objectParent, property).name(name || property);
+	}
+
+	/**
+	 * Adds typical debugs for lights
+	 * */
+	debugLight(light: Light, label: string) {
+		const folder = this.lilGUI.addFolder(label);
+		folder.open(false);
+		this.addDebugNumber({
+			folder: folder,
+			objectParent: light.threeLight,
+			property: 'intensity',
+			min: 0,
+			max: 5,
+			step: 0.001,
+			name: `${label} Intensity`,
+		});
+		this.addDebugNumber({
+			folder: folder,
+			objectParent: light.threeLight.position,
+			property: 'x',
+			min: -50,
+			max: 50,
+			step: 0.001,
+			name: `${label} x`,
+		});
+		this.addDebugNumber({
+			folder: folder,
+			objectParent: light.threeLight.position,
+			property: 'y',
+			min: -50,
+			max: 50,
+			step: 0.001,
+			name: `${label} y`,
+		});
+		this.addDebugNumber({
+			folder: folder,
+			objectParent: light.threeLight.position,
+			property: 'z',
+			min: -50,
+			max: 50,
+			step: 0.001,
+			name: `${label} z`,
+		});
 	}
 }

@@ -9,7 +9,7 @@ export class TrollDink extends Creep {
 	 * Main
 	 * */
 	assetPath: string = 'assets/models/creeps/creep_troll.glb';
-	assetScale: number = 0.004;
+	assetScale: number = 0.25;
 
 	/**
 	 * Stats
@@ -48,8 +48,6 @@ export class TrollDink extends Creep {
 			},
 			hurt: false,
 		};
-
-		super.createCreep(this.mesh);
 
 		return this;
 	}

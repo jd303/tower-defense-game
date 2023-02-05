@@ -10,6 +10,7 @@ export class TowerCubeMVP extends Tower {
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
+	assetScale = 1.5;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
 	projectiles: Projectile[] = [];
 
@@ -20,6 +21,7 @@ export class TowerCubeMVP extends Tower {
 		type: UITypes.Tower,
 		icon: 'assets/models/towers/Tower.Slinger.UI.icon.png',
 		placeCallback: (intersects: THREE.Intersection[], main: Main) => {
+			if (intersects[0].object.name == 'LevelPath') return;
 			const intersect = intersects[0];
 			main.level.addTower(new TowerCubeMVP(main), intersect.point);
 		},

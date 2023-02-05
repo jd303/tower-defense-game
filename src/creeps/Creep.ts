@@ -50,20 +50,11 @@ export class Creep extends ModelAsset {
 	 * */
 	constructor(main: Main) {
 		super(main);
-		//this.main = main;
 		this.groupMain = new THREE.Group();
 		this.groupTransforms = new THREE.Group();
 		this.groupModel = new THREE.Group();
 		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
-	}
-
-	/**
-	 * Creates and groups the Three objects
-	 * */
-	createCreep(mesh: THREE.Mesh) {
-		this.groupModel.add(mesh);
-		this.main.scene.add(this.groupMain);
 	}
 
 	/**
@@ -145,9 +136,8 @@ export class Creep extends ModelAsset {
 		// THis should be replaced when moving to ModelAsset
 		this.groupModel.children.forEach((child: any) => {
 			if (child.isMesh) {
-				console.log(child);
 				if (cast) child.castShadow = true;
-				if (receive) child.receiveShadow = true;
+				//if (receive) child.receiveShadow = true;
 				child.material.needsUpdate = true;
 			}
 		});

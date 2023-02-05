@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { Main } from './core/Main';
+import { OrbitController } from './core/OrbitController';
 
 export class CameraManager {
 	/**
@@ -10,6 +12,7 @@ export class CameraManager {
 	/**
 	 * Objects
 	 * */
+	orbitController: OrbitController;
 	cameras: Camera[] = [];
 	mainCamera: Camera;
 
@@ -34,11 +37,17 @@ export class CameraManager {
 	orthographicCameraDefaults = {
 		near: 0.01,
 		far: 1000,
-		zoom: 0.6,
+		zoom: 0.65,
 		x: 0,
-		y: 40,
-		z: 75, // Angled
+		y: 75,
+		z: 120,
 		//z: 0, // Top down
+		minPolarAngle: Math.PI * 0.2,
+		maxPolarAngle: Math.PI * 0.4,
+		minAzimuthAngle: Math.PI * -0.25,
+		maxAzimuthAngle: Math.PI * 0.25,
+		minZoom: 0.5,
+		maxZoom: 1.1,
 	};
 
 	/**
@@ -54,6 +63,7 @@ export class CameraManager {
 	createOrthographicCamera(isMain: boolean = false) {
 		const settings = this.orthographicCameraDefaults;
 		const camera = new Camera();
+		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.OrthographicCamera(
 			(0.04 * this.main.sizes.width) / -2,
@@ -104,9 +114,41 @@ export class CameraManager {
 			console.log(newMainCam);
 			this.setMainCamera(newMainCam as Camera);
 
-			this.main.interactionManager.removeOrbitControls();
-			this.main.interactionManager.setupOrbitControls();
+			this.removeOrbitControls();
+			this.setupOrbitControls();
 		}
+	}
+
+	/**
+	 * Sets up orbit handling
+	 * */
+	setupOrbitControls() {
+		this.orbitController = new OrbitController(this.main.cameraManager.mainCamera.threeCamera, this.main.canvas);
+		this.main.tick.registerCallback(() => {
+			this.orbitController.controls.update();
+		}, false);
+
+		// Set a max pan
+		var minPan = new THREE.Vector3(-1, -1, -1);
+		var maxPan = new THREE.Vector3(1, 1, 1);
+		this.orbitController.controls.target = new Vector3(0, 0, 0);
+		this.orbitController.controls.target.clamp(minPan, maxPan);
+
+		// Set a max rotate
+		//this.orbitController.controls.enableRotate = false;
+		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle;
+		this.orbitController.controls.maxPolarAngle = this.mainCamera.settings.maxPolarAngle;
+		this.orbitController.controls.minAzimuthAngle = this.mainCamera.settings.minAzimuthAngle;
+		this.orbitController.controls.maxAzimuthAngle = this.mainCamera.settings.maxAzimuthAngle;
+		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom;
+		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom;
+	}
+
+	/**
+	 * Deletes and orbit controller
+	 * */
+	removeOrbitControls() {
+		this.orbitController.controls.dispose();
 	}
 
 	/**
@@ -130,5 +172,6 @@ export class CameraManager {
 
 class Camera {
 	isMain: boolean;
+	settings: any;
 	threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
 }

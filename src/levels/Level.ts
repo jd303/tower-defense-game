@@ -5,6 +5,7 @@ import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelPath } from '../LevelPath';
+import { LevelDefinition } from '../data/LevelInterfaces';
 
 export class Level {
 	/**
@@ -36,9 +37,19 @@ export class Level {
 	/**
 	 * Adds a creep to the level
 	 * */
+	addTerrain(levelDetails: LevelDefinition) {
+		const terrain = new Terrain(levelDetails.terrain);
+		this.terrain = terrain;
+		this.main.scene.add(terrain.groupMain);
+	}
+
+	/**
+	 * Adds a creep to the level
+	 * */
 	addCreep(creep: Creep) {
 		// if (!this.creeps.find((creep) => creep)) this.creeps.push(creep);
 		this.creeps.push(creep);
+		this.main.scene.add(creep.groupMain);
 	}
 
 	/**

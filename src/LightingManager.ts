@@ -39,7 +39,7 @@ export class LightingManager {
 	 * */
 	addDirectionalLight(
 		main: boolean = false,
-		position: THREE.Vector3 = new THREE.Vector3(0, 20, 30),
+		position: THREE.Vector3 = new THREE.Vector3(40, 40, 40),
 		color: string = '#ffffff',
 		intensity: number = 1.25
 	) {
@@ -74,16 +74,17 @@ export class LightingManager {
 	 * */
 	addShadowsToLight(light: Light) {
 		light.threeLight.castShadow = true;
-		light.threeLight.shadow.mapSize.width = 4096;
-		light.threeLight.shadow.mapSize.height = 4096;
-		(light.threeLight.shadow.camera as any).left = 200;
-		(light.threeLight.shadow.camera as any).right = -200;
-		(light.threeLight.shadow.camera as any).bottom = -200;
-		(light.threeLight.shadow.camera as any).top = 200;
+		light.threeLight.shadow.mapSize.width = 2048;
+		light.threeLight.shadow.mapSize.height = 2048;
+		(light.threeLight.shadow.camera as any).left = 250;
+		(light.threeLight.shadow.camera as any).right = -250;
+		(light.threeLight.shadow.camera as any).bottom = -250;
+		(light.threeLight.shadow.camera as any).top = 250;
 		(light.threeLight.shadow.camera as any).near = 0.5;
-		(light.threeLight.shadow.camera as any).far = 200;
+		(light.threeLight.shadow.camera as any).far = 250;
 		//directionalLight.shadow.radius = 10; // Adds 'blur' to shadows
 		//directionalLight.shadow.type = THREE.PCFSoftShadowMap;
+		light.threeLight.shadow.normalBias = 0.03;
 	}
 
 	/**
@@ -104,7 +105,7 @@ export class LightingManager {
 	}
 }
 
-class Light {
+export class Light {
 	isMain: boolean;
 	threeLight: THREE.Light;
 }
