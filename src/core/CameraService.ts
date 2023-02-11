@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from './Main';
 import { OrbitController } from './OrbitController';
+import { FPSController, FPSControlsType } from './FPSController';
+import { TickTimeProperties } from './TickService';
 
 export class CameraService {
 	/**
@@ -13,6 +15,7 @@ export class CameraService {
 	 * Objects
 	 * */
 	orbitController: OrbitController;
+	fpsController: FPSController;
 	cameras: Camera[] = [];
 	mainCamera: Camera;
 
@@ -94,6 +97,14 @@ export class CameraService {
 	}
 
 	/**
+	 * Updates the camera by
+	 * */
+	updateCameraPositionBy(positionUpdate: CameraPositionProperties) {
+		this.mainCamera.threeCamera.position;
+		console.log('UPDATE', positionUpdate);
+	}
+
+	/**
 	 * Sets up orbit handling
 	 * */
 	setupOrbitControls() {
@@ -122,6 +133,20 @@ export class CameraService {
 	 * */
 	removeOrbitControls() {
 		this.orbitController.controls.dispose();
+	}
+
+	/**
+	 * Sets up orbit handling
+	 * */
+	setupFPSControls() {
+		this.fpsController = new FPSController(this.main, FPSControlsType.fpsAdvancedControls, this.main.s('Camera').mainCamera.threeCamera);
+	}
+
+	/**
+	 * Deletes and orbit controller
+	 * */
+	removeFPSControls() {
+		this.fpsController.controls.dispose();
 	}
 
 	/**
@@ -163,4 +188,13 @@ export interface CameraSettings {
 	maxAzimuthAngle?: number;
 	minZoom?: number;
 	maxZoom?: number;
+}
+
+export interface CameraPositionProperties {
+	x: number;
+	y: number;
+	z: number;
+	rotX: number;
+	rotY: number;
+	rotZ: number;
 }

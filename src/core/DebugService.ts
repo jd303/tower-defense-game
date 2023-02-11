@@ -112,7 +112,24 @@ export class DebugService {
 		const geometry = new THREE.SphereGeometry(1, 10, 10);
 		const material = new THREE.MeshStandardMaterial({ color: '#ffffff' });
 		const mesh = new THREE.Mesh(geometry, material);
-		mesh.position.set(0, 1, 0);
+		mesh.position.set(0, 1.25, 0);
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+
+		this.main.scene.add(mesh);
+	}
+
+	/**
+	 * Add a Plane to the scene at 0,0,0
+	 * */
+	createDebugPlane() {
+		const geometry = new THREE.PlaneGeometry(100, 100);
+		const material = new THREE.MeshStandardMaterial({ color: '#aaaaaa' });
+		const mesh = new THREE.Mesh(geometry, material);
+		mesh.position.set(0, 0, 0);
+		mesh.rotation.x = Math.PI * -0.5;
+		mesh.receiveShadow = true;
+		material.needsUpdate = true;
 
 		this.main.scene.add(mesh);
 	}
