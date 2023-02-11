@@ -63,7 +63,7 @@ export class Creep extends ModelAsset {
 	resolveAttack(damage: number) {
 		this.stats.damage_taken += damage;
 		if (this.stats.damage_taken >= this.stats.hp_total) {
-			this.main.level.removeCreep(this);
+			this.main.s('Level').currentLevel.removeCreep(this);
 		} else {
 			this.stateTakeDamage();
 		}

@@ -102,8 +102,8 @@ export class UI {
 	 * */
 	requestCreateAsset(element: UIProperties, uiOnComplete: Function) {
 		// Start listening to raycasters
-		this.main.s('Interaction').addRaycasterSubjects([this.main.level.terrain]);
-		this.main.s('Interaction').addRaycasterSubjects(this.main.level.levelPaths);
+		this.main.s('Interaction').addRaycasterSubjects([this.main.s('Level').currentLevel.terrain]);
+		this.main.s('Interaction').addRaycasterSubjects(this.main.s('Level').currentLevel.levelPaths);
 
 		if (element.placeCallback) {
 			// Create an oncomplete function
@@ -121,8 +121,8 @@ export class UI {
 	 * Cancels the create request
 	 * */
 	cancelCreateRequest(element: UIProperties) {
-		this.main.s('Interaction').removeRaycasterSubjects([this.main.level.terrain]);
-		this.main.s('Interaction').removeRaycasterSubjects(this.main.level.levelPaths);
+		this.main.s('Interaction').removeRaycasterSubjects([this.main.s('Level').currentLevel.terrain]);
+		this.main.s('Interaction').removeRaycasterSubjects(this.main.s('Level').currentLevel.levelPaths);
 		if (element.placeCallback) this.main.s('Interaction').removeClickHandler(element.placeCallback);
 	}
 

@@ -4,6 +4,7 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { UITypes } from '../../UIProperties';
 import { Projectile, ProjectileTypes } from '../attacks/Projectile';
+import { Creep } from '../creeps/Creep';
 
 export class TowerCubeMVP extends Tower {
 	/**
@@ -23,7 +24,7 @@ export class TowerCubeMVP extends Tower {
 		placeCallback: (intersects: THREE.Intersection[], main: Main) => {
 			if (intersects[0].object.name == 'LevelPath') return;
 			const intersect = intersects[0];
-			main.level.addTower(new TowerCubeMVP(main), intersect.point);
+			main.s('Level').currentLevel.addTower(new TowerCubeMVP(main), intersect.point);
 		},
 	});
 
@@ -49,7 +50,7 @@ export class TowerCubeMVP extends Tower {
 	 */
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
-		this.main.level.creeps.forEach((creep) => {
+		this.main.s('Level').currentLevel.creeps.forEach((creep: Creep) => {
 			const creepPosition = creep.groupMain.position;
 			const distance = creepPosition.distanceTo(position);
 

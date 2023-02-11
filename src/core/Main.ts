@@ -2,10 +2,8 @@ import * as THREE from 'three';
 import { WindowService } from './WindowService';
 import { DebugService } from './DebugService';
 import { TickService } from './TickService';
-
 import { SizesInterface } from './WindowService';
 import { GLTFLoadController } from './LoaderService';
-import { Level } from '../levels/Level';
 import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
 
@@ -23,8 +21,6 @@ export class Main {
 	 * Services
 	 * */
 	services: any[] = [];
-
-	level: Level;
 
 	/**
 	 * Constructor

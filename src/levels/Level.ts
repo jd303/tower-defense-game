@@ -32,7 +32,7 @@ export class Level {
 	 */
 	constructor(main: Main) {
 		this.main = main;
-		this.main.level = this;
+		this.main.s('Level').currentLevel = this;
 		this.setupMainTick();
 	}
 
