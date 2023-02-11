@@ -1,6 +1,6 @@
 import { Vector3 } from 'three';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/Tick';
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from './Creep';
 import { CreepStats } from './CreepStats';
 

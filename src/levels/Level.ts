@@ -1,11 +1,12 @@
 import * as THREE from 'three';
-import { Creep } from '../creeps/Creep';
-import { Tower } from '../towers/Tower';
+import { Creep } from '../environment/creeps/Creep';
+import { Tower } from '../environment/towers/Tower';
 import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
-import { LevelPath } from '../LevelPath';
+import { LevelPath } from './LevelPath';
 import { LevelDefinition } from '../data/LevelInterfaces';
+import { TickTimeProperties } from '../core/TickService';
 
 export class Level {
 	/**
@@ -32,6 +33,7 @@ export class Level {
 	constructor(main: Main) {
 		this.main = main;
 		this.main.level = this;
+		this.setupMainTick();
 	}
 
 	/**
@@ -77,5 +79,20 @@ export class Level {
 		this.props.push(prop);
 		this.main.scene.add(prop.groupMain);
 		prop.groupMain.position.set(point.x, point.y, point.z);
+	}
+
+	/**
+	 * Registers callback for tick
+	 * */
+	setupMainTick() {
+		this.main.s('Tick').registerCallback(this.gameplayTickCallback.bind(this));
+	}
+
+	/**
+	 * Animates creeps and towers and other game items
+	 * */
+	gameplayTickCallback(timeProperties: TickTimeProperties) {
+		this.creeps.forEach((creep) => creep.animate(timeProperties));
+		this.towers.forEach((tower) => tower.animate(timeProperties));
 	}
 }

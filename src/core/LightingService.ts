@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Main } from './core/Main';
+import { Main } from './Main';
 
-export class LightingManager {
+export class LightingService {
 	/**
 	 * System Properties
 	 * */

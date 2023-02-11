@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from './core/Main';
-import { Creep } from './creeps/Creep';
+import { Creep } from './environment/creeps/Creep';
 import { Prop } from './environment/Prop';
 import { Terrain } from './environment/Terrain';
-import { LevelPath } from './LevelPath';
-import { Tower } from './towers/Tower';
+import { LevelPath } from './levels/LevelPath';
+import { Tower } from './environment/towers/Tower';
 
-export class InteractionManager {
+export class InteractionService {
 	/**
 	 * Event Listeners
 	 * */
@@ -93,7 +93,7 @@ export class InteractionManager {
 		}
 
 		// Set the raycaster
-		this.raycaster.setFromCamera(position, this.main.cameraManager.mainCamera.threeCamera);
+		this.raycaster.setFromCamera(position, this.main.s('Camera').mainCamera.threeCamera);
 		const intersects = this.raycaster.intersectObjects(this.raycasterSubjects.map((subject) => subject.groupMain));
 
 		// If we have intersected

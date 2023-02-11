@@ -1,8 +1,8 @@
 import { Vector3 } from 'three';
-import { Level } from './levels/Level';
+import { Level } from './Level';
 import { Wave } from './Wave';
 import { WaveDefinition } from './WaveDefinition';
-import { CreepGenerator } from './creeps/CreepGenerator';
+import { CreepGenerator } from '../environment/creeps/CreepGenerator';
 
 export class WaveManager {
 	/**

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/Tick';
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset } from '../ModelAsset';
-import { UIProperties, UITypes } from '../UIProperties';
+import { UIProperties, UITypes } from '../../UIProperties';
 import { TowerStates } from './TowerStats';
 
 export class Tower extends ModelAsset {

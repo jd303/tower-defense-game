@@ -1,35 +1,30 @@
 import * as THREE from 'three';
-import { WindowSizer } from './WindowSizer';
-import { DebugFeatures } from './DebugFeatures';
-import { LevelManager } from '../LevelManager';
-import { Tick, TickTimeProperties } from './Tick';
+import { WindowService } from './WindowService';
+import { DebugService } from './DebugService';
+import { TickService } from './TickService';
 
-import { CameraInterface, SizesInterface } from '../data/Interfaces';
-import { GLTFLoadController } from '../Loaders';
-import { InteractionManager } from '../InteractionManager';
+import { SizesInterface } from './WindowService';
+import { GLTFLoadController } from './LoaderService';
 import { Level } from '../levels/Level';
-import { LightingManager } from '../LightingManager';
-import { CameraManager } from '../CameraManager';
+import { LightingService } from './LightingService';
+import { CameraService } from '../core/CameraService';
 
 export class Main {
 	/**
-	 * Properties
+	 * Core Properties
 	 * */
 	sizes: SizesInterface;
-	windowSizer: WindowSizer;
+	windowSizer: WindowService;
 	canvas: HTMLCanvasElement;
 	scene: THREE.Scene;
 	renderer: THREE.WebGLRenderer;
-	glTFLoader: GLTFLoadController;
-	cameraManager: CameraManager;
-	tick: Tick;
-	interactionManager: InteractionManager;
-	lightingManager: LightingManager;
 
-	levelManager: LevelManager;
+	/**
+	 * Services
+	 * */
+	services: any[] = [];
+
 	level: Level;
-
-	debugFeatures: DebugFeatures;
 
 	/**
 	 * Constructor
@@ -37,58 +32,36 @@ export class Main {
 	constructor(canvas: HTMLCanvasElement, sizes: SizesInterface, debugMode: boolean) {
 		this.canvas = canvas;
 		this.sizes = sizes;
-		this.tick = new Tick();
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-		this.glTFLoader = new GLTFLoadController();
-		this.levelManager = new LevelManager(this);
-		this.debugFeatures = new DebugFeatures(debugMode, this.tick);
-		this.interactionManager = new InteractionManager(this);
-		this.lightingManager = new LightingManager(this);
-		this.cameraManager = new CameraManager(this);
 
-		// Create a default camera during initial developemnt
-		this.cameraManager.createPerspectiveCamera(false);
-		this.cameraManager.createOrthographicCamera(true);
-		const cameraDebug = {
-			changeMain: this.cameraManager.switchCameras.bind(this.cameraManager),
-		};
-		this.debugFeatures.addGUIDebugProperty(cameraDebug, 'changeMain');
+		// Register core services
+		this.registerService('GLTF', new GLTFLoadController());
+		this.registerService('Lighting', new LightingService(this));
+		this.registerService('Camera', new CameraService(this));
+		this.registerService('Tick', new TickService(this));
+		this.registerService('Debug', new DebugService(this, debugMode, this.s('Tick')));
 
-		this.setupMainTick();
+		// Watch the screen
+		this.windowSizer = new WindowService(this);
+		this.windowSizer.resize();
+		this.windowSizer.watchResize();
 
 		return this;
 	}
 
 	/**
-	 * Registers callback for tick
+	 * Returns a Service
+	 * @param {string} serviceName The name of a service
 	 * */
-	setupMainTick() {
-		this.tick.registerCallback(this.gameplayTickCallback.bind(this));
-		this.tick.registerCallback(this.rendererTickCallback.bind(this), false);
+	s(serviceName: string) {
+		return this.services.find((s) => s.name == serviceName).instance;
 	}
 
 	/**
-	 * Renders the scene
+	 * Registers a manager that will be accessible to the main scope
 	 * */
-	rendererTickCallback() {
-		this.renderer.render(this.scene, this.cameraManager.mainCamera.threeCamera);
-	}
-
-	/**
-	 * Animates creeps and towers and other game items
-	 * */
-	gameplayTickCallback(timeProperties: TickTimeProperties) {
-		this.level.creeps.forEach((creep) => creep.animate(timeProperties));
-		this.level.towers.forEach((tower) => tower.animate(timeProperties));
-	}
-
-	/**
-	 * Sets the window size
-	 * */
-	setupWindowSize() {
-		this.windowSizer = new WindowSizer(this);
-		this.windowSizer.resize();
-		this.windowSizer.watchResize();
+	registerService(serviceName: string, instance: any) {
+		this.services.push({ name: serviceName, instance: instance });
 	}
 }

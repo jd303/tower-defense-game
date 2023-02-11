@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Vector, Vector3 } from 'three';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/Tick';
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from '../creeps/Creep';
 
 export class Projectile {

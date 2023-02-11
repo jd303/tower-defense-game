@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Main } from './core/Main';
+import { Main } from '../core/Main';
 
 export class ModelAsset {
 	/**
@@ -34,7 +34,7 @@ export class ModelAsset {
 	 * Loads the model
 	 * */
 	loadModel() {
-		this.main.glTFLoader.loadModel(this.assetPath, this.loadComplete.bind(this), this.loadProgress.bind(this), this.loadError.bind(this));
+		this.main.s('GLTF').loadModel(this.assetPath, this.loadComplete.bind(this), this.loadProgress.bind(this), this.loadError.bind(this));
 	}
 
 	/**

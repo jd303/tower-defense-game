@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { Maths } from '../Maths';
-import { Main } from '../core/Main';
-import { Level } from './Level';
+import { perspectiveCameraDefaults, orthographicCameraDefaults } from '../../config/cameraSettingsDefault';
+import { Maths } from '../../core/Maths';
+import { Main } from '../../core/Main';
+import { Level } from '../Level';
 import { LevelPath } from '../LevelPath';
-import { TreeCone1 } from '../environment/nature/TreeCone1';
-import { UI } from '../UI';
-import { Mountain_Type1 } from '../environment/nature/Mountain_Type1';
+import { TreeCone1 } from '../../environment/nature/TreeCone1';
+import { UI } from '../../UI';
+import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
-import { TowerCubeMVP } from '../towers/Tower_CubeMVP';
+import { TowerCubeMVP } from '../../environment/towers/Tower_CubeMVP';
 
 import { levelDetails } from './Level_0_MVP_JSON';
 
@@ -34,8 +35,19 @@ export class Level0MVP extends Level {
 
 		console.log('TODO:: Convert Creep to ModelAsset');
 
+		// Setup cameras
+		main.s('Camera').createPerspectiveCamera(false, perspectiveCameraDefaults);
+		main.s('Camera').createOrthographicCamera(true, orthographicCameraDefaults);
+		const cameraDebug = {
+			changeMain: main.s('Camera').switchCameras.bind(main.s('Camera')),
+		};
+		main.s('Debug').addGUIDebugProperty(cameraDebug, 'changeMain');
+
+		// Start basic shit
+		main.s('Tick').tick();
+
 		// Setup OrbitControls
-		this.main.cameraManager.setupOrbitControls();
+		this.main.s('Camera').setupOrbitControls();
 
 		// Create the environment
 		this.addTerrain(levelDetails);
@@ -100,9 +112,9 @@ export class Level0MVP extends Level {
 		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
-		this.main.interactionManager.addRaycasterSubjects([this.terrain]); // Listen to clicks on terrain
-		this.main.interactionManager.addRaycasterSubjects(this.levelPaths); // Listen to clicks on terrain
-		this.main.interactionManager.addClickHandler(
+		this.main.s('Interaction').addRaycasterSubjects([this.terrain]); // Listen to clicks on terrain
+		this.main.s('Interaction').addRaycasterSubjects(this.levelPaths); // Listen to clicks on terrain
+		this.main.s('Interaction').addClickHandler(
 			(event: any) =>
 				console.log({
 					x: Maths.roundQuarter(event[0].point.x),
@@ -113,10 +125,10 @@ export class Level0MVP extends Level {
 		);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
-		const ambientLight = this.main.lightingManager.addAmbientLight();
-		const directionalLight = this.main.lightingManager.addDirectionalLight(true);
-		this.main.debugFeatures.debugLight(directionalLight, 'Directional Light');
-		this.main.debugFeatures.debugLight(ambientLight, 'Ambient Light');
+		const ambientLight = this.main.s('Lighting').addAmbientLight();
+		const directionalLight = this.main.s('Lighting').addDirectionalLight(true);
+		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
+		this.main.s('Debug').debugLight(ambientLight, 'Ambient Light');
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		this.UI = new UI(this.main);
@@ -138,7 +150,7 @@ export class Level0MVP extends Level {
 
 			this.terrain.enableShadows();
 
-			this.main.lightingManager.addShadowsToLight(directionalLight);
+			this.main.s('Lighting').addShadowsToLight(directionalLight);
 
 			console.log(this.terrain);
 			console.log(directionalLight);

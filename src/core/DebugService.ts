@@ -1,22 +1,27 @@
+import * as THREE from 'three';
 import * as lil from 'lil-gui';
-import { Light } from '../LightingManager';
-import { Tick } from './Tick';
+import { Light } from './LightingService';
+import { TickService } from './TickService';
+import { Main } from './Main';
 
-export class DebugFeatures {
+export class DebugService {
 	/**
 	 * Properties
 	 * */
+	main: Main;
 	lilGUI: lil.GUI;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(debugMode: boolean, tick: Tick) {
+	constructor(main: Main, debugMode: boolean, tickService: TickService) {
+		this.main = main;
+
 		if (debugMode) {
 			this.lilGUI = new lil.GUI();
 
-			this.lilGUI.add(tick, 'pauseGame').name('Pause Game');
-			this.lilGUI.add(tick, 'unpauseGame').name('Unpause Game');
+			this.lilGUI.add(tickService, 'pauseTick').name('Pause Tick');
+			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
 		}
 
 		return this;
@@ -98,5 +103,17 @@ export class DebugFeatures {
 			step: 0.001,
 			name: `${label} z`,
 		});
+	}
+
+	/**
+	 * Add a Sphere to the scene at 0,0,0
+	 * */
+	createDebugSphere() {
+		const geometry = new THREE.SphereGeometry(1, 10, 10);
+		const material = new THREE.MeshStandardMaterial({ color: '#ffffff' });
+		const mesh = new THREE.Mesh(geometry, material);
+		mesh.position.set(0, 1, 0);
+
+		this.main.scene.add(mesh);
 	}
 }

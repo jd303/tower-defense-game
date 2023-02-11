@@ -1,5 +1,5 @@
 import { Main } from './core/Main';
-import { Tower } from './towers/Tower';
+import { Tower } from './environment/towers/Tower';
 import { UIProperties, UITypes } from './UIProperties';
 
 export class UI {
@@ -102,8 +102,8 @@ export class UI {
 	 * */
 	requestCreateAsset(element: UIProperties, uiOnComplete: Function) {
 		// Start listening to raycasters
-		this.main.interactionManager.addRaycasterSubjects([this.main.level.terrain]);
-		this.main.interactionManager.addRaycasterSubjects(this.main.level.levelPaths);
+		this.main.s('Interaction').addRaycasterSubjects([this.main.level.terrain]);
+		this.main.s('Interaction').addRaycasterSubjects(this.main.level.levelPaths);
 
 		if (element.placeCallback) {
 			// Create an oncomplete function
@@ -113,7 +113,7 @@ export class UI {
 			};
 
 			// Add a click handler
-			this.main.interactionManager.addClickHandler(element.placeCallback, onComplete);
+			this.main.s('Interaction').addClickHandler(element.placeCallback, onComplete);
 		}
 	}
 
@@ -121,9 +121,9 @@ export class UI {
 	 * Cancels the create request
 	 * */
 	cancelCreateRequest(element: UIProperties) {
-		this.main.interactionManager.removeRaycasterSubjects([this.main.level.terrain]);
-		this.main.interactionManager.removeRaycasterSubjects(this.main.level.levelPaths);
-		if (element.placeCallback) this.main.interactionManager.removeClickHandler(element.placeCallback);
+		this.main.s('Interaction').removeRaycasterSubjects([this.main.level.terrain]);
+		this.main.s('Interaction').removeRaycasterSubjects(this.main.level.levelPaths);
+		if (element.placeCallback) this.main.s('Interaction').removeClickHandler(element.placeCallback);
 	}
 
 	/**

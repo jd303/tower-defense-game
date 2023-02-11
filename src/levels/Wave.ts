@@ -1,5 +1,5 @@
-import { Creep } from './creeps/Creep';
-import { CreepGroup } from './creeps/CreepGroup';
+import { Creep } from '../environment/creeps/Creep';
+import { CreepGroup } from '../environment/creeps/CreepGroup';
 import { LevelPath } from './LevelPath';
 import { WaveDefinition } from './WaveDefinition';
 

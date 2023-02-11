@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/Tick';
-import { LevelPathDefinition } from '../data/PathInterfaces';
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
+import { LevelPathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset } from '../ModelAsset';
 import { CreepStates, CreepStats } from './CreepStats';
 

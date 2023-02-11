@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { Main } from './core/Main';
-import { OrbitController } from './core/OrbitController';
+import { Main } from './Main';
+import { OrbitController } from './OrbitController';
 
-export class CameraManager {
+export class CameraService {
 	/**
 	 * System Properties
 	 * */
@@ -16,16 +16,7 @@ export class CameraManager {
 	cameras: Camera[] = [];
 	mainCamera: Camera;
 
-	/**
-	 * Defaults
-	 * */
-	perspectiveCameraDefaults = {
-		/*fov: 50,
-		near: 0.1,
-		far: 250,
-		x: 0,
-		y: 40,
-		z: 50,*/
+	defaultCameraSettings: CameraSettings = {
 		fov: 25,
 		near: 0.1,
 		far: 350,
@@ -33,21 +24,6 @@ export class CameraManager {
 		x: 0,
 		y: 40,
 		z: 50,
-	};
-	orthographicCameraDefaults = {
-		near: 0.01,
-		far: 1000,
-		zoom: 0.65,
-		x: 0,
-		y: 75,
-		z: 120,
-		//z: 0, // Top down
-		minPolarAngle: Math.PI * 0.2,
-		maxPolarAngle: Math.PI * 0.4,
-		minAzimuthAngle: Math.PI * -0.25,
-		maxAzimuthAngle: Math.PI * 0.25,
-		minZoom: 0.5,
-		maxZoom: 1.1,
 	};
 
 	/**
@@ -60,8 +36,7 @@ export class CameraManager {
 	/**
 	 * Creates an orthographic camera
 	 * */
-	createOrthographicCamera(isMain: boolean = false) {
-		const settings = this.orthographicCameraDefaults;
+	createOrthographicCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
 		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;
@@ -84,11 +59,10 @@ export class CameraManager {
 	/**
 	 * Creates a perspective camera
 	 * */
-	createPerspectiveCamera(isMain: boolean = false) {
-		const settings = this.perspectiveCameraDefaults;
+	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
 		const camera = new Camera();
+		camera.settings = settings;
 		camera.isMain = isMain;
-		console.log(this.main.sizes);
 		camera.threeCamera = new THREE.PerspectiveCamera(settings.fov, this.main.sizes.width / this.main.sizes.height, settings.near, settings.far);
 
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
@@ -123,8 +97,8 @@ export class CameraManager {
 	 * Sets up orbit handling
 	 * */
 	setupOrbitControls() {
-		this.orbitController = new OrbitController(this.main.cameraManager.mainCamera.threeCamera, this.main.canvas);
-		this.main.tick.registerCallback(() => {
+		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas);
+		this.main.s('Tick').registerCallback(() => {
 			this.orbitController.controls.update();
 		}, false);
 
@@ -135,13 +109,12 @@ export class CameraManager {
 		this.orbitController.controls.target.clamp(minPan, maxPan);
 
 		// Set a max rotate
-		//this.orbitController.controls.enableRotate = false;
-		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle;
-		this.orbitController.controls.maxPolarAngle = this.mainCamera.settings.maxPolarAngle;
-		this.orbitController.controls.minAzimuthAngle = this.mainCamera.settings.minAzimuthAngle;
-		this.orbitController.controls.maxAzimuthAngle = this.mainCamera.settings.maxAzimuthAngle;
-		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom;
-		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom;
+		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle || -Infinity;
+		this.orbitController.controls.maxPolarAngle = this.mainCamera.settings.maxPolarAngle || Infinity;
+		this.orbitController.controls.minAzimuthAngle = this.mainCamera.settings.minAzimuthAngle || -Infinity;
+		this.orbitController.controls.maxAzimuthAngle = this.mainCamera.settings.maxAzimuthAngle || -Infinity;
+		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom || 0.1;
+		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom || 5;
 	}
 
 	/**
@@ -174,4 +147,20 @@ class Camera {
 	isMain: boolean;
 	settings: any;
 	threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
+}
+
+export interface CameraSettings {
+	near: number;
+	far: number;
+	zoom: number;
+	x: number;
+	y: number;
+	z: number;
+	fov?: number;
+	minPolarAngle?: number;
+	maxPolarAngle?: number;
+	minAzimuthAngle?: number;
+	maxAzimuthAngle?: number;
+	minZoom?: number;
+	maxZoom?: number;
 }

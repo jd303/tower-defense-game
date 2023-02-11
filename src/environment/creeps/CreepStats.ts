@@ -1,4 +1,4 @@
-import { DamageTypes } from '../data/DamageTypes';
+import { DamageTypes } from '../../data/DamageTypes';
 
 export class CreepStats {
 	/**

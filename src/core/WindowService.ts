@@ -1,6 +1,6 @@
 import { Main } from './Main';
 
-export class WindowSizer {
+export class WindowService {
 	main: Main;
 
 	/**
@@ -18,7 +18,7 @@ export class WindowSizer {
 		this.main.sizes.height = window.innerHeight;
 
 		// Update camera
-		this.main.cameraManager.resizeEvent();
+		this.main.s('Camera').resizeEvent();
 
 		// Update the renderer
 		this.main.renderer.setSize(this.main.sizes.width, this.main.sizes.height);
@@ -31,4 +31,9 @@ export class WindowSizer {
 	watchResize() {
 		window.addEventListener('resize', this.resize.bind(this));
 	}
+}
+
+export interface SizesInterface {
+	width: number;
+	height: number;
 }

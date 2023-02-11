@@ -1,6 +1,6 @@
-import { PathGeometryTypes, PathTypes } from '../data/PathInterfaces';
+import { PathGeometryTypes, PathTypes } from '../../data/PathInterfaces';
 import { Vector3 } from 'three';
-import { LevelDefinition, TerrainTypes } from '../data/LevelInterfaces';
+import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
 	terrain: TerrainTypes.sand,

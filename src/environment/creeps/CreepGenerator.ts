@@ -1,4 +1,4 @@
-import { Main } from '../core/Main';
+import { Main } from '../../core/Main';
 import { Troll } from './Troll';
 import { TrollDink } from './TrollDink';
 

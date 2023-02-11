@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { LevelPathDefinition, PathDefinition, PathSegment, PathTypes, PathGeometryTypes } from './data/PathInterfaces';
+import { LevelPathDefinition, PathDefinition, PathSegment, PathTypes, PathGeometryTypes } from '../data/PathInterfaces';
 
 export class LevelPath {
 	/**

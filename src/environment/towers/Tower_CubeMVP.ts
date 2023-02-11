@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { Tower, TowerUI } from './Tower';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/Tick';
-import { UITypes } from '../UIProperties';
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
+import { UITypes } from '../../UIProperties';
 import { Projectile, ProjectileTypes } from '../attacks/Projectile';
 
 export class TowerCubeMVP extends Tower {
