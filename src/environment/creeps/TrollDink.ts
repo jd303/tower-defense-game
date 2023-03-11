@@ -14,8 +14,8 @@ export class TrollDink extends Creep {
 	 * Stats
 	 * */
 	stats = new CreepStats({
-		hp_total: 10,
-		move_speed: 4,
+		hp_total: 30,
+		move_speed: 3,
 		defenses: {
 			piercing: 0,
 			crushing: 0,

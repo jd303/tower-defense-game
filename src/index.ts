@@ -2,6 +2,7 @@ import './style.css';
 import { Main } from './core/Main';
 import { LevelService } from './levels/LevelService';
 import { InteractionService } from './InteractionService';
+import { PositionService } from './environment/PositionService';
 
 /**
  * Configuration
@@ -21,6 +22,7 @@ const main = new Main(canvas, sizes, debugMode);
 // Create services
 main.registerService('Level', new LevelService(main));
 main.registerService('Interaction', new InteractionService(main));
+main.registerService('PositionService', new PositionService(main));
 
 // Loads the working scene
 main.s('Level').loadScene('Level_0_MVP');

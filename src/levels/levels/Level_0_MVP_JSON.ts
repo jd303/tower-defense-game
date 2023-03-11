@@ -198,8 +198,8 @@ export const levelDetails: LevelDefinition = {
 						},
 						{
 							id: '6',
-							type: 'Wisp'
-						}
+							type: 'Wisp',
+						},
 					],
 				},
 			],
@@ -227,12 +227,8 @@ export const levelDetails: LevelDefinition = {
 						},
 						{
 							id: '4',
-							type: 'Wisp'
+							type: 'Wisp',
 						},
-						{
-							id: '5',
-							type: 'Wisp'
-						}
 					],
 				},
 			],

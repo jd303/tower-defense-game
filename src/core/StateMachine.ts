@@ -59,6 +59,12 @@ export class StateMachine {
 			state.active = true;
 			this.activeStates.add(state.name);
 
+			// onEnter Lifecycle
+			console.log('SHTAPTE', state);
+			if ('onEnter' in state) {
+				if (state.onEnter) state.onEnter();
+			}
+
 			// If this should stopAfterTime
 			if (state.autoStateChange && state.autoStateChangeTimeMS) {
 				let stateChangeCallback: Function;
@@ -95,12 +101,12 @@ export class StateMachine {
 
 interface State {
 	name: string;
-	//init?: string;
-	//transitions: StateTransition[];
 	active?: boolean;
 	autoStateChange?: StateMachineEvents | string; // If the state naturally has a timeout
 	autoStateChangeTimeMS?: number;
 	timer?: Timer;
+	onEnter?: Function;
+	onExit?: Function;
 }
 
 interface StateTransition {

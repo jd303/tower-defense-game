@@ -85,6 +85,7 @@ export class Creep extends ModelAsset {
 			},
 			{
 				name: CreepStates.activatingStandingPower,
+				onEnter: this.activateStandingPower.bind(this),
 			},
 		]);
 
@@ -129,11 +130,58 @@ export class Creep extends ModelAsset {
 	 * Resolves when a creep was attacked
 	 * */
 	resolveAttack(damage: number) {
-		this.stats.damage_taken += damage;
+		// Check any weaknesses or resistances, such as resistance to magic damage
+
+		// Adjust the creeps's health by this damage
+		this.adjustHealthByNumber(damage);
+	}
+
+	/**
+	 * Changes a Creep's health
+	 * @param { number } difference Positive or negative number to adjust the creeps' health
+	 * */
+	adjustHealthByNumber(difference: number) {
+		this.stats.damage_taken += difference;
+
+		this.checkHealthStatus();
+	}
+
+	/**
+	 * Sets a Creep's health to a percentage
+	 * @param { number } percentage Percentage of health to set
+	 * */
+	setHealthByPercentage(percentage: number) {
+		this.stats.damage_taken = this.stats.hp_total - Math.floor((this.stats.hp_total * percentage) / 100);
+		console.log('SETTING HEALTH', this.stats.hp_total - Math.floor((this.stats.hp_total * percentage) / 100));
+
+		this.checkHealthStatus();
+	}
+
+	/**
+	 * Checks the health status and orgnaises health bars
+	 * */
+	checkHealthStatus() {
+		// If the creep died
 		if (this.stats.damage_taken >= this.stats.hp_total) {
 			this.main.s('Level').currentLevel.removeCreep(this);
+
+			// If the creep is fresh
+		} else if (this.stats.damage_taken == 0) {
+			// Should remove health bar
+			// DO THAT HERE
+			console.log('FULL HEALTH');
+
+			// Otherwise the creep's status bar needs to be set
 		} else {
-			this.takeDamage();
+			if (!this.stateMachine.activeStates.has(CreepStates.hurt)) {
+				this.createHealthBar();
+			} else {
+				this.updateHealthBar();
+			}
+
+			this.stateMachine.trigger(CreepStates.hurting);
+
+			console.log('>>>> UPDATED STATES', this.stateMachine.activeStates);
 		}
 	}
 
@@ -197,24 +245,6 @@ export class Creep extends ModelAsset {
 	animate(timeProperties: TickTimeProperties) {}
 
 	/**
-	 * Update Creep: Creep took damage
-	 * */
-	takeDamage() {
-		/*this.states.hurting.isHurting = true;
-		this.states.hurting.hurtStartTime = new Date().getTime();*/
-
-		if (!this.stateMachine.activeStates.has(CreepStates.hurt)) {
-			this.createHealthBar();
-		} else {
-			this.updateHealthBar();
-		}
-
-		this.stateMachine.trigger(CreepStates.hurting);
-
-		console.log('>>>> UPDATED STATES', this.stateMachine.activeStates);
-	}
-
-	/**
 	 * Moves a Creep according to its movement speed
 	 * */
 	moveMe(timeProperties: TickTimeProperties) {
@@ -254,4 +284,10 @@ export class Creep extends ModelAsset {
 			}
 		});
 	}
+
+	/**
+	 * Creep Powers
+	 * */
+	activateStandingPower() {}
+	activateIdlePower() {}
 }

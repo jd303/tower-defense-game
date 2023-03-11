@@ -14,8 +14,8 @@ export class Troll extends Creep {
 	 * Stats
 	 * */
 	stats = new CreepStats({
-		hp_total: 20,
-		move_speed: 4,
+		hp_total: 40,
+		move_speed: 3,
 		defenses: {
 			piercing: 0,
 			crushing: 0,
