@@ -4,6 +4,8 @@ import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonCont
 import { Main } from './Main';
 import { TickTimeProperties } from './TickService';
 import { AdvancedFirstPersonControls } from './AdvancedFPSController';
+import { Camera } from './CameraService';
+import { PerspectiveCamera } from 'three';
 
 export class FPSController {
 	/**
@@ -15,15 +17,15 @@ export class FPSController {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, controlType: FPSControlsType = FPSControlsType.flyControls, camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
+	constructor(main: Main, controlType: FPSControlsType = FPSControlsType.flyControls, camera: Camera) {
 		this.main = main;
 
 		switch (controlType) {
 			case FPSControlsType.flyControls:
-				this.setupFlyControls(camera);
+				this.setupFlyControls(camera.threeCamera);
 				break;
 			case FPSControlsType.fpsSimpleControls:
-				this.setupFPSSimpleControls(camera);
+				this.setupFPSSimpleControls(camera.threeCamera);
 				break;
 			case FPSControlsType.fpsAdvancedControls:
 				this.setupFPSAdvancedControls(camera);
@@ -34,7 +36,8 @@ export class FPSController {
 	/**
 	 * Uses the fly controls from THREE.js
 	 * */
-	setupFlyControls(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
+	setupFlyControls(camera: THREE.Camera) {
+		console.log(camera);
 		var camControls = new FlyControls(camera);
 		camControls.movementSpeed = 20;
 		camControls.rollSpeed = 0.4;
@@ -52,7 +55,7 @@ export class FPSController {
 	/**
 	 * Uses the FirstPersonControls from THREE.js
 	 * */
-	setupFPSSimpleControls(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
+	setupFPSSimpleControls(camera: THREE.Camera) {
 		var camControls = new FirstPersonControls(camera);
 		camControls.lookSpeed = 0.1;
 		camControls.movementSpeed = 20;
@@ -75,7 +78,7 @@ export class FPSController {
 	/**
 	 * Uses a custom controller scheme for FPS-style keyboard navigation and look
 	 * */
-	setupFPSAdvancedControls(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
+	setupFPSAdvancedControls(camera: Camera) {
 		this.controls = new AdvancedFirstPersonControls(camera);
 
 		this.main.s('Tick').registerCallback(() => {

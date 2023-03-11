@@ -57,12 +57,6 @@ interface CreepStatSetup {
 	defenses: DamageTypes;
 }
 
-export interface CreepStates {
-	moving: CreepMoving;
-	hurting: CreepHurting;
-	hurt: boolean;
-}
-
 export interface CreepMoving {
 	isMoving: boolean;
 }

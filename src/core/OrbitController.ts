@@ -12,7 +12,7 @@ export class OrbitController {
 	 * */
 	constructor(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, canvas: HTMLCanvasElement) {
 		this.controls = new OrbitControls(camera, canvas);
-		this.controls.enableDamping = true;
+		this.controls.enableDamping = false;
 		this.controls.enablePan = true;
 		this.controls.enableRotate = true;
 		this.controls.enableZoom = true;

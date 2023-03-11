@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Camera } from './CameraService';
 
 /**
  * CLASS: Advanced First Person Controls
@@ -6,7 +7,7 @@ import * as THREE from 'three';
  * Contains mouse look
  * */
 export class AdvancedFirstPersonControls {
-	camera: THREE.Camera;
+	camera: Camera;
 	cameraDirection = new THREE.Vector3();
 
 	toggleLeft: boolean = false;
@@ -19,13 +20,17 @@ export class AdvancedFirstPersonControls {
 	keyboardMoveSpeed: number = 0.2;
 	keyboardRotateSpeed: number = 0.008;
 
+	lastMouseAnimationFramePosition: THREE.Vector2 = new THREE.Vector2(0, 0);
+	lastMouseEventPosition: THREE.Vector2 = new THREE.Vector2(0, 0);
+
 	/**
 	 * Constructor
 	 * */
-	constructor(camera: THREE.Camera) {
+	constructor(camera: Camera) {
 		this.camera = camera;
 
 		this.setupKeyboardControls();
+		this.setupMouseControls();
 	}
 
 	/**
@@ -33,23 +38,37 @@ export class AdvancedFirstPersonControls {
 	 * */
 	updateCamera() {
 		// Get the camera direction
-		this.camera.getWorldDirection(this.cameraDirection);
+		this.camera.threeCamera.getWorldDirection(this.cameraDirection);
 
 		// Setup strafe directions
 		const strafeDirection = this.cameraDirection.clone();
 		strafeDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
 		// Position
-		if (this.toggleUp) this.camera.position.addScaledVector(this.cameraDirection, this.keyboardMoveSpeed);
-		if (this.toggleDown) this.camera.position.addScaledVector(this.cameraDirection, -this.keyboardMoveSpeed);
-		if (this.toggleLeft) this.camera.position.addScaledVector(strafeDirection, this.keyboardMoveSpeed);
-		if (this.toggleRight) this.camera.position.addScaledVector(strafeDirection, -this.keyboardMoveSpeed);
+		if (this.toggleUp) this.camera.threeCamera.position.addScaledVector(this.cameraDirection, this.keyboardMoveSpeed);
+		if (this.toggleDown) this.camera.threeCamera.position.addScaledVector(this.cameraDirection, -this.keyboardMoveSpeed);
+		if (this.toggleLeft) this.camera.threeCamera.position.addScaledVector(strafeDirection, this.keyboardMoveSpeed);
+		if (this.toggleRight) this.camera.threeCamera.position.addScaledVector(strafeDirection, -this.keyboardMoveSpeed);
 
 		// Rotation
-		if (this.toggleRotYNeg) this.camera.rotation.y += this.keyboardRotateSpeed;
-		if (this.toggleRotYPos) this.camera.rotation.y -= this.keyboardRotateSpeed;
+		if (this.toggleRotYNeg) this.camera.threeCamera.rotation.y += this.keyboardRotateSpeed;
+		if (this.toggleRotYPos) this.camera.threeCamera.rotation.y -= this.keyboardRotateSpeed;
 
-		this.camera.getWorldDirection(this.cameraDirection);
+		this.camera.threeCamera.getWorldDirection(this.cameraDirection);
+
+		// And now mouse
+		// THIS CURRENTLY DON'T WOIK
+		console.log("Start here, and fix it");
+		const differenceX = this.lastMouseEventPosition.x - this.lastMouseAnimationFramePosition.x;
+		const differenceY = this.lastMouseEventPosition.y - this.lastMouseAnimationFramePosition.y;
+
+		if (differenceX < 20 && differenceY < 20) {
+			this.camera.threeCameraTiltGroup.rotation.y += differenceX * 0.001;
+			this.camera.threeCameraTiltGroup.rotation.x += differenceY * 0.001;
+		}
+		console.log(differenceX, differenceY);
+		this.lastMouseAnimationFramePosition.x = this.lastMouseEventPosition.x;
+		this.lastMouseAnimationFramePosition.y = this.lastMouseEventPosition.y;
 	}
 
 	/**
@@ -62,6 +81,16 @@ export class AdvancedFirstPersonControls {
 
 		window.addEventListener('keyup', (keyboardEvent: KeyboardEvent) => {
 			this.updateKeyToggle(keyboardEvent, false);
+		});
+	}
+
+	/**
+	 * Listens to keyboard controls
+	 * */
+	setupMouseControls() {
+		window.addEventListener('mousemove', (mouseEvent: MouseEvent) => {
+			this.lastMouseEventPosition.x = mouseEvent.pageX;
+			this.lastMouseEventPosition.y = mouseEvent.pageY;
 		});
 	}
 

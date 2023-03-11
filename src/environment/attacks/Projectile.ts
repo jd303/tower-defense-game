@@ -39,8 +39,6 @@ export class Projectile {
 		this.projectileType = type;
 		this.projectileAsset = asset;
 
-		console.log('NEW PROJ');
-
 		this.projectileAsset.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
 		this.main.scene.add(this.projectileAsset);
 		this.createPath();

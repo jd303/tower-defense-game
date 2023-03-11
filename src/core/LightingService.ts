@@ -35,7 +35,7 @@ export class LightingService {
 	}
 
 	/**
-	 * Adds an ambient light
+	 * Adds a directional light
 	 * */
 	addDirectionalLight(
 		main: boolean = false,
@@ -52,6 +52,28 @@ export class LightingService {
 
 		if (main) directionalLight.isMain = true;
 		return directionalLight;
+	}
+
+	/**
+	 * Adds a point light
+	 * */
+	addPointLight(
+		main: boolean = false,
+		position: THREE.Vector3 = new THREE.Vector3(0, 5, 0),
+		color: string = '#ffffff',
+		intensity: number = 1,
+		distance: number = 10,
+		decay: number = 0.5
+	) {
+		const pointLight = new Light();
+		const threeLight = new THREE.PointLight(color, intensity, distance, decay);
+		pointLight.threeLight = threeLight;
+		pointLight.threeLight.position.set(position.x, position.y, position.z);
+		this.lights.push(pointLight);
+		this.main.scene.add(threeLight);
+
+		if (main) pointLight.isMain = true;
+		return pointLight;
 	}
 
 	/**

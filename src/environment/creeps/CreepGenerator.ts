@@ -1,6 +1,7 @@
 import { Main } from '../../core/Main';
 import { Troll } from './Troll';
 import { TrollDink } from './TrollDink';
+import { Wisp } from './Wisp';
 
 export class CreepGenerator {
 	/**
@@ -13,6 +14,9 @@ export class CreepGenerator {
 			case 'Troll':
 				return new Troll(main);
 			case 'TrollDink':
+				return new TrollDink(main);
+			case 'Wisp':
+				return new Wisp(main);
 			default:
 				return new TrollDink(main);
 		}

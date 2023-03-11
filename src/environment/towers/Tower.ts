@@ -23,7 +23,14 @@ export class Tower extends ModelAsset {
 	}
 
 	/**
-	 * Overwriteable animation
+	 * Animate
+	 * */
+	animateCore(timeProperties: TickTimeProperties) {
+		this.animate(timeProperties);
+	}
+
+	/**
+	 * Animate: Overwritten by Towers
 	 * */
 	animate(timeProperties: TickTimeProperties) {}
 }

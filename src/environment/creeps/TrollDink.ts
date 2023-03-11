@@ -1,4 +1,3 @@
-import { Vector3 } from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from './Creep';
@@ -36,44 +35,11 @@ export class TrollDink extends Creep {
 
 		this.loadModel();
 
-		// Set Creep States
-		this.states = {
-			moving: {
-				isMoving: true,
-			},
-			hurting: {
-				isHurting: false,
-				hurtStartTime: 0,
-				hurtingStateLength: 750,
-			},
-			hurt: false,
-		};
-
 		return this;
 	}
 
 	/**
 	 * Animations
 	 * */
-	animate(timeProperties: TickTimeProperties) {
-		if (this.states.moving.isMoving) {
-			// Calculate travel distance
-			let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
-
-			this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
-			const point = this.path.path.getPoint(this.pathProgress) as Vector3;
-			this.groupMain.position.set(point.x, point.y, point.z);
-
-			this.groupTransforms.position.y = Math.sin(timeProperties.elapsedTime * 50) / 20;
-		}
-
-		if (this.states?.hurting?.isHurting) {
-			if (this.states.hurting.hurtStartTime + this.states.hurting.hurtingStateLength < new Date().getTime()) {
-				this.states.hurting.isHurting = false;
-				this.groupModel.position.x = 0;
-			} else {
-				this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
-			}
-		}
-	}
+	animate(timeProperties: TickTimeProperties) {}
 }

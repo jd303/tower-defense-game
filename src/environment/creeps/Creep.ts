@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
+import { StateMachine, StateMachineEvents, StateTransitionTypes } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelPathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset } from '../ModelAsset';
-import { CreepStates, CreepStats } from './CreepStats';
+import { CreepStates } from './CreepStates';
+import { CreepStats } from './CreepStats';
 
 export class Creep extends ModelAsset {
 	/**
@@ -35,6 +37,7 @@ export class Creep extends ModelAsset {
 	 * Status
 	 * */
 	states: CreepStates;
+	stateMachine: StateMachine;
 
 	/**
 	 * Health bar
@@ -55,6 +58,71 @@ export class Creep extends ModelAsset {
 		this.groupModel = new THREE.Group();
 		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
+		this.stateMachine = this.setDefaultStates();
+		this.stateMachine.trigger('moving');
+	}
+
+	/**
+	 * Sets default States for creeps
+	 * */
+	setDefaultStates() {
+		const stateMachine = new StateMachine();
+
+		stateMachine.addStates([
+			{
+				name: CreepStates.idle,
+			},
+			{
+				name: CreepStates.moving,
+			},
+			{
+				name: CreepStates.hurting,
+				autoStateChange: StateMachineEvents.Stop,
+				autoStateChangeTimeMS: 1000,
+			},
+			{
+				name: CreepStates.hurt,
+			},
+			{
+				name: CreepStates.activatingStandingPower,
+			},
+		]);
+
+		stateMachine.addTransitions([
+			{
+				name: 'pause',
+				activatedStates: [CreepStates.idle],
+				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
+			},
+			{
+				name: 'unpause',
+				activatedStates: [CreepStates.moving],
+				deactivatedStates: [CreepStates.idle],
+			},
+			{
+				name: 'moving',
+				activatedStates: [CreepStates.moving],
+			},
+			{
+				name: 'stop',
+				deactivatedStates: [CreepStates.moving],
+			},
+			{
+				name: 'hurting',
+				activatedStates: [CreepStates.hurting, CreepStates.hurt],
+			},
+			{
+				name: 'activatingStandingPower',
+				activatedStates: [CreepStates.activatingStandingPower],
+				deactivatedStates: [CreepStates.moving],
+			},
+			{
+				name: 'fullHeal',
+				deactivatedStates: [CreepStates.hurt],
+			},
+		]);
+
+		return stateMachine;
 	}
 
 	/**
@@ -65,7 +133,7 @@ export class Creep extends ModelAsset {
 		if (this.stats.damage_taken >= this.stats.hp_total) {
 			this.main.s('Level').currentLevel.removeCreep(this);
 		} else {
-			this.stateTakeDamage();
+			this.takeDamage();
 		}
 	}
 
@@ -101,12 +169,26 @@ export class Creep extends ModelAsset {
 	 * Updates the health bar
 	 * */
 	updateHealthBar() {
-		console.log('UPDATE HEALTH BAR', this.groupTransforms);
 		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
-		const healthBar = healthBarGroup?.getObjectByName(this.healthBarName);
-		console.log('HB', healthBar);
 		healthBarGroup!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
 		healthBarGroup!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
+	}
+
+	/**
+	 * Animation
+	 * */
+	animateCore(timeProperties: TickTimeProperties) {
+		const states = this.stateMachine.activeStates;
+
+		if (states.has(CreepStates.moving)) {
+			this.moveMe(timeProperties);
+		}
+
+		if (states.has(CreepStates.hurting)) {
+			this.hurtMe(timeProperties);
+		}
+
+		this.animate(timeProperties);
 	}
 
 	/**
@@ -115,18 +197,48 @@ export class Creep extends ModelAsset {
 	animate(timeProperties: TickTimeProperties) {}
 
 	/**
-	 * Update Creep State: Creep took damage
+	 * Update Creep: Creep took damage
 	 * */
-	stateTakeDamage() {
-		this.states.hurting.isHurting = true;
-		this.states.hurting.hurtStartTime = new Date().getTime();
+	takeDamage() {
+		/*this.states.hurting.isHurting = true;
+		this.states.hurting.hurtStartTime = new Date().getTime();*/
 
-		if (!this.states.hurt) {
+		if (!this.stateMachine.activeStates.has(CreepStates.hurt)) {
 			this.createHealthBar();
-			this.states.hurt = true;
 		} else {
 			this.updateHealthBar();
 		}
+
+		this.stateMachine.trigger(CreepStates.hurting);
+
+		console.log('>>>> UPDATED STATES', this.stateMachine.activeStates);
+	}
+
+	/**
+	 * Moves a Creep according to its movement speed
+	 * */
+	moveMe(timeProperties: TickTimeProperties) {
+		// Calculate travel distance
+		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
+
+		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
+		const point = this.path.path.getPoint(this.pathProgress) as THREE.Vector3;
+		this.groupMain.position.set(point.x, point.y, point.z);
+
+		this.groupTransforms.position.y = Math.sin(timeProperties.elapsedTime * 50) / 20;
+	}
+
+	/**
+	 * Shows that a Creep is hurt
+	 * */
+	hurtMe(timeProperties: TickTimeProperties) {
+		/*if (this.states.hurting.hurtStartTime + this.states.hurting.hurtingStateLength < new Date().getTime()) {
+			this.states.hurting.isHurting = false;
+			this.groupModel.position.x = 0;
+		} else {
+			this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
+		}*/
+		this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 12;
 	}
 
 	/**

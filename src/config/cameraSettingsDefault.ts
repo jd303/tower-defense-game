@@ -19,8 +19,8 @@ export const orthographicCameraDefaults: CameraSettings = {
 	z: 120,
 	minPolarAngle: Math.PI * 0.2,
 	maxPolarAngle: Math.PI * 0.4,
-	minAzimuthAngle: Math.PI * -0.25,
-	maxAzimuthAngle: Math.PI * 0.25,
+	minAzimuthAngle: Math.PI * -0.1,
+	maxAzimuthAngle: Math.PI * 0.1,
 	minZoom: 0.65,
 	maxZoom: 1.3,
 };

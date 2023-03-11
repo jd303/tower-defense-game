@@ -41,6 +41,7 @@ export class CameraService {
 	 * */
 	createOrthographicCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
 		const camera = new Camera();
+		const cameraTilt = new THREE.Group();
 		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.OrthographicCamera(
@@ -52,6 +53,8 @@ export class CameraService {
 			settings.far
 		);
 
+		camera.threeCameraTiltGroup = cameraTilt;
+		camera.threeCameraTiltGroup.add(camera.threeCamera);
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
 
@@ -64,10 +67,13 @@ export class CameraService {
 	 * */
 	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
 		const camera = new Camera();
+		const cameraTilt = new THREE.Group();
 		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.PerspectiveCamera(settings.fov, this.main.sizes.width / this.main.sizes.height, settings.near, settings.far);
 
+		camera.threeCameraTiltGroup = cameraTilt;
+		camera.threeCameraTiltGroup.add(camera.threeCamera);
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
 
@@ -139,7 +145,7 @@ export class CameraService {
 	 * Sets up orbit handling
 	 * */
 	setupFPSControls() {
-		this.fpsController = new FPSController(this.main, FPSControlsType.fpsAdvancedControls, this.main.s('Camera').mainCamera.threeCamera);
+		this.fpsController = new FPSController(this.main, FPSControlsType.fpsAdvancedControls, this.main.s('Camera').mainCamera);
 	}
 
 	/**
@@ -168,10 +174,11 @@ export class CameraService {
 	}
 }
 
-class Camera {
+export class Camera {
 	isMain: boolean;
 	settings: any;
 	threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
+	threeCameraTiltGroup: THREE.Group;
 }
 
 export interface CameraSettings {

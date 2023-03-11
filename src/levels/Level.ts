@@ -92,7 +92,7 @@ export class Level {
 	 * Animates creeps and towers and other game items
 	 * */
 	gameplayTickCallback(timeProperties: TickTimeProperties) {
-		this.creeps.forEach((creep) => creep.animate(timeProperties));
-		this.towers.forEach((tower) => tower.animate(timeProperties));
+		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
+		this.towers.forEach((tower) => tower.animateCore(timeProperties));
 	}
 }

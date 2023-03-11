@@ -113,7 +113,8 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 2,
-			pathGeometry: PathGeometryTypes.rock,
+			//pathGeometry: PathGeometryTypes.rock,
+			pathGeometry: PathGeometryTypes.dirt,
 			segments: [
 				{
 					type: PathTypes.bezier,
@@ -195,6 +196,10 @@ export const levelDetails: LevelDefinition = {
 							id: '5',
 							type: 'TrollDink',
 						},
+						{
+							id: '6',
+							type: 'Wisp'
+						}
 					],
 				},
 			],
@@ -220,6 +225,14 @@ export const levelDetails: LevelDefinition = {
 							id: '3',
 							type: 'Troll',
 						},
+						{
+							id: '4',
+							type: 'Wisp'
+						},
+						{
+							id: '5',
+							type: 'Wisp'
+						}
 					],
 				},
 			],
