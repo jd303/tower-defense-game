@@ -8,7 +8,6 @@ export class CreepGenerator {
 	 * Construtor
 	 * */
 	static createCreep(creepDefinition: any, main: Main) {
-		console.log('CREATE CREEP', creepDefinition.type);
 		switch (creepDefinition.type) {
 			// Fantasy
 			case 'Troll':

@@ -76,6 +76,10 @@ export class DebugService {
 			step: 0.001,
 			name: `${label} Intensity`,
 		});
+
+		// Stop here if an Ambient light
+		if (light.threeLight instanceof THREE.AmbientLight) return;
+
 		this.addDebugNumber({
 			folder: folder,
 			objectParent: light.threeLight.position,
@@ -108,7 +112,7 @@ export class DebugService {
 	/**
 	 * Add a Sphere to the scene at 0,0,0
 	 * */
-	createDebugSphere() {
+	addDebugSphere() {
 		const geometry = new THREE.SphereGeometry(1, 10, 10);
 		const material = new THREE.MeshStandardMaterial({ color: '#ffffff' });
 		const mesh = new THREE.Mesh(geometry, material);
@@ -122,7 +126,7 @@ export class DebugService {
 	/**
 	 * Add a Plane to the scene at 0,0,0
 	 * */
-	createDebugPlane() {
+	addDebugPlane() {
 		const geometry = new THREE.PlaneGeometry(100, 100);
 		const material = new THREE.MeshStandardMaterial({ color: '#aaaaaa' });
 		const mesh = new THREE.Mesh(geometry, material);
@@ -132,5 +136,16 @@ export class DebugService {
 		material.needsUpdate = true;
 
 		this.main.scene.add(mesh);
+	}
+
+	/**
+	 * Add a world cube of a particular colour
+	 * */
+	addWorldCube(size: number = 100, colour: number = 0xffffff) {
+		const cubeGeometry = new THREE.BoxGeometry(size, size, size, 1, 1, 1);
+		const cubeMaterial = new THREE.MeshBasicMaterial( { color: colour } );
+		cubeMaterial.side = THREE.BackSide;
+		const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+		this.main.scene.add(cubeMesh);
 	}
 }

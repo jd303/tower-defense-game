@@ -7,13 +7,15 @@ export class CreepStats {
 	hp_total: number;
 	move_speed: number;
 	defenses: DamageTypes;
-	damage_taken = 0;
+	hp_current: number;
+	kill_rewards: CreepKillAwards;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(stats: CreepStatSetup) {
 		this.hp_total = stats.hp_total;
+		this.hp_current = stats.hp_total;
 		this.move_speed = stats.move_speed;
 		this.defenses = {
 			piercing: stats.defenses.piercing,
@@ -23,6 +25,7 @@ export class CreepStats {
 			lightning: stats.defenses.lightning,
 			fire: stats.defenses.fire,
 		};
+		this.kill_rewards = stats.kill_rewards;
 
 		return this;
 	}
@@ -55,6 +58,7 @@ interface CreepStatSetup {
 	hp_total: number;
 	move_speed: number;
 	defenses: DamageTypes;
+	kill_rewards: CreepKillAwards;
 }
 
 export interface CreepMoving {
@@ -65,4 +69,9 @@ export interface CreepHurting {
 	isHurting: boolean;
 	hurtStartTime: number;
 	hurtingStateLength: number;
+}
+
+interface CreepKillAwards {
+	economic_property: string;
+	value: number;
 }

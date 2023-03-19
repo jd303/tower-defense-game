@@ -29,7 +29,6 @@ export class StateMachine {
 		}
 
 		if (index !== undefined) this.states[index] = newDefinition;
-		console.log('STATES', this.states);
 	}
 
 	/**
@@ -42,7 +41,7 @@ export class StateMachine {
 	/**
 	 * An event is given to the state machine
 	 * */
-	trigger(transitionName: string) {
+	transition(transitionName: string) {
 		const transition = this.transitions.find((trans) => trans.name == transitionName);
 
 		transition?.activatedStates?.forEach((activatedState) => this.activateStateByName(activatedState));
@@ -60,28 +59,27 @@ export class StateMachine {
 			this.activeStates.add(state.name);
 
 			// onEnter Lifecycle
-			console.log('SHTAPTE', state);
 			if ('onEnter' in state) {
 				if (state.onEnter) state.onEnter();
 			}
 
 			// If this should stopAfterTime
-			if (state.autoStateChange && state.autoStateChangeTimeMS) {
+			if (state.autoTransition && state.autoTransitionTimeMS) {
 				let stateChangeCallback: Function;
 
-				switch (state.autoStateChange) {
+				switch (state.autoTransition) {
 					case StateMachineEvents.Stop:
 						stateChangeCallback = () => this.deactivateStateByName(stateName);
 						break;
 					default:
 						stateChangeCallback = () => {
-							console.log('TRIGGER CHANGE TO', state.autoStateChange);
-							this.trigger(state.autoStateChange as string);
+							console.log('TRIGGER CHANGE TO', state.autoTransition);
+							this.transition(state.autoTransition as string);
 						};
 				}
 
 				if (state.timer) state.timer.dispose();
-				state.timer = new Timer(stateChangeCallback, state.autoStateChangeTimeMS);
+				state.timer = new Timer(stateChangeCallback, state.autoTransitionTimeMS);
 			}
 		}
 	}
@@ -92,7 +90,13 @@ export class StateMachine {
 	deactivateStateByName(stateName: string) {
 		console.log('%c Dectivating ' + stateName, 'color:red');
 		const state = this.states.find((state) => state.name == stateName);
+
 		if (state) {
+			// onExit Lifecycle
+			if ('onExit' in state) {
+				if (state.onExit) state.onExit();
+			}
+
 			state.active = false;
 			this.activeStates.delete(stateName);
 		}
@@ -102,8 +106,8 @@ export class StateMachine {
 interface State {
 	name: string;
 	active?: boolean;
-	autoStateChange?: StateMachineEvents | string; // If the state naturally has a timeout
-	autoStateChangeTimeMS?: number;
+	autoTransition?: StateMachineEvents | string; // If the state naturally has a timeout
+	autoTransitionTimeMS?: number;
 	timer?: Timer;
 	onEnter?: Function;
 	onExit?: Function;

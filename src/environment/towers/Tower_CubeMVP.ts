@@ -31,10 +31,14 @@ export class TowerCubeMVP extends Tower {
 	/**
 	 * Stats
 	 * */
-	damage = 3;
-	range = 10;
-	last_attack_time = 0;
-	attack_cooldown = 800;
+	static baseStats = {
+		cost: 150,
+		costType: 'money',
+		damage: 6,
+		range: 10,
+		last_attack_time: 0,
+		attack_cooldown: 800
+	}
 
 	/**
 	 * Constructor
@@ -42,6 +46,7 @@ export class TowerCubeMVP extends Tower {
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
+		this.stats = TowerCubeMVP.baseStats;
 		return this;
 	}
 
@@ -55,13 +60,13 @@ export class TowerCubeMVP extends Tower {
 			const distance = creepPosition.distanceTo(position);
 
 			// If something is in range
-			if (distance < this.range) {
+			if (distance < this.stats.range) {
 				const currentTime = new Date().getTime();
 
 				// If this thing can attack
-				if (currentTime - this.attack_cooldown > this.last_attack_time) {
-					creep.resolveAttack(this.damage);
-					this.last_attack_time = new Date().getTime();
+				if (currentTime - this.stats.attack_cooldown > this.stats.last_attack_time) {
+					creep.resolveAttack(this.stats.damage);
+					this.stats.last_attack_time = new Date().getTime();
 					this.states.attacking.isAttacking = true;
 					this.states.attacking.attackStartTime = new Date().getTime();
 

@@ -1,4 +1,6 @@
 export class TowerStats {
+	cost: number;
+	costType: string;
 	damage: number;
 	range: number;
 	last_attack_time: number;

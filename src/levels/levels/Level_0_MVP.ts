@@ -1,24 +1,25 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { perspectiveCameraDefaults, orthographicCameraDefaults } from '../../config/cameraSettingsDefault';
 import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
 import { Level } from '../Level';
 import { LevelPath } from '../LevelPath';
 import { TreeCone1 } from '../../environment/nature/TreeCone1';
-import { UI } from '../../UI';
 import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
 import { TowerCubeMVP } from '../../environment/towers/Tower_CubeMVP';
-
 import { levelDetails } from './Level_0_MVP_JSON';
+import { EconomyService } from '../../game/EconomyService';
+import { UIService } from '../../UIService';
+import { EventService } from '../../core/EventService';
 
 export class Level0MVP extends Level {
 	/**
 	 * System Properties
 	 * */
 	main: Main;
-	UI: UI;
 
 	/**
 	 * Level Properties
@@ -125,17 +126,27 @@ export class Level0MVP extends Level {
 		);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
-		const ambientLight = this.main.s('Lighting').addAmbientLight();
-		const directionalLight = this.main.s('Lighting').addDirectionalLight(true);
+		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");
+		this.main.s('Lighting').enableLight(ambientLight);
+		const directionalLight = this.main.s('Lighting').createDirectionalLight(true);
+		this.main.s('Lighting').enableLight(directionalLight);
 		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
 		this.main.s('Debug').debugLight(ambientLight, 'Ambient Light');
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
-		this.UI = new UI(this.main);
-		console.log(TowerCubeMVP.UI);
-		console.log(TowerCubeMVP.UI.getProperties());
-		this.UI.addTowerUI([TowerCubeMVP.UI.getProperties()]);
-		this.UI.attach();
+		const sUI: UIService = this.main.s('UI');
+		sUI.addUIButtons([TowerCubeMVP]);
+		sUI.addEconomyLabel('money', 'commerce_money_changed');
+		sUI.attach();
+
+		// Test change economy
+		const sEconomy: EconomyService = this.main.s('Economy');
+		const sEvent: EventService = this.main.s('Event');
+		sEconomy.setEconomyValue("money", 600);
+		sEvent.fire('commerce_money_changed', 600);
+
+		
+
 
 		// Enable shadows
 		setTimeout(() => {
@@ -155,6 +166,7 @@ export class Level0MVP extends Level {
 			console.log(this.terrain);
 			console.log(directionalLight);
 		}, 1000);
+		
 
 		/**
 		 * DEBUG THINGS

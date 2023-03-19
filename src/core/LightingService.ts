@@ -23,22 +23,22 @@ export class LightingService {
 	/**
 	 * Adds an ambient light
 	 * */
-	addAmbientLight(main: boolean = false, color: string = '#ffffff', intensity: number = 0.5) {
+	createAmbientLight(name: string, color: string = '#ffffff', intensity: number = 0.5) {
 		const ambientLight = new Light();
 		const threeLight = new THREE.AmbientLight(color, intensity);
 		ambientLight.threeLight = threeLight;
+		ambientLight.name = name;
+		ambientLight.threeLight.name = name;
 		this.lights.push(ambientLight);
-		this.main.scene.add(threeLight);
 
-		if (main) ambientLight.isMain = true;
 		return ambientLight;
 	}
 
 	/**
 	 * Adds a directional light
 	 * */
-	addDirectionalLight(
-		main: boolean = false,
+	createDirectionalLight(
+		name: string,
 		position: THREE.Vector3 = new THREE.Vector3(40, 40, 40),
 		color: string = '#ffffff',
 		intensity: number = 1.25
@@ -46,19 +46,19 @@ export class LightingService {
 		const directionalLight = new Light();
 		const threeLight = new THREE.DirectionalLight(color, intensity);
 		directionalLight.threeLight = threeLight;
+		directionalLight.name = name;
+		directionalLight.threeLight.name = name;
 		directionalLight.threeLight.position.set(position.x, position.y, position.z);
 		this.lights.push(directionalLight);
-		this.main.scene.add(threeLight);
 
-		if (main) directionalLight.isMain = true;
 		return directionalLight;
 	}
 
 	/**
 	 * Adds a point light
 	 * */
-	addPointLight(
-		main: boolean = false,
+	createPointLight(
+		name: string,
 		position: THREE.Vector3 = new THREE.Vector3(0, 5, 0),
 		color: string = '#ffffff',
 		intensity: number = 1,
@@ -68,11 +68,11 @@ export class LightingService {
 		const pointLight = new Light();
 		const threeLight = new THREE.PointLight(color, intensity, distance, decay);
 		pointLight.threeLight = threeLight;
+		pointLight.name = name;
+		pointLight.threeLight.name = name;
 		pointLight.threeLight.position.set(position.x, position.y, position.z);
 		this.lights.push(pointLight);
-		this.main.scene.add(threeLight);
 
-		if (main) pointLight.isMain = true;
 		return pointLight;
 	}
 
@@ -110,10 +110,41 @@ export class LightingService {
 	}
 
 	/**
+	 * Stops a light casting shadows
+	 * */
+	removeShadowsFromLight(light: Light) {
+		light.threeLight.castShadow = false;
+	}
+
+	/**
 	 * Returns the main light
 	 * */
-	getMainLight() {
-		return this.lights.find((light) => light.isMain);
+	getLightByName(name: string) {
+		return this.lights.find((light) => light.name == name);
+	}
+
+	/**
+	 * Adds the light to the scene
+	 * @param { string | Light } lightToEnable Name of the light as a string, or an actual light
+	 * */
+	enableLight(lightToEnable: string | Light) {
+		let light = null;
+
+		if (typeof(lightToEnable) == "string") {
+			light = this.getLightByName(lightToEnable);
+		} else if (lightToEnable instanceof Light) {
+			light = lightToEnable;
+		}
+
+		if (light) this.main.scene.add(light.threeLight);
+	}
+
+	/**
+	 * Removes the light to the scene
+	 * */
+	disableLight(name: string) {
+		const light = this.getLightByName(name);
+		if (light) this.main.scene.remove(light.threeLight);
 	}
 
 	/**
@@ -128,6 +159,6 @@ export class LightingService {
 }
 
 export class Light {
-	isMain: boolean;
+	name: string;
 	threeLight: THREE.Light;
 }

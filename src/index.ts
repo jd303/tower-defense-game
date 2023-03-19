@@ -3,6 +3,9 @@ import { Main } from './core/Main';
 import { LevelService } from './levels/LevelService';
 import { InteractionService } from './InteractionService';
 import { PositionService } from './environment/PositionService';
+import { EconomyService } from './game/EconomyService';
+import { UIService } from './UIService';
+import { EventService } from './core/EventService';
 
 /**
  * Configuration
@@ -23,6 +26,9 @@ const main = new Main(canvas, sizes, debugMode);
 main.registerService('Level', new LevelService(main));
 main.registerService('Interaction', new InteractionService(main));
 main.registerService('PositionService', new PositionService(main));
+main.registerService('Economy', new EconomyService(main));
+main.registerService('UI', new UIService(main));
+main.registerService('Event', new EventService());
 
 // Loads the working scene
 main.s('Level').loadScene('Level_0_MVP');

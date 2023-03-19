@@ -1,7 +1,7 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from './Creep';
-import { CreepStates } from './CreepStates';
+import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 
 export class Wisp extends Creep {
@@ -16,7 +16,7 @@ export class Wisp extends Creep {
 	 * */
 	stats = new CreepStats({
 		hp_total: 10,
-		move_speed: 4,
+		move_speed: 3,
 		defenses: {
 			piercing: 0,
 			crushing: 0,
@@ -25,6 +25,10 @@ export class Wisp extends Creep {
 			lightning: 0,
 			fire: 0,
 		},
+		kill_rewards: {
+			economic_property: "money",
+			value: 15
+		}
 	});
 	healthBarY: 1;
 
@@ -36,7 +40,7 @@ export class Wisp extends Creep {
 
 		this.loadModel();
 		this.modifyStateMachine();
-		this.stateMachine.trigger('moving');
+		this.stateMachine.transition('moving');
 
 		return this;
 	}
@@ -48,15 +52,15 @@ export class Wisp extends Creep {
 		// Wisps stop to use their ability
 		this.stateMachine.modifyState(CreepStates.moving, {
 			name: CreepStates.moving,
-			autoStateChange: 'activatingStandingPower',
-			autoStateChangeTimeMS: 5000,
+			autoTransition: CreepTransitions.activating_standing_power,
+			autoTransitionTimeMS: 5000,
 		});
 
 		// Wisps then activate and move on
 		this.stateMachine.modifyState(CreepStates.activatingStandingPower, {
 			name: CreepStates.activatingStandingPower,
-			autoStateChange: 'moving',
-			autoStateChangeTimeMS: 1750,
+			autoTransition: CreepTransitions.moving,
+			autoTransitionTimeMS: 1750,
 			onEnter: this.activateStandingPower.bind(this),
 		});
 	}
@@ -70,15 +74,15 @@ export class Wisp extends Creep {
 		const creepsAroundMe = this.main.s('PositionService').findCreepsByLocation(this.groupMain.position, 15);
 		const creepsThatArentMe = creepsAroundMe.filter((creep: Creep) => creep !== this);
 
-		const averageHealthPercentage =
-			creepsThatArentMe.reduce(
-				(percentage: number, creep: Creep) => percentage + ((creep.stats.hp_total - creep.stats.damage_taken) / creep.stats.hp_total) * 100,
-				0
-			) / creepsThatArentMe.length;
+		const combinedHealthPercentage =
+			creepsThatArentMe.reduce((percentage: number, creep: Creep) => percentage + (creep.stats.hp_current / creep.stats.hp_total) * 100, 0);
+		const averageHealthPercentage = combinedHealthPercentage / creepsThatArentMe.length;
 
-		console.log('AVERAGE HEALTH IS', averageHealthPercentage);
-
-		creepsThatArentMe.forEach((creep: Creep) => creep.setHealthByPercentage(averageHealthPercentage));
+		creepsThatArentMe.forEach((creep: Creep) => {
+			creep.stateMachine.transition(CreepTransitions.healed);
+			//creep.adjustHealthByNumber(20);
+			creep.setHealthByPercentage(averageHealthPercentage);
+		});
 	}
 
 	/**

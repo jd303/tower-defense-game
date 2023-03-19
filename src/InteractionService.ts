@@ -37,7 +37,6 @@ export class InteractionService {
 	 * Adds clickable raycaster subjects
 	 * */
 	addRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
-		console.log('SUB', subjects);
 		this.raycasterSubjects.push(...subjects);
 	}
 

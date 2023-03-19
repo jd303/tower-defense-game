@@ -25,8 +25,8 @@ export class CameraService {
 		far: 350,
 		zoom: 0.5,
 		x: 0,
-		y: 40,
-		z: 50,
+		y: 0,
+		z: 0,
 	};
 
 	/**
@@ -40,8 +40,9 @@ export class CameraService {
 	 * Creates an orthographic camera
 	 * */
 	createOrthographicCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
-		const camera = new Camera();
+		const cameraPan = new THREE.Group();
 		const cameraTilt = new THREE.Group();
+		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.OrthographicCamera(
@@ -53,32 +54,42 @@ export class CameraService {
 			settings.far
 		);
 
-		camera.threeCameraTiltGroup = cameraTilt;
-		camera.threeCameraTiltGroup.add(camera.threeCamera);
+		camera.groupPan = cameraPan;
+		camera.groupTilt = cameraTilt;
+
+		camera.groupPan.add(camera.groupTilt);
+		camera.groupTilt.add(camera.threeCamera);
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
+		return camera;
 	}
 
 	/**
 	 * Creates a perspective camera
 	 * */
 	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
-		const camera = new Camera();
+		const cameraPan = new THREE.Group();
 		const cameraTilt = new THREE.Group();
+		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.PerspectiveCamera(settings.fov, this.main.sizes.width / this.main.sizes.height, settings.near, settings.far);
 
-		camera.threeCameraTiltGroup = cameraTilt;
-		camera.threeCameraTiltGroup.add(camera.threeCamera);
+		camera.groupPan = cameraPan;
+		camera.groupTilt = cameraTilt;
+
+		camera.groupPan.add(camera.groupTilt);
+		camera.groupTilt.add(camera.threeCamera);
+
 		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
+		return camera;
 	}
 
 	/**
@@ -177,8 +188,9 @@ export class CameraService {
 export class Camera {
 	isMain: boolean;
 	settings: any;
+	groupPan: THREE.Group;
+	groupTilt: THREE.Group;
 	threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
-	threeCameraTiltGroup: THREE.Group;
 }
 
 export interface CameraSettings {

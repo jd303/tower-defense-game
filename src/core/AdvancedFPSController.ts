@@ -38,37 +38,38 @@ export class AdvancedFirstPersonControls {
 	 * */
 	updateCamera() {
 		// Get the camera direction
-		this.camera.threeCamera.getWorldDirection(this.cameraDirection);
+		this.camera.groupPan.getWorldDirection(this.cameraDirection);
+		this.camera.groupTilt.getWorldDirection(this.cameraDirection);
 
 		// Setup strafe directions
 		const strafeDirection = this.cameraDirection.clone();
 		strafeDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
 		// Position
-		if (this.toggleUp) this.camera.threeCamera.position.addScaledVector(this.cameraDirection, this.keyboardMoveSpeed);
-		if (this.toggleDown) this.camera.threeCamera.position.addScaledVector(this.cameraDirection, -this.keyboardMoveSpeed);
-		if (this.toggleLeft) this.camera.threeCamera.position.addScaledVector(strafeDirection, this.keyboardMoveSpeed);
-		if (this.toggleRight) this.camera.threeCamera.position.addScaledVector(strafeDirection, -this.keyboardMoveSpeed);
+		if (this.toggleUp) this.camera.groupPan.position.addScaledVector(this.cameraDirection, -this.keyboardMoveSpeed);
+		if (this.toggleDown) this.camera.groupPan.position.addScaledVector(this.cameraDirection, this.keyboardMoveSpeed);
+		if (this.toggleLeft) this.camera.groupPan.position.addScaledVector(strafeDirection, -this.keyboardMoveSpeed);
+		if (this.toggleRight) this.camera.groupPan.position.addScaledVector(strafeDirection, this.keyboardMoveSpeed);
 
 		// Rotation
-		if (this.toggleRotYNeg) this.camera.threeCamera.rotation.y += this.keyboardRotateSpeed;
-		if (this.toggleRotYPos) this.camera.threeCamera.rotation.y -= this.keyboardRotateSpeed;
+		if (this.toggleRotYNeg) this.camera.groupPan.rotation.y += this.keyboardRotateSpeed;
+		if (this.toggleRotYPos) this.camera.groupPan.rotation.y -= this.keyboardRotateSpeed;
 
 		this.camera.threeCamera.getWorldDirection(this.cameraDirection);
 
 		// And now mouse
 		// THIS CURRENTLY DON'T WOIK
-		console.log("Start here, and fix it");
-		const differenceX = this.lastMouseEventPosition.x - this.lastMouseAnimationFramePosition.x;
+		console.log("Mouse controls disabled until fixed");
+		/*const differenceX = this.lastMouseEventPosition.x - this.lastMouseAnimationFramePosition.x;
 		const differenceY = this.lastMouseEventPosition.y - this.lastMouseAnimationFramePosition.y;
 
 		if (differenceX < 20 && differenceY < 20) {
-			this.camera.threeCameraTiltGroup.rotation.y += differenceX * 0.001;
-			this.camera.threeCameraTiltGroup.rotation.x += differenceY * 0.001;
+			this.camera.groupTilt.rotation.y += differenceX * 0.001;
+			this.camera.groupTilt.rotation.x += differenceY * 0.001;
 		}
 		console.log(differenceX, differenceY);
 		this.lastMouseAnimationFramePosition.x = this.lastMouseEventPosition.x;
-		this.lastMouseAnimationFramePosition.y = this.lastMouseEventPosition.y;
+		this.lastMouseAnimationFramePosition.y = this.lastMouseEventPosition.y;*/
 	}
 
 	/**

@@ -3,7 +3,7 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset } from '../ModelAsset';
 import { UIProperties, UITypes } from '../../UIProperties';
-import { TowerStates } from './TowerStats';
+import { TowerStats, TowerStates } from './TowerStats';
 
 export class Tower extends ModelAsset {
 	/**
@@ -12,6 +12,20 @@ export class Tower extends ModelAsset {
 	states: TowerStates = new TowerStates();
 	attackStateLength: number = 750;
 
+	/**
+	 * Stats
+	 * */
+	baseStats: TowerStats;
+	stats: TowerStats;
+
+	/**
+	 * UI Elements
+	 * */
+	UI: TowerUI;
+
+	/**
+	 * Constructor
+	 * */
 	constructor(main: Main) {
 		super(main);
 		this.main = main;

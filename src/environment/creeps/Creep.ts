@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { StateMachine, StateMachineEvents, StateTransitionTypes } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelPathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset } from '../ModelAsset';
-import { CreepStates } from './CreepStates';
+import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 
 export class Creep extends ModelAsset {
@@ -42,8 +43,7 @@ export class Creep extends ModelAsset {
 	/**
 	 * Health bar
 	 * */
-	healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
-	healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
+	healthBar: THREE.Group | null;
 	healthBarGroupName: string = 'healthbargroup';
 	healthBarName: string = 'healthbar';
 	healthBarY: number = 1;
@@ -59,7 +59,7 @@ export class Creep extends ModelAsset {
 		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.trigger('moving');
+		this.stateMachine.transition('moving');
 	}
 
 	/**
@@ -77,11 +77,18 @@ export class Creep extends ModelAsset {
 			},
 			{
 				name: CreepStates.hurting,
-				autoStateChange: StateMachineEvents.Stop,
-				autoStateChangeTimeMS: 1000,
+				autoTransition: StateMachineEvents.Stop,
+				autoTransitionTimeMS: 1000,
 			},
 			{
 				name: CreepStates.hurt,
+			},
+			{
+				name: CreepStates.healing,
+				autoTransition: StateMachineEvents.Stop,
+				autoTransitionTimeMS: 1500,
+				onEnter: this.stateEnterHealing.bind(this),
+				onExit: this.stateExitHealing.bind(this)
 			},
 			{
 				name: CreepStates.activatingStandingPower,
@@ -91,35 +98,40 @@ export class Creep extends ModelAsset {
 
 		stateMachine.addTransitions([
 			{
-				name: 'pause',
+				name: CreepTransitions.pause,
 				activatedStates: [CreepStates.idle],
 				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
 			},
 			{
-				name: 'unpause',
+				name: CreepTransitions.unpause,
 				activatedStates: [CreepStates.moving],
 				deactivatedStates: [CreepStates.idle],
 			},
 			{
-				name: 'moving',
+				name: CreepTransitions.moving,
 				activatedStates: [CreepStates.moving],
 			},
 			{
-				name: 'stop',
+				name: CreepTransitions.stop,
 				deactivatedStates: [CreepStates.moving],
 			},
 			{
-				name: 'hurting',
+				name: CreepTransitions.took_damage,
 				activatedStates: [CreepStates.hurting, CreepStates.hurt],
 			},
 			{
-				name: 'activatingStandingPower',
+				name: CreepTransitions.activating_standing_power,
 				activatedStates: [CreepStates.activatingStandingPower],
 				deactivatedStates: [CreepStates.moving],
 			},
 			{
-				name: 'fullHeal',
+				name: CreepTransitions.full_heal,
 				deactivatedStates: [CreepStates.hurt],
+			},
+			{
+				name: CreepTransitions.healed,
+				activatedStates: [CreepStates.healing],
+				deactivatedStates: [CreepStates.hurt, CreepStates.hurting],
 			},
 		]);
 
@@ -133,7 +145,7 @@ export class Creep extends ModelAsset {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
-		this.adjustHealthByNumber(damage);
+		this.adjustHealthByNumber(-1 * damage);
 	}
 
 	/**
@@ -141,7 +153,9 @@ export class Creep extends ModelAsset {
 	 * @param { number } difference Positive or negative number to adjust the creeps' health
 	 * */
 	adjustHealthByNumber(difference: number) {
-		this.stats.damage_taken += difference;
+		const minHealth = Math.max(0, this.stats.hp_current + difference);
+		const maxHealth = Math.min(this.stats.hp_total, minHealth);
+		this.stats.hp_current = maxHealth;
 
 		this.checkHealthStatus();
 	}
@@ -151,8 +165,7 @@ export class Creep extends ModelAsset {
 	 * @param { number } percentage Percentage of health to set
 	 * */
 	setHealthByPercentage(percentage: number) {
-		this.stats.damage_taken = this.stats.hp_total - Math.floor((this.stats.hp_total * percentage) / 100);
-		console.log('SETTING HEALTH', this.stats.hp_total - Math.floor((this.stats.hp_total * percentage) / 100));
+		this.stats.hp_current = this.stats.hp_total * percentage / 100;
 
 		this.checkHealthStatus();
 	}
@@ -161,28 +174,44 @@ export class Creep extends ModelAsset {
 	 * Checks the health status and orgnaises health bars
 	 * */
 	checkHealthStatus() {
-		// If the creep died
-		if (this.stats.damage_taken >= this.stats.hp_total) {
-			this.main.s('Level').currentLevel.removeCreep(this);
 
-			// If the creep is fresh
-		} else if (this.stats.damage_taken == 0) {
-			// Should remove health bar
-			// DO THAT HERE
-			console.log('FULL HEALTH');
+		switch (true) {
 
-			// Otherwise the creep's status bar needs to be set
-		} else {
-			if (!this.stateMachine.activeStates.has(CreepStates.hurt)) {
-				this.createHealthBar();
-			} else {
-				this.updateHealthBar();
+			// The Creep has died
+			case this.stats.hp_current <= 0:
+				this.killCreep();
+				break;
+
+			// The Creep has full health
+			case this.stats.hp_current >= this.stats.hp_total:
+				this.removeHealthBar();
+				break;
+
+			// The Creep has lost some health
+			default:
+				if (!this.healthBar) this.createHealthBar();
+				else this.updateHealthBar();
+	
+				this.stateMachine.transition(CreepTransitions.took_damage);
+				break;
 			}
+	}
 
-			this.stateMachine.trigger(CreepStates.hurting);
+	/**
+	 * A creep has died
+	 * */
+	killCreep() {
+		const rewards = this.stats.kill_rewards;
+		const newValue = this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
+		this.main.s('Event').fire('commerce_money_changed', newValue);
+		this.main.s('Level').currentLevel.removeCreep(this);
+	}
 
-			console.log('>>>> UPDATED STATES', this.stateMachine.activeStates);
-		}
+	/**
+	 * A creep has escaped their path / beaten the player
+	 * */
+	creepEscaped() {
+		this.main.s('Level').currentLevel.removeCreep(this);
 	}
 
 	/**
@@ -197,17 +226,18 @@ export class Creep extends ModelAsset {
 	 * Creates a health bar for this creep
 	 * */
 	createHealthBar() {
-		const barBG = new THREE.PlaneBufferGeometry(1, 0.25);
-		const barFG = new THREE.PlaneBufferGeometry(1, 0.25);
+		const barBG = CreepCommons.healthBarGeometry;
+		const barFG = CreepCommons.healthBarGeometry;
 		const healthBarGroup = new THREE.Group();
-		const bgMesh = new THREE.Mesh(barBG, this.healthBarBGMaterial);
-		const fgMesh = new THREE.Mesh(barFG, this.healthBarFGMaterial);
+		const bgMesh = new THREE.Mesh(barBG, CreepCommons.healthBarBGMaterial);
+		const fgMesh = new THREE.Mesh(barFG, CreepCommons.healthBarFGMaterial);
 		fgMesh.name = this.healthBarName;
 		healthBarGroup.name = this.healthBarGroupName;
 		healthBarGroup.add(bgMesh);
 		healthBarGroup.add(fgMesh);
 		healthBarGroup.position.y = this.healthBarY;
 		healthBarGroup.position.z = 1;
+		this.healthBar = healthBarGroup;
 		this.groupTransforms.add(healthBarGroup);
 
 		this.updateHealthBar();
@@ -218,8 +248,20 @@ export class Creep extends ModelAsset {
 	 * */
 	updateHealthBar() {
 		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
-		healthBarGroup!.scale.x = 1 - this.stats.damage_taken / this.stats.hp_total;
-		healthBarGroup!.position.x = -(this.stats.damage_taken / this.stats.hp_total) / 2;
+		healthBarGroup!.scale.x = this.stats.hp_current / this.stats.hp_total;
+		healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) / 2;
+		healthBarGroup!.position.x = 0;
+		console.log("TODO: Align item properly");
+	}
+
+	/**
+	 * Removes a health bar if one exists
+	 * */
+	removeHealthBar() {
+		if (this.healthBar) {
+			this.groupTransforms.remove(this.healthBar);
+			this.healthBar = null;
+		}
 	}
 
 	/**
@@ -229,11 +271,15 @@ export class Creep extends ModelAsset {
 		const states = this.stateMachine.activeStates;
 
 		if (states.has(CreepStates.moving)) {
-			this.moveMe(timeProperties);
+			this.animationMoveMe(timeProperties);
 		}
 
 		if (states.has(CreepStates.hurting)) {
-			this.hurtMe(timeProperties);
+			this.animationHurtMe(timeProperties);
+		}
+
+		if (states.has(CreepStates.healing)) {
+			this.animationHealing();
 		}
 
 		this.animate(timeProperties);
@@ -247,11 +293,16 @@ export class Creep extends ModelAsset {
 	/**
 	 * Moves a Creep according to its movement speed
 	 * */
-	moveMe(timeProperties: TickTimeProperties) {
+	animationMoveMe(timeProperties: TickTimeProperties) {
 		// Calculate travel distance
 		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
 
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
+		
+		if (this.pathProgress >= 1) {
+			this.creepEscaped();
+		}
+
 		const point = this.path.path.getPoint(this.pathProgress) as THREE.Vector3;
 		this.groupMain.position.set(point.x, point.y, point.z);
 
@@ -261,14 +312,52 @@ export class Creep extends ModelAsset {
 	/**
 	 * Shows that a Creep is hurt
 	 * */
-	hurtMe(timeProperties: TickTimeProperties) {
-		/*if (this.states.hurting.hurtStartTime + this.states.hurting.hurtingStateLength < new Date().getTime()) {
-			this.states.hurting.isHurting = false;
-			this.groupModel.position.x = 0;
-		} else {
-			this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 20;
-		}*/
+	animationHurtMe(timeProperties: TickTimeProperties) {
 		this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 12;
+	}
+
+	/**
+	 * Animates healing crosses
+	 * */
+	animationHealing() {
+		const healingCrosses = this.groupMain.getObjectByName("HealingAnimation");
+		if (healingCrosses) {
+			healingCrosses.children.forEach((cross, index) => {
+				cross.position.y += index * 0.005 + 0.001;
+			});
+		}
+	}
+
+	/**
+	 * When the Creep is healed
+	 * */
+	stateEnterHealing() {
+		const healingAnimationGroup = new THREE.Group();
+
+		this.stateExitHealing();
+
+		for (let x=0; x<4; x++) {
+			const thisCross = CreepCommons.healingCrossMesh();
+			thisCross.position.x += Math.random() - 0.5;
+			thisCross.position.y += Math.random();
+			const scale = Math.random() * 0.9 + 0.1;
+			thisCross.scale.set(scale, scale, scale);
+
+			healingAnimationGroup.add(thisCross);
+		}
+		
+		healingAnimationGroup.name = "HealingAnimation";
+
+		this.groupMain.add(healingAnimationGroup);
+		healingAnimationGroup.position.z = 2;
+	}
+
+	/**
+	 * When the Creep leaves healing state (also called when entering, to clear it out)
+	 * */
+	stateExitHealing() {
+		const healingAnimationGroup = this.groupMain.getObjectByName("HealingAnimation");
+		if (healingAnimationGroup) this.groupMain.remove(healingAnimationGroup);
 	}
 
 	/**
@@ -286,8 +375,29 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
+	 * Creates a temporary healing animation
+	 * */
+	createHealingEffect() {
+		console.log("%c Creating healing effect", "color: green");
+	}
+
+	/**
 	 * Creep Powers
 	 * */
 	activateStandingPower() {}
 	activateIdlePower() {}
+}
+
+class CreepCommons {
+	/* Health Bar Commons */
+	static healthBarGeometry: THREE.PlaneBufferGeometry = new THREE.PlaneBufferGeometry(1, 0.25);
+	static healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
+	static healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
+
+	/** Healing commons */
+	static healingCrossBeamHorizontal = new THREE.BoxGeometry(0.5, 0.1, 0.05);
+	static healingCrossBeamVertical = new THREE.BoxGeometry(0.10, 0.5, 0.05);
+	static healingCrossMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00});
+	static healingCrossMerge = BufferGeometryUtils.mergeBufferGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
+	static healingCrossMesh = () => { return new THREE.Mesh(this.healingCrossMerge, this.healingCrossMaterial); }
 }
