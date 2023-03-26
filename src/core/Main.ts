@@ -6,6 +6,7 @@ import { SizesInterface } from './WindowService';
 import { GLTFLoadController } from './LoaderService';
 import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
+import { AudioService } from './AudioService';
 
 export class Main {
 	/**
@@ -35,6 +36,7 @@ export class Main {
 		this.registerService('GLTF', new GLTFLoadController());
 		this.registerService('Lighting', new LightingService(this));
 		this.registerService('Camera', new CameraService(this));
+		this.registerService('Audio', new AudioService(this));
 		this.registerService('Tick', new TickService(this));
 		this.registerService('Debug', new DebugService(this, debugMode, this.s('Tick')));
 
