@@ -3,13 +3,15 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset } from '../ModelAsset';
 import { UIProperties, UITypes } from '../../UIProperties';
-import { TowerStats, TowerStates } from './TowerStats';
+import { TowerStats, TowerStatesLegacy } from './TowerStats';
+import { StateMachine } from '../../core/StateMachine';
+import { TowerStates, TowerTransitions } from './TowerStates';
 
 export class Tower extends ModelAsset {
 	/**
 	 * Status
 	 */
-	states: TowerStates = new TowerStates();
+	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
 
 	/**
@@ -17,6 +19,11 @@ export class Tower extends ModelAsset {
 	 * */
 	baseStats: TowerStats;
 	stats: TowerStats;
+
+	/**
+	 * States
+	 * */
+	stateMachine: StateMachine;
 
 	/**
 	 * UI Elements
@@ -34,6 +41,58 @@ export class Tower extends ModelAsset {
 		this.groupModel = new THREE.Group();
 		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
+
+		this.stateMachine = this.setDefaultStates();
+		this.stateMachine.transition(TowerStates.attacking);
+	}
+
+	/**
+	 * Sets default States for creeps
+	 * */
+	setDefaultStates() {
+		const stateMachine = new StateMachine();
+
+		stateMachine.addStates([
+			{
+				name: TowerStates.idle,
+			},
+			{
+				name: TowerStates.scanning,
+				//onEnter: this.lookForCreeps.bind(this),
+			},
+			{
+				name: TowerStates.attacking,
+				autoTransition: TowerTransitions.scanning,
+				autoTransitionTimeMS: 1750,
+				//onEnter: this.activateStandingPower.bind(this),
+			},
+			{
+				name: TowerStates.activatingPower1,
+			},
+			{
+				name: TowerStates.activatingPower2,
+			},
+		]);
+
+		stateMachine.addTransitions([
+			{
+				name: TowerTransitions.pause,
+				activatedStates: [TowerStates.idle],
+				deactivatedStates: [TowerStates.attacking, TowerStates.activatingPower1, TowerStates.activatingPower2],
+			},
+			{
+				name: TowerTransitions.attacking,
+				activatedStates: [TowerStates.attacking],
+				deactivatedStates: [TowerStates.idle, TowerStates.scanning, TowerStates.activatingPower1, TowerStates.activatingPower2],
+			},
+			{
+				name: TowerTransitions.scanning,
+				activatedStates: [TowerStates.scanning],
+				deactivatedStates: [TowerStates.attacking, TowerStates.activatingPower1, TowerStates.activatingPower2],
+			},
+		]);
+
+		return stateMachine;
 	}
 
 	/**

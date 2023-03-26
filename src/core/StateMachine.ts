@@ -18,6 +18,9 @@ export class StateMachine {
 		this.states = states;
 	}
 
+	/**
+	 * Updates a state
+	 * */
 	modifyState(stateName: string, newDefinition: State) {
 		let index;
 
@@ -100,6 +103,13 @@ export class StateMachine {
 			state.active = false;
 			this.activeStates.delete(stateName);
 		}
+	}
+
+	/**
+	 * Determines if this state machine is in a state
+	 * */
+	isInState(statename: string) {
+		return this.activeStates.has(statename);
 	}
 }
 

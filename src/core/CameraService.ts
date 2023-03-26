@@ -3,7 +3,6 @@ import { Vector3 } from 'three';
 import { Main } from './Main';
 import { OrbitController } from './OrbitController';
 import { FPSController, FPSControlsType } from './FPSController';
-import { TickTimeProperties } from './TickService';
 
 export class CameraService {
 	/**
@@ -39,9 +38,7 @@ export class CameraService {
 	/**
 	 * Creates an orthographic camera
 	 * */
-	createOrthographicCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
-		const cameraPan = new THREE.Group();
-		const cameraTilt = new THREE.Group();
+	createOrthographicCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings, groupForCustomControls: boolean = false) {
 		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;
@@ -53,14 +50,24 @@ export class CameraService {
 			settings.near,
 			settings.far
 		);
-
-		camera.groupPan = cameraPan;
-		camera.groupTilt = cameraTilt;
-
-		camera.groupPan.add(camera.groupTilt);
-		camera.groupTilt.add(camera.threeCamera);
-		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
+
+		// If we want to group the camera for custom controls
+		if (groupForCustomControls) {
+			const cameraPan = new THREE.Group();
+			const cameraTilt = new THREE.Group();
+
+			camera.groupPan = cameraPan;
+			camera.groupTilt = cameraTilt;
+
+			camera.groupPan.add(camera.groupTilt);
+			camera.groupTilt.add(camera.threeCamera);
+			camera.groupPan.position.set(settings.x, settings.y, settings.z);
+
+			// We don't need camera groups, or want to use Orbit controls
+		} else {
+			camera.threeCamera.position.set(settings.x, settings.y, settings.z);
+		}
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
@@ -70,22 +77,29 @@ export class CameraService {
 	/**
 	 * Creates a perspective camera
 	 * */
-	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings) {
-		const cameraPan = new THREE.Group();
-		const cameraTilt = new THREE.Group();
+	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings, groupForCustomControls: boolean = false) {
 		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;
 		camera.threeCamera = new THREE.PerspectiveCamera(settings.fov, this.main.sizes.width / this.main.sizes.height, settings.near, settings.far);
-
-		camera.groupPan = cameraPan;
-		camera.groupTilt = cameraTilt;
-
-		camera.groupPan.add(camera.groupTilt);
-		camera.groupTilt.add(camera.threeCamera);
-
-		camera.threeCamera.position.set(settings.x, settings.y, settings.z);
 		camera.threeCamera.zoom = settings.zoom;
+
+		// If we want to group the camera for custom controls
+		if (groupForCustomControls) {
+			const cameraPan = new THREE.Group();
+			const cameraTilt = new THREE.Group();
+
+			camera.groupPan = cameraPan;
+			camera.groupTilt = cameraTilt;
+
+			camera.groupPan.add(camera.groupTilt);
+			camera.groupTilt.add(camera.threeCamera);
+			camera.groupPan.position.set(settings.x, settings.y, settings.z);
+
+			// We don't need camera groups, or want to use Orbit controls
+		} else {
+			camera.threeCamera.position.set(settings.x, settings.y, settings.z);
+		}
 
 		this.cameras.push(camera);
 		if (isMain) this.mainCamera = camera;
@@ -114,11 +128,11 @@ export class CameraService {
 	}
 
 	/**
-	 * Updates the camera by
+	 * Updates the camera by a position and rotation (and maybe zoom in the future, or refactor to split position, rotation and zoom)
 	 * */
 	updateCameraPositionBy(positionUpdate: CameraPositionProperties) {
-		this.mainCamera.threeCamera.position;
-		console.log('UPDATE', positionUpdate);
+		this.mainCamera.threeCamera.position.set(positionUpdate.x, positionUpdate.y, positionUpdate.z);
+		this.mainCamera.threeCamera.position.set(positionUpdate.rotX, positionUpdate.rotY, positionUpdate.rotZ);
 	}
 
 	/**

@@ -7,7 +7,7 @@ export class TowerStats {
 	attack_cooldown: number;
 }
 
-export class TowerStates {
+export class TowerStatesLegacy {
 	attacking: TowerAttacking;
 	stunned: TowerStunned;
 

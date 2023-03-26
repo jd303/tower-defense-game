@@ -58,6 +58,7 @@ export class Creep extends ModelAsset {
 		this.groupModel = new THREE.Group();
 		this.groupTransforms.add(this.groupModel);
 		this.groupMain.add(this.groupTransforms);
+		
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition('moving');
 	}

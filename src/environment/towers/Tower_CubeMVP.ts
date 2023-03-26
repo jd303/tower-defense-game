@@ -5,6 +5,7 @@ import { TickTimeProperties } from '../../core/TickService';
 import { UITypes } from '../../UIProperties';
 import { Projectile, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
+import { TowerStates, TowerTransitions } from './TowerStates';
 
 export class TowerCubeMVP extends Tower {
 	/**
@@ -37,8 +38,10 @@ export class TowerCubeMVP extends Tower {
 		damage: 6,
 		range: 10,
 		last_attack_time: 0,
-		attack_cooldown: 800
-	}
+		attack_cooldown: 800,
+	};
+
+	tempID: number;
 
 	/**
 	 * Constructor
@@ -46,7 +49,9 @@ export class TowerCubeMVP extends Tower {
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
-		this.stats = TowerCubeMVP.baseStats;
+		this.stats = { ...TowerCubeMVP.baseStats };
+		this.tempID = Math.floor(Math.random() * 5000);
+		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
 
@@ -55,40 +60,46 @@ export class TowerCubeMVP extends Tower {
 	 */
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
-		this.main.s('Level').currentLevel.creeps.forEach((creep: Creep) => {
-			const creepPosition = creep.groupMain.position;
-			const distance = creepPosition.distanceTo(position);
 
-			// If something is in range
-			if (distance < this.stats.range) {
-				const currentTime = new Date().getTime();
+		if (this.stateMachine.isInState(TowerStates.scanning)) {
+			const creep = this.main.s('Level').currentLevel.creeps.find((creep: Creep) => {
+				const creepPosition = creep.groupMain.position;
+				const distance = creepPosition.distanceTo(position);
 
-				// If this thing can attack
-				if (currentTime - this.stats.attack_cooldown > this.stats.last_attack_time) {
-					creep.resolveAttack(this.stats.damage);
-					this.stats.last_attack_time = new Date().getTime();
-					this.states.attacking.isAttacking = true;
-					this.states.attacking.attackStartTime = new Date().getTime();
-
-					const projectile = new Projectile(
-						this.main,
-						new THREE.Vector3(this.groupMain.position.x, 3.5, this.groupMain.position.z),
-						creep,
-						ProjectileTypes.homing,
-						this.projectileBasis.clone()
-					);
-
-					this.projectiles.push(projectile);
+				// If something is in range
+				if (distance < this.stats.range) {
+					return true;
 				}
-			}
-		});
+			});
 
-		if (this.states.attacking.isAttacking) {
+			// If we have a target
+			if (creep) {
+				this.stateMachine.transition(TowerTransitions.attacking);
+				//if (currentTime - this.stats.attack_cooldown > this.stats.last_attack_time) {
+				creep.resolveAttack(this.stats.damage);
+				this.stats.last_attack_time = new Date().getTime();
+				this.states.attacking.isAttacking = true;
+				this.states.attacking.attackStartTime = new Date().getTime();
+
+				const projectile = new Projectile(
+					this.main,
+					new THREE.Vector3(this.groupMain.position.x, 3.5, this.groupMain.position.z),
+					creep,
+					ProjectileTypes.homing,
+					this.projectileBasis.clone()
+				);
+
+				this.projectiles.push(projectile);
+				//}
+			}
+		}
+
+		if (this.stateMachine.isInState(TowerStates.attacking)) {
 			if (this.states.attacking.attackStartTime + this.states.attacking.attackDuration < new Date().getTime()) {
 				this.states.attacking.isAttacking = false;
 				this.groupModel.position.z = 0;
 			} else {
-				this.groupModel.position.z = Math.sin(timeProperties.elapsedTime * 50) / 20;
+				this.groupModel.position.z = Math.sin(timeProperties.elapsedTime * 50) / 10;
 			}
 		}
 
