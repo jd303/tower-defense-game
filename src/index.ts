@@ -31,7 +31,7 @@ main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
 
 // Loads the working scene
-main.s('Level').loadScene('Level_0_MVP');
+main.s('Level').loadLevel('Level_0_MVP');
 
 // Load an alternate debug scene
 /*main.s('Camera').createPerspectiveCamera(true);

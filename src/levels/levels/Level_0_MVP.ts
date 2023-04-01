@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { perspectiveCameraDefaults, orthographicCameraDefaults } from '../../config/cameraSettingsDefault';
 import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
@@ -137,16 +136,16 @@ export class Level0MVP extends Level {
 		const sUI: UIService = this.main.s('UI');
 		sUI.addUIButtons([TowerCubeMVP]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
+		sUI.addEconomyLabel('vp', 'vp_changed');
 		sUI.attach();
 
-		// Test change economy
+		// Setup Economy for this level
 		const sEconomy: EconomyService = this.main.s('Economy');
 		const sEvent: EventService = this.main.s('Event');
 		sEconomy.setEconomyValue("money", 600);
 		sEvent.fire('commerce_money_changed', 600);
-
-		
-
+		sEconomy.setEconomyValue("vp", 20);
+		sEvent.fire("vp_changed", 20);
 
 		// Enable shadows
 		setTimeout(() => {

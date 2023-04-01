@@ -161,7 +161,8 @@ export class UIService {
 	 * */
 	createLabel(name: string, eventName: string) {
 		const div = document.createElement('div');
-		div.className = name;
+		div.classList.add(name);
+		div.classList.add('label');
 
 		const callback: any = this.updateLabelWithText.bind({ scope: this, target: div });
 

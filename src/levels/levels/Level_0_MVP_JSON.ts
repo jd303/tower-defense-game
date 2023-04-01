@@ -206,7 +206,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 2,
-			delayFromLastWave: 1000,
+			delayFromLastWave: 4000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [
@@ -228,6 +228,109 @@ export const levelDetails: LevelDefinition = {
 						{
 							id: '4',
 							type: 'Wisp',
+						},
+					],
+				},
+			],
+		},
+		{
+			id: 3,
+			delayFromLastWave: 6000,
+			pathID: '1',
+			difficulty: 5,
+			creepGroups: [
+				{
+					id: '1',
+					creeps: [
+						{
+							id: '1',
+							type: 'TrollDink',
+						},
+						{
+							id: '2',
+							type: 'TrollDink',
+						},
+						{
+							id: '3',
+							type: 'TrollDink',
+						},
+						{
+							id: '4',
+							type: 'TrollDink',
+						},
+					],
+				},
+			],
+		},
+		{
+			id: 4,
+			delayFromLastWave: 7500,
+			pathID: '1',
+			difficulty: 5,
+			creepGroups: [
+				{
+					id: '1',
+					creeps: [
+						{
+							id: '1',
+							type: 'TrollDink',
+						},
+						{
+							id: '2',
+							type: 'TrollDink',
+						},
+						{
+							id: '3',
+							type: 'TrollDink',
+						},
+						{
+							id: '4',
+							type: 'TrollDink',
+						},
+						{
+							id: '5',
+							type: 'Troll',
+						},
+						{
+							id: '6',
+							type: 'Troll',
+						},
+					],
+				},
+			],
+		},
+		{
+			id: 5,
+			delayFromLastWave: 7000,
+			pathID: '2',
+			difficulty: 5,
+			creepGroups: [
+				{
+					id: '1',
+					creeps: [
+						{
+							id: '1',
+							type: 'TrollDink',
+						},
+						{
+							id: '2',
+							type: 'TrollDink',
+						},
+						{
+							id: '3',
+							type: 'TrollDink',
+						},
+						{
+							id: '4',
+							type: 'TrollDink',
+						},
+						{
+							id: '5',
+							type: 'Troll',
+						},
+						{
+							id: '6',
+							type: 'Troll',
 						},
 					],
 				},

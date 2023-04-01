@@ -28,7 +28,8 @@ export class Wisp extends Creep {
 		kill_rewards: {
 			economic_property: "money",
 			value: 15
-		}
+		},
+		vp_loss: 1
 	});
 	healthBarY: 1;
 

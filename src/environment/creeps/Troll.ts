@@ -27,7 +27,8 @@ export class Troll extends Creep {
 		kill_rewards: {
 			economic_property: "money",
 			value: 10
-		}
+		},
+		vp_loss: 2
 	});
 	healthBarY: 2;
 

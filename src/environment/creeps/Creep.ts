@@ -212,6 +212,8 @@ export class Creep extends ModelAsset {
 	 * A creep has escaped their path / beaten the player
 	 * */
 	creepEscaped() {
+		const sLevel = this.main.s('Level');
+		sLevel.currentLevel.creepEscaped(this);
 		this.main.s('Level').currentLevel.removeCreep(this);
 	}
 
@@ -297,10 +299,10 @@ export class Creep extends ModelAsset {
 	animationMoveMe(timeProperties: TickTimeProperties) {
 		// Calculate travel distance
 		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
-
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
-		
-		if (this.pathProgress >= 1) {
+
+		// If this creature has finished its path
+		if (this.pathProgress >= 0.99) {
 			this.creepEscaped();
 		}
 

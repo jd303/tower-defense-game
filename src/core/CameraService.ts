@@ -77,7 +77,8 @@ export class CameraService {
 	/**
 	 * Creates a perspective camera
 	 * */
-	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings = this.defaultCameraSettings, groupForCustomControls: boolean = false) {
+	createPerspectiveCamera(isMain: boolean = false, settings: CameraSettings, groupForCustomControls: boolean = false) {
+		if (!settings) settings = this.defaultCameraSettings;
 		const camera = new Camera();
 		camera.settings = settings;
 		camera.isMain = isMain;

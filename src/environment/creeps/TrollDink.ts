@@ -27,7 +27,8 @@ export class TrollDink extends Creep {
 		kill_rewards: {
 			economic_property: "money",
 			value: 5
-		}
+		},
+		vp_loss: 1
 	});
 	healthBarY: 1.5;
 

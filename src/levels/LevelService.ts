@@ -6,6 +6,9 @@ export class LevelService {
 	currentLevel: Level;
 	main: Main;
 
+	/**
+	 * Declare levels
+	 * */
 	levels = [
 		{
 			name: 'Menu',
@@ -16,13 +19,17 @@ export class LevelService {
 		},
 	];
 
+	/**
+	 * Constructor
+	 * */
 	constructor(main: Main) {
 		this.main = main;
 	}
 
-	unloadScene() {}
-
-	loadScene(levelName: string) {
+	/**
+	 * Loads a level and logic
+	 * */
+	loadLevel(levelName: string) {
 		console.log('Load Level', levelName);
 
 		switch (levelName) {

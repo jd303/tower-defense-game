@@ -7,6 +7,9 @@ export class EconomyService {
 	economy = {
 		money: {
 			current: 0
+		},
+		vp: {
+			current: 0
 		}
 	}
 
@@ -31,13 +34,15 @@ export class EconomyService {
 		switch (property) {
 			case "money":
 				return this.economy.money;
+			case "vp":
+				return this.economy.vp;
 		}
 	}
 
 	/**
 	 * Gets the value of an economic metric
 	 * */
-getEconomyValue(property: string) {
+	getEconomyValue(property: string) {
 		const propertyObject = this.getEconomicProperty(property);
 		return propertyObject?.current;
 	}
@@ -57,6 +62,8 @@ getEconomyValue(property: string) {
 		switch (property) {
 			case "money":
 				return this.adjustValue(this.economy.money, value);
+			case "vp":
+				return this.adjustValue(this.economy.vp, value);
 		}
 	}
 
@@ -72,7 +79,7 @@ getEconomyValue(property: string) {
 	 * Sets a value for a resource
 	 * */
 	adjustValue(property: any, value: number) {
-		if (value < 0 && property.current <= 0) return false;
+		if (value < 0 && property.current <= 0) return 0;
 		else {	
 			property.current += value;
 			return property.current;

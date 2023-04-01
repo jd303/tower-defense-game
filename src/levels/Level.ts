@@ -95,4 +95,16 @@ export class Level {
 		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
 		this.towers.forEach((tower) => tower.animateCore(timeProperties));
 	}
+
+	/**
+	 * A creep passes the finish line
+	 * */
+	creepEscaped(creep: Creep) {
+		console.log("A creep passed the line:", creep);
+
+		const sEconomy = this.main.s('Economy');
+		const sEvent = this.main.s('Event');
+		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.vp_loss);
+		sEvent.fire('vp_changed', vpValue);
+	}
 }

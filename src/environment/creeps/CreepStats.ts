@@ -9,6 +9,7 @@ export class CreepStats {
 	defenses: DamageTypes;
 	hp_current: number;
 	kill_rewards: CreepKillAwards;
+	vp_loss: number;
 
 	/**
 	 * Constructor
@@ -26,6 +27,7 @@ export class CreepStats {
 			fire: stats.defenses.fire,
 		};
 		this.kill_rewards = stats.kill_rewards;
+		this.vp_loss = stats.vp_loss;
 
 		return this;
 	}
@@ -59,6 +61,7 @@ interface CreepStatSetup {
 	move_speed: number;
 	defenses: DamageTypes;
 	kill_rewards: CreepKillAwards;
+	vp_loss: number;
 }
 
 export interface CreepMoving {
