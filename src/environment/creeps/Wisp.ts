@@ -16,7 +16,7 @@ export class Wisp extends Creep {
 	 * */
 	stats = new CreepStats({
 		hp_total: 10,
-		move_speed: 3,
+		move_speed: 2.75,
 		defenses: {
 			piercing: 0,
 			crushing: 0,
@@ -72,7 +72,7 @@ export class Wisp extends Creep {
 	activateStandingPower(): void {
 		console.log('%c WISP: Life Scales', 'color: purple');
 
-		const creepsAroundMe = this.main.s('PositionService').findCreepsByLocation(this.groupMain.position, 15);
+		const creepsAroundMe = this.main.s('Position').getCreepsInRadiusFromPosition(this.groupMain.position, 15);
 		const creepsThatArentMe = creepsAroundMe.filter((creep: Creep) => creep !== this);
 
 		const combinedHealthPercentage =

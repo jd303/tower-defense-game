@@ -25,7 +25,7 @@ const main = new Main(canvas, sizes, debugMode);
 // Create services
 main.registerService('Level', new LevelService(main));
 main.registerService('Interaction', new InteractionService(main));
-main.registerService('PositionService', new PositionService(main));
+main.registerService('Position', new PositionService(main));
 main.registerService('Economy', new EconomyService(main));
 main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());

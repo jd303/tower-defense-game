@@ -1,10 +1,19 @@
+import { ProjectileHitTypes, ProjectileTypes } from "../attacks/Projectile";
+
 export class TowerStats {
 	cost: number;
 	costType: string;
-	damage: number;
-	range: number;
+	attack: TowerAttackStats;
 	last_attack_time: number;
 	attack_cooldown: number;
+}
+
+export interface TowerAttackStats {
+	damage: number;
+	type: ProjectileTypes,
+	hitType: ProjectileHitTypes;
+	range: number;
+	radius?: number;
 }
 
 export class TowerStatesLegacy {

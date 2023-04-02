@@ -3,12 +3,14 @@ import { Vector, Vector3 } from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from '../creeps/Creep';
+import { Tower } from '../towers/Tower';
 
 export class Projectile {
 	/**
 	 * Core Properties
 	 * */
 	main: Main;
+	tower: Tower;
 
 	/**
 	 * Visual Asset Properties
@@ -25,18 +27,21 @@ export class Projectile {
 	 * Definitions
 	 * */
 	projectileType: ProjectileTypes;
+	hitType: ProjectileHitTypes;
 	projectileSpeed: number;
 	pathProgress: number = 0;
-	projectileTarget: Creep;
+	target: Creep;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, startingPoint: THREE.Vector3, target: Creep, type: ProjectileTypes, asset: THREE.Mesh) {
+	constructor(main: Main, tower: Tower, startingPoint: THREE.Vector3, target: Creep, type: ProjectileTypes, hitType: ProjectileHitTypes, asset: THREE.Mesh) {
 		this.main = main;
+		this.tower = tower;
 		this.startingPoint = startingPoint;
-		this.projectileTarget = target;
+		this.target = target;
 		this.projectileType = type;
+		this.hitType = hitType;
 		this.projectileAsset = asset;
 
 		this.projectileAsset.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
@@ -52,22 +57,26 @@ export class Projectile {
 		// Points 2 and 3 should be control points, not starting and target
 		this.projectilePath = new THREE.CurvePath();
 		let curveSegment: THREE.Curve<Vector>;
+		let arcedUpStart: THREE.Vector3;
 
-		console.log("ARC ISN'T RIGHT YET, Plus I need to add accuracy and to resolve damage on hit");
+		// Create a path based on its type
 		switch (this.projectileType) {
 			// Arc Projectiles
 			case ProjectileTypes.arc:
+				arcedUpStart = this.startingPoint.clone();
+				arcedUpStart.y = arcedUpStart.y + 10;
+
 				curveSegment = new THREE.CubicBezierCurve3(
 					this.startingPoint,
-					this.startingPoint,
-					this.projectileTarget.groupMain.position.clone(),
-					this.projectileTarget.groupMain.position.clone()
+					arcedUpStart,
+					this.target.getExpectedPositionAt(1000),
+					this.target.getExpectedPositionAt(1000)
 				);
 				break;
 
 			// Direct Projectiles
 			case ProjectileTypes.direct:
-				curveSegment = new THREE.LineCurve3(this.startingPoint, this.projectileTarget.groupMain.position);
+				curveSegment = new THREE.LineCurve3(this.startingPoint, this.target.groupMain.position);
 				break;
 
 			// Homing projectiles
@@ -76,8 +85,8 @@ export class Projectile {
 				curveSegment = new THREE.CubicBezierCurve3(
 					this.startingPoint,
 					this.startingPoint,
-					this.projectileTarget.groupMain.position,
-					this.projectileTarget.groupMain.position
+					this.target.groupMain.position,
+					this.target.groupMain.position
 				);
 				break;
 		}
@@ -95,11 +104,31 @@ export class Projectile {
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
 		const point = this.projectilePath.getPoint(this.pathProgress) as Vector3;
 		this.projectileAsset.position.set(point.x, point.y, point.z);
+
+		if (this.pathProgress >= 1) {
+			this.remove();
+			this.tower.resolveHit(this);
+		}
+	}
+
+	/**
+	 * Gets rid of the Projectile
+	 * */
+	remove() {
+		this.main.scene.remove(this.projectileAsset);
+		this.tower.removeProjectile(this);
 	}
 }
 
 export enum ProjectileTypes {
 	arc,
 	direct,
+	instant,
 	homing,
+	spread,
+}
+
+export enum ProjectileHitTypes {
+	direct,
+	splash,
 }

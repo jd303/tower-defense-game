@@ -8,7 +8,8 @@ import { LevelPath } from '../LevelPath';
 import { TreeCone1 } from '../../environment/nature/TreeCone1';
 import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
-import { TowerCubeMVP } from '../../environment/towers/Tower_CubeMVP';
+import { TowerArcher } from '../../environment/towers/TowerArcher';
+import { TowerBomber } from '../../environment/towers/TowerBomber';
 import { levelDetails } from './Level_0_MVP_JSON';
 import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../UIService';
@@ -134,7 +135,7 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		sUI.addUIButtons([TowerCubeMVP]);
+		sUI.addUIButtons([TowerArcher, TowerBomber]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');
 		sUI.attach();

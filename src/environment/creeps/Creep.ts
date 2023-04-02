@@ -205,7 +205,7 @@ export class Creep extends ModelAsset {
 		const rewards = this.stats.kill_rewards;
 		const newValue = this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
 		this.main.s('Event').fire('commerce_money_changed', newValue);
-		this.main.s('Level').currentLevel.removeCreep(this);
+		this.deleteCreep();
 	}
 
 	/**
@@ -214,6 +214,14 @@ export class Creep extends ModelAsset {
 	creepEscaped() {
 		const sLevel = this.main.s('Level');
 		sLevel.currentLevel.creepEscaped(this);
+		this.deleteCreep();
+	}
+
+	/**
+	 * Final deletions of Creeps
+	 * */
+	deleteCreep() {
+		this.stateMachine.remove();
 		this.main.s('Level').currentLevel.removeCreep(this);
 	}
 
@@ -389,6 +397,16 @@ export class Creep extends ModelAsset {
 	 * */
 	activateStandingPower() {}
 	activateIdlePower() {}
+
+	/**
+	 * Position Functions
+	 * */
+	getExpectedPositionAt(timeInMS: number) {
+		let distanceTravelled = timeInMS / 1000 * this.pathTravelPercentagePerSec;
+		let expectedPathProgress = Math.min(1, this.pathProgress + distanceTravelled);
+		console.log(distanceTravelled, expectedPathProgress, this.path.path.getPoint(expectedPathProgress));
+		return this.path.path.getPoint(expectedPathProgress) as THREE.Vector3;
+	}
 }
 
 class CreepCommons {

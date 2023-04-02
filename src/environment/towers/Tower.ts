@@ -6,6 +6,9 @@ import { UIProperties, UITypes } from '../../UIProperties';
 import { TowerStats, TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
+import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
+import { PositionService } from '../PositionService';
+import { Creep } from '../creeps/Creep';
 
 export class Tower extends ModelAsset {
 	/**
@@ -13,12 +16,13 @@ export class Tower extends ModelAsset {
 	 */
 	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
-
-	/**
-	 * Stats
-	 * */
 	baseStats: TowerStats;
 	stats: TowerStats;
+
+	/**
+	 * Objects
+	 * */
+	projectiles: Projectile[] = [];
 
 	/**
 	 * States
@@ -106,6 +110,32 @@ export class Tower extends ModelAsset {
 	 * Animate: Overwritten by Towers
 	 * */
 	animate(timeProperties: TickTimeProperties) {}
+
+	/**
+	 * Resolve a hit
+	 * */
+	resolveHit(projectile: Projectile) {
+		console.log("The Projectile Hit", projectile);
+		const sPositioning: PositionService = this.main.s('Position');
+		let targets: Creep[] = [];
+
+		switch (projectile.hitType) {
+			case ProjectileHitTypes.direct:
+				projectile.target.resolveAttack(this.stats.attack.damage);
+				break;
+			case ProjectileHitTypes.splash:
+				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, 2);
+				targets.forEach(creep => creep.resolveAttack(this.stats.attack.damage));
+				break;
+		}
+	}
+
+	/**
+	 * Removes a Projectile
+	 * */
+	removeProjectile(removedProjectile: Projectile) {
+		this.projectiles = this.projectiles.filter(projectile => projectile != removedProjectile);
+	}
 }
 
 export class TowerUI {

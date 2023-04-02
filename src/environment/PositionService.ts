@@ -21,7 +21,7 @@ export class PositionService {
 	 * @param { Vector3 } position Search from this position
 	 * @param { number } radius Search this radius
 	 * */
-	findCreepsByLocation(position: THREE.Vector3, radius: number) {
+	getCreepsInRadiusFromPosition(position: THREE.Vector3, radius: number) {
 		const allCreeps = this.main.s('Level').currentLevel.creeps;
 		const nearbyCreeps = allCreeps.filter((creep: Creep) => {
 			return creep.groupMain.position.distanceTo(position) <= radius;

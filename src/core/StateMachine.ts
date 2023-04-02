@@ -111,6 +111,17 @@ export class StateMachine {
 	isInState(statename: string) {
 		return this.activeStates.has(statename);
 	}
+
+	/**
+	 * Determines if this state machine is in a state
+	 * */
+	remove() {
+		this.states.forEach(state => {
+			state.timer?.dispose();
+			state.timer = undefined;
+		});
+		this.states = [];
+	}
 }
 
 interface State {
