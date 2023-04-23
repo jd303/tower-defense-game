@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { Main } from './core/Main';
-import { Creep } from './environment/creeps/Creep';
-import { Prop } from './environment/Prop';
-import { Terrain } from './environment/Terrain';
-import { LevelPath } from './levels/LevelPath';
-import { Tower } from './environment/towers/Tower';
+import { Main } from '../core/Main';
+import { Creep } from '../environment/creeps/Creep';
+import { Prop } from '../environment/Prop';
+import { Terrain } from '../environment/Terrain';
+import { LevelPath } from '../levels/LevelPath';
+import { Tower } from '../environment/towers/Tower';
 
 export class InteractionService {
 	/**

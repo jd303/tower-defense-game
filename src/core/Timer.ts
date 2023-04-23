@@ -1,47 +1,42 @@
+import { Main } from "./Main";
+import { TickService } from "./TickService";
+
+/**
+ * Creates a Timer that is based on the TickService's gameTime
+ * This allows pause events to halt the Timer
+ * */
 export class Timer {
-	timer: any;
+	tickService: TickService;
 	durationInMS: number;
-	startTime: number;
-	pauseStartTime: number;
+	completeGameTime: number;
 	callback: Function;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(callback: Function, durationInMS: number) {
+	constructor(callback: Function, durationInMS: number, main: Main) {
 		this.durationInMS = durationInMS;
 		this.callback = callback;
-		this.set(durationInMS);
+		this.tickService = main.s('Tick');
+		
+		const gameTime = this.tickService.gameTime;
+		this.completeGameTime = gameTime + durationInMS / 1000;
+		this.tickService.registerTimer(this, true);
 	}
 
 	/**
-	 * Sets the timer
+	 * Triggers the Timer callback
 	 * */
-	set(durationInMS: number) {
-		this.timer = setTimeout(this.callback, durationInMS);
-	}
-
-	/**
-	 * Pauses the timer
-	 * */
-	pause() {
-		clearTimeout(this.timer);
-		this.pauseStartTime = new Date().getTime();
-	}
-
-	/**
-	 * Unpauses the timer
-	 * */
-	unpause() {
-		const elapsed = this.pauseStartTime - this.startTime;
-		const newDuration = this.durationInMS - elapsed;
-		this.set(newDuration);
+	trigger() {
+		this.callback();
+		this.tickService.deregisterTimer(this);
 	}
 
 	/**
 	 * Clears and removes the Timer
 	 * */
 	dispose() {
-		clearTimeout(this.timer);
+		console.log("%c !!!!!!!! Is this still here?  This should be REMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOVED", "color: red");
+		//clearTimeout(this.timer);
 	}
 }

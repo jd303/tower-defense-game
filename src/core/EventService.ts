@@ -4,9 +4,7 @@ export class EventService {
 	/**
 	 * Constructor
 	 * */
-	constructor() {
-		console.log("EVEnt Service");
-	}
+	constructor() {}
 
 	/**
 	 * Adds an event to the window, bound with a callback to affect the correct item

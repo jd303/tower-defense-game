@@ -1,6 +1,6 @@
 export interface WaveDefinition {
 	id: number;
-	delayFromLastWave: number;
+	waveStartTime: number;
 	pathID: string;
 	difficulty: number;
 	creepGroups: any[];

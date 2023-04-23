@@ -22,7 +22,7 @@ export class Troll extends Creep {
 			arcane: 0,
 			poison: 0,
 			lightning: 0,
-			fire: 0,
+			fire: -10,
 		},
 		kill_rewards: {
 			economic_property: "money",

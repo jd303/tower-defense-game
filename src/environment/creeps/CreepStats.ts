@@ -1,4 +1,4 @@
-import { DamageTypes } from '../../data/DamageTypes';
+import { DamageTypeDefences, DamageTypes } from '../../data/DamageTypes';
 
 export class CreepStats {
 	/**
@@ -6,7 +6,7 @@ export class CreepStats {
 	 * */
 	hp_total: number;
 	move_speed: number;
-	defenses: DamageTypes;
+	defenses: DamageTypeDefences;
 	hp_current: number;
 	kill_rewards: CreepKillAwards;
 	vp_loss: number;
@@ -33,33 +33,32 @@ export class CreepStats {
 	}
 
 	// Commented as unsure this is the direction
-	/*takeDamage(damage: number, damage_type: string) {
+	calculateDamage(damage: number, damage_type: DamageTypes) {
 		switch (damage_type) {
-			case 'piercing':
+			case DamageTypes.piercing:
 				damage = Math.max(0, damage - this.defenses.piercing);
 				break;
-			case 'crushing':
+			case DamageTypes.crushing:
 				damage = Math.max(0, damage - this.defenses.crushing);
 				break;
-			case 'arcane':
+			case DamageTypes.arcane:
 				damage = Math.max(0, damage - this.defenses.arcane);
 				break;
-			case 'poison':
+			case DamageTypes.poison:
 				damage = Math.max(0, damage - this.defenses.poison);
 				break;
+			case DamageTypes.fire:
+				damage = Math.max(0, damage - this.defenses.fire);
+				break;
 		}
-		this.damage_taken -= damage;
-
-		if (this.damage_taken >= this.hp_total) {
-			console.log('DIE');
-		}
-	}*/
+		return damage;
+	}
 }
 
 interface CreepStatSetup {
 	hp_total: number;
 	move_speed: number;
-	defenses: DamageTypes;
+	defenses: DamageTypeDefences;
 	kill_rewards: CreepKillAwards;
 	vp_loss: number;
 }

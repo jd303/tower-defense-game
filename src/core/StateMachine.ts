@@ -1,6 +1,8 @@
+import { Main } from './Main';
 import { Timer } from './Timer';
 
 export class StateMachine {
+	main: Main;
 	states: State[];
 	transitions: StateTransition[];
 	activeStates: Set<string> = new Set();
@@ -9,7 +11,9 @@ export class StateMachine {
 	/**
 	 * Constructor
 	 * */
-	constructor() {}
+	constructor(main: Main) {
+		this.main = main;
+	}
 
 	/**
 	 * Sets the states for this state machine
@@ -55,7 +59,7 @@ export class StateMachine {
 	 * Activates a state
 	 * */
 	activateStateByName(stateName: string) {
-		console.log('%c Activating ' + stateName, 'color:green');
+		//console.log('%c Activating ' + stateName, 'color:green');
 		const state = this.states.find((state) => state.name == stateName);
 		if (state) {
 			state.active = true;
@@ -76,13 +80,11 @@ export class StateMachine {
 						break;
 					default:
 						stateChangeCallback = () => {
-							console.log('TRIGGER CHANGE TO', state.autoTransition);
 							this.transition(state.autoTransition as string);
 						};
 				}
 
-				if (state.timer) state.timer.dispose();
-				state.timer = new Timer(stateChangeCallback, state.autoTransitionTimeMS);
+				state.timer = new Timer(stateChangeCallback, state.autoTransitionTimeMS, this.main);
 			}
 		}
 	}
@@ -91,7 +93,7 @@ export class StateMachine {
 	 * Deactivates a state
 	 * */
 	deactivateStateByName(stateName: string) {
-		console.log('%c Dectivating ' + stateName, 'color:red');
+		//console.log('%c Deactivating ' + stateName, 'color:red');
 		const state = this.states.find((state) => state.name == stateName);
 
 		if (state) {

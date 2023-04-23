@@ -169,7 +169,7 @@ export const levelDetails: LevelDefinition = {
 	waves: [
 		{
 			id: 1,
-			delayFromLastWave: 0,
+			waveStartTime: 0,
 			pathID: '1',
 			difficulty: 5,
 			creepGroups: [
@@ -206,7 +206,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 2,
-			delayFromLastWave: 4000,
+			waveStartTime: 4000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [
@@ -235,7 +235,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 3,
-			delayFromLastWave: 6000,
+			waveStartTime: 10000,
 			pathID: '1',
 			difficulty: 5,
 			creepGroups: [
@@ -264,7 +264,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 4,
-			delayFromLastWave: 7500,
+			waveStartTime: 17500,
 			pathID: '1',
 			difficulty: 5,
 			creepGroups: [
@@ -301,7 +301,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: 5,
-			delayFromLastWave: 7000,
+			waveStartTime: 24000,
 			pathID: '2',
 			difficulty: 5,
 			creepGroups: [

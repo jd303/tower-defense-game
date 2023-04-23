@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { StateMachine, StateMachineEvents, StateTransitionTypes } from '../../core/StateMachine';
+import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelPathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset } from '../ModelAsset';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
+import { TowerAttackStats } from '../towers/TowerStats';
 
 export class Creep extends ModelAsset {
 	/**
@@ -67,7 +68,7 @@ export class Creep extends ModelAsset {
 	 * Sets default States for creeps
 	 * */
 	setDefaultStates() {
-		const stateMachine = new StateMachine();
+		const stateMachine = new StateMachine(this.main);
 
 		stateMachine.addStates([
 			{
@@ -142,10 +143,11 @@ export class Creep extends ModelAsset {
 	/**
 	 * Resolves when a creep was attacked
 	 * */
-	resolveAttack(damage: number) {
+	resolveAttack(attack: TowerAttackStats) {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
+		const damage = this.stats.calculateDamage(attack.damage, attack.damageType)
 		this.adjustHealthByNumber(-1 * damage);
 	}
 

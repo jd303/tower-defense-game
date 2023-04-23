@@ -10,9 +10,10 @@ import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
 import { TowerArcher } from '../../environment/towers/TowerArcher';
 import { TowerBomber } from '../../environment/towers/TowerBomber';
+import { TowerMage } from '../../environment/towers/TowerMage';
 import { levelDetails } from './Level_0_MVP_JSON';
 import { EconomyService } from '../../game/EconomyService';
-import { UIService } from '../../UIService';
+import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
 
 export class Level0MVP extends Level {
@@ -45,7 +46,7 @@ export class Level0MVP extends Level {
 		main.s('Debug').addGUIDebugProperty(cameraDebug, 'changeMain');
 
 		// Start basic shit
-		main.s('Tick').tick();
+		main.s('Tick').start();
 
 		// Setup OrbitControls
 		this.main.s('Camera').setupOrbitControls();
@@ -61,7 +62,7 @@ export class Level0MVP extends Level {
 		});
 
 		// Setup a Wave Manager
-		this.waveManager = new WaveManager(levelDetails.waves, this);
+		this.waveManager = new WaveManager(levelDetails.waves, this, this.main);
 
 		// Create 2 tree groups
 		const position1 = { x: -60, z: -10 };
@@ -135,10 +136,9 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		sUI.addUIButtons([TowerArcher, TowerBomber]);
+		sUI.addUIButtons([TowerArcher, TowerBomber, TowerMage]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');
-		sUI.attach();
 
 		// Setup Economy for this level
 		const sEconomy: EconomyService = this.main.s('Economy');
@@ -162,9 +162,6 @@ export class Level0MVP extends Level {
 			this.terrain.enableShadows();
 
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
-
-			console.log(this.terrain);
-			console.log(directionalLight);
 		}, 1000);
 		
 

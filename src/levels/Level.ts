@@ -6,7 +6,9 @@ import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelPath } from './LevelPath';
 import { LevelDefinition } from '../data/LevelInterfaces';
-import { TickTimeProperties } from '../core/TickService';
+import { TickService, TickTimeProperties } from '../core/TickService';
+import { UIService } from '../game/UIService';
+import { CameraService } from '../core/CameraService';
 
 export class Level {
 	/**
@@ -97,6 +99,30 @@ export class Level {
 	}
 
 	/**
+	 * If the player wins the level!
+	 * */
+	winLevel() {
+		console.log("You win the level!");
+	}
+
+	/**
+	 * If the player loses the level!
+	 * */
+	loseLevel() {
+		console.log("You lose the level!");
+		const sTick: TickService = this.main.s('Tick');
+		const sUI: UIService = this.main.s('UI');
+		const sCamera: CameraService = this.main.s('Camera');
+		sTick.end();
+		
+		sUI.removeEconomyUI();
+		sUI.removeTowersUI();
+		sUI.removeHeroesUI();
+		sUI.createPopup("lose-level", "Sorry, you lost the level.  Sad face", ['bubble-in']);
+		sCamera.removeOrbitControls();
+	}
+
+	/**
 	 * A creep passes the finish line
 	 * */
 	creepEscaped(creep: Creep) {
@@ -106,5 +132,9 @@ export class Level {
 		const sEvent = this.main.s('Event');
 		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.vp_loss);
 		sEvent.fire('vp_changed', vpValue);
+
+		if (vpValue <= 0) {
+			this.loseLevel();
+		}
 	}
 }

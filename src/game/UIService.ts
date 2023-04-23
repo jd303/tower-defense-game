@@ -1,8 +1,8 @@
-import { EventService } from './core/EventService';
-import { Main } from './core/Main';
-import { Tower } from './environment/towers/Tower';
-import { EconomyService } from './game/EconomyService';
-import { UIProperties, UITypes } from './UIProperties';
+import { EventService } from '../core/EventService';
+import { Main } from '../core/Main';
+import { Tower } from '../environment/towers/Tower';
+import { EconomyService } from './EconomyService';
+import { UITypes } from './UIProperties';
 
 export class UIService {
 	/**
@@ -55,6 +55,8 @@ export class UIService {
 		this.rootUIElement.appendChild(this.towersUIElement);
 		this.rootUIElement.appendChild(this.heroesUIElement);
 		this.rootUIElement.appendChild(this.economyUIElement);
+
+		this.attach();
 	}
 
 	/**
@@ -192,9 +194,56 @@ export class UIService {
 	}
 
 	/**
+	 * Creates a popup
+	 * */
+	createPopup(name: string, html: string, classList:string[] = []) {
+		const div = document.createElement('div');
+		div.classList.add(name);
+		div.classList.add('popup');
+		classList.forEach(className => div.classList.add(className));
+		div.innerHTML = html;
+		this.rootUIElement.appendChild(div);
+	}
+
+	/**
 	 * Attach the UI to the document
 	 * */
 	attach() {
 		document.querySelector('body')?.appendChild(this.rootUIElement);
+	}
+
+	/**
+	 * Removes Menu buttons and UI
+	 * */
+	removeMenusUI() {
+		this.menuUIElement.innerHTML = "";
+	}
+
+	/**
+	 * Removes Tower buttons and UI
+	 * */
+	removeTowersUI() {
+		this.towersUIElement.innerHTML = "";
+	}
+
+	/**
+	 * Removes Hero buttons and UI
+	 * */
+	removeHeroesUI() {
+		this.heroesUIElement.innerHTML = "";
+	}
+
+	/**
+	 * Removes Economy buttons and UI
+	 * */
+	removeEconomyUI() {
+		this.economyUIElement.innerHTML = "";
+	}
+
+	/**
+	 * Removes all elements from the UI and clears all interactions
+	 * */
+	clearUI() {
+		this.rootUIElement.innerHTML = "";
 	}
 }

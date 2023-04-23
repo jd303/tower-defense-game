@@ -1,11 +1,12 @@
 import './style.css';
 import { Main } from './core/Main';
 import { LevelService } from './levels/LevelService';
-import { InteractionService } from './InteractionService';
+import { InteractionService } from './game/InteractionService';
 import { PositionService } from './environment/PositionService';
 import { EconomyService } from './game/EconomyService';
-import { UIService } from './UIService';
+import { UIService } from './game/UIService';
 import { EventService } from './core/EventService';
+import { SplashScreen } from './levels/levels/_SplashScreen';
 
 /**
  * Configuration
@@ -31,7 +32,11 @@ main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
 
 // Loads the working scene
-main.s('Level').loadLevel('Level_0_MVP');
+if (location.hash == '') {
+	new SplashScreen(main);
+} else {
+	main.s('Level').loadLevel('Level_0_MVP');
+}
 
 // Load an alternate debug scene
 /*main.s('Camera').createPerspectiveCamera(true);

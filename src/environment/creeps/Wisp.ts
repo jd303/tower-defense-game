@@ -20,7 +20,7 @@ export class Wisp extends Creep {
 		defenses: {
 			piercing: 0,
 			crushing: 0,
-			arcane: 0,
+			arcane: 10,
 			poison: 0,
 			lightning: 0,
 			fire: 0,

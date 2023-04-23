@@ -2,10 +2,11 @@ import * as THREE from 'three';
 import { Tower, TowerUI } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UITypes } from '../../UIProperties';
+import { UITypes } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
+import { DamageTypes } from '../../data/DamageTypes';
 
 export class TowerArcher extends Tower {
 	/**
@@ -32,10 +33,11 @@ export class TowerArcher extends Tower {
 	 * Stats
 	 * */
 	static baseStats = {
-		cost: 150,
+		cost: 100,
 		costType: 'money',
 		attack: {
 			damage: 6,
+			damageType: DamageTypes.piercing,
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.direct,
 			range: 12

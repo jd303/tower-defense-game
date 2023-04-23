@@ -8,24 +8,24 @@ import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 
-export class TowerBomber extends Tower {
+export class TowerMage extends Tower {
 	/**
 	 * Tower Assets
 	 * */
-	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
+	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
 	assetScale = 1.5;
-	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
+	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'blue' }));
 
 	/**
 	 * UI Behaviours
 	 * */
 	static UI: TowerUI = new TowerUI({
 		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Bomber.UI.icon.png',
+		icon: 'assets/models/towers/Tower.Mage.UI.icon.png',
 		placeCallback: (intersects: THREE.Intersection[], main: Main) => {
 			if (intersects[0].object.name == 'LevelPath') return;
 			const intersect = intersects[0];
-			main.s('Level').currentLevel.addTower(new TowerBomber(main), intersect.point);
+			main.s('Level').currentLevel.addTower(new TowerMage(main), intersect.point);
 		},
 	});
 
@@ -33,15 +33,14 @@ export class TowerBomber extends Tower {
 	 * Stats
 	 * */
 	static baseStats = {
-		cost: 175,
+		cost: 150,
 		costType: 'money',
 		attack: {
-			damage: 2,
-			damageType: DamageTypes.crushing,
-			type: ProjectileTypes.arc,
-			hitType: ProjectileHitTypes.splash,
-			range: 10,
-			radius: 1.5
+			damage: 6,
+			damageType: DamageTypes.poison,
+			type: ProjectileTypes.homing,
+			hitType: ProjectileHitTypes.direct,
+			range: 10
 		},
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
@@ -53,7 +52,7 @@ export class TowerBomber extends Tower {
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
-		this.stats = { ...TowerBomber.baseStats };
+		this.stats = { ...TowerMage.baseStats };
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
@@ -78,10 +77,6 @@ export class TowerBomber extends Tower {
 			// If we have a target
 			if (creep) {
 				this.stateMachine.transition(TowerTransitions.attacking);
-				//if (currentTime - this.stats.attack_cooldown > this.stats.last_attack_time) {
-				//this.stats.last_attack_time = new Date().getTime();
-				//this.states.attacking.isAttacking = true;
-				//this.states.attacking.attackStartTime = new Date().getTime();
 
 				const projectile = new Projectile(
 					this.main,

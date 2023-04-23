@@ -3,8 +3,15 @@ import { Level } from './Level';
 import { Wave } from './Wave';
 import { WaveDefinition } from './WaveDefinition';
 import { CreepGenerator } from '../environment/creeps/CreepGenerator';
+import { Timer } from '../core/Timer';
+import { Main } from '../core/Main';
 
 export class WaveManager {
+	/**
+	 * Core Properties
+	 * */
+	main: Main;
+
 	/**
 	 * Level Properties
 	 * */
@@ -21,10 +28,11 @@ export class WaveManager {
 	/**
 	 * Constructor
 	 * */
-	constructor(waveDefinitions: WaveDefinition[], level: Level) {
+	constructor(waveDefinitions: WaveDefinition[], level: Level, main: Main) {
+		this.main = main;
 		this.level = level;
 		this.waves = this.prepareWaveDefinitions(waveDefinitions);
-		this.startWaveTimer();
+		//this.startWaveTimer();
 	}
 
 	/**
@@ -44,6 +52,9 @@ export class WaveManager {
 			if (wavePath) wave.corePath = wavePath;
 			else return; // Just break if no path exists
 
+			// Create a Timer for this wave
+			const waveTimer = new Timer(this.triggerWave.bind(this, wave), wave.waveStartTime, this.main);
+
 			waves.push(wave);
 		});
 
@@ -61,7 +72,7 @@ export class WaveManager {
 
 	getNextWave() {
 		if (this.waves[0]) {
-			this.nextWaveTime = new Date().getTime() + this.waves[0].delayFromLastWave;
+			this.nextWaveTime = new Date().getTime() + this.waves[0].waveStartTime;
 			this.nextWave = this.waves[0];
 		} else {
 			this.stopWaveTimer();
@@ -78,6 +89,7 @@ export class WaveManager {
 	}
 
 	triggerWave(wave: Wave) {
+		console.log("TRIGGER WAVE", wave);
 		const curveStart = wave.corePath.corePath.path.getPoint(0) as Vector3;
 
 		// Create creep groups

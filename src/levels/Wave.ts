@@ -10,7 +10,7 @@ export class Wave {
 	id: number;
 	difficulty: number;
 	corePath: LevelPath;
-	delayFromLastWave: number;
+	waveStartTime: number;
 	creepGroups: CreepGroup[] = [];
 
 	/**
@@ -18,7 +18,7 @@ export class Wave {
 	 * */
 	constructor(waveDefinition: WaveDefinition) {
 		this.id = waveDefinition.id;
-		this.delayFromLastWave = waveDefinition.delayFromLastWave;
+		this.waveStartTime = waveDefinition.waveStartTime;
 		this.difficulty = waveDefinition.difficulty;
 		this.creepGroups = waveDefinition.creepGroups;
 	}

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset } from '../ModelAsset';
-import { UIProperties, UITypes } from '../../UIProperties';
+import { UIProperties, UITypes } from '../../game/UIProperties';
 import { TowerStats, TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
@@ -54,7 +54,7 @@ export class Tower extends ModelAsset {
 	 * Sets default States for creeps
 	 * */
 	setDefaultStates() {
-		const stateMachine = new StateMachine();
+		const stateMachine = new StateMachine(this.main);
 
 		stateMachine.addStates([
 			{
@@ -121,11 +121,11 @@ export class Tower extends ModelAsset {
 
 		switch (projectile.hitType) {
 			case ProjectileHitTypes.direct:
-				projectile.target.resolveAttack(this.stats.attack.damage);
+				projectile.target.resolveAttack(this.stats.attack);
 				break;
 			case ProjectileHitTypes.splash:
 				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, 2);
-				targets.forEach(creep => creep.resolveAttack(this.stats.attack.damage));
+				targets.forEach(creep => creep.resolveAttack(this.stats.attack));
 				break;
 		}
 	}

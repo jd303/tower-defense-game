@@ -1,3 +1,4 @@
+import { DamageTypes } from "../../data/DamageTypes";
 import { ProjectileHitTypes, ProjectileTypes } from "../attacks/Projectile";
 
 export class TowerStats {
@@ -10,6 +11,7 @@ export class TowerStats {
 
 export interface TowerAttackStats {
 	damage: number;
+	damageType: DamageTypes,
 	type: ProjectileTypes,
 	hitType: ProjectileHitTypes;
 	range: number;

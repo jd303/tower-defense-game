@@ -1,5 +1,8 @@
 :root {
+	--z-index-game: 1;
+	--z-index-UI: 10;
 	--towers-height: 50px;
+	--standard-padding: 20px;
 }
 
 * {
@@ -24,6 +27,7 @@ UI ELEMENTS
 */
 .ui {
 	position: fixed;
+	z-index: var(--z-index-UI);
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -75,4 +79,17 @@ UI ELEMENTS
 	line-height: 50px;
 	text-align: center;
 	background: rgba(0, 0, 0, 0.2);
+}
+
+.ui .popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	padding: var(--standard-padding);
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.15);
+	pointer-events: all;
+
+	transform: translate(-50%, -50%);
 }
