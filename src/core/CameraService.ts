@@ -158,6 +158,9 @@ export class CameraService {
 		this.orbitController.controls.maxAzimuthAngle = this.mainCamera.settings.maxAzimuthAngle || -Infinity;
 		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom || 0.1;
 		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom || 5;
+
+		// Call reset, which sets zoom properly
+		this.orbitController.controls.reset();
 	}
 
 	/**

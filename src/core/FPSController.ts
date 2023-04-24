@@ -5,7 +5,6 @@ import { Main } from './Main';
 import { TickTimeProperties } from './TickService';
 import { AdvancedFirstPersonControls } from './AdvancedFPSController';
 import { Camera } from './CameraService';
-import { PerspectiveCamera } from 'three';
 
 export class FPSController {
 	/**
