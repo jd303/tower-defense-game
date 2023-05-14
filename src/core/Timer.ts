@@ -31,12 +31,4 @@ export class Timer {
 		this.callback();
 		this.tickService.deregisterTimer(this);
 	}
-
-	/**
-	 * Clears and removes the Timer
-	 * */
-	dispose() {
-		console.log("%c !!!!!!!! Is this still here?  This should be REMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOVED", "color: red");
-		//clearTimeout(this.timer);
-	}
 }

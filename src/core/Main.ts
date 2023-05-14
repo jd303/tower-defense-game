@@ -7,6 +7,8 @@ import { GLTFLoadController } from './LoaderService';
 import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
 import { AudioService } from './AudioService';
+import { RaycasterService } from './RaycasterService';
+import { FogOfWarService } from '../game/FogOfWarService';
 
 export class Main {
 	/**
@@ -37,13 +39,22 @@ export class Main {
 		this.registerService('Lighting', new LightingService(this));
 		this.registerService('Camera', new CameraService(this));
 		this.registerService('Audio', new AudioService(this));
+		this.registerService('Raycaster', new RaycasterService(this));
 		this.registerService('Tick', new TickService(this));
+		this.registerService('FogOfWar', new FogOfWarService(this));
 		this.registerService('Debug', new DebugService(this, debugMode, this.s('Tick')));
 
 		// Watch the screen
 		this.windowSizer = new WindowService(this);
 		this.windowSizer.resize();
 		this.windowSizer.watchResize();
+
+		// Next up messages
+		console.log("%c OK, next up: Fog of War", 'color: red');
+		console.log("%c Then, React Native to see if we can build this to device", 'color: red');
+		console.log("%c Then, Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
+		console.log("%c Then: position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');
+		console.log("%c Then: Projectile results: explosions, magic reactins, arrows left behind?", 'color: red');
 
 		return this;
 	}

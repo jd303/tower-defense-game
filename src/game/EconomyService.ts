@@ -23,8 +23,6 @@ export class EconomyService {
 	 * */
 	constructor(main: Main) {
 		this.main = main;
-
-		this.main.s("Interaction");
 	}
 
 	/**

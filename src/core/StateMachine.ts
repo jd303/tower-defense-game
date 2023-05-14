@@ -1,6 +1,40 @@
 import { Main } from './Main';
+import { TickService } from './TickService';
 import { Timer } from './Timer';
 
+/**
+ * STATE MACHINE
+ * 
+ * States are defined using an array of states that are valid, in the format:
+ * 	[
+ *			{
+ *				name: 'Simple State Name',
+ *			},
+ *			{
+ *				name: 'Complex State Name',
+ *				autoTransition: StateMachineEvents.Stop, // Deactivates this State thread.  Also accepts a state name to transition to
+ *				autoTransitionTimeMS: 1000, // The time to automatically transition to, in MS, after the state started
+ *				onEnter: callback, // A callback to call when this state is entered
+ *				onExit: callback // A callback to call when this state is exited
+ *		]
+ *
+ * Transitions are then seperately defined, to determine what happens when a transition is triggered.  Transitions are defined in the format:
+ * 	[
+ * 		{
+ *				name: CreepTransitions.pause,
+ *				activatedStates: [CreepStates.idle],
+ *				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
+ *				deactivatedStates: StateMachineTransitions.All, // Alternative, which will automatically disable all other active states
+ *			}
+ *		]
+ * 
+ * The State Machine can handle multiple states running at once.  As examples:
+ * - Idle: this state can transition to 'moving' and back
+ * - visible: this state can exist at the same time as idle, and it can transition to 'invisible' and bakc
+ * - flashing: this state can exist at the same time as idle, and it can be completely removed once complete
+ * 
+ * It is also possible to give an entity multiple state machines, as long as each machine's states do not interact with each other.
+ * */
 export class StateMachine {
 	main: Main;
 	states: State[];
@@ -51,8 +85,13 @@ export class StateMachine {
 	transition(transitionName: string) {
 		const transition = this.transitions.find((trans) => trans.name == transitionName);
 
-		transition?.activatedStates?.forEach((activatedState) => this.activateStateByName(activatedState));
-		transition?.deactivatedStates?.forEach((deactivatedState) => this.deactivateStateByName(deactivatedState));
+		// Deactivate states
+		if (transition?.deactivatedStates == StateMachineTransitions.All) this.activeStates.forEach(activeState => this.deactivateStateByName(activeState));
+		else transition?.deactivatedStates?.forEach((deactivatedState) => this.deactivateStateByName(deactivatedState));
+
+		// Activate States
+		if (transition?.activatedStates == StateMachineTransitions.All) this.states.forEach(state => this.activateStateByName(state.name));
+		else transition?.activatedStates?.forEach((activatedState) => this.activateStateByName(activatedState));
 	}
 
 	/**
@@ -115,11 +154,12 @@ export class StateMachine {
 	}
 
 	/**
-	 * Determines if this state machine is in a state
+	 * Remove this state machine
 	 * */
 	remove() {
+		const sTick: TickService = this.main.s('Tick');
 		this.states.forEach(state => {
-			state.timer?.dispose();
+			if (state.timer) sTick.deregisterTimer(state.timer);
 			state.timer = undefined;
 		});
 		this.states = [];
@@ -138,8 +178,8 @@ interface State {
 
 interface StateTransition {
 	name: string;
-	activatedStates?: string[];
-	deactivatedStates?: string[];
+	activatedStates?: string[] | StateMachineTransitions;
+	deactivatedStates?: string[] | StateMachineTransitions;
 }
 
 export enum StateTransitionTypes {
@@ -151,4 +191,8 @@ export enum StateMachineEvents {
 	Stop = 'stop',
 	PauseAll = 'pauseAll',
 	SetTimer = 'setTimer',
+}
+
+export enum StateMachineTransitions {
+	All
 }

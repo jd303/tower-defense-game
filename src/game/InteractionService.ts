@@ -1,123 +1,161 @@
-import * as THREE from 'three';
-import { Vector3 } from 'three';
 import { Main } from '../core/Main';
-import { Creep } from '../environment/creeps/Creep';
-import { Prop } from '../environment/Prop';
-import { Terrain } from '../environment/Terrain';
-import { LevelPath } from '../levels/LevelPath';
-import { Tower } from '../environment/towers/Tower';
+import { RaycasterService } from '../core/RaycasterService';
+import { StateMachine, StateMachineTransitions } from '../core/StateMachine';
+
+/*
+Interaction thinking
+
+- Tap Board: Select an object on board
+- Tap UI button
+- Tap Context button (such as Tower settings, Hero settings)
+
+States
+
+- Object on board selected (disable Tap Board) (tapping UI button disables this)
+- UI button selected (disable Tap Board, disable Tap Context Button)
+- Menu open (disable Buttons, disable Tap Board, disable Tap Context Button)
+*/
 
 export class InteractionService {
-	/**
-	 * Event Listeners
-	 * */
-	lastIntersectionPoint: Vector3 | null; // Dumb, only stores the last intersection point - improve later
-	mousePosition: THREE.Vector2 = new THREE.Vector2();
-	raycaster: THREE.Raycaster;
-	clickWatcher: any;
-	raycasterSubjects: (Prop | Creep | Tower | Terrain | LevelPath)[] = [];
-	clickHandlers: ClickHandler[] = [];
-
 	/**
 	 * System Properties
 	 * */
 	main: Main;
+	sRaycaster: RaycasterService;
+
+	/**
+	 * States
+	 * */
+	stateMachine: StateMachine;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
 		this.main = main;
-		this.raycaster = new THREE.Raycaster();
-		this.addClickWatcher();
-		console.log("Fix 'any' on Click Manager and mouseMoveWatcher");
+		this.sRaycaster = this.main.s('Raycaster');
+
+		// Setup Statemachine
+		this.stateMachine = new StateMachine(main);
+		this.setupStates();
+
+		// Enable Raycaster
+		this.sRaycaster.enableRaycaster();
 	}
 
 	/**
-	 * Adds clickable raycaster subjects
+	 * Sets up the State Machine for interactions
+	 * Helps track which interaction mode we are in
 	 * */
-	addRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
-		this.raycasterSubjects.push(...subjects);
+	setupStates = function() {
+		// Add states
+		this.stateMachine.addStates([
+			{
+				// The board or UI buttons are tappable
+				name: InteractionStates.default,
+				onEnter: this.enterStateDefault
+			},
+			{
+				// The user has tapped an interactive object on the board
+				name: InteractionStates.board_object_context_selected,
+				onEnter: this.enterStateBoardInteraction
+			},
+			{
+				// The user has tapped a UI button
+				name: InteractionStates.ui_button_selected,
+				onEnter: this.enterStateUIButtonInteraction
+			},
+			{
+				// The user has opened a menu
+				name: InteractionStates.menu_open,
+				onEnter: this.enterStateMenu
+			}
+		]);
+
+		// Add transitions
+		this.stateMachine.addTransitions([
+			{
+				name: InteractionTransitions.reset,
+				deactivatedStates: StateMachineTransitions.All,
+				activatedStates: InteractionStates.default
+			},
+			{
+				name: InteractionTransitions.tap_board_object,
+				deactivatedStates: StateMachineTransitions.All,
+				activatedStates: InteractionStates.board_object_context_selected
+			},
+			{
+				name: InteractionTransitions.tap_ui_button,
+				deactivatedStates: StateMachineTransitions.All,
+				activatedStates: InteractionStates.ui_button_selected
+			},
+			{
+				name: InteractionTransitions.cancel_ui_button,
+				deactivatedStates: StateMachineTransitions.All,
+				activatedStates: InteractionStates.default
+			},
+			{
+				name: InteractionTransitions.open_menu,
+				deactivatedStates: StateMachineTransitions.All,
+				activatedStates: InteractionStates.menu_open
+			},
+			{
+				name: InteractionTransitions.close_menu,
+				deactivatedStates: InteractionStates.menu_open,
+			}
+		]);
+
+		this.stateMachine.transition(InteractionTransitions.reset);
 	}
 
 	/**
-	 * Adds clickable raycaster subjects
+	 * Triggers a reset of interactions
 	 * */
-	removeRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
-		const subjectsSet = new Set(subjects);
-		this.raycasterSubjects = this.raycasterSubjects.filter((subject) => {
-			return !subjectsSet.has(subject);
-		});
+	triggerReset() {
+		this.stateMachine.transition(InteractionTransitions.reset);
 	}
 
 	/**
-	 * Adds a click handler.
-	 * The click handler will resolve if the returned target is appropriate and act.
+	 * We have entered Default State
 	 * */
-	addClickHandler(onClick: Function, onComplete: Function) {
-		const clickHandler: ClickHandler = { onClick: onClick, onComplete: onComplete };
-
-		if (!this.clickHandlers.find((ch) => ch.onClick == onClick)) {
-			this.clickHandlers.push(clickHandler);
-		}
+	enterStateDefault() {
+		console.log("Enter state: Default");
 	}
 
 	/**
-	 * Removes a click handler
+	 * We entered Board Interaction State
 	 * */
-	removeClickHandler(removedOnClick: Function) {
-		console.log('REMOVE ONCLICK');
-		console.log(this);
-		this.clickHandlers = this.clickHandlers.filter((ch) => ch.onClick != removedOnClick);
+	enterStateBoardInteraction() {
+		console.log("Entered state: Board interaction");
 	}
 
 	/**
-	 * Watches for a click on a known subject, and returns the type and position
+	 * We entered UI Button State
 	 * */
-	addClickWatcher() {
-		this.clickWatcher = window.addEventListener('click', this.handleClickEvent.bind(this));
+	enterStateUIButtonInteraction() {
+		console.log("Entere state: UI Button")
 	}
 
 	/**
-	 * When a click occurs, handle it
+	 * We entered a Menu State
 	 * */
-	handleClickEvent(event: MouseEvent | TouchEvent) {
-		const position = { x: 0, y: 0 };
-		if (event instanceof MouseEvent) {
-			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
-			position.y = -((event.clientY / this.main.sizes.height) * 2 - 1);
-		} else {
-			position.x = (event.touches[0].clientX / this.main.sizes.width) * 2 - 1;
-			position.y = -((event.touches[0].clientY / this.main.sizes.height) * 2 - 1);
-		}
-
-		// Set the raycaster
-		this.raycaster.setFromCamera(position, this.main.s('Camera').mainCamera.threeCamera);
-		const intersects = this.raycaster.intersectObjects(this.raycasterSubjects.map((subject) => subject.groupMain));
-
-		// If we have intersected
-		if (intersects.length) {
-			console.log(intersects[0]);
-			console.log('Intersects');
-
-			this.clickHandlers.forEach((handler) => {
-				handler.onClick(intersects, this.main);
-
-				if (handler.onComplete) handler.onComplete();
-			});
-		}
-	}
-
-	/**
-	 * Removes a click event
-	 * */
-	removeClickWatcher() {
-		window.removeEventListener('click', this.handleClickEvent.bind(this));
-		this.clickWatcher = null;
+	enterStateMenu() {
+		console.log("Entere state: Menu")
 	}
 }
 
-interface ClickHandler {
-	onClick: Function;
-	onComplete: Function;
+enum InteractionStates {
+	default,
+	board_object_context_selected,
+	ui_button_selected,
+	menu_open
+}
+
+enum InteractionTransitions {
+	reset = "reset",
+	tap_board_object = "tap_board_object",
+	tap_ui_button = "tap_ui_button",
+	cancel_ui_button = "cancel_ui_button",
+	open_menu = "open_menu",
+	close_menu = "close_menu"
 }

@@ -1,12 +1,12 @@
 import './style.css';
 import { Main } from './core/Main';
 import { LevelService } from './levels/LevelService';
-import { InteractionService } from './game/InteractionService';
 import { PositionService } from './environment/PositionService';
 import { EconomyService } from './game/EconomyService';
 import { UIService } from './game/UIService';
 import { EventService } from './core/EventService';
 import { SplashScreen } from './levels/levels/_SplashScreen';
+import { InteractionService } from './game/InteractionService';
 
 /**
  * Configuration
@@ -24,8 +24,8 @@ const debugMode = true;
 const main = new Main(canvas, sizes, debugMode);
 
 // Create services
-main.registerService('Level', new LevelService(main));
 main.registerService('Interaction', new InteractionService(main));
+main.registerService('Level', new LevelService(main));
 main.registerService('Position', new PositionService(main));
 main.registerService('Economy', new EconomyService(main));
 main.registerService('UI', new UIService(main));

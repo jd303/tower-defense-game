@@ -1,6 +1,7 @@
 import { Level } from './Level';
 import { Level0MVP } from './levels/Level_0_MVP';
 import { Main } from '../core/Main';
+import { FogOfWarService } from '../game/FogOfWarService';
 
 export class LevelService {
 	currentLevel: Level;
@@ -37,5 +38,10 @@ export class LevelService {
 				this.currentLevel = new Level0MVP(this.main);
 				break;
 		}
+
+		// Fog of war
+		const sFog: FogOfWarService = this.main.s('FogOfWar');
+		//sFog.createFogOfWar();
+		sFog.createDebug();
 	}
 }

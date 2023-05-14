@@ -15,6 +15,7 @@ import { levelDetails } from './Level_0_MVP_JSON';
 import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
+import { RaycasterService } from '../../core/RaycasterService';
 
 export class Level0MVP extends Level {
 	/**
@@ -114,9 +115,10 @@ export class Level0MVP extends Level {
 		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
-		this.main.s('Interaction').addRaycasterSubjects([this.terrain]); // Listen to clicks on terrain
-		this.main.s('Interaction').addRaycasterSubjects(this.levelPaths); // Listen to clicks on terrain
-		this.main.s('Interaction').addClickHandler(
+		const sRaycaster: RaycasterService = this.main.s('Raycaster');
+		sRaycaster.addRaycasterSubjects([this.terrain]); // Listen to clicks on terrain
+		sRaycaster.addRaycasterSubjects(this.levelPaths); // Listen to clicks on terrain
+		sRaycaster.addClickHandler(
 			(event: any) =>
 				console.log({
 					x: Maths.roundQuarter(event[0].point.x),
