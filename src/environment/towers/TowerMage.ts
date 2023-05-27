@@ -14,7 +14,7 @@ export class TowerMage extends Tower {
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
 	assetScale = 1.5;
-	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleBufferGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'blue' }));
+	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'blue' }));
 
 	/**
 	 * UI Behaviours

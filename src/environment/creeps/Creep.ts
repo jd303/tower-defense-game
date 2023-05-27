@@ -241,6 +241,7 @@ export class Creep extends ModelAsset {
 	createHealthBar() {
 		const barBG = CreepCommons.healthBarGeometry;
 		const barFG = CreepCommons.healthBarGeometry;
+		barBG.setAttribute( 'position', new THREE.BufferAttribute( CreepCommons.healthBarVertices, 3 ) );
 		const healthBarGroup = new THREE.Group();
 		const bgMesh = new THREE.Mesh(barBG, CreepCommons.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, CreepCommons.healthBarFGMaterial);
@@ -413,7 +414,18 @@ export class Creep extends ModelAsset {
 
 class CreepCommons {
 	/* Health Bar Commons */
-	static healthBarGeometry: THREE.PlaneBufferGeometry = new THREE.PlaneBufferGeometry(1, 0.25);
+	//static healthBarGeometry: THREE.PlaneBufferGeometry = new THREE.PlaneBufferGeometry(1, 0.25);
+	static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
+	static healthBarVertices: Float32Array = new Float32Array( [
+		-1.0, -1.0,  1.0, // v0
+		1.0, -1.0,  1.0, // v1
+		1.0,  1.0,  1.0, // v2
+	
+		1.0,  1.0,  1.0, // v3
+		-1.0,  1.0,  1.0, // v4
+		-1.0, -1.0,  1.0  // v5
+	]);
+	
 	static healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
 	static healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
 
@@ -421,6 +433,6 @@ class CreepCommons {
 	static healingCrossBeamHorizontal = new THREE.BoxGeometry(0.5, 0.1, 0.05);
 	static healingCrossBeamVertical = new THREE.BoxGeometry(0.10, 0.5, 0.05);
 	static healingCrossMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00});
-	static healingCrossMerge = BufferGeometryUtils.mergeBufferGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
+	static healingCrossMerge = BufferGeometryUtils.mergeGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
 	static healingCrossMesh = () => { return new THREE.Mesh(this.healingCrossMerge, this.healingCrossMaterial); }
 }

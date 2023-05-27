@@ -96,7 +96,5 @@ export class SplashScreen {
 		// Create a UI
 		const sUI: UIService = this.main.s('UI');
 		sUI.createPopup("Menu", `<h1>Tower Defense</h1><a href="/#game">Load game</a>`);
-
-		
 	}
 }

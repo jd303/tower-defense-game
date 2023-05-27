@@ -90,7 +90,7 @@ export class RaycasterService {
 	 * When a click occurs, handle it
 	 * */
 	handleClickEvent(event: MouseEvent | TouchEvent) {
-		const position = { x: 0, y: 0 };
+		const position: THREE.Vector2 = new THREE.Vector2(0, 0);
 		if (event instanceof MouseEvent) {
 			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
 			position.y = -((event.clientY / this.main.sizes.height) * 2 - 1);

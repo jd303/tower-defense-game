@@ -96,17 +96,20 @@ export class LightingService {
 	 * */
 	addShadowsToLight(light: Light) {
 		light.threeLight.castShadow = true;
-		light.threeLight.shadow.mapSize.width = 2048;
-		light.threeLight.shadow.mapSize.height = 2048;
-		(light.threeLight.shadow.camera as any).left = 250;
-		(light.threeLight.shadow.camera as any).right = -250;
-		(light.threeLight.shadow.camera as any).bottom = -250;
-		(light.threeLight.shadow.camera as any).top = 250;
-		(light.threeLight.shadow.camera as any).near = 0.5;
-		(light.threeLight.shadow.camera as any).far = 250;
-		//directionalLight.shadow.radius = 10; // Adds 'blur' to shadows
-		//directionalLight.shadow.type = THREE.PCFSoftShadowMap;
-		light.threeLight.shadow.normalBias = 0.03;
+
+		if (light.threeLight.shadow) {
+			light.threeLight.shadow.mapSize.width = 2048;
+			light.threeLight.shadow.mapSize.height = 2048;
+			(light.threeLight.shadow.camera as any).left = 250;
+			(light.threeLight.shadow.camera as any).right = -250;
+			(light.threeLight.shadow.camera as any).bottom = -250;
+			(light.threeLight.shadow.camera as any).top = 250;
+			(light.threeLight.shadow.camera as any).near = 0.5;
+			(light.threeLight.shadow.camera as any).far = 250;
+			//directionalLight.shadow.radius = 10; // Adds 'blur' to shadows
+			//directionalLight.shadow.type = THREE.PCFSoftShadowMap;
+			light.threeLight.shadow.normalBias = 0.03;
+		}
 	}
 
 	/**

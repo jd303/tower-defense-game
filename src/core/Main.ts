@@ -33,6 +33,7 @@ export class Main {
 		this.sizes = sizes;
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+		this.renderer.outputColorSpace  = THREE.SRGBColorSpace; // || LinearSRGBColorSpace
 
 		// Register core services
 		this.registerService('GLTF', new GLTFLoadController());
@@ -55,6 +56,7 @@ export class Main {
 		console.log("%c Then, Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c Then: position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');
 		console.log("%c Then: Projectile results: explosions, magic reactins, arrows left behind?", 'color: red');
+		console.log("%c Then: Refactor and research BufferGeometries, now that we can't use PlaneBufferGeom");
 
 		return this;
 	}
