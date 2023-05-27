@@ -97,6 +97,7 @@ export class FogOfWarService {
 
 	createDebug() {
 		console.log("%c, TODO: Convert Fog of War into a matrix for simplicty in understanding and updating", "color: red");
+		
 		const width = 70;
 		const height = 50;
 		const widthMargin = Math.floor(width * 0.1);
