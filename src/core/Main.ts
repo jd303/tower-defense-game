@@ -8,7 +8,6 @@ import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
 import { AudioService } from './AudioService';
 import { RaycasterService } from './RaycasterService';
-import { FogOfWarService } from '../game/FogOfWarService';
 
 export class Main {
 	/**
@@ -42,7 +41,6 @@ export class Main {
 		this.registerService('Audio', new AudioService(this));
 		this.registerService('Raycaster', new RaycasterService(this));
 		this.registerService('Tick', new TickService(this));
-		this.registerService('FogOfWar', new FogOfWarService(this));
 		this.registerService('Debug', new DebugService(this, debugMode, this.s('Tick')));
 
 		// Watch the screen

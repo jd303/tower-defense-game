@@ -7,6 +7,8 @@ import { UIService } from './game/UIService';
 import { EventService } from './core/EventService';
 import { SplashScreen } from './levels/levels/_SplashScreen';
 import { InteractionService } from './game/InteractionService';
+import { FogOfWarService } from './game/FogOfWarService';
+import { ParticleService } from './core/ParticleService';
 
 /**
  * Configuration
@@ -30,6 +32,8 @@ main.registerService('Position', new PositionService(main));
 main.registerService('Economy', new EconomyService(main));
 main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
+main.registerService('FogOfWar', new FogOfWarService(main));
+main.registerService('Particle', new ParticleService(main));
 
 // Loads the working scene
 if (location.hash == '') {

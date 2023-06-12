@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { perspectiveCameraDefaults, orthographicCameraDefaults } from '../../config/cameraSettingsDefault';
+import { perspectiveCameraDefaults } from '../../config/cameraSettingsDefault';
+import { orthographicCameraLevel } from '../../config/cameraSettingsLevel';
 import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
 import { Level } from '../Level';
@@ -16,6 +17,7 @@ import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
 import { RaycasterService } from '../../core/RaycasterService';
+import { ParticleService } from '../../core/ParticleService';
 
 export class Level0MVP extends Level {
 	/**
@@ -40,7 +42,7 @@ export class Level0MVP extends Level {
 
 		// Setup cameras
 		main.s('Camera').createPerspectiveCamera(false, perspectiveCameraDefaults);
-		main.s('Camera').createOrthographicCamera(true, orthographicCameraDefaults);
+		main.s('Camera').createOrthographicCamera(true, orthographicCameraLevel);
 		const cameraDebug = {
 			changeMain: main.s('Camera').switchCameras.bind(main.s('Camera')),
 		};
@@ -165,6 +167,10 @@ export class Level0MVP extends Level {
 
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
 		}, 1000);
+
+		// Debug particles
+		const sParticle: ParticleService = this.main.s('Particle');
+		sParticle.createExplosion();
 		
 
 		/**

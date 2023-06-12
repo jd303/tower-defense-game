@@ -154,8 +154,8 @@ export class CameraService {
 		// Set a max rotate
 		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle || -Infinity;
 		this.orbitController.controls.maxPolarAngle = this.mainCamera.settings.maxPolarAngle || Infinity;
-		this.orbitController.controls.minAzimuthAngle = this.mainCamera.settings.minAzimuthAngle || -Infinity;
-		this.orbitController.controls.maxAzimuthAngle = this.mainCamera.settings.maxAzimuthAngle || -Infinity;
+		this.orbitController.controls.minAzimuthAngle = Number.isFinite(this.mainCamera.settings.minAzimuthAngle) ? this.mainCamera.settings.minAzimuthAngle : -Infinity;
+		this.orbitController.controls.maxAzimuthAngle = Number.isFinite(this.mainCamera.settings.maxAzimuthAngle) ? this.mainCamera.settings.maxAzimuthAngle : -Infinity;
 		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom || 0.1;
 		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom || 5;
 

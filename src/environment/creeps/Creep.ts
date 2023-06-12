@@ -414,16 +414,14 @@ export class Creep extends ModelAsset {
 
 class CreepCommons {
 	/* Health Bar Commons */
-	//static healthBarGeometry: THREE.PlaneBufferGeometry = new THREE.PlaneBufferGeometry(1, 0.25);
 	static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
 	static healthBarVertices: Float32Array = new Float32Array( [
-		-1.0, -1.0,  1.0, // v0
-		1.0, -1.0,  1.0, // v1
-		1.0,  1.0,  1.0, // v2
-	
-		1.0,  1.0,  1.0, // v3
-		-1.0,  1.0,  1.0, // v4
-		-1.0, -1.0,  1.0  // v5
+		-1, 0, 0,
+		1, 0, 0,
+		1, 0.25, 0,
+		1, 0.25, 0,
+		-1, 0.25, 0,
+		-1, 0, 0,
 	]);
 	
 	static healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
