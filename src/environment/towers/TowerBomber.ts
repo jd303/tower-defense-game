@@ -7,6 +7,8 @@ import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Proj
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
+import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive } from '../../environment/particles/Explosion';
+import { BombShot } from '../effects/BombShot';
 
 export class TowerBomber extends Tower {
 	/**
@@ -41,7 +43,8 @@ export class TowerBomber extends Tower {
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.splash,
 			range: 10,
-			radius: 1.5
+			radius: 1.5,
+			speed: 0.75
 		},
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
@@ -90,11 +93,15 @@ export class TowerBomber extends Tower {
 					creep,
 					this.stats.attack.type,
 					this.stats.attack.hitType,
-					this.projectileBasis.clone()
+					new BombShot(this.main),
+					this.stats.attack.speed,
+					() => {
+						new ParticleExperienceExplosionActive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0.5, creep.groupMain.position.z));
+						new ParticleExperienceExplosionPassive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0.5, creep.groupMain.position.z));
+					}
 				);
 
 				this.projectiles.push(projectile);
-				//}
 			}
 		}
 

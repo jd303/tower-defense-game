@@ -7,6 +7,7 @@ import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Proj
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
+import { ArrowShot } from '../effects/ArrowShot';
 
 export class TowerArcher extends Tower {
 	/**
@@ -40,7 +41,8 @@ export class TowerArcher extends Tower {
 			damageType: DamageTypes.piercing,
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.direct,
-			range: 12
+			range: 12,
+			speed: 1.5
 		},
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
@@ -89,7 +91,8 @@ export class TowerArcher extends Tower {
 					creep,
 					this.stats.attack.type,
 					this.stats.attack.hitType,
-					this.projectileBasis.clone()
+					new ArrowShot(this.main),
+					this.stats.attack.speed
 				);
 
 				this.projectiles.push(projectile);

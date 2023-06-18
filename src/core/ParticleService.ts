@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as lil from 'lil-gui';
 import { Main } from './Main';
-import { TickService } from './TickService';
+import { TickCallback, TickService } from './TickService';
 
 export class ParticleService {
 	/**
@@ -13,7 +13,7 @@ export class ParticleService {
 	/**
 	 * Systems
 	 * */
-	particleExperiences: ParticleExperience[] = [];
+	particleExperiences: ParticleExperience[] = []; // Particle Systems are 
 
 	/**
 	 * Constructor
@@ -21,18 +21,19 @@ export class ParticleService {
 	constructor(main: Main) {
 		this.main = main;
 
-		const sTick: TickService = this.main.s('Tick');
-		sTick.registerCallback(this.updateExperiences.bind(this));
-
 		return this;
 	}
 
 	/**
-	 * Creates an explosion particle system
+	 * Registers a particle experience, for animation
 	 * */
-	createExplosion() {
-		const particleExplosion = new ParticleExperienceExplosion(this.main);
-		this.particleExperiences.push(particleExplosion);
+	registerExperience(experience: ParticleExperience) {
+		this.particleExperiences.push(experience);
+
+		if (this.particleExperiences.length == 1) {
+			const sTick: TickService = this.main.s('Tick');
+			sTick.registerCallback(new TickCallback("ParticleExperienceUpdate", this.updateExperiences.bind(this)));
+		}
 	}
 
 	/**
@@ -49,8 +50,13 @@ export class ParticleService {
 	 * Cleans up the experience
 	 * */
 	removeExperience(experience: ParticleExperience) {
-		this.main.scene.remove(experience.particles);
-		this.particleExperiences = this.particleExperiences.filter(particleExperience => particleExperience !== experience); 
+		this.main.scene.remove(experience.group);
+		this.particleExperiences = this.particleExperiences.filter(particleExperience => particleExperience !== experience);
+
+		if (!this.particleExperiences.length) {
+			const sTick: TickService = this.main.s('Tick');
+			sTick.deregisterCallback("ParticleExperienceUpdate");
+		}
 	}
 
 	/**
@@ -128,25 +134,20 @@ export class ParticleService {
 /**
  * Super Class for particle experiences
  * */
-class ParticleExperience {
+export class ParticleExperience {
 
 	/**
 	 * System properties
 	 * */
 	main: Main;
+	group: THREE.Group;
 	particles: THREE.Points;
 	complete: boolean = false;
 
 	/**
 	 * Setup properties
 	 * */
-	texture: string;
-	particleCount: number;
-	positionType: ParticleSystemPositions;
-	colorType: ParticleSystemColors;
-	animationType: ParticleSystemAnimation;
-	particleBlending: THREE.Blending;
-	particleAttenuation: number;
+	particleProperties: ParticleExperienceProperties;
 
 	/**
 	 * Live Properties
@@ -160,23 +161,43 @@ class ParticleExperience {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, particleProperties: ParticleExperienceProperties) {
 		this.main = main;
+		this.particleProperties = particleProperties;
+
+		this.createParticlePositionsAndColors();
+		this.createParticleGeometry();
+		this.createParticleMaterial();
+		this.createParticleAnimation();
+		this.createParticles();
+
+		// Create a containing group
+		this.group = new THREE.Group();
+		this.group.add(this.particles);
+		this.group.position.x = this.particleProperties.position.x;
+		this.group.position.y = this.particleProperties.position.y;
+		this.group.position.z = this.particleProperties.position.z;
+		this.main.scene.add(this.group);
+
+		// Register itself with the Particle Service
+		const sParticle = this.main.s('Particle');
+		sParticle.registerExperience(this);
 	}
-	
+
 	/**
 	 * Creates a set of positions for particles
 	 * */
 	createParticlePositionsAndColors() {
-		this.positions = new Float32Array(this.particleCount * 3); // 3 values (x|y|z) per vertex
-		this.colors = new Float32Array(this.particleCount * 4);
+		console.log(this.particleProperties.positionType);
+		this.positions = new Float32Array(this.particleProperties.particleCount * 3); // 3 values (x|y|z) per vertex
+		this.colors = new Float32Array(this.particleProperties.particleCount * 4);
 
-		for (let i = 0; i < this.particleCount; i++) {
+		for (let i = 0; i < this.particleProperties.particleCount; i++) {
 			const i3 = i * 3;
 			const i4 = i * 4;
 
-			const positions = this.positionType instanceof Function ? this.positionType() : this.positionType;
-			const colors = this.colorType instanceof Function ? this.colorType() : this.colorType;
+			const positions = this.particleProperties.positionType instanceof Function ? this.particleProperties.positionType() : this.particleProperties.positionType;
+			const colors = this.particleProperties.colorType instanceof Function ? this.particleProperties.colorType() : this.particleProperties.colorType;
 
 			this.positions[i3] = positions.x;
 			this.positions[i3+1] = positions.y;
@@ -206,13 +227,13 @@ class ParticleExperience {
 	createParticleMaterial() {
 		const textureLoader = new THREE.TextureLoader();
 		const particleMaterial = new THREE.PointsMaterial({
-			size: 75,
-			sizeAttenuation: true, // Points scale with distance from cam
-			color: 'orange'
+			size: this.particleProperties.pointSize,
+			sizeAttenuation: this.particleProperties.pointSizeAttenuation, // Points scale with distance from cam
+			color: this.particleProperties.pointColourStart
 		});
 
 		particleMaterial.vertexColors = true; // Says to use the color property of particlesGeometry
-		const particleTexture = textureLoader.load(this.texture);
+		const particleTexture = textureLoader.load(this.particleProperties.texture);
 		particleMaterial.transparent = true;
 		particleMaterial.alphaMap = particleTexture;
 		
@@ -220,24 +241,22 @@ class ParticleExperience {
 		particleMaterial.depthWrite = false;
 
 		// Blending Mode
-		particleMaterial.blending = this.particleBlending;
+		particleMaterial.blending = this.particleProperties.particleBlending;
 
 		this.material = particleMaterial;
 	}
 
 	/**
 	 * Gives each particle an animation direction
-	 * NOTE: Currently creates a static animation: all particles have the same movement each frame
+	 * Should be overwritten; defaults to random movement in the y axis
 	 * */
 	createParticleAnimation() {
-		const particleAnimations = new Float32Array(this.particleCount * 3);
+		const particleAnimations = new Float32Array(this.particleProperties.particleCount * 3);
 
-		for (let i=0; i<this.particleCount; i++) {
-			const animationValues = this.animationType instanceof Function && this.animationType() || this.animationType;
-
-			particleAnimations[i] = animationValues.x;
-			particleAnimations[i + 1] = animationValues.y;
-			particleAnimations[i + 2] = animationValues.z;
+		for (let i=0; i<this.particleProperties.particleCount; i++) {
+			particleAnimations[i] = 0;
+			particleAnimations[i + 1] += Math.random() / 4;
+			particleAnimations[i + 2] = 0;
 		}
 
 		this.particleAnimations = particleAnimations;
@@ -248,7 +267,6 @@ class ParticleExperience {
 	 * */
 	createParticles() {
 		this.particles = new THREE.Points(this.geometry, this.material);
-		this.main.scene.add(this.particles);
 	}
 
 	/**
@@ -263,74 +281,29 @@ class ParticleExperience {
 		this.positions = this.positions.slice(index, 3);
 		this.colors = this.colors.slice(index, 4);
 
-		this.particleCount -= 1;
+		this.particleProperties.particleCount -= 1;
 	}
 }
 
-/**
- * A specific explosion animation
- * */
-class ParticleExperienceExplosion extends ParticleExperience {
-
-	/**
-	 * Constructor
-	 * */
-	constructor(main: Main) {
-		super(main);
-
-		this.texture = 'assets/particles/explosion_large.jpg';
-		this.particleCount = 1000;
-		this.positionType = ParticleSystemPositions.origin.value;
-		this.colorType = ParticleSystemColors.explosionorange.value;
-		this.animationType = ParticleSystemAnimation.explosion.value;
-		this.particleBlending = THREE.NormalBlending;
-		
-		this.createParticlePositionsAndColors();
-		this.createParticleGeometry();
-		this.createParticleMaterial();
-		this.createParticleAnimation();
-		this.createParticles();
-
-		return this;
-	}
-
-	/**
-	 * Overwrites the tick callback
-	 * */
-	tickCallback(): void {
-		for (let i = 0; i < this.particleCount; i++) {
-			const i3 = i * 3;
-			const i4 = i * 4;
-			
-			// Update particle positions
-			(this.geometry.attributes.position.array[i3] as number) += this.particleAnimations[i3];
-			(this.geometry.attributes.position.array[i3+1] as number) += this.particleAnimations[i3+1];
-			(this.geometry.attributes.position.array[i3+2] as number) += this.particleAnimations[i3+2];
-
-			// Recolour points
-			(this.geometry.attributes.color.array[i4] as number) += 0.03;
-			(this.geometry.attributes.color.array[i4+1] as number) += 0.03;
-			(this.geometry.attributes.color.array[i4+2] as number) += 0.03;
-
-			// Attenuate points
-			(this.geometry.attributes.color.array[i4+3] as number) -= 0.03;
-			if (this.geometry.attributes.color.array[i4+3] <= 0) this.removeParticle(i);
-
-			// Update location
-			this.geometry.attributes.position.needsUpdate = true;
-			this.geometry.attributes.color.needsUpdate = true;
-		}
-
-		// Remove a random particle
-		if (this.particleCount <= 0) this.complete = true;
-	}
+export interface ParticleExperienceProperties {
+	particleCount: number;
+	pointColourStart: string;
+	pointSize: number;
+	pointSizeAttenuation: boolean;
+	texture: string;
+	positionType: ParticleSystemPositions;
+	colorType: ParticleSystemColors;
+	animationFunction: Function;
+	particleBlending: THREE.Blending;
+	particleAttenuation: number;
+	position: THREE.Vector3;
 }
 
 /**
  * ENUM: Allowed position types
  * */
-class ParticleSystemPositions {
-	static readonly origin  = new ParticleSystemPositions('ORIGIN', { x:0, y:0, z:0 });
+export class ParticleSystemPositions {
+	static readonly default = new ParticleSystemPositions('DEFAULT', { x:0, y:0, z:0 });
  
 	// private to disallow creating other instances of this type
 	private constructor(private readonly key: string, public readonly value: any) {}
@@ -343,7 +316,7 @@ class ParticleSystemPositions {
 /**
 * ENUM: Allowed colors
 * */
-class ParticleSystemColors {
+export class ParticleSystemColors {
 	static readonly default = new ParticleSystemColors('DEFAULT', { r: 0, g: 0, b: 0 });
 	static readonly explosionorange = new ParticleSystemColors('EXPLOSION', { r: 0.2, g: 0.2, b: 0.2, a:1 });
 
@@ -355,27 +328,7 @@ class ParticleSystemColors {
 	}
 }
 
-/**
-* ENUM: Allowed animations
-* */
-class ParticleSystemAnimation {
-
-	// Default values
-	static speed_explosion: number = 0.1;
-
-	// Enummables
-	static readonly default = new ParticleSystemAnimation('DEFAULT', { x: 0, y: 0, z: 0 });
-	static readonly explosion = new ParticleSystemAnimation('EXPLOSION', () => { return { x: (1 - Math.random() * 2) * this.speed_explosion, y: (Math.random()) * this.speed_explosion, z: (1 - Math.random() * 2) * this.speed_explosion } });
-
-	// Private to disallow creating other instances of this type
-	private constructor(private readonly key: string, public readonly value: any) {}
-
-	toValue() {
-		return this.key;
-	}
-}
-
-interface ParticleSystem {
+export interface ParticleSystem {
 	geometry: THREE.BufferGeometry;
 	material: THREE.PointsMaterial;
 	positions: Float32Array;

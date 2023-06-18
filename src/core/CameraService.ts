@@ -3,6 +3,7 @@ import { Vector3 } from 'three';
 import { Main } from './Main';
 import { OrbitController } from './OrbitController';
 import { FPSController, FPSControlsType } from './FPSController';
+import { TickCallback } from './TickService';
 
 export class CameraService {
 	/**
@@ -141,9 +142,9 @@ export class CameraService {
 	 * */
 	setupOrbitControls() {
 		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas);
-		this.main.s('Tick').registerCallback(() => {
+		this.main.s('Tick').registerCallback(new TickCallback('OrbitController', () => {
 			this.orbitController.controls.update();
-		}, false);
+		}), false);
 
 		// Set a max pan
 		var minPan = new THREE.Vector3(-1, -1, -1);

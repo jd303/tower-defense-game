@@ -223,7 +223,7 @@ export const levelDetails: LevelDefinition = {
 						},
 						{
 							id: '3',
-							type: 'Troll',
+							type: 'TrollDink',
 						},
 						{
 							id: '4',

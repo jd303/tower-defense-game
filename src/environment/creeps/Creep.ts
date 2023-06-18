@@ -263,9 +263,8 @@ export class Creep extends ModelAsset {
 	updateHealthBar() {
 		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
 		healthBarGroup!.scale.x = this.stats.hp_current / this.stats.hp_total;
-		healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) / 2;
+		//healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) - 1; // left aligned
 		healthBarGroup!.position.x = 0;
-		console.log("TODO: Align item properly");
 	}
 
 	/**
@@ -407,7 +406,6 @@ export class Creep extends ModelAsset {
 	getExpectedPositionAt(timeInMS: number) {
 		let distanceTravelled = timeInMS / 1000 * this.pathTravelPercentagePerSec;
 		let expectedPathProgress = Math.min(1, this.pathProgress + distanceTravelled);
-		console.log(distanceTravelled, expectedPathProgress, this.path.path.getPoint(expectedPathProgress));
 		return this.path.path.getPoint(expectedPathProgress) as THREE.Vector3;
 	}
 }

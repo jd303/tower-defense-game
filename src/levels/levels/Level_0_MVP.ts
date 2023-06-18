@@ -6,8 +6,8 @@ import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
 import { Level } from '../Level';
 import { LevelPath } from '../LevelPath';
-import { TreeCone1 } from '../../environment/nature/TreeCone1';
-import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
+import { TreeCone1 } from '../../environment/props/TreeCone1';
+import { Mountain_Type1 } from '../../environment/props/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
 import { TowerArcher } from '../../environment/towers/TowerArcher';
 import { TowerBomber } from '../../environment/towers/TowerBomber';
@@ -17,7 +17,6 @@ import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
 import { RaycasterService } from '../../core/RaycasterService';
-import { ParticleService } from '../../core/ParticleService';
 
 export class Level0MVP extends Level {
 	/**
@@ -159,18 +158,14 @@ export class Level0MVP extends Level {
 			this.main.renderer.shadowMap.enabled = true;
 			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-			this.props.forEach((prop) => prop.enableShadows(true, false));
+			/*this.props.forEach((prop) => prop.enableShadows(true, false));
 			this.towers.forEach((tower) => tower.enableShadows(true, true));
-			this.creeps.forEach((creep) => creep.enableShadows(true, true));
+			this.creeps.forEach((creep) => creep.enableShadows(true, true));*/
 
 			this.terrain.enableShadows();
 
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
 		}, 1000);
-
-		// Debug particles
-		const sParticle: ParticleService = this.main.s('Particle');
-		sParticle.createExplosion();
 		
 
 		/**

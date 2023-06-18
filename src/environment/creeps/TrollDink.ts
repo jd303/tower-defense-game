@@ -9,6 +9,7 @@ export class TrollDink extends Creep {
 	 * */
 	assetPath: string = 'assets/models/creeps/creep_troll.glb';
 	assetScale: number = 0.25;
+	shadowsEnabled = true;
 
 	/**
 	 * Stats

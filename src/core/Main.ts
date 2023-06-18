@@ -49,12 +49,12 @@ export class Main {
 		this.windowSizer.watchResize();
 
 		// Next up messages
-		console.log("%c OK, next up: Fog of War", 'color: red');
-		console.log("%c Then, React Native to see if we can build this to device", 'color: red');
+		console.log("%c OK, next up: React Native to see if we can build this to device", 'color: red');
+		console.log("%c Then, Improve BombShot geometry, and add an animation, to see if that works.", 'color: red');
 		console.log("%c Then, Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c Then: position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');
 		console.log("%c Then: Projectile results: explosions, magic reactins, arrows left behind?", 'color: red');
-		console.log("%c Then: Refactor and research BufferGeometries, now that we can't use PlaneBufferGeom");
+		console.log("%c Then: Refactor and research BufferGeometries, now that we can't use PlaneBufferGeom", 'color: red');
 
 		return this;
 	}

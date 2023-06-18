@@ -4,6 +4,7 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from '../creeps/Creep';
 import { Tower } from '../towers/Tower';
+import { Effect } from '../Effect';
 
 export class Projectile {
 	/**
@@ -15,7 +16,8 @@ export class Projectile {
 	/**
 	 * Visual Asset Properties
 	 * */
-	projectileAsset: THREE.Mesh;
+	projectileGroup: THREE.Group;
+	projectileAsset: Effect;
 
 	/**
 	 * Path properties
@@ -28,14 +30,15 @@ export class Projectile {
 	 * */
 	projectileType: ProjectileTypes;
 	hitType: ProjectileHitTypes;
-	projectileSpeed: number;
+	projectileSpeed: number; // Expressed as a float that will be multiplied, e.g. 1.1 is faster and 0.9 is slower
 	pathProgress: number = 0;
 	target: Creep;
+	hitCallback?: Function;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, tower: Tower, startingPoint: THREE.Vector3, target: Creep, type: ProjectileTypes, hitType: ProjectileHitTypes, asset: THREE.Mesh) {
+	constructor(main: Main, tower: Tower, startingPoint: THREE.Vector3, target: Creep, type: ProjectileTypes, hitType: ProjectileHitTypes, asset: Effect, projectileSpeed: number = 1, hitCallback?: Function) {
 		this.main = main;
 		this.tower = tower;
 		this.startingPoint = startingPoint;
@@ -43,9 +46,14 @@ export class Projectile {
 		this.projectileType = type;
 		this.hitType = hitType;
 		this.projectileAsset = asset;
+		this.projectileSpeed = projectileSpeed;
+		this.hitCallback = hitCallback;
+		this.projectileGroup = new THREE.Group();
 
-		this.projectileAsset.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
-		this.main.scene.add(this.projectileAsset);
+		this.projectileGroup.add(asset.groupMain);
+
+		this.projectileGroup.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
+		this.main.scene.add(this.projectileGroup);
 		this.createPath();
 		return this;
 	}
@@ -100,22 +108,30 @@ export class Projectile {
 	 * Animates the projectile
 	 * */
 	animate(timeProperties: TickTimeProperties) {
-		let distanceSinceLastFrame = timeProperties.deltaTime;
+		let distanceSinceLastFrame = timeProperties.deltaTime * this.projectileSpeed;
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
 		const point = this.projectilePath.getPoint(this.pathProgress) as Vector3;
-		this.projectileAsset.position.set(point.x, point.y, point.z);
+		this.projectileGroup.position.set(point.x, point.y, point.z);
 
 		if (this.pathProgress >= 1) {
 			this.remove();
+			this.runHitCallback();
 			this.tower.resolveHit(this);
 		}
+	}
+
+	/**
+	 * Runs the hit callback
+	 * */
+	runHitCallback() {
+		this.hitCallback && this.hitCallback();
 	}
 
 	/**
 	 * Gets rid of the Projectile
 	 * */
 	remove() {
-		this.main.scene.remove(this.projectileAsset);
+		this.main.scene.remove(this.projectileGroup);
 		this.tower.removeProjectile(this);
 	}
 }

@@ -6,6 +6,7 @@ export class Mountain_Type1 extends Prop {
 	 * Prop Properties
 	 * */
 	assetPath: string = 'assets/models/nature/Mountain1.glb';
+	shadowsEnabled = true;
 
 	/**
 	 * Constructor

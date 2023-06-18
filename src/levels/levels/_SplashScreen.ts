@@ -1,25 +1,10 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
 import { perspectiveCameraDefaults } from '../../config/cameraSettingsDefault';
-import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
-import { Level } from '../Level';
-import { LevelPath } from '../LevelPath';
-import { TreeCone1 } from '../../environment/nature/TreeCone1';
-import { Mountain_Type1 } from '../../environment/nature/Mountain_Type1';
-import { WaveManager } from '../WaveManager';
-import { TowerArcher } from '../../environment/towers/TowerArcher';
-import { TowerBomber } from '../../environment/towers/TowerBomber';
-import { TowerMage } from '../../environment/towers/TowerMage';
-import { levelDetails } from './Level_0_MVP_JSON';
-import { EconomyService } from '../../game/EconomyService';
+import { TreeCone1 } from '../../environment/props/TreeCone1';
 import { UIService } from '../../game/UIService';
-import { EventService } from '../../core/EventService';
-import { Troll } from '../../environment/creeps/Troll';
-import { Wisp } from '../../environment/creeps/Wisp';
 import { CameraService } from '../../core/CameraService';
 import { LightingService } from '../../core/LightingService';
-import { DebugService } from '../../core/DebugService';
 
 export class SplashScreen {
 	/**

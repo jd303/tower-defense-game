@@ -7,6 +7,7 @@ import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Proj
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
+import { MagicBolt } from '../effects/MagicBolt';
 
 export class TowerMage extends Tower {
 	/**
@@ -14,7 +15,6 @@ export class TowerMage extends Tower {
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
 	assetScale = 1.5;
-	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'blue' }));
 
 	/**
 	 * UI Behaviours
@@ -40,7 +40,8 @@ export class TowerMage extends Tower {
 			damageType: DamageTypes.poison,
 			type: ProjectileTypes.homing,
 			hitType: ProjectileHitTypes.direct,
-			range: 10
+			range: 10,
+			speed: 0.5
 		},
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
@@ -85,11 +86,11 @@ export class TowerMage extends Tower {
 					creep,
 					this.stats.attack.type,
 					this.stats.attack.hitType,
-					this.projectileBasis.clone()
+					new MagicBolt(this.main),
+					this.stats.attack.speed
 				);
 
 				this.projectiles.push(projectile);
-				//}
 			}
 		}
 

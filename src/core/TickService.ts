@@ -5,12 +5,12 @@ import { Timer } from './Timer';
 export class TickService {
 	main: Main;
 	clock = new THREE.Clock();
-	tickFrameCallbacksGame: Function[] = [];
-	tickFrameCallbacksUI: Function[] = [];
-	tickSecCallbacksGame: Function[] = [];
-	tickSecCallbacksUI: Function[] = [];
-	tickHalfSecCallbacksGame: Function[] = [];
-	tickHalfSecCallbacksUI: Function[] = [];
+	tickFrameCallbacksGame: TickCallback[] = [];
+	tickFrameCallbacksUI: TickCallback[] = [];
+	tickSecCallbacksGame: TickCallback[] = [];
+	tickSecCallbacksUI: TickCallback[] = [];
+	tickHalfSecCallbacksGame: TickCallback[] = [];
+	tickHalfSecCallbacksUI: TickCallback[] = [];
 	timersGame: Timer[] = [];
 	timersUI: Timer[] = [];
 
@@ -19,6 +19,11 @@ export class TickService {
 	 * */
 	gameTime: number = 0;
 	pausedTick = false;
+	
+	/**
+	 * Debugs
+	 * */
+	debugDeltaChange: number = 0;
 
 	/**
 	 * Constructor
@@ -59,7 +64,7 @@ export class TickService {
 		// If running
 		if (!this.pausedTick) {
 			// Setup time properties
-			const deltaTime = this.clock.getDelta();
+			const deltaTime = this.clock.getDelta() + this.debugDeltaChange;
 			this.gameTime += deltaTime;
 			const { isTickSecond, isTickHalfSecond } = this.checkTickFraction(deltaTime);
 
@@ -98,8 +103,8 @@ export class TickService {
 	/**
 	 * Runs animations on a given tick timeframe
 	 * */
-	runTickAnimations(callbacks: Function[], elapsedTime: number, deltaTime: number, time: string = 'frame') {
-		callbacks.forEach((callback) => callback.bind(this, { elapsedTime, deltaTime })());
+	runTickAnimations(callbacks: TickCallback[], elapsedTime: number, deltaTime: number, time: string = 'frame') {
+		callbacks.forEach((callback) => callback.callback.bind(this, { elapsedTime, deltaTime })());
 	}
 
 	/**
@@ -141,9 +146,16 @@ export class TickService {
 	}
 
 	/**
+	 * Unpauses game objects
+	 * */
+	speedTick() {
+		this.debugDeltaChange = this.debugDeltaChange === 0 && 0.05 || 0;
+	}
+
+	/**
 	 * Register a Tick callback
 	 * */
-	registerCallback = function (callback: Function, gameCallback = true, time: TickTimeTypes = TickTimeTypes.frame) {
+	registerCallback = function (callback: TickCallback, gameCallback = true, time: TickTimeTypes = TickTimeTypes.frame) {
 		let destinationArray;
 
 		if (gameCallback) {
@@ -164,9 +176,9 @@ export class TickService {
 	/**
 	 * Deregister a Tick callback
 	 * */
-	deregisterCallback(callback: Function, game = true) {
-		if (game) this.tickFrameCallbacksGame = this.tickFrameCallbacksGame.filter((thisCallback: Function) => thisCallback !== callback);
-		else this.tickFrameCallbacksUI = this.tickFrameCallbacksUI.filter((thisCallback: Function) => thisCallback !== callback);
+	deregisterCallback(callbackName: string, game = true) {
+		if (game) this.tickFrameCallbacksGame = this.tickFrameCallbacksGame.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+		else this.tickFrameCallbacksUI = this.tickFrameCallbacksUI.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
 	}
 
 	/**
@@ -182,6 +194,16 @@ export class TickService {
 	 * */
 	deregisterTimer(removedTimer: Timer) {
 		this.timersGame = this.timersGame.filter(timer => timer !== removedTimer);
+	}
+}
+
+export class TickCallback {
+	name: string;
+	callback: Function;
+	
+	constructor(name: string, callback: Function) {
+		this.name = name;
+		this.callback = callback;
 	}
 }
 

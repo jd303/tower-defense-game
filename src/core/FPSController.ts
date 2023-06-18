@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls.js';
 import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
 import { Main } from './Main';
-import { TickTimeProperties } from './TickService';
+import { TickCallback, TickTimeProperties } from './TickService';
 import { AdvancedFirstPersonControls } from './AdvancedFPSController';
 import { Camera } from './CameraService';
 
@@ -44,9 +44,9 @@ export class FPSController {
 		this.controls = camControls;
 
 		// Update controls
-		this.main.s('Tick').registerCallback((tickTimeProperties: TickTimeProperties) => {
+		this.main.s('Tick').registerCallback(new TickCallback('FlyControls', (tickTimeProperties: TickTimeProperties) => {
 			this.controls.update(tickTimeProperties.deltaTime);
-		}, false);
+		}), false);
 
 		return this;
 	}
@@ -67,9 +67,9 @@ export class FPSController {
 		this.controls = camControls;
 
 		// Update controls
-		this.main.s('Tick').registerCallback((tickTimeProperties: TickTimeProperties) => {
+		this.main.s('Tick').registerCallback(new TickCallback("FPSSimpleControls", (tickTimeProperties: TickTimeProperties) => {
 			this.controls.update(tickTimeProperties.deltaTime);
-		}, false);
+		}), false);
 
 		return this;
 	}
@@ -80,9 +80,9 @@ export class FPSController {
 	setupFPSAdvancedControls(camera: Camera) {
 		this.controls = new AdvancedFirstPersonControls(camera);
 
-		this.main.s('Tick').registerCallback(() => {
+		this.main.s('Tick').registerCallback(new TickCallback("FPSAdvancedControls", () => {
 			this.controls.update(0);
-		}, false);
+		}), false);
 	}
 }
 

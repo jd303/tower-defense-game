@@ -5,6 +5,7 @@ export class ModelAsset {
 	/**
 	 * Setup Properties
 	 * */
+	shadowsEnabled: boolean = false;
 	assetPath: string;
 	assetScale: number = 1; // default
 
@@ -34,15 +35,26 @@ export class ModelAsset {
 	 * Loads the model
 	 * */
 	loadModel() {
-		this.main.s('GLTF').loadModel(this.assetPath, this.loadComplete.bind(this), this.loadProgress.bind(this), this.loadError.bind(this));
+		this.main.s('GLTF').loadModel(this.assetPath, this.loadModelComplete.bind(this), this.loadProgress.bind(this), this.loadError.bind(this));
 	}
 
 	/**
 	 * The assets loaded properly
 	 * */
-	loadComplete(gltfAsset: any) {
+	loadModelComplete(gltfAsset: any) {
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
 		this.groupModel.add(...gltfAsset.scene.children);
+		this.enableShadows();
+	}
+
+	/**
+	 * Add mesh manuall
+	 * */
+	createMesh(geometry: THREE.BufferGeometry, material: THREE.Material) {
+		this.mesh = new THREE.Mesh(geometry, material);
+		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
+		this.groupModel.add(this.mesh);
+		this.enableShadows();
 	}
 
 	/**
@@ -62,7 +74,7 @@ export class ModelAsset {
 	 * */
 	enableShadows(cast: boolean = true, receive: boolean = false) {
 		this.groupModel.children.forEach((child: any) => {
-			if (child.isMesh) {
+			if (child.isMesh && this.shadowsEnabled) {
 				child.castShadow = cast;
 				child.receiveShadow = receive;
 				child.material.needsUpdate = true;

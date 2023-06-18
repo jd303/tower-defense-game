@@ -6,7 +6,7 @@ import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelPath } from './LevelPath';
 import { LevelDefinition } from '../data/LevelInterfaces';
-import { TickService, TickTimeProperties } from '../core/TickService';
+import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 
@@ -87,7 +87,7 @@ export class Level {
 	 * Registers callback for tick
 	 * */
 	setupMainTick() {
-		this.main.s('Tick').registerCallback(this.gameplayTickCallback.bind(this));
+		this.main.s('Tick').registerCallback(new TickCallback("Level", this.gameplayTickCallback.bind(this)));
 	}
 
 	/**

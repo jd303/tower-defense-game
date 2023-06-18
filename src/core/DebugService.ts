@@ -22,6 +22,7 @@ export class DebugService {
 
 			this.lilGUI.add(tickService, 'pauseTick').name('Pause Tick');
 			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
+			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
 		}
 
 		return this;
