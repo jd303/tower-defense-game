@@ -43,7 +43,7 @@ export class TowerBomber extends Tower {
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.splash,
 			range: 10,
-			radius: 1.5,
+			radius: 2,
 			speed: 0.75
 		},
 		last_attack_time: 0,

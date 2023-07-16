@@ -124,7 +124,7 @@ export class Tower extends ModelAsset {
 				projectile.target.resolveAttack(this.stats.attack);
 				break;
 			case ProjectileHitTypes.splash:
-				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, 2);
+				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, this.stats.attack.radius);
 				targets.forEach(creep => creep.resolveAttack(this.stats.attack));
 				break;
 		}

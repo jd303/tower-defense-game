@@ -42,7 +42,8 @@ export class TowerArcher extends Tower {
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.direct,
 			range: 12,
-			speed: 1.5
+			speed: 1.5,
+			radius: 0
 		},
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead

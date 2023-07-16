@@ -11,6 +11,6 @@ export class BombShot extends Effect {
 	constructor(main: Main) {
 		super(main);
 
-		this.createMesh(new THREE.SphereGeometry(0.4, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
+		this.createMesh(new THREE.SphereGeometry(0.3, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 	}
 }

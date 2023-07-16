@@ -15,7 +15,7 @@ export interface TowerAttackStats {
 	type: ProjectileTypes,
 	hitType: ProjectileHitTypes;
 	range: number;
-	radius?: number;
+	radius: number;
 	speed: number
 }
 
