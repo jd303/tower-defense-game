@@ -75,7 +75,7 @@ export class UIService {
 		const icon = document.createElement('img');
 		icon.src = objectUI.icon;
 		button.appendChild(icon);
-		button.addEventListener('click', onClick);
+		button.addEventListener('click', (event: MouseEvent | TouchEvent) => onClick(event, this.main));
 		(button as any).cancelBehaviour = onCancel;
 
 		// Create a UI Button

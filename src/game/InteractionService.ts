@@ -1,6 +1,8 @@
 import { Main } from '../core/Main';
 import { RaycasterService } from '../core/RaycasterService';
 import { StateMachine, StateMachineTransitions } from '../core/StateMachine';
+import { ModelAsset } from '../environment/ModelAsset';
+import { Terrain } from '../environment/Terrain';
 
 /*
 Interaction thinking
@@ -120,11 +122,13 @@ export class InteractionService {
 	/**
 	 * Registers when an interaction has been registered
 	 * */
-	registerInteraction(targets, callback) {
+	registerInteraction(targets: (ModelAsset | Terrain)[], callback: Function) {
 		this.interactionListener = window.addEventListener('click', (event: MouseEvent | TouchEvent) => {
 			const sRaycaster: RaycasterService = this.main.s('Raycaster');
-			const matchedTargets = sRaycaster.getEventIntersections(event);
-			console.log(matchedTargets);
+			const matchedTarget = sRaycaster.fireRayToTargets(event, targets);
+			if (matchedTarget) {
+				callback(matchedTarget, this.main);
+			}
 		});
 	}
 

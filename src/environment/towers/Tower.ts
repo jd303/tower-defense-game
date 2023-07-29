@@ -150,7 +150,7 @@ export class Tower extends ModelAsset {
 			sUI.deselectButton(target);
 		}
 
-		const onClick = function(event: any) {
+		const onClick = function(event: any, main: Main) {
 			let target: any = event.target;
 			target = target instanceof HTMLButtonElement && target || target.closest('button');
 			
@@ -162,10 +162,9 @@ export class Tower extends ModelAsset {
 				
 				// Notify the Interaction Service that we want to create a tower
 				const sInteraction = main.s('Interaction');
-				sInteraction.registerInteraction(this.main.s('Level').currentLevel.terrain, () => console.log("Clicked terrain"));
-				
+				sInteraction.registerInteraction([main.s('Level').currentLevel.terrain], this.UI.placeCallback);
 			}
-		}
+		}.bind(this);
 
 		sUI.addButton(this.UI, onClick, onCancel);
 	}

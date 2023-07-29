@@ -8,6 +8,7 @@ import { LevelPath } from '../levels/LevelPath';
 import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
 import { CameraService } from './CameraService';
+import { ModelAsset } from '../environment/ModelAsset';
 
 export class RaycasterService {
 	/**
@@ -84,7 +85,38 @@ export class RaycasterService {
 		this.clickWatcher = null;
 	}
 
-	getEventIntersections(event: MouseEvent | TouchEvent) {
+	/**
+	 * When a click occurs, handle it
+	 * */
+	fireRayToTargets(event: MouseEvent | TouchEvent, targets: (ModelAsset | Terrain)[]) {
+		const position: THREE.Vector2 = new THREE.Vector2(0, 0);
+		if (event instanceof MouseEvent) {
+			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
+			position.y = -((event.clientY / this.main.sizes.height) * 2 - 1);
+		} else {
+			position.x = (event.touches[0].clientX / this.main.sizes.width) * 2 - 1;
+			position.y = -((event.touches[0].clientY / this.main.sizes.height) * 2 - 1);
+		}
+
+		// Set the raycaster
+		this.raycaster?.setFromCamera(position, this.main.s('Camera').mainCamera.threeCamera);
+
+		// Find the first intersection, using our own top-down ordering system
+		let intersected: RaycasterIntersection | null = null;
+		for (let i=0; i <targets.length; i++) {
+			let subject = targets[i];
+
+			let intersects = this.raycaster?.intersectObjects( [subject['groupMain']] );
+			if (intersects?.length) {
+				intersected = {
+					point: intersects[0],
+					object: subject
+				}
+				break;
+			}
+		}
+
+		return intersected;
 	}
 
 	/**
