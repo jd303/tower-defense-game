@@ -9,6 +9,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
+import { UIService } from '../../game/UIService';
 
 export class Tower extends ModelAsset {
 	/**
@@ -32,7 +33,7 @@ export class Tower extends ModelAsset {
 	/**
 	 * UI Elements
 	 * */
-	UI: TowerUI;
+	static UI: TowerUI;
 
 	/**
 	 * Constructor
@@ -135,6 +136,21 @@ export class Tower extends ModelAsset {
 	 * */
 	removeProjectile(removedProjectile: Projectile) {
 		this.projectiles = this.projectiles.filter(projectile => projectile != removedProjectile);
+	}
+
+	/**
+	 * Sets up the Tower, such as the UI
+	 * */
+	setup(main: Main) {
+		const sUI: UIService = main.s('UI');
+
+		const onClick = function(event) {
+			sUI.selectButton(event.target);
+			const sInteraction = main.s('Interaction');
+			sInteraction.
+		}
+
+		sUI.addButton(this.UI, );
 	}
 }
 
