@@ -141,16 +141,33 @@ export class Tower extends ModelAsset {
 	/**
 	 * Sets up the Tower, such as the UI
 	 * */
-	setup(main: Main) {
+	static setup(main: Main) {
 		const sUI: UIService = main.s('UI');
 
-		const onClick = function(event) {
-			sUI.selectButton(event.target);
-			const sInteraction = main.s('Interaction');
-			sInteraction.
+		const onCancel = function(event: any) {
+			let target: any = event.target;
+			target = target instanceof HTMLButtonElement && target || target.closest('button');
+			sUI.deselectButton(target);
 		}
 
-		sUI.addButton(this.UI, );
+		const onClick = function(event: any) {
+			let target: any = event.target;
+			target = target instanceof HTMLButtonElement && target || target.closest('button');
+			
+			if (target.getAttribute('data-selected') == "true") {
+				sUI.cancelAllButtons();
+			} else {
+				sUI.cancelAllButtons();
+				sUI.selectButton(target);
+				
+				// Notify the Interaction Service that we want to create a tower
+				const sInteraction = main.s('Interaction');
+				sInteraction.registerInteraction(this.main.s('Level').currentLevel.terrain, () => console.log("Clicked terrain"));
+				
+			}
+		}
+
+		sUI.addButton(this.UI, onClick, onCancel);
 	}
 }
 

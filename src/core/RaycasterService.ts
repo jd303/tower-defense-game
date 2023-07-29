@@ -84,6 +84,9 @@ export class RaycasterService {
 		this.clickWatcher = null;
 	}
 
+	getEventIntersections(event: MouseEvent | TouchEvent) {
+	}
+
 	/**
 	 * When a click occurs, handle it
 	 * */

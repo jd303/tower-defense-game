@@ -23,6 +23,11 @@ export class UIService {
 	economyUIElement: HTMLElement;
 
 	/**
+	 * All buttons, for state management
+	 * */
+	UIButtons: UIButton[] = [];
+
+	/**
 	 * Game Assets
 	 * */
 	towers: Tower[];
@@ -63,9 +68,54 @@ export class UIService {
 	}
 
 	/**
+	 * Adds a button
+	 * */
+	addButton(objectUI: any, onClick: any, onCancel: Function) {
+		const button = document.createElement('button');
+		const icon = document.createElement('img');
+		icon.src = objectUI.icon;
+		button.appendChild(icon);
+		button.addEventListener('click', onClick);
+		(button as any).cancelBehaviour = onCancel;
+
+		// Create a UI Button
+		const newButton = new UIButton(button, onCancel);
+		this.UIButtons.push(newButton);
+
+		// Switch depending on the type
+		switch (objectUI.type) {
+			// Towers
+			case UITypes.Tower:
+				this.towersUIElement.appendChild(button);
+				break;
+		}
+	}
+
+	/**
+	 * Marks a button as selected
+	 * */
+	selectButton(button: any) {
+		button.setAttribute('data-selected', 'true');
+	}
+
+	/**
+	 * Marks a button as deselected
+	 * */
+	deselectButton(button: any) {
+		button.setAttribute('data-selected', 'false');
+	}
+
+	/**
+	 * Runs the cancel callback on all buttons
+	 * */
+	cancelAllButtons() {
+		this.UIButtons.forEach(button => button.cancelBehaviour({ target: button.button }));
+	}
+
+	/**
 	 * Adds Level UI buttons when provided with a Tower or similar UI-able object
 	 * */
-	addLevelUIButtons(clickTarget: ModelAsset | Terrain, objects: any[]) {
+	/*addLevelUIButtons(clickTarget: ModelAsset | Terrain, objects: any[]) {
 		objects.forEach((object) => {
 			const button = document.createElement('button');
 			const icon = document.createElement('img');
@@ -85,12 +135,12 @@ export class UIService {
 					break;
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * A UI Element wants to create an asset
 	 * */
-	toggleAssetCreation(button: HTMLElement, clickTarget: ModelAsset | Terrain, object: Tower, event: MouseEvent) {
+	/*toggleAssetCreation(button: HTMLElement, clickTarget: ModelAsset | Terrain, object: Tower, event: MouseEvent) {
 		event.stopImmediatePropagation();
 		event.stopPropagation();
 
@@ -116,12 +166,12 @@ export class UIService {
 			markSelected();
 			this.requestCreateAsset(clickTarget, object, markDeselected);
 		}
-	}
+	}*/
 
 	/**
 	 * The UI has triggered an asset creation
 	 * */
-	requestCreateAsset(clickTarget: ModelAsset | Terrain, element: Tower, uiOnComplete: Function) {
+	/*requestCreateAsset(clickTarget: ModelAsset | Terrain, element: Tower, uiOnComplete: Function) {
 		// Start listening to raycasters
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
 		sRaycaster.addRaycasterSubjects([ {  order: RaycasterOrders.terrain, object: this.main.s('Level').currentLevel.terrain }]);
@@ -136,17 +186,17 @@ export class UIService {
 			// Add a click handler
 			sRaycaster.addClickHandler(clickTarget, element.UI.placeCallback, onComplete);
 		}
-	}
+	}*/
 
 	/**
 	 * Cancels the create request
 	 * */
-	cancelCreateRequest(element: Tower) {
+	/*cancelCreateRequest(element: Tower) {
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
 		sRaycaster.removeRaycasterSubjects([this.main.s('Level').currentLevel.terrain]);
 		sRaycaster.removeRaycasterSubjects(this.main.s('Level').currentLevel.levelPaths);
 		if (element.UI.placeCallback) sRaycaster.removeClickHandler(element.UI.placeCallback);
-	}
+	}*/
 
 	/**
 	 * Adds a label to the economy section
@@ -247,5 +297,15 @@ export class UIService {
 	 * */
 	clearUI() {
 		this.rootUIElement.innerHTML = "";
+	}
+}
+
+class UIButton {
+	button: HTMLButtonElement;
+	cancelBehaviour: Function;
+
+	constructor(button: HTMLButtonElement, cancelBehaviour: Function) {
+		this.button = button;
+		this.cancelBehaviour = cancelBehaviour;
 	}
 }

@@ -24,6 +24,11 @@ export class InteractionService {
 	sRaycaster: RaycasterService;
 
 	/**
+	 * Interactions
+	 * */
+	interactionListener: any;
+
+	/**
 	 * States
 	 * */
 	stateMachine: StateMachine;
@@ -113,6 +118,20 @@ export class InteractionService {
 	}
 
 	/**
+	 * Registers when an interaction has been registered
+	 * */
+	registerInteraction(targets, callback) {
+		this.interactionListener = window.addEventListener('click', (event: MouseEvent | TouchEvent) => {
+			const sRaycaster: RaycasterService = this.main.s('Raycaster');
+			const matchedTargets = sRaycaster.getEventIntersections(event);
+			console.log(matchedTargets);
+		});
+	}
+
+	deregisterInteraction() {
+	}
+
+	/**
 	 * We have entered Default State
 	 * */
 	enterStateDefault() {
@@ -148,7 +167,7 @@ enum InteractionStates {
 	menu_open
 }
 
-enum InteractionTransitions {
+export enum InteractionTransitions {
 	reset = "reset",
 	tap_board_object = "tap_board_object",
 	tap_ui_button = "tap_ui_button",

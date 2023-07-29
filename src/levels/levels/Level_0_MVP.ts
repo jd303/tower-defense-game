@@ -143,7 +143,9 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		sUI.addLevelUIButtons(this.terrain, [TowerArcher, TowerBomber, TowerMage]);
+		TowerArcher.setup(this.main);
+		TowerBomber.setup(this.main);
+		//sUI.addLevelUIButtons(this.terrain, [TowerArcher, TowerBomber, TowerMage]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');
 
