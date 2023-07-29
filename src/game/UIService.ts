@@ -1,6 +1,8 @@
 import { EventService } from '../core/EventService';
 import { Main } from '../core/Main';
-import { RaycasterService } from '../core/RaycasterService';
+import { RaycasterOrders, RaycasterService } from '../core/RaycasterService';
+import { ModelAsset } from '../environment/ModelAsset';
+import { Terrain } from '../environment/Terrain';
 import { Tower } from '../environment/towers/Tower';
 import { EconomyService } from './EconomyService';
 import { UITypes } from './UIProperties';
@@ -61,9 +63,9 @@ export class UIService {
 	}
 
 	/**
-	 * Adds a UI button when provided with a Tower or similar UI-able object
+	 * Adds Level UI buttons when provided with a Tower or similar UI-able object
 	 * */
-	addUIButtons(objects: any[]) {
+	addLevelUIButtons(clickTarget: ModelAsset | Terrain, objects: any[]) {
 		objects.forEach((object) => {
 			const button = document.createElement('button');
 			const icon = document.createElement('img');
@@ -78,7 +80,7 @@ export class UIService {
 				case UITypes.Tower:
 					this.towersUIElement.appendChild(button);
 
-					callback = this.toggleAssetCreation.bind(this, button, object);
+					callback = this.toggleAssetCreation.bind(this, button, clickTarget, object);
 					button.addEventListener('click', callback);
 					break;
 			}
@@ -88,7 +90,7 @@ export class UIService {
 	/**
 	 * A UI Element wants to create an asset
 	 * */
-	toggleAssetCreation(button: HTMLElement, object: Tower, event: MouseEvent) {
+	toggleAssetCreation(button: HTMLElement, clickTarget: ModelAsset | Terrain, object: Tower, event: MouseEvent) {
 		event.stopImmediatePropagation();
 		event.stopPropagation();
 
@@ -112,30 +114,27 @@ export class UIService {
 			this.cancelCreateRequest(object);
 		} else {
 			markSelected();
-			this.requestCreateAsset(object, markDeselected);
+			this.requestCreateAsset(clickTarget, object, markDeselected);
 		}
 	}
 
 	/**
 	 * The UI has triggered an asset creation
 	 * */
-	requestCreateAsset(element: Tower, uiOnComplete: Function) {
+	requestCreateAsset(clickTarget: ModelAsset | Terrain, element: Tower, uiOnComplete: Function) {
 		// Start listening to raycasters
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.addRaycasterSubjects([this.main.s('Level').currentLevel.terrain]);
-		sRaycaster.addRaycasterSubjects(this.main.s('Level').currentLevel.levelPaths);
+		sRaycaster.addRaycasterSubjects([ {  order: RaycasterOrders.terrain, object: this.main.s('Level').currentLevel.terrain }]);
 
 		if (element.UI.placeCallback) {
 			// Create an oncomplete function
 			const onComplete = () => {
-				const remainingMoney = this.main.s('Economy').adjustEconomyValue(element.baseStats.costType, -1*element.baseStats.cost);
-				this.main.s('Event').fire('commerce_money_changed', remainingMoney);
 				this.cancelCreateRequest(element);
 				uiOnComplete();
 			};
 
 			// Add a click handler
-			sRaycaster.addClickHandler(element.UI.placeCallback, onComplete);
+			sRaycaster.addClickHandler(clickTarget, element.UI.placeCallback, onComplete);
 		}
 	}
 

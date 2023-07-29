@@ -6,16 +6,16 @@ import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { LevelPath } from '../levels/LevelPath';
 import { Tower } from '../environment/towers/Tower';
+import { Hero } from '../environment/heroes/Hero';
+import { CameraService } from './CameraService';
 
 export class RaycasterService {
 	/**
 	 * Event Listeners
 	 * */
-	lastIntersectionPoint: Vector3 | null; // Dumb, only stores the last intersection point - improve later
-	mousePosition: THREE.Vector2 = new THREE.Vector2();
 	raycaster?: THREE.Raycaster | null;
 	clickWatcher: any;
-	raycasterSubjects: (Prop | Creep | Tower | Terrain | LevelPath)[] = [];
+	raycasterSubjects: RaycasterSubject[] = [];
 	clickHandlers: ClickHandler[] = [];
 
 	/**
@@ -33,15 +33,15 @@ export class RaycasterService {
 	/**
 	 * Adds clickable raycaster subjects
 	 * */
-	addRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
-		console.log(subjects);
+	addRaycasterSubjects(subjects: RaycasterSubject[]) {
 		this.raycasterSubjects.push(...subjects);
+		this.raycasterSubjects = this.raycasterSubjects.sort((a, b) => a.order < b.order && 1 || -1);
 	}
 
 	/**
 	 * Adds clickable raycaster subjects
 	 * */
-	removeRaycasterSubjects(subjects: (Prop | Creep | Tower | Terrain | LevelPath)[]) {
+	removeRaycasterSubjects(subjects: RaycasterSubject[]) {
 		const subjectsSet = new Set(subjects);
 		this.raycasterSubjects = this.raycasterSubjects.filter((subject) => {
 			return !subjectsSet.has(subject);
@@ -52,8 +52,8 @@ export class RaycasterService {
 	 * Adds a click handler.
 	 * The click handler will resolve if the returned target is appropriate and act.
 	 * */
-	addClickHandler(onClick: Function, onComplete: Function) {
-		const clickHandler: ClickHandler = { onClick: onClick, onComplete: onComplete };
+	addClickHandler(clickTarget: Hero | Prop | Creep | Tower | Terrain | LevelPath, onClick: Function, onComplete: Function) {
+		const clickHandler: ClickHandler = { target: clickTarget, onClick: onClick, onComplete: onComplete };
 
 		if (!this.clickHandlers.find((ch) => ch.onClick == onClick)) {
 			this.clickHandlers.push(clickHandler);
@@ -64,8 +64,6 @@ export class RaycasterService {
 	 * Removes a click handler
 	 * */
 	removeClickHandler(removedOnClick: Function) {
-		console.log('REMOVE ONCLICK');
-		console.log(this);
 		this.clickHandlers = this.clickHandlers.filter((ch) => ch.onClick != removedOnClick);
 	}
 
@@ -101,15 +99,29 @@ export class RaycasterService {
 
 		// Set the raycaster
 		this.raycaster?.setFromCamera(position, this.main.s('Camera').mainCamera.threeCamera);
-		const intersects = this.raycaster?.intersectObjects(this.raycasterSubjects.map((subject) => subject['groupMain']));
+
+		// Find the first intersection, using our own top-down ordering system
+		let intersected: RaycasterIntersection | null = null;
+		for (let i=0; i <this.raycasterSubjects.length; i++) {
+			let subject = this.raycasterSubjects[i];
+
+			let intersects = this.raycaster?.intersectObjects( [subject.object['groupMain']] );
+			if (intersects?.length) {
+				intersected = {
+					point: intersects[0],
+					object: subject.object
+				}
+				break;
+			}
+		}
 
 		// If we have intersected
-		if (intersects?.length) {
-			console.log(intersects[0]);
-			console.log('Intersects');
+		if (intersected !== null) {
 
 			this.clickHandlers.forEach((handler) => {
-				handler.onClick(intersects, this.main);
+				if (handler.target == intersected?.object) {
+					handler.onClick(intersected, this.main);
+				}
 
 				if (handler.onComplete) handler.onComplete();
 			});
@@ -118,6 +130,24 @@ export class RaycasterService {
 }
 
 interface ClickHandler {
+	target: Hero | Prop | Creep | Tower | Terrain | LevelPath;
 	onClick: Function;
 	onComplete: Function;
+}
+
+interface RaycasterSubject {
+	order: RaycasterOrders;
+	object: Hero | Prop | Creep | Tower | Terrain | LevelPath;
+}
+
+export interface RaycasterIntersection {
+	point: any,
+	object: Hero | Prop | Creep | Tower | Terrain | LevelPath;
+}
+
+export enum RaycasterOrders {
+	"terrain" = 0,
+	"props" = 1,
+	"towers" = 2,
+	"heroes" = 3,
 }

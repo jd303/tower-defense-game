@@ -1,18 +1,19 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
-import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
-import { LevelPathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
-import { CreepStates, CreepTransitions } from './CreepStates';
-import { CreepStats } from './CreepStats';
-import { TowerAttackStats } from '../towers/TowerStats';
+import { HeroStats } from './HeroStats';
+import { HeroPathDefinition } from '../../data/PathInterfaces';
+import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
+import { HeroStates, HeroTransitions } from './HeroStates';
+import { CreepStats } from '../creeps/CreepStats';
+import { RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
 
-export class Creep extends ModelAsset {
+export class Hero extends ModelAsset {
 	/**
 	 * Stats
 	 * */
-	stats: CreepStats;
+	stats: HeroStats;
 
 	/**
 	 * Three Assets
@@ -28,9 +29,16 @@ export class Creep extends ModelAsset {
 	main: Main;
 
 	/**
+	 * Level Properties
+	 * */
+	path: HeroPathDefinition;
+	pathTravelPercentagePerSec: number;
+	pathProgress: number = 0;
+
+	/**
 	 * Status
 	 * */
-	states: CreepStates;
+	states: HeroStates;
 	stateMachine: StateMachine;
 
 	/**
@@ -53,7 +61,7 @@ export class Creep extends ModelAsset {
 		this.groupMain.add(this.groupTransforms);
 		
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.transition('moving');
+		this.setupInteractions();
 	}
 
 	/**
@@ -64,68 +72,83 @@ export class Creep extends ModelAsset {
 
 		stateMachine.addStates([
 			{
-				name: CreepStates.idle,
+				name: HeroStates.idle,
 			},
 			{
-				name: CreepStates.moving,
+				name: HeroStates.moving,
 			},
 			{
-				name: CreepStates.hurting,
+				name: HeroStates.hurting,
 				autoTransition: StateMachineEvents.Stop,
 				autoTransitionTimeMS: 1000,
 			},
 			{
-				name: CreepStates.hurt,
+				name: HeroStates.hurt,
 			},
 			{
-				name: CreepStates.healing,
+				name: HeroStates.healing,
 				autoTransition: StateMachineEvents.Stop,
 				autoTransitionTimeMS: 1500,
 				onEnter: this.stateEnterHealing.bind(this),
 				onExit: this.stateExitHealing.bind(this)
 			},
 			{
-				name: CreepStates.activatingStandingPower,
+				name: HeroStates.activatingStandingPower,
 				onEnter: this.activateStandingPower.bind(this),
+			},
+			{
+				name: HeroStates.disabled,
+				autoTransition: HeroTransitions.revived,
+				autoTransitionTimeMS: 1500,
 			},
 		]);
 
 		stateMachine.addTransitions([
 			{
-				name: CreepTransitions.pause,
-				activatedStates: [CreepStates.idle],
-				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
+				name: HeroTransitions.pause,
+				activatedStates: [HeroStates.idle],
+				deactivatedStates: [HeroStates.moving, HeroStates.activatingStandingPower],
 			},
 			{
-				name: CreepTransitions.unpause,
-				activatedStates: [CreepStates.moving],
-				deactivatedStates: [CreepStates.idle],
+				name: HeroTransitions.unpause,
+				activatedStates: [HeroStates.moving],
+				deactivatedStates: [HeroStates.idle],
 			},
 			{
-				name: CreepTransitions.moving,
-				activatedStates: [CreepStates.moving],
+				name: HeroTransitions.moving,
+				activatedStates: [HeroStates.moving],
 			},
 			{
-				name: CreepTransitions.stop,
-				deactivatedStates: [CreepStates.moving],
+				name: HeroTransitions.stop,
+				deactivatedStates: [HeroStates.moving],
 			},
 			{
-				name: CreepTransitions.took_damage,
-				activatedStates: [CreepStates.hurting, CreepStates.hurt],
+				name: HeroTransitions.took_damage,
+				activatedStates: [HeroStates.hurting, HeroStates.hurt],
 			},
 			{
-				name: CreepTransitions.activating_standing_power,
-				activatedStates: [CreepStates.activatingStandingPower],
-				deactivatedStates: [CreepStates.moving],
+				name: HeroTransitions.activating_standing_power,
+				activatedStates: [HeroStates.activatingStandingPower],
+				deactivatedStates: [HeroStates.moving],
 			},
 			{
-				name: CreepTransitions.full_heal,
-				deactivatedStates: [CreepStates.hurt],
+				name: HeroTransitions.full_heal,
+				deactivatedStates: [HeroStates.hurt],
 			},
 			{
-				name: CreepTransitions.healed,
-				activatedStates: [CreepStates.healing],
-				deactivatedStates: [CreepStates.hurt, CreepStates.hurting],
+				name: HeroTransitions.healed,
+				activatedStates: [HeroStates.healing],
+				deactivatedStates: [HeroStates.hurt, HeroStates.hurting],
+			},
+			{
+				name: HeroTransitions.became_disabled,
+				activatedStates: [HeroStates.disabled],
+				deactivatedStates: [HeroStates.moving, HeroStates.activatingStandingPower, HeroStates.hurting, HeroStates.hurt],
+			},
+			{
+				name: HeroTransitions.revived,
+				activatedStates: [HeroStates.idle],
+				deactivatedStates: [HeroStates.disabled],
 			},
 		]);
 
@@ -133,19 +156,31 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
-	 * Resolves when a creep was attacked
+	 * Adds interactions and movements
 	 * */
-	resolveAttack(attack: TowerAttackStats) {
-		// Check any weaknesses or resistances, such as resistance to magic damage
+	setupInteractions() {
+		const sRaycaster: RaycasterService = this.main.s('Raycaster');
+		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.heroes, object: this }]);
+	}
 
-		// Adjust the creeps's health by this damage
-		const damage = this.stats.calculateDamage(attack.damage, attack.damageType)
+	/**
+	 * Resolves what happens at the end of a path
+	 * */
+	resolveEndOfPath(): void {
+		this.stateMachine.activateStateByName(HeroStates.idle);
+	}
+
+	/**
+	 * Resolves when a hero was attacked
+	 * */
+	resolveAttack(attack: CreepStats) {
+		const damage = this.stats.calculateDamage(attack.attack_damage, attack.attack_damagetype)
 		this.adjustHealthByNumber(-1 * damage);
 	}
 
 	/**
-	 * Changes a Creep's health
-	 * @param { number } difference Positive or negative number to adjust the creeps' health
+	 * Changes a Hero's health
+	 * @param { number } difference Positive or negative number to adjust the heros' health
 	 * */
 	adjustHealthByNumber(difference: number) {
 		const minHealth = Math.max(0, this.stats.hp_current + difference);
@@ -156,7 +191,7 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
-	 * Sets a Creep's health to a percentage
+	 * Sets a Hero's health to a percentage
 	 * @param { number } percentage Percentage of health to set
 	 * */
 	setHealthByPercentage(percentage: number) {
@@ -174,7 +209,7 @@ export class Creep extends ModelAsset {
 
 			// The Creep has died
 			case this.stats.hp_current <= 0:
-				this.killCreep();
+				this.disableHero();
 				break;
 
 			// The Creep has full health
@@ -187,42 +222,22 @@ export class Creep extends ModelAsset {
 				if (!this.healthBar) this.createHealthBar();
 				else this.updateHealthBar();
 	
-				this.stateMachine.transition(CreepTransitions.took_damage);
+				this.stateMachine.transition(HeroTransitions.took_damage);
 				break;
 			}
 	}
 
 	/**
-	 * A creep has died
+	 * A hero has lost all health and is disabled
 	 * */
-	killCreep() {
-		const rewards = this.stats.kill_rewards;
-		const newValue = this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
-		this.main.s('Event').fire('commerce_money_changed', newValue);
-		this.deleteCreep();
-	}
-
-	/**
-	 * A creep has escaped their path / beaten the player
-	 * */
-	creepEscaped() {
-		const sLevel = this.main.s('Level');
-		sLevel.currentLevel.creepEscaped(this);
-		this.deleteCreep();
-	}
-
-	/**
-	 * Final deletions of Creeps
-	 * */
-	deleteCreep() {
-		this.stateMachine.remove();
-		this.main.s('Level').currentLevel.removeCreep(this);
+	disableHero() {
+		this.stateMachine.transition(HeroTransitions.became_disabled);
 	}
 
 	/**
 	 * Sets a path for a creep
 	 * */
-	setPath(path: LevelPathDefinition) {
+	setPath(path: HeroPathDefinition) {
 		this.path = path;
 		this.pathTravelPercentagePerSec = this.stats.move_speed / path.pathLength;
 	}
@@ -275,15 +290,15 @@ export class Creep extends ModelAsset {
 	animateCore(timeProperties: TickTimeProperties) {
 		const states = this.stateMachine.activeStates;
 
-		if (states.has(CreepStates.moving)) {
+		if (states.has(HeroStates.moving)) {
 			this.animationMoveMe(timeProperties);
 		}
 
-		if (states.has(CreepStates.hurting)) {
+		if (states.has(HeroStates.hurting)) {
 			this.animationHurtMe(timeProperties);
 		}
 
-		if (states.has(CreepStates.healing)) {
+		if (states.has(HeroStates.healing)) {
 			this.animationHealing();
 		}
 
@@ -296,67 +311,7 @@ export class Creep extends ModelAsset {
 	animate(timeProperties: TickTimeProperties) {}
 
 	/**
-	 * Resolves what happens at the end of a path
-	 * */
-	resolveEndOfPath(): void {
-		this.creepEscaped();
-	}
-
-	/**
-	 * When the Creep is healed
-	 * */
-	stateEnterHealing() {
-		const healingAnimationGroup = new THREE.Group();
-
-		this.stateExitHealing();
-
-		for (let x=0; x<4; x++) {
-			const thisCross = ModelCommons.healingCrossMesh();
-			thisCross.position.x += Math.random() - 0.5;
-			thisCross.position.y += Math.random();
-			const scale = Math.random() * 0.9 + 0.1;
-			thisCross.scale.set(scale, scale, scale);
-
-			healingAnimationGroup.add(thisCross);
-		}
-		
-		healingAnimationGroup.name = "HealingAnimation";
-
-		this.groupMain.add(healingAnimationGroup);
-		healingAnimationGroup.position.z = 2;
-	}
-
-	/**
-	 * When the Creep leaves healing state (also called when entering, to clear it out)
-	 * */
-	stateExitHealing() {
-		const healingAnimationGroup = this.groupMain.getObjectByName("HealingAnimation");
-		if (healingAnimationGroup) this.groupMain.remove(healingAnimationGroup);
-	}
-
-	/**
-	 * Enabled Shadows
-	 * */
-	enableShadows(cast: boolean = true, receive: boolean = false) {
-		// THis should be replaced when moving to ModelAsset
-		this.groupModel.children.forEach((child: any) => {
-			if (child.isMesh) {
-				if (cast) child.castShadow = true;
-				//if (receive) child.receiveShadow = true;
-				child.material.needsUpdate = true;
-			}
-		});
-	}
-
-	/**
-	 * Creates a temporary healing animation
-	 * */
-	createHealingEffect() {
-		console.log("%c Creating healing effect", "color: green");
-	}
-
-	/**
-	 * Creep Powers
+	 * Hero Powers
 	 * */
 	activateStandingPower() {}
 	activateIdlePower() {}

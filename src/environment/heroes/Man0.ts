@@ -1,21 +1,21 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { DamageTypes } from '../../data/DamageTypes';
-import { Creep } from './Creep';
-import { CreepStats } from './CreepStats';
+//import { DamageTypes } from '../../data/DamageTypes';
+import { Hero } from './Hero';
+import { HeroStats } from './HeroStats';
 
-export class Troll extends Creep {
+export class Man0 extends Hero {
 	/**
 	 * Main
 	 * */
-	assetPath: string = 'assets/models/creeps/creep_troll.glb';
+	assetPath: string = 'assets/models/heroes/Man0.glb';
 	assetScale: number = 0.5;
 	shadowsEnabled = true;
 
 	/**
 	 * Stats
 	 * */
-	stats = new CreepStats({
+	stats = new HeroStats({
 		hp_total: 40,
 		move_speed: 2,
 		defenses: {
@@ -26,14 +26,9 @@ export class Troll extends Creep {
 			lightning: 0,
 			fire: -10,
 		},
-		kill_rewards: {
-			economic_property: "money",
-			value: 10
-		},
-		vp_loss: 2,
-		attack_speed: 10,
+		/*attack_speed: 10,
 		attack_damage: 10,
-		attack_damagetype: DamageTypes.crushing
+		attack_damagetype: DamageTypes.crushing*/
 	});
 	healthBarY: 2;
 

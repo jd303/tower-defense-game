@@ -20,6 +20,13 @@ export interface LevelPathDefinition {
 	path: THREE.CurvePath<Vector>;
 }
 
+export interface HeroPathDefinition {
+	id: string;
+	segments: any[];
+	pathLength: number;
+	path: THREE.CurvePath<Vector>;
+}
+
 export enum PathGeometryTypes {
 	none = 'none',
 	dirt = 'dirt',

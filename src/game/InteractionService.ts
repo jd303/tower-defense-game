@@ -38,9 +38,6 @@ export class InteractionService {
 		// Setup Statemachine
 		this.stateMachine = new StateMachine(main);
 		this.setupStates();
-
-		// Enable Raycaster
-		this.sRaycaster.enableRaycaster();
 	}
 
 	/**

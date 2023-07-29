@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { Main } from '../core/Main';
+import { TickTimeProperties } from '../core/TickService';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { LevelPathDefinition } from '../data/PathInterfaces';
 
 export class ModelAsset {
 	/**
@@ -23,6 +26,13 @@ export class ModelAsset {
 	groupMain: THREE.Group; // Outermost group - transforms the whole model
 	groupTransforms: THREE.Group; // Inner group - applies minor transformations
 	groupModel: THREE.Group; // Innermost group - applies status transforms
+
+	/**
+	 * Movement / Path Properties (Creeps and Heroes)
+	 * */
+	path: LevelPathDefinition;
+	pathTravelPercentagePerSec: number;
+	pathProgress: number = 0;
 
 	/**
 	 * Constructor
@@ -81,4 +91,119 @@ export class ModelAsset {
 			}
 		});
 	}
+
+	/**
+	 * Moves a Model Asset according to its movement speed
+	 * */
+	animationMoveMe(timeProperties: TickTimeProperties) {
+		// Calculate travel distance
+		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
+		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
+
+		const point = this.path.path.getPoint(this.pathProgress) as THREE.Vector3;
+		this.groupMain.position.set(point.x, point.y, point.z);
+
+		this.groupTransforms.position.y = Math.sin(timeProperties.elapsedTime * 50) / 20;
+
+		// If this asset has finished its path
+		if (this.pathProgress >= 0.99) {
+			this.resolveEndOfPath();
+		}
+	}
+
+	/**
+	 * Shows that a Hero is hurt
+	 * */
+	animationHurtMe(timeProperties: TickTimeProperties) {
+		this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 12;
+	}
+
+	/**
+	 * Animates healing crosses
+	 * */
+	animationHealing() {
+		const healingCrosses = this.groupMain.getObjectByName("HealingAnimation");
+		if (healingCrosses) {
+			healingCrosses.children.forEach((cross, index) => {
+				cross.position.y += index * 0.005 + 0.001;
+			});
+		}
+	}
+
+	/**
+	 * Get expected position when it is moving
+	 * */
+	getExpectedPositionAt(timeInMS: number) {
+		let distanceTravelled = timeInMS / 1000 * this.pathTravelPercentagePerSec;
+		let expectedPathProgress = Math.min(1, this.pathProgress + distanceTravelled);
+		return this.path.path.getPoint(expectedPathProgress) as THREE.Vector3;
+	}
+
+	/**
+	 * Resolves what happens at the end of a path
+	 * Overwritten by individual classes
+	 * */
+	resolveEndOfPath() {}
+
+	/**
+	 * When the Hero is healed
+	 * */
+	stateEnterHealing() {
+		const healingAnimationGroup = new THREE.Group();
+
+		this.stateExitHealing();
+
+		for (let x=0; x<4; x++) {
+			const thisCross = ModelCommons.healingCrossMesh();
+			thisCross.position.x += Math.random() - 0.5;
+			thisCross.position.y += Math.random();
+			const scale = Math.random() * 0.9 + 0.1;
+			thisCross.scale.set(scale, scale, scale);
+
+			healingAnimationGroup.add(thisCross);
+		}
+		
+		healingAnimationGroup.name = "HealingAnimation";
+
+		this.groupMain.add(healingAnimationGroup);
+		healingAnimationGroup.position.z = 2;
+	}
+
+	/**
+	 * When the Creep leaves healing state (also called when entering, to clear it out)
+	 * */
+	stateExitHealing() {
+		const healingAnimationGroup = this.groupMain.getObjectByName("HealingAnimation");
+		if (healingAnimationGroup) this.groupMain.remove(healingAnimationGroup);
+	}
+
+	/**
+	 * Creates a temporary healing animation
+	 * */
+	createHealingEffect() {
+		console.log("%c Creating healing effect", "color: green");
+	}
+}
+
+export class ModelCommons {
+	/* Health Bar Commons */
+	static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
+	static healthBarVertices: Float32Array = new Float32Array( [
+		-1, 0, 0,
+		1, 0, 0,
+		1, 0.25, 0,
+		1, 0.25, 0,
+		-1, 0.25, 0,
+		-1, 0, 0,
+	]);
+	
+	static healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
+	static healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
+
+	/** Healing commons */
+	static healingCrossBeamHorizontal = new THREE.BoxGeometry(0.5, 0.1, 0.05);
+	static healingCrossBeamVertical = new THREE.BoxGeometry(0.10, 0.5, 0.05);
+	static healingCrossMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00});
+	static healingCrossMerge = BufferGeometryUtils.mergeGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
+	static healingCrossMesh = () => { return new THREE.Mesh(this.healingCrossMerge, this.healingCrossMaterial); }
 }

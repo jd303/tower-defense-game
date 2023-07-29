@@ -1,4 +1,4 @@
-export enum CreepStates {
+export enum HeroStates {
 	any = 'any',
 	idle = 'idle',
 	moving = 'moving',
@@ -7,9 +7,10 @@ export enum CreepStates {
 	healing = "healing",
 	activatingStandingPower = 'activatingStandingPower',
 	activatingMovingPower = 'activatingStandingPower',
+	disabled = 'disabled'
 }
 
-export enum CreepTransitions {
+export enum HeroTransitions {
 	pause = "pause",
 	unpause = "unpause",
 	moving = "moving",
@@ -18,4 +19,6 @@ export enum CreepTransitions {
 	activating_standing_power = "activating_standing_power",
 	healed = "healed",
 	full_heal = "full_heal",
+	became_disabled = "became_disabled",
+	revived = "revived"
 }

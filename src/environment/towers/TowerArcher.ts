@@ -8,6 +8,7 @@ import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
+import { RaycasterIntersection } from '../../core/RaycasterService';
 
 export class TowerArcher extends Tower {
 	/**
@@ -23,10 +24,10 @@ export class TowerArcher extends Tower {
 	static UI: TowerUI = new TowerUI({
 		type: UITypes.Tower,
 		icon: 'assets/models/towers/Tower.Archer.UI.icon.png',
-		placeCallback: (intersects: THREE.Intersection[], main: Main) => {
-			if (intersects[0].object.name == 'LevelPath') return;
-			const intersect = intersects[0];
-			main.s('Level').currentLevel.addTower(new TowerArcher(main), intersect.point);
+		placeCallback: (intersect: RaycasterIntersection, main: Main) => {
+			const remainingMoney = main.s('Economy').adjustEconomyValue(this.baseStats.costType, -1*this.baseStats.cost);
+			main.s('Event').fire('commerce_money_changed', remainingMoney);
+			main.s('Level').currentLevel.addTower(new TowerArcher(main), intersect.point.point);
 		},
 	});
 

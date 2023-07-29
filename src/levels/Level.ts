@@ -9,6 +9,7 @@ import { LevelDefinition } from '../data/LevelInterfaces';
 import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
+import { Hero } from '../environment/heroes/Hero';
 
 export class Level {
 	/**
@@ -28,6 +29,7 @@ export class Level {
 	creeps: Creep[] = [];
 	towers: Tower[] = [];
 	props: Prop[] = [];
+	heroes: Hero[] = [];
 
 	/**
 	 * Constructor
@@ -81,6 +83,15 @@ export class Level {
 		this.props.push(prop);
 		this.main.scene.add(prop.groupMain);
 		prop.groupMain.position.set(point.x, point.y, point.z);
+	}
+
+	/**
+	 * Adds a prop to the level
+	 * */
+	addHero(hero: Hero, point: THREE.Vector3) {
+		this.heroes.push(hero);
+		this.main.scene.add(hero.groupMain);
+		hero.groupMain.position.set(point.x, point.y, point.z);
 	}
 
 	/**

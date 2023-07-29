@@ -16,7 +16,8 @@ import { levelDetails } from './Level_0_MVP_JSON';
 import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
-import { RaycasterService } from '../../core/RaycasterService';
+import { RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
+import { Man0 } from '../../environment/heroes/Man0';
 
 export class Level0MVP extends Level {
 	/**
@@ -117,15 +118,18 @@ export class Level0MVP extends Level {
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.addRaycasterSubjects([this.terrain]); // Listen to clicks on terrain
-		sRaycaster.addRaycasterSubjects(this.levelPaths); // Listen to clicks on terrain
+		sRaycaster.enableRaycaster();
+		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: this.terrain }]); // Listen to clicks on terrain
+		sRaycaster.addRaycasterSubjects(this.levelPaths.map(path => { return { order: RaycasterOrders.props, object: path } })); // Listen to clicks on level paths
 		sRaycaster.addClickHandler(
-			(event: any) =>
+			this.terrain,
+			(event: any) => {
+				console.log("EP", event.object);
 				console.log({
-					x: Maths.roundQuarter(event[0].point.x),
-					y: Maths.roundQuarter(event[0].point.y),
-					z: Maths.roundQuarter(event[0].point.z),
-				}),
+					x: Maths.roundQuarter(event.point.point.x),
+					y: Maths.roundQuarter(event.point.point.y),
+					z: Maths.roundQuarter(event.point.point.z),
+				})},
 			() => {}
 		);
 
@@ -139,7 +143,7 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		sUI.addUIButtons([TowerArcher, TowerBomber, TowerMage]);
+		sUI.addLevelUIButtons(this.terrain, [TowerArcher, TowerBomber, TowerMage]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');
 
@@ -150,6 +154,10 @@ export class Level0MVP extends Level {
 		sEvent.fire('commerce_money_changed', 600);
 		sEconomy.setEconomyValue("vp", 20);
 		sEvent.fire("vp_changed", 20);
+
+		// Create a Hero
+		const HeroMan0 = new Man0(this.main);
+		this.addHero(HeroMan0, new Vector3(-20, 0, 50));
 
 		// Enable shadows
 		setTimeout(() => {

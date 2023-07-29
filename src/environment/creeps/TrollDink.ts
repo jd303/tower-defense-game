@@ -1,5 +1,6 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
+import { DamageTypes } from '../../data/DamageTypes';
 import { Creep } from './Creep';
 import { CreepStats } from './CreepStats';
 
@@ -29,7 +30,10 @@ export class TrollDink extends Creep {
 			economic_property: "money",
 			value: 5
 		},
-		vp_loss: 1
+		vp_loss: 1,
+		attack_speed: 10,
+		attack_damage: 10,
+		attack_damagetype: DamageTypes.piercing
 	});
 	healthBarY: 1.5;
 

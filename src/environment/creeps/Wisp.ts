@@ -1,5 +1,6 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
+import { DamageTypes } from '../../data/DamageTypes';
 import { Creep } from './Creep';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
@@ -29,7 +30,10 @@ export class Wisp extends Creep {
 			economic_property: "money",
 			value: 15
 		},
-		vp_loss: 1
+		vp_loss: 1,
+		attack_speed: 10,
+		attack_damage: 10,
+		attack_damagetype: DamageTypes.arcane
 	});
 	healthBarY: 1;
 

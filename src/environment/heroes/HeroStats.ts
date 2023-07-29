@@ -1,23 +1,18 @@
 import { DamageTypeDefences, DamageTypes } from '../../data/DamageTypes';
 
-export class CreepStats {
+export class HeroStats {
 	/**
 	 * Stats
 	 * */
 	hp_total: number;
+	hp_current: number;
 	move_speed: number;
 	defenses: DamageTypeDefences;
-	hp_current: number;
-	kill_rewards: CreepKillAwards;
-	vp_loss: number;
-	attack_speed: number;
-	attack_damage: number;
-	attack_damagetype: DamageTypes;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(stats: CreepStatSetup) {
+	constructor(stats: HeroStatSetup) {
 		this.hp_total = stats.hp_total;
 		this.hp_current = stats.hp_total;
 		this.move_speed = stats.move_speed;
@@ -29,16 +24,11 @@ export class CreepStats {
 			lightning: stats.defenses.lightning,
 			fire: stats.defenses.fire,
 		};
-		this.kill_rewards = stats.kill_rewards;
-		this.vp_loss = stats.vp_loss;
-		this.attack_speed = stats.attack_speed;
-		this.attack_damage = stats.attack_damage;
-		this.attack_damagetype = stats.attack_damagetype;
 
 		return this;
 	}
 
-	// Commented as unsure this is the direction
+	// Calculates Damage
 	calculateDamage(damage: number, damage_type: DamageTypes) {
 		switch (damage_type) {
 			case DamageTypes.piercing:
@@ -61,18 +51,8 @@ export class CreepStats {
 	}
 }
 
-interface CreepStatSetup {
+interface HeroStatSetup {
 	hp_total: number;
 	move_speed: number;
 	defenses: DamageTypeDefences;
-	kill_rewards: CreepKillAwards;
-	vp_loss: number;
-	attack_speed: number;
-	attack_damage: number;
-	attack_damagetype: DamageTypes;
-}
-
-interface CreepKillAwards {
-	economic_property: string;
-	value: number;
 }
