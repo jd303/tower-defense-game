@@ -1,15 +1,14 @@
 import * as THREE from 'three';
-import { Tower, TowerUI } from './Tower';
+import { Tower, TowerFactory } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UITypes } from '../../game/UIProperties';
+import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive } from '../../environment/particles/Explosion';
 import { BombShot } from '../effects/BombShot';
-import { RaycasterIntersection } from '../../core/RaycasterService';
 
 export class TowerBomber extends Tower {
 	/**
@@ -20,24 +19,9 @@ export class TowerBomber extends Tower {
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 
 	/**
-	 * UI Behaviours
-	 * */
-	static UI: TowerUI = new TowerUI({
-		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Bomber.UI.icon.png',
-		placeCallback: (intersect: RaycasterIntersection, main: Main) => {
-			const remainingMoney = main.s('Economy').adjustEconomyValue(this.baseStats.costType, -1*this.baseStats.cost);
-			main.s('Event').fire('commerce_money_changed', remainingMoney);
-			main.s('Level').currentLevel.addTower(new TowerBomber(main), intersect.point.point);
-		},
-	});
-
-	/**
 	 * Stats
 	 * */
-	static baseStats = {
-		cost: 175,
-		costType: 'money',
+	static stats = {
 		attack: {
 			damage: 2,
 			damageType: DamageTypes.crushing,
@@ -52,12 +36,24 @@ export class TowerBomber extends Tower {
 	};
 
 	/**
+	 * Factory
+	 * */
+	static Factory: TowerFactory = new TowerFactory(
+		UIRegions.Tower,
+		'assets/models/towers/Tower.Bomber.UI.icon.png',
+		175,
+		"money",
+		TowerBomber,
+		() => {}
+	);
+
+	/**
 	 * Constructor
 	 */
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
-		this.stats = { ...TowerBomber.baseStats };
+		this.stats = { ...TowerBomber.stats };
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}

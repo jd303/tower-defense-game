@@ -25,9 +25,15 @@ export class Main {
 	services: any[] = [];
 
 	/**
+	 * Debug mode
+	 * */
+	debugMode: boolean = false;
+
+	/**
 	 * Constructor
 	 * */
-	constructor(canvas: HTMLCanvasElement, sizes: SizesInterface, debugMode: boolean) {
+	constructor(canvas: HTMLCanvasElement, sizes: SizesInterface, debugMode: boolean = false) {
+		this.debugMode = debugMode;
 		this.canvas = canvas;
 		this.sizes = sizes;
 		this.scene = new THREE.Scene();
@@ -50,6 +56,7 @@ export class Main {
 
 		// Next up messages
 		console.log("%c OK, next up:", 'color: red');
+		console.log("%c Create a PathService, and get the hero on the path", 'color: red');
 		console.log("%c Improve BombShot geometry, and add an animation, to see if that works.", 'color: red');
 		console.log("%c Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');

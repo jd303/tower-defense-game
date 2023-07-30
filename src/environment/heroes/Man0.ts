@@ -11,6 +11,7 @@ export class Man0 extends Hero {
 	assetPath: string = 'assets/models/heroes/Man0.glb';
 	assetScale: number = 0.5;
 	shadowsEnabled = true;
+	interactive = true;
 
 	/**
 	 * Stats
@@ -36,7 +37,7 @@ export class Man0 extends Hero {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main);
+	super(main);
 
 		this.loadModel();
 

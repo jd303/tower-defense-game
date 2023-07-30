@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
-import { LevelPathDefinition } from '../../data/PathInterfaces';
+import { MovePathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
+import { InteractionService } from '../../game/InteractionService';
 
 export class Creep extends ModelAsset {
 	/**
@@ -54,6 +55,8 @@ export class Creep extends ModelAsset {
 		
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition('moving');
+
+		this.setInteractive();
 	}
 
 	/**
@@ -217,12 +220,13 @@ export class Creep extends ModelAsset {
 	deleteCreep() {
 		this.stateMachine.remove();
 		this.main.s('Level').currentLevel.removeCreep(this);
+		this.main.s('Interaction').deregisterDefaultTarget(this);
 	}
 
 	/**
 	 * Sets a path for a creep
 	 * */
-	setPath(path: LevelPathDefinition) {
+	setPath(path: MovePathDefinition) {
 		this.path = path;
 		this.pathTravelPercentagePerSec = this.stats.move_speed / path.pathLength;
 	}
@@ -360,4 +364,21 @@ export class Creep extends ModelAsset {
 	 * */
 	activateStandingPower() {}
 	activateIdlePower() {}
+
+	/**
+	 ******************************************************* UI INTERACTIONS
+	 * */
+	defaultClick() {
+		console.log("Default Click: Creep");
+		const sInteraction: InteractionService = this.main.s('Interaction');
+		sInteraction.markAsSelected(this);
+	}
+
+	select() {
+		console.log("Add a selection graphic: CREEP");
+	}
+
+	deselect() {
+		console.log("Remove the selection graphic: CREEP");
+	}
 }

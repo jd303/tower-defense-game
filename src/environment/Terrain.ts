@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import { TerrainTypes } from '../data/LevelInterfaces';
+import { Main } from '../core/Main';
+import { Interactable, InteractableOrders } from '../game/InteractionService';
 
 export class Terrain {
 	/**
 	 * Definitions
 	 * */
+	main: Main;
 	cast: boolean = false;
 	receive: boolean = true;
 
@@ -16,7 +19,8 @@ export class Terrain {
 	/**
 	 * Constructor
 	 * */
-	constructor(terrainType: TerrainTypes) {
+	constructor(terrainType: TerrainTypes, main: Main) {
+		this.main = main;
 		this.groupMain = new THREE.Group();
 
 		// Determin the terrain type
@@ -36,6 +40,8 @@ export class Terrain {
 
 		mesh.rotation.x = -Math.PI * 0.5;
 
+		this.setInteractive();
+
 		return this;
 	}
 
@@ -50,5 +56,13 @@ export class Terrain {
 				child.material.needsUpdate = true;
 			}
 		});
+	}
+
+	/**
+	 * Sets whether this model can be interactive 
+	 * */
+	setInteractive() {
+		const sInteraction = this.main.s('Interaction');
+		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.terrain, this));
 	}
 }

@@ -88,6 +88,9 @@ export class WaveManager {
 		}
 	}
 
+	/**
+	 * Triggers a wave
+	 * */
 	triggerWave(wave: Wave) {
 		console.log("TRIGGER WAVE", wave);
 		const curveStart = wave.corePath.corePath.path.getPoint(0) as Vector3;

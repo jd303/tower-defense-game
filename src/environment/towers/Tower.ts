@@ -2,16 +2,23 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset } from '../ModelAsset';
-import { UIProperties, UITypes } from '../../game/UIProperties';
+import { UIRegions } from '../../game/UIProperties';
 import { TowerStats, TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
-import { UIService } from '../../game/UIService';
+import { UIButton, UIService } from '../../game/UIService';
+import { Interactable, InteractableOrders, InteractionService, InteractionTransitions } from '../../game/InteractionService';
+import { RaycasterIntersection } from '../../core/RaycasterService';
 
 export class Tower extends ModelAsset {
+	/**
+	 * Core
+	 * */
+	main: Main;
+
 	/**
 	 * Status
 	 */
@@ -31,9 +38,10 @@ export class Tower extends ModelAsset {
 	stateMachine: StateMachine;
 
 	/**
-	 * UI Elements
+	 * Static Stats
 	 * */
-	static UI: TowerUI;
+	static Factory: TowerFactory;
+	static UIButton: UIButton;
 
 	/**
 	 * Constructor
@@ -49,6 +57,8 @@ export class Tower extends ModelAsset {
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(TowerStates.attacking);
+
+		this.setInteractive();
 	}
 
 	/**
@@ -139,60 +149,121 @@ export class Tower extends ModelAsset {
 	}
 
 	/**
+	 ******************************************************* UI INTERACTIONS
+	 * */
+	
+	/**
 	 * Sets up the Tower, such as the UI
 	 * */
-	static setup(main: Main) {
+	static setupUI(main: Main) {
 		const sUI: UIService = main.s('UI');
 
-		const onCancel = function(event: any) {
-			let target: any = event.target;
-			target = target instanceof HTMLButtonElement && target || target.closest('button');
-			sUI.deselectButton(target);
+		const button = sUI.createIconButton(this.Factory.buttonIcon, UIRegions.Tower);
+		button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.clickUIButton(event, main));
+		this.UIButton = button;
+		sUI.addButtonToUI(button);
+	}
+
+	/**
+	 * Initiates create mode
+	 * */
+	static clickUIButton(event: any, main: Main) {
+		event.stopPropagation();
+		//const sUI: UIService = main.s('UI');
+		const sInteraction = main.s('Interaction');
+		
+		if (this.UIButton.selected) {
+			this.endCreateTowerOnTerrain({}, main);
+		} else {
+			this.UIButton.select();
+			
+			// Notify the Interaction Service that we want to create a tower
+			const targetSet = new Set();
+			targetSet.add(new Interactable(InteractableOrders.terrain, main.s('Level').currentLevel.terrain));
+			const cancellationSet = new Set();
+			main.s('Level').currentLevel.levelPaths.forEach((path: any) => {
+				cancellationSet.add(new Interactable(InteractableOrders.props, path));
+			});
+			console.log("TODO: Orders are not quite right, not when LevelPaths have to be 'props'");
+			console.log("CANCC", cancellationSet);
+			sInteraction.registerContextInteraction((intersect: RaycasterIntersection) => this.requestCreateTower(intersect, main), targetSet, cancellationSet);
+			sInteraction.stateMachine.transition(InteractionTransitions.context_selection);
+		}
+	}
+
+	/**
+	 * Request to create a Tower
+	 * */
+	static requestCreateTower(intersect: RaycasterIntersection, main: Main) {
+		const sEconomy = main.s('Economy');
+		let remainingMoney: any;
+
+		switch (this.Factory.costType) {
+			case "money":
+				remainingMoney = sEconomy.getEconomicProperty('money');
+				if (remainingMoney.current >= this.Factory.cost) {
+					remainingMoney = main.s('Economy').adjustEconomyValue(this.Factory.costType, -1*this.Factory.cost);
+					main.s('Event').fire('commerce_money_changed', remainingMoney);
+					this.createTower(intersect, main);
+				}
+				break;
 		}
 
-		const onClick = function(event: any, main: Main) {
-			let target: any = event.target;
-			target = target instanceof HTMLButtonElement && target || target.closest('button');
-			
-			if (target.getAttribute('data-selected') == "true") {
-				sUI.cancelAllButtons();
-			} else {
-				sUI.cancelAllButtons();
-				sUI.selectButton(target);
-				
-				// Notify the Interaction Service that we want to create a tower
-				const sInteraction = main.s('Interaction');
-				sInteraction.registerInteraction([main.s('Level').currentLevel.terrain], this.UI.placeCallback);
-			}
-		}.bind(this);
+		this.endCreateTowerOnTerrain({}, main);
+	}
 
-		sUI.addButton(this.UI, onClick, onCancel);
+	/**
+	 * Complete creation
+	 * */
+	static createTower(intersect: RaycasterIntersection, main: Main) {
+		main.s('Level').currentLevel.addTower(new this.Factory.factory(main), intersect.point.point);
+	}
+
+
+	/**
+	 * Cancels Create Mode
+	 * */
+	static endCreateTowerOnTerrain(event: any, main: Main) {
+		const sUI: UIService = main.s('UI');
+		//sUI.deselectButton(this.UI.UIButton.element);
+		const sInteraction: InteractionService = main.s('Interaction');
+		sInteraction.deregisterContextInteraction();
+
+		this.UIButton.deselect();
+	}
+
+	/**
+	 ******************************************************* UI INTERACTIONS
+	 * */
+	defaultClick() {
+		console.log("Default Click: Tower");
 	}
 }
 
-export class TowerUI {
-	type: UITypes;
-	icon: string;
+export class TowerFactory {
+	UIRegion: UIRegions;
+	buttonIcon: string;
+	cost: number;
+	costType: string;
+	factory: any;
+
 	placeCallback: Function | undefined;
+	UIButton: UIButton;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(towerDetails: UIProperties) {
-		this.type = towerDetails.type;
-		this.icon = towerDetails.icon;
-		this.placeCallback = towerDetails.placeCallback;
+	constructor(UIRegion: UIRegions, buttonIcon: string, cost: number, costType: string, factory: any, placeCallback: Function) {
+		this.UIRegion = UIRegion;
+		this.buttonIcon = buttonIcon;
+		this.cost = cost;
+		this.costType = costType;
+		this.factory = factory;
+		this.placeCallback = placeCallback;
 		return this;
 	}
 
-	/**
-	 * Return properties
-	 * */
-	getProperties() {
-		return {
-			type: this.type,
-			icon: this.icon,
-			placeCallback: this.placeCallback,
-		};
+	registerUIButton(button: UIButton) {
+		this.UIButton = button;
 	}
 }

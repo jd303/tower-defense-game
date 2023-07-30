@@ -1,14 +1,13 @@
 import * as THREE from 'three';
-import { Tower, TowerUI } from './Tower';
+import { Tower, TowerFactory } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UITypes } from '../../game/UIProperties';
+import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
-import { RaycasterIntersection } from '../../core/RaycasterService';
 
 export class TowerMage extends Tower {
 	/**
@@ -18,24 +17,21 @@ export class TowerMage extends Tower {
 	assetScale = 1.5;
 
 	/**
-	 * UI Behaviours
+	 * Factory
 	 * */
-	static UI: TowerUI = new TowerUI({
-		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Mage.UI.icon.png',
-		placeCallback: (intersect: RaycasterIntersection, main: Main) => {
-			const remainingMoney = main.s('Economy').adjustEconomyValue(this.baseStats.costType, -1*this.baseStats.cost);
-			main.s('Event').fire('commerce_money_changed', remainingMoney);
-			main.s('Level').currentLevel.addTower(new TowerMage(main), intersect.point.point);
-		},
-	});
+	static Factory: TowerFactory = new TowerFactory(
+		UIRegions.Tower,
+		'assets/models/towers/Tower.Mage.UI.icon.png',
+		150,
+		'money',
+		TowerMage,
+		() => {}
+	);
 
 	/**
 	 * Stats
 	 * */
-	static baseStats = {
-		cost: 150,
-		costType: 'money',
+	static stats = {
 		attack: {
 			damage: 6,
 			damageType: DamageTypes.poison,
@@ -55,7 +51,7 @@ export class TowerMage extends Tower {
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
-		this.stats = { ...TowerMage.baseStats };
+		this.stats = { ...TowerMage.stats };
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}

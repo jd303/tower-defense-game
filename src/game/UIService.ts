@@ -1,11 +1,7 @@
 import { EventService } from '../core/EventService';
 import { Main } from '../core/Main';
-import { RaycasterOrders, RaycasterService } from '../core/RaycasterService';
-import { ModelAsset } from '../environment/ModelAsset';
-import { Terrain } from '../environment/Terrain';
 import { Tower } from '../environment/towers/Tower';
-import { EconomyService } from './EconomyService';
-import { UITypes } from './UIProperties';
+import { UIRegions } from './UIProperties';
 
 export class UIService {
 	/**
@@ -31,11 +27,6 @@ export class UIService {
 	 * Game Assets
 	 * */
 	towers: Tower[];
-
-	/**
-	 * States
-	 * */
-	buttonSelectedAttribute: string = 'data-selected';
 
 	/**
 	 * Event Properties
@@ -68,135 +59,31 @@ export class UIService {
 	}
 
 	/**
-	 * Adds a button
+	 * Creates an icon button for a Factory
 	 * */
-	addButton(objectUI: any, onClick: any, onCancel: Function) {
-		const button = document.createElement('button');
+	createIconButton(iconPath: string, region: UIRegions) {
+		const buttonElement = document.createElement('button');
 		const icon = document.createElement('img');
-		icon.src = objectUI.icon;
-		button.appendChild(icon);
-		button.addEventListener('click', (event: MouseEvent | TouchEvent) => onClick(event, this.main));
-		(button as any).cancelBehaviour = onCancel;
+		icon.src = iconPath;
+		buttonElement.appendChild(icon);
 
-		// Create a UI Button
-		const newButton = new UIButton(button, onCancel);
-		this.UIButtons.push(newButton);
+		const button = new UIButton(buttonElement, region)
+		return button;
+	}
 
+	/**
+	 * Adds a button to the UI
+	 * */
+	addButtonToUI(button: UIButton) {
 		// Switch depending on the type
-		switch (objectUI.type) {
+		switch (button.region) {
 			// Towers
-			case UITypes.Tower:
-				this.towersUIElement.appendChild(button);
+			case UIRegions.Tower:
+				this.towersUIElement.appendChild(button.element);
+				this.UIButtons.push(button);
 				break;
 		}
 	}
-
-	/**
-	 * Marks a button as selected
-	 * */
-	selectButton(button: any) {
-		button.setAttribute('data-selected', 'true');
-	}
-
-	/**
-	 * Marks a button as deselected
-	 * */
-	deselectButton(button: any) {
-		button.setAttribute('data-selected', 'false');
-	}
-
-	/**
-	 * Runs the cancel callback on all buttons
-	 * */
-	cancelAllButtons() {
-		this.UIButtons.forEach(button => button.cancelBehaviour({ target: button.button }));
-	}
-
-	/**
-	 * Adds Level UI buttons when provided with a Tower or similar UI-able object
-	 * */
-	/*addLevelUIButtons(clickTarget: ModelAsset | Terrain, objects: any[]) {
-		objects.forEach((object) => {
-			const button = document.createElement('button');
-			const icon = document.createElement('img');
-			icon.src = object.UI.icon;
-			button.appendChild(icon);
-
-			let callback: any;
-
-			// Switch depending on the type
-			switch (object.UI.type) {
-				// Towers
-				case UITypes.Tower:
-					this.towersUIElement.appendChild(button);
-
-					callback = this.toggleAssetCreation.bind(this, button, clickTarget, object);
-					button.addEventListener('click', callback);
-					break;
-			}
-		});
-	}*/
-
-	/**
-	 * A UI Element wants to create an asset
-	 * */
-	/*toggleAssetCreation(button: HTMLElement, clickTarget: ModelAsset | Terrain, object: Tower, event: MouseEvent) {
-		event.stopImmediatePropagation();
-		event.stopPropagation();
-
-		const markDeselected = () => button.setAttribute(this.buttonSelectedAttribute, 'false');
-		const markSelected = () => button.setAttribute(this.buttonSelectedAttribute, 'true');
-
-		// Check that the item is affordable
-		const sEconomy: EconomyService = this.main.s('Economy');
-		const objectCost = object.baseStats.cost;
-		const objectCostType = object.baseStats.costType;
-		const currentResources = sEconomy.getEconomyValue(objectCostType);
-
-		if (currentResources !== undefined && currentResources < objectCost) {
-			console.log("Too poor - should we animate this?");
-			return false;
-		}
-
-		// Good to go
-		if (button.getAttribute(this.buttonSelectedAttribute) == 'true') {
-			markDeselected();
-			this.cancelCreateRequest(object);
-		} else {
-			markSelected();
-			this.requestCreateAsset(clickTarget, object, markDeselected);
-		}
-	}*/
-
-	/**
-	 * The UI has triggered an asset creation
-	 * */
-	/*requestCreateAsset(clickTarget: ModelAsset | Terrain, element: Tower, uiOnComplete: Function) {
-		// Start listening to raycasters
-		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.addRaycasterSubjects([ {  order: RaycasterOrders.terrain, object: this.main.s('Level').currentLevel.terrain }]);
-
-		if (element.UI.placeCallback) {
-			// Create an oncomplete function
-			const onComplete = () => {
-				this.cancelCreateRequest(element);
-				uiOnComplete();
-			};
-
-			// Add a click handler
-			sRaycaster.addClickHandler(clickTarget, element.UI.placeCallback, onComplete);
-		}
-	}*/
-
-	/**
-	 * Cancels the create request
-	 * */
-	/*cancelCreateRequest(element: Tower) {
-		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.removeRaycasterSubjects([this.main.s('Level').currentLevel.terrain]);
-		sRaycaster.removeRaycasterSubjects(this.main.s('Level').currentLevel.levelPaths);
-		if (element.UI.placeCallback) sRaycaster.removeClickHandler(element.UI.placeCallback);
-	}*/
 
 	/**
 	 * Adds a label to the economy section
@@ -300,12 +187,32 @@ export class UIService {
 	}
 }
 
-class UIButton {
-	button: HTMLButtonElement;
-	cancelBehaviour: Function;
+export class UIButton {
+	selected: boolean = false;
+	element: HTMLButtonElement;
+	region: UIRegions;
 
-	constructor(button: HTMLButtonElement, cancelBehaviour: Function) {
-		this.button = button;
-		this.cancelBehaviour = cancelBehaviour;
+	constructor(element: HTMLButtonElement, region: UIRegions) {
+		this.element = element;
+		this.region = region;
+	}
+
+	/**
+	 * Adds a click behaviour to a button
+	 * */
+	addClickBehaviour(callback: any) {
+		this.element.addEventListener('click', callback);
+	}
+
+	/**
+	 * States and selections
+	 * */
+	select() {
+		this.element.setAttribute('data-selected', 'true');
+		this.selected = true;
+	}
+	deselect() {
+		this.element.setAttribute('data-selected', 'false');
+		this.selected = false;
 	}
 }

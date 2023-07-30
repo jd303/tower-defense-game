@@ -9,6 +9,7 @@ import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
 import { CameraService } from './CameraService';
 import { ModelAsset } from '../environment/ModelAsset';
+import { Interactable } from '../game/InteractionService';
 
 export class RaycasterService {
 	/**
@@ -50,18 +51,6 @@ export class RaycasterService {
 	}
 
 	/**
-	 * Adds a click handler.
-	 * The click handler will resolve if the returned target is appropriate and act.
-	 * */
-	addClickHandler(clickTarget: Hero | Prop | Creep | Tower | Terrain | LevelPath, onClick: Function, onComplete: Function) {
-		const clickHandler: ClickHandler = { target: clickTarget, onClick: onClick, onComplete: onComplete };
-
-		if (!this.clickHandlers.find((ch) => ch.onClick == onClick)) {
-			this.clickHandlers.push(clickHandler);
-		}
-	}
-
-	/**
 	 * Removes a click handler
 	 * */
 	removeClickHandler(removedOnClick: Function) {
@@ -87,8 +76,9 @@ export class RaycasterService {
 
 	/**
 	 * When a click occurs, handle it
+	 * Will accept targets, and cancel if it first hits a cancelTarget
 	 * */
-	fireRayToTargets(event: MouseEvent | TouchEvent, targets: (ModelAsset | Terrain)[]) {
+	fireRayToTargets(event: MouseEvent | TouchEvent, targets: Interactable[], cancelTargets: Interactable[] = []): RaycasterIntersection | null {
 		const position: THREE.Vector2 = new THREE.Vector2(0, 0);
 		if (event instanceof MouseEvent) {
 			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
@@ -106,13 +96,19 @@ export class RaycasterService {
 		for (let i=0; i <targets.length; i++) {
 			let subject = targets[i];
 
-			let intersects = this.raycaster?.intersectObjects( [subject['groupMain']] );
-			if (intersects?.length) {
-				intersected = {
-					point: intersects[0],
-					object: subject
+			let intersectsTarget = this.raycaster?.intersectObjects( [subject.object['groupMain']] );
+			if (intersectsTarget?.length) {
+
+				// Check that we don't also intersect with a cancelTarget
+				let intersectsCancel = this.raycaster?.intersectObjects( cancelTargets.map(target => target.object['groupMain']) );
+				
+				if (!intersectsCancel?.length) {
+					intersected = {
+						point: intersectsTarget[0],
+						object: subject.object
+					}
+					break;
 				}
-				break;
 			}
 		}
 

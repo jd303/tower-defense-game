@@ -59,7 +59,7 @@ export class Level0MVP extends Level {
 
 		// Create LevelPaths
 		levelDetails.paths.forEach((path) => {
-			const levelPath = new LevelPath(path);
+			const levelPath = new LevelPath(path, main);
 			this.levelPaths.push(levelPath);
 			main.scene.add(levelPath.groupMain);
 		});
@@ -121,17 +121,6 @@ export class Level0MVP extends Level {
 		sRaycaster.enableRaycaster();
 		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: this.terrain }]); // Listen to clicks on terrain
 		sRaycaster.addRaycasterSubjects(this.levelPaths.map(path => { return { order: RaycasterOrders.props, object: path } })); // Listen to clicks on level paths
-		sRaycaster.addClickHandler(
-			this.terrain,
-			(event: any) => {
-				console.log("EP", event.object);
-				console.log({
-					x: Maths.roundQuarter(event.point.point.x),
-					y: Maths.roundQuarter(event.point.point.y),
-					z: Maths.roundQuarter(event.point.point.z),
-				})},
-			() => {}
-		);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
 		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");
@@ -143,8 +132,9 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		TowerArcher.setup(this.main);
-		TowerBomber.setup(this.main);
+		TowerArcher.setupUI(this.main);
+		TowerBomber.setupUI(this.main);
+		TowerMage.setupUI(this.main);
 		//sUI.addLevelUIButtons(this.terrain, [TowerArcher, TowerBomber, TowerMage]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');

@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { LevelPathDefinition, PathDefinition, PathSegment, PathTypes, PathGeometryTypes } from '../data/PathInterfaces';
+import { MovePathDefinition, PathDefinition, PathSegment, PathTypes, PathGeometryTypes } from '../data/PathInterfaces';
+import { Main } from '../core/Main';
+import { Interactable, InteractableOrders } from '../game/InteractionService';
 
 export class LevelPath {
 	/**
@@ -12,22 +14,24 @@ export class LevelPath {
 	 * Wave Properties
 	 * */
 	id: number;
-	corePath: LevelPathDefinition = {
+	corePath: MovePathDefinition = {
 		id: 'core',
 		segments: [],
 		pathLength: 0,
 		path: new THREE.CurvePath(),
 	};
-	variantPaths: LevelPathDefinition[] = [];
+	variantPaths: MovePathDefinition[] = [];
 	groupMain: THREE.Group; // Contains a pathMesh's groupmain, if created
 
 	/**
 	 * Constructor
 	 * */
-	constructor(pathDefinition: PathDefinition) {
+	constructor(pathDefinition: PathDefinition, main: Main) {
 		this.id = pathDefinition.id;
 		this.setCorePath(pathDefinition.segments);
 		this.createPathGeometry(pathDefinition);
+
+		this.setInteractive(main);
 
 		return this;
 	}
@@ -94,7 +98,7 @@ export class LevelPath {
 	 * Creates a variant path for uniqueness
 	 * */
 	createVariantPath(creepID: string) {
-		const variantPath: LevelPathDefinition = {
+		const variantPath: MovePathDefinition = {
 			id: `${this.corePath.id}_${creepID}`,
 			segments: [],
 			pathLength: 0,
@@ -176,6 +180,14 @@ export class LevelPath {
 				child.material.needsUpdate = true;
 			}
 		});
+	}
+
+	/**
+	 * Sets whether this model can be interactive 
+	 * */
+	setInteractive(main: Main) {
+		const sInteraction = main.s('Interaction');
+		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.terrain, this));
 	}
 
 	getRandomAdjustX() {

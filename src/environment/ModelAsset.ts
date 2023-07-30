@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { LevelPathDefinition } from '../data/PathInterfaces';
+import { MovePathDefinition } from '../data/PathInterfaces';
+import { Interactable, InteractableOrders } from '../game/InteractionService';
 
 export class ModelAsset {
 	/**
@@ -11,6 +12,7 @@ export class ModelAsset {
 	shadowsEnabled: boolean = false;
 	assetPath: string;
 	assetScale: number = 1; // default
+	interactive: boolean;
 
 	/**
 	 * System Properties
@@ -30,7 +32,7 @@ export class ModelAsset {
 	/**
 	 * Movement / Path Properties (Creeps and Heroes)
 	 * */
-	path: LevelPathDefinition;
+	path: MovePathDefinition;
 	pathTravelPercentagePerSec: number;
 	pathProgress: number = 0;
 
@@ -90,6 +92,14 @@ export class ModelAsset {
 				child.material.needsUpdate = true;
 			}
 		});
+	}
+
+	/**
+	 * Sets whether this model can be interactive 
+	 * */
+	setInteractive() {
+		const sInteraction = this.main.s('Interaction');
+		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.props, this));
 	}
 
 	/**
@@ -183,6 +193,13 @@ export class ModelAsset {
 	createHealingEffect() {
 		console.log("%c Creating healing effect", "color: green");
 	}
+
+	/**
+	 * Overwritten
+	 * */
+	defaultClick() {}
+	select() {}
+	deselect() {}
 }
 
 export class ModelCommons {

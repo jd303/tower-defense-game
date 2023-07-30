@@ -13,14 +13,7 @@ export interface PathSegment {
 	controlPoints?: Vector3[];
 }
 
-export interface LevelPathDefinition {
-	id: string;
-	segments: any[];
-	pathLength: number;
-	path: THREE.CurvePath<Vector>;
-}
-
-export interface HeroPathDefinition {
+export interface MovePathDefinition {
 	id: string;
 	segments: any[];
 	pathLength: number;

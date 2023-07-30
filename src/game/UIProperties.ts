@@ -1,10 +1,6 @@
-export interface UIProperties {
-	type: UITypes;
-	icon: string;
-	placeCallback?: Function;
-}
+import { TowerStats } from "../environment/towers/TowerStats";
 
-export enum UITypes {
+export enum UIRegions {
 	Tower = 'tower',
 	HeroAbility = 'heroability',
 }

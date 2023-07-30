@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { Tower, TowerUI } from './Tower';
+import { Tower, TowerFactory } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UITypes } from '../../game/UIProperties';
+import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
-import { RaycasterIntersection } from '../../core/RaycasterService';
+import { TowerStats } from './TowerStats';
 
 export class TowerArcher extends Tower {
 	/**
@@ -19,24 +19,9 @@ export class TowerArcher extends Tower {
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
 
 	/**
-	 * UI Behaviours
-	 * */
-	static UI: TowerUI = new TowerUI({
-		type: UITypes.Tower,
-		icon: 'assets/models/towers/Tower.Archer.UI.icon.png',
-		placeCallback: (intersect: RaycasterIntersection, main: Main) => {
-			const remainingMoney = main.s('Economy').adjustEconomyValue(this.baseStats.costType, -1*this.baseStats.cost);
-			main.s('Event').fire('commerce_money_changed', remainingMoney);
-			main.s('Level').currentLevel.addTower(new TowerArcher(main), intersect.point.point);
-		},
-	});
-
-	/**
 	 * Stats
 	 * */
-	static baseStats = {
-		cost: 100,
-		costType: 'money',
+	static stats: TowerStats = {
 		attack: {
 			damage: 6,
 			damageType: DamageTypes.piercing,
@@ -49,6 +34,18 @@ export class TowerArcher extends Tower {
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
 	};
+	
+	/**
+	* Factory
+	* */
+  static Factory: TowerFactory = new TowerFactory(
+		UIRegions.Tower,
+		'assets/models/towers/Tower.Archer.UI.icon.png',
+		100,
+		'money',
+		TowerArcher,
+		() => {}
+	);
 
 	/**
 	 * Constructor
@@ -56,7 +53,7 @@ export class TowerArcher extends Tower {
 	constructor(main: Main) {
 		super(main);
 		this.loadModel();
-		this.stats = { ...TowerArcher.baseStats };
+		this.stats = { ...TowerArcher.stats };
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
@@ -81,11 +78,6 @@ export class TowerArcher extends Tower {
 			// If we have a target
 			if (creep) {
 				this.stateMachine.transition(TowerTransitions.attacking);
-				//if (currentTime - this.stats.attack_cooldown > this.stats.last_attack_time) {
-				//this.stats.last_attack_time = new Date().getTime();
-				//this.states.attacking.isAttacking = true;
-				//this.states.attacking.attackStartTime = new Date().getTime();
-
 				const projectile = new Projectile(
 					this.main,
 					this,

@@ -2,8 +2,6 @@ import { DamageTypes } from "../../data/DamageTypes";
 import { ProjectileHitTypes, ProjectileTypes } from "../attacks/Projectile";
 
 export class TowerStats {
-	cost: number;
-	costType: string;
 	attack: TowerAttackStats;
 	last_attack_time: number;
 	attack_cooldown: number;

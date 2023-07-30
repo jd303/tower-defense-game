@@ -3,11 +3,12 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { HeroStats } from './HeroStats';
-import { HeroPathDefinition } from '../../data/PathInterfaces';
+import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
 import { CreepStats } from '../creeps/CreepStats';
-import { RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
+import { RaycasterIntersection, RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
+import { Interactable, InteractableOrders, InteractionService } from '../../game/InteractionService';
 
 export class Hero extends ModelAsset {
 	/**
@@ -31,7 +32,7 @@ export class Hero extends ModelAsset {
 	/**
 	 * Level Properties
 	 * */
-	path: HeroPathDefinition;
+	path: MovePathDefinition;
 	pathTravelPercentagePerSec: number;
 	pathProgress: number = 0;
 
@@ -62,6 +63,8 @@ export class Hero extends ModelAsset {
 		
 		this.stateMachine = this.setDefaultStates();
 		this.setupInteractions();
+
+		this.setInteractive();
 	}
 
 	/**
@@ -235,9 +238,18 @@ export class Hero extends ModelAsset {
 	}
 
 	/**
+	 * Registers movement
+	 * */
+	registerMovement(intersect: RaycasterIntersection, main: Main) {
+		const path = new THREE.LineCurve3(this.groupMain.position, intersect.point);
+		console.log(path);
+		this.stateMachine.transition(HeroTransitions.moving);
+	}
+
+	/**
 	 * Sets a path for a creep
 	 * */
-	setPath(path: HeroPathDefinition) {
+	setPath(path: MovePathDefinition) {
 		this.path = path;
 		this.pathTravelPercentagePerSec = this.stats.move_speed / path.pathLength;
 	}
@@ -315,4 +327,27 @@ export class Hero extends ModelAsset {
 	 * */
 	activateStandingPower() {}
 	activateIdlePower() {}
+
+	/**
+	 ******************************************************* UI INTERACTIONS
+	 * */
+	defaultClick() {
+		console.log("Default Click: Hero");
+		const sInteraction: InteractionService = this.main.s('Interaction');
+		sInteraction.markAsSelected(this);
+
+		const targetSet = new Set<Interactable>();
+		targetSet.add(new Interactable(InteractableOrders.terrain, this.main.s('Level').currentLevel.terrain));
+		sInteraction.registerContextInteraction(this.registerMovement.bind(this), targetSet);
+	}
+
+	/**
+	 * Selection Callbacks
+	 * */
+	select() {
+		console.log("TODO: Add a selection graphic: Hero");
+	}
+	deselect() {
+		console.log("TODO: Remove the selection graphic: Hero");
+	}
 }

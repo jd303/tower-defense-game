@@ -44,7 +44,7 @@ export class Level {
 	 * Adds a creep to the level
 	 * */
 	addTerrain(levelDetails: LevelDefinition) {
-		const terrain = new Terrain(levelDetails.terrain);
+		const terrain = new Terrain(levelDetails.terrain, this.main);
 		this.terrain = terrain;
 		this.main.scene.add(terrain.groupMain);
 	}
