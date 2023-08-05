@@ -149,7 +149,7 @@ export class Level0MVP extends Level {
 
 		// Create a Hero
 		const HeroMan0 = new Man0(this.main);
-		this.addHero(HeroMan0, new Vector3(-20, 0, 50));
+		this.addHero(HeroMan0, new Vector3(-5, 0, 50));
 
 		// Enable shadows
 		setTimeout(() => {

@@ -6,6 +6,11 @@ import { Interactable, InteractableOrders } from '../game/InteractionService';
 
 export class LevelPath {
 	/**
+	 * Core
+	 * */
+	main: Main;
+
+	/**
 	 * Setup Properties
 	 * */
 	variantDistance: number = 5;
@@ -28,6 +33,7 @@ export class LevelPath {
 	 * */
 	constructor(pathDefinition: PathDefinition, main: Main) {
 		this.id = pathDefinition.id;
+		this.main = main;
 		this.setCorePath(pathDefinition.segments);
 		this.createPathGeometry(pathDefinition);
 
@@ -40,90 +46,21 @@ export class LevelPath {
 	 * Sets the core path
 	 * */
 	setCorePath(pathSegments: PathSegment[]) {
+		const sPath = this.main.s('Path');
 		this.corePath.segments = pathSegments;
-		this.corePath.path = this.createPathFromSegments(pathSegments);
+		this.corePath.path = sPath.createPathFromSegments(pathSegments);
 		this.corePath.pathLength = this.corePath.path.getLength();
-	}
-
-	/**
-	 * Creates a Three CurvePath
-	 * */
-	createPathFromSegments(pathSegments: PathSegment[], adjustX: number = 0, adjustZ: number = 0) {
-		const curvePath = new THREE.CurvePath();
-		let pathSegmentsClone = this.cloneSegmentsArray(pathSegments);
-
-		// Adjust the path if an adjustment given
-		if (adjustX || adjustZ) {
-			pathSegmentsClone.forEach((segment: PathSegment) =>
-				segment.points.forEach((segment) => {
-					segment.x += adjustX;
-					segment.z += adjustZ;
-				})
-			);
-		}
-
-		// Create paths from a combination of path segments
-		pathSegmentsClone.forEach((segment: PathSegment) => {
-			let curvePart;
-			switch (segment.type) {
-				case PathTypes.bezier:
-					curvePart = this.addBezierPath(segment.points, segment.controlPoints!);
-					break;
-				default:
-					curvePart = this.addLinePath(segment.points);
-					break;
-			}
-
-			curvePath.add(curvePart);
-		});
-
-		return curvePath;
-	}
-
-	/**
-	 * Creates a Bezier Curve
-	 * */
-	addBezierPath(points: Vector3[], controlPoints: Vector3[]): THREE.CubicBezierCurve3 {
-		return new THREE.CubicBezierCurve3(points[0], controlPoints[0], controlPoints[1], points[1]);
-	}
-
-	/**
-	 * Creates a Straight Line
-	 * */
-	addLinePath(points: Vector3[]): THREE.LineCurve3 {
-		return new THREE.LineCurve3(points[0], points[1]);
 	}
 
 	/**
 	 * Creates a variant path for uniqueness
 	 * */
 	createVariantPath(creepID: string) {
-		const variantPath: MovePathDefinition = {
-			id: `${this.corePath.id}_${creepID}`,
-			segments: [],
-			pathLength: 0,
-			path: this.createPathFromSegments(this.corePath.segments, this.getRandomAdjustX(), this.getRandomAdjustZ()),
-		};
-		variantPath.pathLength = variantPath.path.getLength();
+		const sPath = this.main.s('Path');
+
+		const variantPath = sPath.createMovePath(`${this.corePath.id}_${creepID}`, this.corePath.segments, this.getRandomAdjustX(), this.getRandomAdjustZ());
 		this.variantPaths.push(variantPath);
 		return variantPath;
-	}
-
-	/**
-	 * Makes a copy of an array and a clone of object items
-	 * */
-	cloneSegmentsArray(pathSegments: PathSegment[]) {
-		const newPathSegments: PathSegment[] = [];
-		pathSegments.forEach((pathSegment: PathSegment) => {
-			const newPathSegment = {
-				type: pathSegment.type,
-				points: pathSegment.points.map((point) => new Vector3(point.x, point.y, point.z)),
-				controlPoints: pathSegment.controlPoints?.map((point) => new Vector3(point.x, point.y, point.z)),
-			};
-			newPathSegments.push(newPathSegment);
-		});
-
-		return newPathSegments;
 	}
 
 	/**

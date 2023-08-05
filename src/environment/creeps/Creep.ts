@@ -8,6 +8,8 @@ import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
 import { InteractionService } from '../../game/InteractionService';
+import { Hero } from '../heroes/Hero';
+import { HeroAttackStats } from '../heroes/HeroStats';
 
 export class Creep extends ModelAsset {
 	/**
@@ -35,6 +37,11 @@ export class Creep extends ModelAsset {
 	stateMachine: StateMachine;
 
 	/**
+	 * Combat and Interception
+	 * */
+	intercepter: Hero | null = null;
+
+	/**
 	 * Health bar
 	 * */
 	healthBar: THREE.Group | null;
@@ -47,11 +54,6 @@ export class Creep extends ModelAsset {
 	 * */
 	constructor(main: Main) {
 		super(main);
-		this.groupMain = new THREE.Group();
-		this.groupTransforms = new THREE.Group();
-		this.groupModel = new THREE.Group();
-		this.groupTransforms.add(this.groupModel);
-		this.groupMain.add(this.groupTransforms);
 		
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition('moving');
@@ -107,6 +109,7 @@ export class Creep extends ModelAsset {
 			{
 				name: CreepTransitions.moving,
 				activatedStates: [CreepStates.moving],
+				deactivatedStates: [CreepStates.intercepted]
 			},
 			{
 				name: CreepTransitions.stop,
@@ -130,6 +133,11 @@ export class Creep extends ModelAsset {
 				activatedStates: [CreepStates.healing],
 				deactivatedStates: [CreepStates.hurt, CreepStates.hurting],
 			},
+			{
+				name: CreepTransitions.intercepted,
+				activatedStates: [CreepStates.intercepted],
+				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower, CreepStates.activatingMovingPower],
+			},
 		]);
 
 		return stateMachine;
@@ -138,7 +146,7 @@ export class Creep extends ModelAsset {
 	/**
 	 * Resolves when a creep was attacked
 	 * */
-	resolveAttack(attack: TowerAttackStats) {
+	resolveAttack(attack: TowerAttackStats | HeroAttackStats) {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
@@ -196,12 +204,32 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
+	 * Combat and Interception
+	 * */
+	setIntercepted(byWhom: Hero) {
+		this.intercepter = byWhom;
+		this.stateMachine.transition(CreepTransitions.intercepted);
+
+		// Move the creep to next to the hero
+		const interceptedIndex = byWhom.interceptedCreeps.indexOf(this);
+		const temporaryRandom = Math.random() * 3; // TODO remove this, it's just to make sure that I can see the creep until I place them better
+		this.groupMain.position.set(byWhom.groupMain.position.x + 2.5 + temporaryRandom, byWhom.groupMain.position.y, byWhom.groupMain.position.z + (2.5 * interceptedIndex));
+	}
+	setDisintercepted(byWhom: Hero) {
+		if (this.intercepter == byWhom) {
+			this.intercepter = null;
+			this.stateMachine.transition(CreepTransitions.moving);
+		}
+	}
+
+	/**
 	 * A creep has died
 	 * */
 	killCreep() {
 		const rewards = this.stats.kill_rewards;
 		const newValue = this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
 		this.main.s('Event').fire('commerce_money_changed', newValue);
+		if (this.intercepter) this.intercepter.removeInterceptee(this);
 		this.deleteCreep();
 	}
 
@@ -371,7 +399,7 @@ export class Creep extends ModelAsset {
 	defaultClick() {
 		console.log("Default Click: Creep");
 		const sInteraction: InteractionService = this.main.s('Interaction');
-		sInteraction.markAsSelected(this);
+		sInteraction.setSelectionState(this, true);
 	}
 
 	select() {

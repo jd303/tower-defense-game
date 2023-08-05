@@ -9,6 +9,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive } from '../../environment/particles/Explosion';
 import { BombShot } from '../effects/BombShot';
+import { ModelAsset } from '../ModelAsset';
 
 export class TowerBomber extends Tower {
 	/**
@@ -65,15 +66,8 @@ export class TowerBomber extends Tower {
 		const position = this.groupMain.position;
 
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creep = this.main.s('Level').currentLevel.creeps.find((creep: Creep) => {
-				const creepPosition = creep.groupMain.position;
-				const distance = creepPosition.distanceTo(position);
-
-				// If something is in range
-				if (distance < this.stats.attack.range) {
-					return true;
-				}
-			});
+			const creeps = this.sLocation.findTargetsInRange(this.main.s('Level').currentLevel.creeps, position, this.stats.attack.range);
+			const creep: ModelAsset | null = creeps.length ? creeps[0] : null;
 
 			// If we have a target
 			if (creep) {
@@ -87,7 +81,7 @@ export class TowerBomber extends Tower {
 					this.main,
 					this,
 					new THREE.Vector3(this.groupMain.position.x, 3.5, this.groupMain.position.z),
-					creep,
+					creep as Creep,
 					this.stats.attack.type,
 					this.stats.attack.hitType,
 					new BombShot(this.main),

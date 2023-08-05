@@ -7,12 +7,11 @@ export enum HeroStates {
 	healing = "healing",
 	activatingStandingPower = 'activatingStandingPower',
 	activatingMovingPower = 'activatingStandingPower',
-	disabled = 'disabled'
+	disabled = 'disabled',
+	attacking = 'attacking'
 }
 
 export enum HeroTransitions {
-	pause = "pause",
-	unpause = "unpause",
 	moving = "moving",
 	stop = "stop",
 	took_damage = "took_damage",
@@ -20,5 +19,6 @@ export enum HeroTransitions {
 	healed = "healed",
 	full_heal = "full_heal",
 	became_disabled = "became_disabled",
-	revived = "revived"
+	revived = "revived",
+	attacking = "attacking",
 }

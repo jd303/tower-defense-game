@@ -164,15 +164,24 @@ export class InteractionService {
 	/**
 	 * Marks something as selected and deselected
 	 * */
-	markAsSelected(target: (ModelAsset | Terrain | LevelPath)) {
+	setSelectionState(target: (ModelAsset | Terrain | LevelPath), markSelected: boolean = true) {
 		const currentSelectedObject = this.selectedObject;
-		if (currentSelectedObject && 'deselect' in currentSelectedObject) {
-			currentSelectedObject.deselect();
+
+		if (!markSelected) {
+			if (currentSelectedObject && 'deselect' in currentSelectedObject) {
+				currentSelectedObject.deselect();
+			}
 		}
 
-		if ('select' in target) {
-			target.select();
-			this.selectedObject = target;
+		if (markSelected) {
+			if (currentSelectedObject && 'deselect' in currentSelectedObject) {
+				currentSelectedObject.deselect();
+			}
+
+			if ('select' in target) {
+				target.select();
+				this.selectedObject = target;
+			}
 		}
 	}
 

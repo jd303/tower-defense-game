@@ -106,6 +106,7 @@ export class Level {
 	 * */
 	gameplayTickCallback(timeProperties: TickTimeProperties) {
 		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
+		this.heroes.forEach((hero) => hero.animateCore(timeProperties));
 		this.towers.forEach((tower) => tower.animateCore(timeProperties));
 	}
 

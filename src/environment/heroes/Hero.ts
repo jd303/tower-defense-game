@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
-import { TickTimeProperties } from '../../core/TickService';
+import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../../core/TickService';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { HeroStats } from './HeroStats';
-import { MovePathDefinition } from '../../data/PathInterfaces';
-import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
+import { MovePathDefinition, PathSegment, PathTypes } from '../../data/PathInterfaces';
+import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
 import { CreepStats } from '../creeps/CreepStats';
 import { RaycasterIntersection, RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
 import { Interactable, InteractableOrders, InteractionService } from '../../game/InteractionService';
+import { Creep } from '../creeps/Creep';
 
 export class Hero extends ModelAsset {
 	/**
@@ -51,15 +52,15 @@ export class Hero extends ModelAsset {
 	healthBarY: number = 1;
 
 	/**
+	 * Combat States
+	 * */
+	interceptedCreeps: (Creep | ModelAsset)[] = [];
+
+	/**
 	 * Construtor
 	 * */
 	constructor(main: Main) {
 		super(main);
-		this.groupMain = new THREE.Group();
-		this.groupTransforms = new THREE.Group();
-		this.groupModel = new THREE.Group();
-		this.groupTransforms.add(this.groupModel);
-		this.groupMain.add(this.groupTransforms);
 		
 		this.stateMachine = this.setDefaultStates();
 		this.setupInteractions();
@@ -76,6 +77,8 @@ export class Hero extends ModelAsset {
 		stateMachine.addStates([
 			{
 				name: HeroStates.idle,
+				onEnter: this.stateEnterIdle.bind(this),
+				onExit: this.stateExitIdle.bind(this)
 			},
 			{
 				name: HeroStates.moving,
@@ -104,26 +107,23 @@ export class Hero extends ModelAsset {
 				autoTransition: HeroTransitions.revived,
 				autoTransitionTimeMS: 1500,
 			},
+			{
+				name: HeroStates.attacking,
+				onEnter: this.stateEnterAttack.bind(this),
+				onExit: this.stateExitAttack.bind(this)
+			}
 		]);
 
 		stateMachine.addTransitions([
 			{
-				name: HeroTransitions.pause,
+				name: HeroTransitions.stop,
 				activatedStates: [HeroStates.idle],
-				deactivatedStates: [HeroStates.moving, HeroStates.activatingStandingPower],
-			},
-			{
-				name: HeroTransitions.unpause,
-				activatedStates: [HeroStates.moving],
-				deactivatedStates: [HeroStates.idle],
+				deactivatedStates: StateMachineTransitions.All,
 			},
 			{
 				name: HeroTransitions.moving,
 				activatedStates: [HeroStates.moving],
-			},
-			{
-				name: HeroTransitions.stop,
-				deactivatedStates: [HeroStates.moving],
+				deactivatedStates: [HeroStates.idle, HeroStates.attacking, HeroStates.activatingStandingPower],
 			},
 			{
 				name: HeroTransitions.took_damage,
@@ -153,6 +153,10 @@ export class Hero extends ModelAsset {
 				activatedStates: [HeroStates.idle],
 				deactivatedStates: [HeroStates.disabled],
 			},
+			{
+				name: HeroTransitions.attacking,
+				activatedStates: [HeroStates.attacking]
+			}
 		]);
 
 		return stateMachine;
@@ -170,7 +174,7 @@ export class Hero extends ModelAsset {
 	 * Resolves what happens at the end of a path
 	 * */
 	resolveEndOfPath(): void {
-		this.stateMachine.activateStateByName(HeroStates.idle);
+		this.stateMachine.transition(HeroTransitions.stop);
 	}
 
 	/**
@@ -240,10 +244,21 @@ export class Hero extends ModelAsset {
 	/**
 	 * Registers movement
 	 * */
-	registerMovement(intersect: RaycasterIntersection, main: Main) {
-		const path = new THREE.LineCurve3(this.groupMain.position, intersect.point);
-		console.log(path);
+	registerMovement(intersect: RaycasterIntersection) {
+		const sPath = this.main.s('Path');
+
+		// Create path segments
+		const pathSegments: PathSegment[] = [{
+			type: PathTypes.straight,
+			points: [this.groupMain.position, intersect.point.point]
+		}];
+
+		const movePath = sPath.createMovePath(`${this.stats.heroName}_move`, pathSegments);
+		this.pathProgress = 0;
+		this.setPath(movePath);
 		this.stateMachine.transition(HeroTransitions.moving);
+
+		this.cancelDefaultClick();
 	}
 
 	/**
@@ -310,6 +325,10 @@ export class Hero extends ModelAsset {
 			this.animationHurtMe(timeProperties);
 		}
 
+		if (states.has(HeroStates.attacking)) {
+			this.animationAttack(timeProperties);
+		}
+
 		if (states.has(HeroStates.healing)) {
 			this.animationHealing();
 		}
@@ -323,6 +342,78 @@ export class Hero extends ModelAsset {
 	animate(timeProperties: TickTimeProperties) {}
 
 	/**
+	 * When Idling
+	 * */
+	stateEnterIdle() {
+		// Listen for interceptions
+		const callback = new TickCallback(`${this.stats.heroName}_intercept`, this.findInterceptees.bind(this));
+		const sTick: TickService = this.main.s('Tick');
+		sTick.registerCallback(callback, true, TickTimeTypes.second);
+	}
+	stateExitIdle() {
+		const sTick: TickService = this.main.s('Tick');
+		sTick.deregisterCallback(`${this.stats.heroName}_intercept`);
+		this.disengageAsIntercepter();
+	}
+
+	/**
+	 * Combat and Interception
+	 * */
+	findInterceptees() {
+		// First, watch and find more interceptees
+		const remainingIntercepts = this.stats.numberIntercepted - this.interceptedCreeps.length;
+		if (remainingIntercepts > 0) {
+			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null;
+			const intercepted: ModelAsset[] = this.sLocation.findTargetsInRange(this.sLevel.currentLevel.creeps, this.groupMain.position, this.stats.interceptDistance, omissionCallback).splice(0, remainingIntercepts);
+			
+			if (intercepted.length) {
+				this.interceptedCreeps = this.interceptedCreeps.concat(intercepted);
+				this.interceptedCreeps.forEach((thisCreep) => (thisCreep as Creep).setIntercepted(this));
+			}
+		}
+
+		// Then set attack state if needs be
+		if (this.interceptedCreeps.length && !this.stateMachine.isInState(HeroStates.attacking)) {
+			this.stateMachine.transition(HeroTransitions.attacking);
+		} else if (!this.interceptedCreeps.length) {
+			this.stateMachine.transition(HeroTransitions.stop);
+		}
+	}
+
+	/**
+	 * Engage and disengage
+	 * */
+	disengageAsIntercepter() {
+		this.interceptedCreeps.forEach((thisCreep) => (thisCreep as Creep).setDisintercepted(this));
+		this.interceptedCreeps = [];
+	}
+	removeInterceptee(removed: ModelAsset) {
+		this.interceptedCreeps = this.interceptedCreeps.filter((intercepted: ModelAsset) => intercepted !== removed);
+	}
+
+	/**
+	 * Combat states
+	 * */
+	stateEnterAttack() {
+		const sTick: TickService = this.main.s('Tick');
+		const callback = new TickCallback(`${this.stats.heroName}_attacking`, this.attackInterceptee.bind(this));
+		sTick.registerCallback(callback, true, TickTimeTypes.halfsecond);
+	}
+	stateExitAttack() {
+		const sTick: TickService = this.main.s('Tick');
+		sTick.deregisterCallback(`${this.stats.heroName}_attacking`);
+	}
+	attackInterceptee() {
+		console.log("ATTACK");
+		const attackTarget: Creep = this.interceptedCreeps[0] as Creep;
+		if (attackTarget) {
+			attackTarget.resolveAttack(this.stats.attack);
+		} else {
+			this.stateMachine.transition(HeroTransitions.stop);
+		}
+	}
+
+	/**
 	 * Hero Powers
 	 * */
 	activateStandingPower() {}
@@ -334,11 +425,17 @@ export class Hero extends ModelAsset {
 	defaultClick() {
 		console.log("Default Click: Hero");
 		const sInteraction: InteractionService = this.main.s('Interaction');
-		sInteraction.markAsSelected(this);
+		sInteraction.setSelectionState(this, true);
 
 		const targetSet = new Set<Interactable>();
 		targetSet.add(new Interactable(InteractableOrders.terrain, this.main.s('Level').currentLevel.terrain));
 		sInteraction.registerContextInteraction(this.registerMovement.bind(this), targetSet);
+	}
+
+	cancelDefaultClick() {
+		const sInteraction: InteractionService = this.main.s('Interaction');
+		sInteraction.setSelectionState(this, false);
+		sInteraction.deregisterContextInteraction();
 	}
 
 	/**

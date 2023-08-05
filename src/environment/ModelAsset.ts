@@ -4,6 +4,8 @@ import { TickTimeProperties } from '../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MovePathDefinition } from '../data/PathInterfaces';
 import { Interactable, InteractableOrders } from '../game/InteractionService';
+import { LocationService } from '../game/LocationService';
+import { LevelService } from '../levels/LevelService';
 
 export class ModelAsset {
 	/**
@@ -18,6 +20,8 @@ export class ModelAsset {
 	 * System Properties
 	 * */
 	main: Main;
+	sLocation: LocationService;
+	sLevel: LevelService;
 
 	/**
 	 * Three Properties
@@ -25,8 +29,9 @@ export class ModelAsset {
 	geometry: any;
 	material: any;
 	mesh: THREE.Mesh;
-	groupMain: THREE.Group; // Outermost group - transforms the whole model
-	groupTransforms: THREE.Group; // Inner group - applies minor transformations
+	groupMain: THREE.Group; // Outermost group - transforms the whole group
+	groupTransforms: THREE.Group; // Middle group - applies minor transformations
+	groupFacing: THREE.Group; // Middle group - applies facing
 	groupModel: THREE.Group; // Innermost group - applies status transforms
 
 	/**
@@ -41,6 +46,17 @@ export class ModelAsset {
 	 * */
 	constructor(main: Main) {
 		this.main = main;
+		this.sLocation = this.main.s('Location');
+		this.sLevel = this.main.s('Level');
+
+		this.groupMain = new THREE.Group();
+		this.groupTransforms = new THREE.Group();
+		this.groupFacing = new THREE.Group();
+		this.groupModel = new THREE.Group();
+
+		this.groupFacing.add(this.groupModel);
+		this.groupTransforms.add(this.groupFacing);
+		this.groupMain.add(this.groupTransforms);
 	}
 
 	/**
@@ -110,15 +126,34 @@ export class ModelAsset {
 		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
 
+		// Set a point and animate
 		const point = this.path.path.getPoint(this.pathProgress) as THREE.Vector3;
 		this.groupMain.position.set(point.x, point.y, point.z);
 
-		this.groupTransforms.position.y = Math.sin(timeProperties.elapsedTime * 50) / 20;
+		// Jiggle animation
+		const jiggleY = Math.sin(timeProperties.elapsedTime * 50) / 20;
+		this.groupTransforms.position.y = jiggleY;
+
+		// Set the look at
+		if (this.pathProgress < 0.95) {
+			const pointAhead = this.path.path.getPoint(this.pathProgress + 0.05) as THREE.Vector3;
+			pointAhead.y = jiggleY;
+			this.groupFacing.lookAt(pointAhead);
+		}
 
 		// If this asset has finished its path
 		if (this.pathProgress >= 0.99) {
 			this.resolveEndOfPath();
 		}
+	}
+
+	/**
+	 * Jiggles a model to show it is attacking
+	 * */
+	animationAttack(timeProperties: TickTimeProperties) {
+		// Jiggle animation
+		const jiggleZ = Math.sin(timeProperties.elapsedTime * 50) / 20;
+		this.groupTransforms.position.z = jiggleZ;
 	}
 
 	/**

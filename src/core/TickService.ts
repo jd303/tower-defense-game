@@ -177,8 +177,16 @@ export class TickService {
 	 * Deregister a Tick callback
 	 * */
 	deregisterCallback(callbackName: string, game = true) {
-		if (game) this.tickFrameCallbacksGame = this.tickFrameCallbacksGame.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
-		else this.tickFrameCallbacksUI = this.tickFrameCallbacksUI.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+		if (game) {
+			this.tickFrameCallbacksGame = this.tickFrameCallbacksGame.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+			this.tickHalfSecCallbacksGame = this.tickHalfSecCallbacksGame.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+			this.tickSecCallbacksGame = this.tickSecCallbacksGame.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+		}
+		else {
+			this.tickFrameCallbacksUI = this.tickFrameCallbacksUI.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+			this.tickHalfSecCallbacksUI = this.tickHalfSecCallbacksUI.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+			this.tickSecCallbacksUI = this.tickSecCallbacksUI.filter((thisCallback: TickCallback) => thisCallback.name !== callbackName);
+		}
 	}
 
 	/**

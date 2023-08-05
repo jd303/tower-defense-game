@@ -9,6 +9,8 @@ import { SplashScreen } from './levels/levels/_SplashScreen';
 import { InteractionService } from './game/InteractionService';
 import { FogOfWarService } from './game/FogOfWarService';
 import { ParticleService } from './core/ParticleService';
+import { PathService } from './game/PathService';
+import { LocationService } from './game/LocationService';
 
 /**
  * Configuration
@@ -27,6 +29,8 @@ const main = new Main(canvas, sizes, debugMode);
 
 // Create services
 main.registerService('Interaction', new InteractionService(main));
+main.registerService('Path', new PathService(main));
+main.registerService('Location', new LocationService(main));
 main.registerService('Level', new LevelService(main));
 main.registerService('Position', new PositionService(main));
 main.registerService('Economy', new EconomyService(main));
