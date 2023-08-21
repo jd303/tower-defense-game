@@ -1,6 +1,7 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
+import { MovementTypes } from '../../data/MovementTypes';
 //import { DamageTypes } from '../../data/DamageTypes';
 import { Hero } from './Hero';
 import { HeroStats } from './HeroStats';
@@ -20,7 +21,10 @@ export class Man0 extends Hero {
 	stats = new HeroStats({
 		name: "Man0",
 		hp_total: 40,
-		move_speed: 3.5,
+		movement: {
+			speed: 3.5,
+			type: MovementTypes.walking,
+		},
 		damage: 10,
 		damageType: DamageTypes.piercing,
 		defenses: {

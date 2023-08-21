@@ -1,6 +1,7 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
+import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStats } from './CreepStats';
 
@@ -17,7 +18,10 @@ export class TrollDink extends Creep {
 	 * */
 	stats = new CreepStats({
 		hp_total: 30,
-		move_speed: 2,
+		movement: {
+			speed: 2,
+			type: MovementTypes.walking,
+		},
 		defenses: {
 			piercing: 0,
 			crushing: 0,

@@ -1,11 +1,12 @@
 import { DamageTypeDefences, DamageTypes } from '../../data/DamageTypes';
+import { MovementTypes } from '../../data/MovementTypes';
 
 export class CreepStats {
 	/**
 	 * Stats
 	 * */
 	hp_total: number;
-	move_speed: number;
+	movement: CreepMovement;
 	defenses: DamageTypeDefences;
 	hp_current: number;
 	kill_rewards: CreepKillAwards;
@@ -20,7 +21,7 @@ export class CreepStats {
 	constructor(stats: CreepStatSetup) {
 		this.hp_total = stats.hp_total;
 		this.hp_current = stats.hp_total;
-		this.move_speed = stats.move_speed;
+		this.movement = stats.movement;
 		this.defenses = {
 			piercing: stats.defenses.piercing,
 			crushing: stats.defenses.crushing,
@@ -63,7 +64,7 @@ export class CreepStats {
 
 interface CreepStatSetup {
 	hp_total: number;
-	move_speed: number;
+	movement: CreepMovement;
 	defenses: DamageTypeDefences;
 	kill_rewards: CreepKillAwards;
 	vp_loss: number;
@@ -75,4 +76,9 @@ interface CreepStatSetup {
 interface CreepKillAwards {
 	economic_property: string;
 	value: number;
+}
+
+interface CreepMovement {
+	speed: number;
+	type: MovementTypes;
 }

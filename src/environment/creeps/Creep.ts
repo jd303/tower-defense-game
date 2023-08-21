@@ -256,7 +256,7 @@ export class Creep extends ModelAsset {
 	 * */
 	setPath(path: MovePathDefinition) {
 		this.path = path;
-		this.pathTravelPercentagePerSec = this.stats.move_speed / path.pathLength;
+		this.pathTravelPercentagePerSec = this.stats.movement.speed / path.pathLength;
 	}
 
 	/**

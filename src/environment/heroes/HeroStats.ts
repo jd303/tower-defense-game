@@ -1,4 +1,5 @@
 import { DamageTypeDefences, DamageTypes } from '../../data/DamageTypes';
+import { MovementTypes } from '../../data/MovementTypes';
 
 export class HeroStats {
 	/**
@@ -7,7 +8,7 @@ export class HeroStats {
 	heroName: string;
 	hp_total: number;
 	hp_current: number;
-	move_speed: number;
+	movement: HeroMovement;
 	attack: HeroAttackStats;
 	defenses: DamageTypeDefences;
 	interceptDistance: number;
@@ -20,7 +21,7 @@ export class HeroStats {
 		this.heroName = stats.name;
 		this.hp_total = stats.hp_total;
 		this.hp_current = stats.hp_total;
-		this.move_speed = stats.move_speed;
+		this.movement = stats.movement;
 		this.attack = {
 			damage: stats.damage,
 			damageType: stats.damageType
@@ -70,10 +71,15 @@ export interface HeroAttackStats {
 interface HeroStatSetup {
 	name: string;
 	hp_total: number;
-	move_speed: number;
+	movement: HeroMovement;
 	damage: number;
 	damageType: DamageTypes;
 	defenses: DamageTypeDefences;
 	interceptDistance: number;
 	numberIntercepted: number;
+}
+
+interface HeroMovement {
+	speed: number;
+	type: MovementTypes;
 }

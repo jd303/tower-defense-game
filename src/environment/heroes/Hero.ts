@@ -10,6 +10,7 @@ import { CreepStats } from '../creeps/CreepStats';
 import { RaycasterIntersection, RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
 import { Interactable, InteractableOrders, InteractionService } from '../../game/InteractionService';
 import { Creep } from '../creeps/Creep';
+import { MovementTypes } from '../../data/MovementTypes';
 
 export class Hero extends ModelAsset {
 	/**
@@ -266,7 +267,7 @@ export class Hero extends ModelAsset {
 	 * */
 	setPath(path: MovePathDefinition) {
 		this.path = path;
-		this.pathTravelPercentagePerSec = this.stats.move_speed / path.pathLength;
+		this.pathTravelPercentagePerSec = this.stats.movement.speed / path.pathLength;
 	}
 
 	/**
@@ -363,7 +364,7 @@ export class Hero extends ModelAsset {
 		// First, watch and find more interceptees
 		const remainingIntercepts = this.stats.numberIntercepted - this.interceptedCreeps.length;
 		if (remainingIntercepts > 0) {
-			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null;
+			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying;
 			const intercepted: ModelAsset[] = this.sLocation.findTargetsInRange(this.sLevel.currentLevel.creeps, this.groupMain.position, this.stats.interceptDistance, omissionCallback).splice(0, remainingIntercepts);
 			
 			if (intercepted.length) {
