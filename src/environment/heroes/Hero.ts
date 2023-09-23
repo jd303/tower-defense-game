@@ -319,7 +319,7 @@ export class Hero extends ModelAsset {
 		const states = this.stateMachine.activeStates;
 
 		if (states.has(HeroStates.moving)) {
-			this.animationMoveMe(timeProperties);
+			this.animationPathMove(timeProperties);
 		}
 
 		if (states.has(HeroStates.hurting)) {
@@ -443,9 +443,14 @@ export class Hero extends ModelAsset {
 	 * Selection Callbacks
 	 * */
 	select() {
-		console.log("TODO: Add a selection graphic: Hero");
+		this.selectionMesh = ModelCommons.selectionCircleMesh();
+		this.selectionMesh.rotation.x = Math.PI * -0.5;
+		this.selectionMesh.position.y = 0.15;
+		this.selectionMesh.position.z = 2.5;
+		this.groupMain.add(this.selectionMesh);
 	}
 	deselect() {
-		console.log("TODO: Remove the selection graphic: Hero");
+		this.groupMain.remove(this.selectionMesh!);
+		this.selectionMesh = undefined;
 	}
 }

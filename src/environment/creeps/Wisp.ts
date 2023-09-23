@@ -59,8 +59,8 @@ export class Wisp extends Creep {
 	 * */
 	modifyStateMachine() {
 		// Wisps stop to use their ability
-		this.stateMachine.modifyState(CreepStates.moving, {
-			name: CreepStates.moving,
+		this.stateMachine.modifyState(CreepStates.pathmoving, {
+			name: CreepStates.pathmoving,
 			autoTransition: CreepTransitions.activating_standing_power,
 			autoTransitionTimeMS: 5000,
 		});
@@ -68,7 +68,7 @@ export class Wisp extends Creep {
 		// Wisps then activate and move on
 		this.stateMachine.modifyState(CreepStates.activatingStandingPower, {
 			name: CreepStates.activatingStandingPower,
-			autoTransition: CreepTransitions.moving,
+			autoTransition: CreepTransitions.pathmoving,
 			autoTransitionTimeMS: 1750,
 			onEnter: this.activateStandingPower.bind(this),
 		});

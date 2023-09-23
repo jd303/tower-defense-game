@@ -33,6 +33,7 @@ export class ModelAsset {
 	groupTransforms: THREE.Group; // Middle group - applies minor transformations
 	groupFacing: THREE.Group; // Middle group - applies facing
 	groupModel: THREE.Group; // Innermost group - applies status transforms
+	selectionMesh?: THREE.Mesh;
 
 	/**
 	 * Movement / Path Properties (Creeps and Heroes)
@@ -121,7 +122,7 @@ export class ModelAsset {
 	/**
 	 * Moves a Model Asset according to its movement speed
 	 * */
-	animationMoveMe(timeProperties: TickTimeProperties) {
+	animationPathMove(timeProperties: TickTimeProperties) {
 		// Calculate travel distance
 		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
@@ -258,4 +259,32 @@ export class ModelCommons {
 	static healingCrossMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00});
 	static healingCrossMerge = BufferGeometryUtils.mergeGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
 	static healingCrossMesh = () => { return new THREE.Mesh(this.healingCrossMerge, this.healingCrossMaterial); }
+
+	/** Selection commons */
+	static selectionCircleMaterial = new THREE.MeshBasicMaterial({ color: 0x4298B5 });
+	static selectionCircleGeometry = new THREE.CircleGeometry(2, 32);
+	//static selectionCircleMesh = () => { return new THREE.Mesh(this.selectionCircleGeometry, this.selectionCircleMaterial); }
+	static selectionCircleMesh = () => {
+		const shape = new THREE.Shape();
+		shape.moveTo(0, 0);
+		shape.bezierCurveTo(2, 0, 2, 2, 2, 2);
+		shape.bezierCurveTo(2, 4, 0, 4, 0, 4);
+		shape.bezierCurveTo(-2, 4, -2, 2, -2, 2);
+		shape.bezierCurveTo(-2, 0, 0, 0, 0, 0);
+
+		const points = shape.getPoints();
+		points.forEach(item => {
+			item = item.multiplyScalar(0.8);
+			item.y += 0.4;
+		})
+
+		// draw the hole
+		const holePath = new THREE.Shape(points.reverse());
+
+		// add hole to shape
+		shape.holes.push(holePath);
+		const geometry = new THREE.ShapeGeometry(shape);
+
+		return new THREE.Mesh(geometry, this.selectionCircleMaterial);
+	}
 }

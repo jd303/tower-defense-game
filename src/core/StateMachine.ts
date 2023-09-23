@@ -23,7 +23,7 @@ import { Timer } from './Timer';
  * 		{
  *				name: CreepTransitions.pause,
  *				activatedStates: [CreepStates.idle],
- *				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
+ *				deactivatedStates: [CreepStates.pathmoving, CreepStates.activatingStandingPower],
  *				deactivatedStates: StateMachineTransitions.All, // Alternative, which will automatically disable all other active states
  *			}
  *		]

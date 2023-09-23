@@ -1,7 +1,7 @@
 export enum CreepStates {
 	any = 'any',
 	idle = 'idle',
-	moving = 'moving',
+	pathmoving = 'pathmoving',
 	hurting = 'hurting', // Has recently been hurt
 	hurt = 'hurt', // Has been hurt ever
 	healing = "healing",
@@ -13,7 +13,7 @@ export enum CreepStates {
 export enum CreepTransitions {
 	pause = "pause",
 	unpause = "unpause",
-	moving = "moving",
+	pathmoving = "pathmoving",
 	stop = "stop",
 	took_damage = "took_damage",
 	activating_standing_power = "activating_standing_power",

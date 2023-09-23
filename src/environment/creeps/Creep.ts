@@ -50,13 +50,13 @@ export class Creep extends ModelAsset {
 	healthBarY: number = 1;
 
 	/**
-	 * Construtor
+	 * Constructor
 	 * */
 	constructor(main: Main) {
 		super(main);
 		
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.transition('moving');
+		this.stateMachine.transition(CreepStates.pathmoving);
 
 		this.setInteractive();
 	}
@@ -72,7 +72,7 @@ export class Creep extends ModelAsset {
 				name: CreepStates.idle,
 			},
 			{
-				name: CreepStates.moving,
+				name: CreepStates.pathmoving,
 			},
 			{
 				name: CreepStates.hurting,
@@ -99,21 +99,21 @@ export class Creep extends ModelAsset {
 			{
 				name: CreepTransitions.pause,
 				activatedStates: [CreepStates.idle],
-				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower],
+				deactivatedStates: [CreepStates.pathmoving, CreepStates.activatingStandingPower],
 			},
 			{
 				name: CreepTransitions.unpause,
-				activatedStates: [CreepStates.moving],
+				activatedStates: [CreepStates.pathmoving],
 				deactivatedStates: [CreepStates.idle],
 			},
 			{
-				name: CreepTransitions.moving,
-				activatedStates: [CreepStates.moving],
+				name: CreepTransitions.pathmoving,
+				activatedStates: [CreepStates.pathmoving],
 				deactivatedStates: [CreepStates.intercepted]
 			},
 			{
 				name: CreepTransitions.stop,
-				deactivatedStates: [CreepStates.moving],
+				deactivatedStates: [CreepStates.pathmoving],
 			},
 			{
 				name: CreepTransitions.took_damage,
@@ -122,7 +122,7 @@ export class Creep extends ModelAsset {
 			{
 				name: CreepTransitions.activating_standing_power,
 				activatedStates: [CreepStates.activatingStandingPower],
-				deactivatedStates: [CreepStates.moving],
+				deactivatedStates: [CreepStates.pathmoving],
 			},
 			{
 				name: CreepTransitions.full_heal,
@@ -136,7 +136,7 @@ export class Creep extends ModelAsset {
 			{
 				name: CreepTransitions.intercepted,
 				activatedStates: [CreepStates.intercepted],
-				deactivatedStates: [CreepStates.moving, CreepStates.activatingStandingPower, CreepStates.activatingMovingPower],
+				deactivatedStates: [CreepStates.pathmoving, CreepStates.activatingStandingPower, CreepStates.activatingMovingPower],
 			},
 		]);
 
@@ -218,7 +218,7 @@ export class Creep extends ModelAsset {
 	setDisintercepted(byWhom: Hero) {
 		if (this.intercepter == byWhom) {
 			this.intercepter = null;
-			this.stateMachine.transition(CreepTransitions.moving);
+			this.stateMachine.transition(CreepTransitions.pathmoving);
 		}
 	}
 
@@ -307,8 +307,8 @@ export class Creep extends ModelAsset {
 	animateCore(timeProperties: TickTimeProperties) {
 		const states = this.stateMachine.activeStates;
 
-		if (states.has(CreepStates.moving)) {
-			this.animationMoveMe(timeProperties);
+		if (states.has(CreepStates.pathmoving)) {
+			this.animationPathMove(timeProperties);
 		}
 
 		if (states.has(CreepStates.hurting)) {
