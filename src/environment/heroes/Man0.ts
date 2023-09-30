@@ -47,6 +47,7 @@ export class Man0 extends Hero {
 	super(main);
 
 		this.loadModel();
+		this.interceptionHandler.setInterceptionSlotCount(this.stats.numberIntercepted);
 
 		return this;
 	}

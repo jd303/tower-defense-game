@@ -120,9 +120,9 @@ export class ModelAsset {
 	}
 
 	/**
-	 * Moves a Model Asset according to its movement speed
+	 * Moves a Model Asset along a path according to its movement speed
 	 * */
-	animationPathMove(timeProperties: TickTimeProperties) {
+	animationMove(timeProperties: TickTimeProperties) {
 		// Calculate travel distance
 		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
 		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);

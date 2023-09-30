@@ -68,7 +68,7 @@ export class TowerBomber extends Tower {
 
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
 			const omissionCallback = (interceptee: Creep) => interceptee.stats.movement.type == MovementTypes.flying;
-			const creeps = this.sLocation.findTargetsInRange(this.main.s('Level').currentLevel.creeps, position, this.stats.attack.range, omissionCallback);
+			const creeps = this.sLocation.findTargetsInRange({ potentialTargets: this.main.s('Level').currentLevel.creeps, fromPoint: position, range: this.stats.attack.range, omissionCallback: omissionCallback });
 			const creep: ModelAsset | null = creeps.length ? creeps[0] : null;
 
 			// If we have a target

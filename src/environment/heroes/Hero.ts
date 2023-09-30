@@ -11,6 +11,7 @@ import { RaycasterIntersection, RaycasterOrders, RaycasterService } from '../../
 import { Interactable, InteractableOrders, InteractionService } from '../../game/InteractionService';
 import { Creep } from '../creeps/Creep';
 import { MovementTypes } from '../../data/MovementTypes';
+import { InterceptionHandler, InterceptionSlotCountInterface } from '../InterceptionHandler';
 
 export class Hero extends ModelAsset {
 	/**
@@ -55,7 +56,7 @@ export class Hero extends ModelAsset {
 	/**
 	 * Combat States
 	 * */
-	interceptedCreeps: (Creep | ModelAsset)[] = [];
+	interceptionHandler: InterceptionHandler = new InterceptionHandler(this);
 
 	/**
 	 * Construtor
@@ -65,7 +66,6 @@ export class Hero extends ModelAsset {
 		
 		this.stateMachine = this.setDefaultStates();
 		this.setupInteractions();
-
 		this.setInteractive();
 	}
 
@@ -319,7 +319,7 @@ export class Hero extends ModelAsset {
 		const states = this.stateMachine.activeStates;
 
 		if (states.has(HeroStates.moving)) {
-			this.animationPathMove(timeProperties);
+			this.animationMove(timeProperties);
 		}
 
 		if (states.has(HeroStates.hurting)) {
@@ -352,6 +352,7 @@ export class Hero extends ModelAsset {
 		sTick.registerCallback(callback, true, TickTimeTypes.second);
 	}
 	stateExitIdle() {
+		console.log("EXIT IDLE (likely due to stop)");
 		const sTick: TickService = this.main.s('Tick');
 		sTick.deregisterCallback(`${this.stats.heroName}_intercept`);
 		this.disengageAsIntercepter();
@@ -362,21 +363,18 @@ export class Hero extends ModelAsset {
 	 * */
 	findInterceptees() {
 		// First, watch and find more interceptees
-		const remainingIntercepts = this.stats.numberIntercepted - this.interceptedCreeps.length;
-		if (remainingIntercepts > 0) {
+		const slotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
+		if (slotCounts.available > 0) {
 			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying;
-			const intercepted: ModelAsset[] = this.sLocation.findTargetsInRange(this.sLevel.currentLevel.creeps, this.groupMain.position, this.stats.interceptDistance, omissionCallback).splice(0, remainingIntercepts);
-			
-			if (intercepted.length) {
-				this.interceptedCreeps = this.interceptedCreeps.concat(intercepted);
-				this.interceptedCreeps.forEach((thisCreep) => (thisCreep as Creep).setIntercepted(this));
-			}
+			const interceptables: ModelAsset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
+			if (interceptables.length) this.interceptionHandler.addInterceptees(interceptables);
 		}
 
 		// Then set attack state if needs be
-		if (this.interceptedCreeps.length && !this.stateMachine.isInState(HeroStates.attacking)) {
+		const updatedSlotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
+		if (updatedSlotCounts.occupied > 0 && !this.stateMachine.isInState(HeroStates.attacking)) {
 			this.stateMachine.transition(HeroTransitions.attacking);
-		} else if (!this.interceptedCreeps.length) {
+		} else if (updatedSlotCounts.occupied == 0) {
 			this.stateMachine.transition(HeroTransitions.stop);
 		}
 	}
@@ -385,11 +383,10 @@ export class Hero extends ModelAsset {
 	 * Engage and disengage
 	 * */
 	disengageAsIntercepter() {
-		this.interceptedCreeps.forEach((thisCreep) => (thisCreep as Creep).setDisintercepted(this));
-		this.interceptedCreeps = [];
+		this.interceptionHandler.disengageAll();
 	}
 	removeInterceptee(removed: ModelAsset) {
-		this.interceptedCreeps = this.interceptedCreeps.filter((intercepted: ModelAsset) => intercepted !== removed);
+		this.interceptionHandler.removeInterceptee(removed);
 	}
 
 	/**
@@ -398,7 +395,7 @@ export class Hero extends ModelAsset {
 	stateEnterAttack() {
 		const sTick: TickService = this.main.s('Tick');
 		const callback = new TickCallback(`${this.stats.heroName}_attacking`, this.attackInterceptee.bind(this));
-		sTick.registerCallback(callback, true, TickTimeTypes.halfsecond);
+		sTick.registerCallback(callback, true, TickTimeTypes.second);
 	}
 	stateExitAttack() {
 		const sTick: TickService = this.main.s('Tick');
@@ -406,7 +403,7 @@ export class Hero extends ModelAsset {
 	}
 	attackInterceptee() {
 		console.log("ATTACK");
-		const attackTarget: Creep = this.interceptedCreeps[0] as Creep;
+		const attackTarget: Creep = this.interceptionHandler.firstAttackableCreep as Creep;
 		if (attackTarget) {
 			attackTarget.resolveAttack(this.stats.attack);
 		} else {

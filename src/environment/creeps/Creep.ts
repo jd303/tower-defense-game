@@ -209,13 +209,10 @@ export class Creep extends ModelAsset {
 	setIntercepted(byWhom: Hero) {
 		this.intercepter = byWhom;
 		this.stateMachine.transition(CreepTransitions.intercepted);
-
-		// Move the creep to next to the hero
-		const interceptedIndex = byWhom.interceptedCreeps.indexOf(this);
-		const temporaryRandom = Math.random() * 3; // TODO remove this, it's just to make sure that I can see the creep until I place them better
-		this.groupMain.position.set(byWhom.groupMain.position.x + 2.5 + temporaryRandom, byWhom.groupMain.position.y, byWhom.groupMain.position.z + (2.5 * interceptedIndex));
+		console.log("I got intercepted", this);
 	}
 	setDisintercepted(byWhom: Hero) {
+		console.log("I got disintercepted", this);
 		if (this.intercepter == byWhom) {
 			this.intercepter = null;
 			this.stateMachine.transition(CreepTransitions.pathmoving);
@@ -308,7 +305,7 @@ export class Creep extends ModelAsset {
 		const states = this.stateMachine.activeStates;
 
 		if (states.has(CreepStates.pathmoving)) {
-			this.animationPathMove(timeProperties);
+			this.animationMove(timeProperties);
 		}
 
 		if (states.has(CreepStates.hurting)) {

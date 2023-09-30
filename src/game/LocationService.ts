@@ -19,21 +19,34 @@ export class LocationService {
 	 * Finds all targets in range
 	 * @param {Function} omissionCallback A function to call which, if true, omits this from the selection criteria
 	 * */
-	findTargetsInRange(potentialTargets: (ModelAsset)[], fromPoint: Vector3, range: number, omissionCallback?: Function) {
-		const targets = potentialTargets.filter((target: ModelAsset) => {
-			if (omissionCallback) {
-				if (omissionCallback(target)) return false;
+	findTargetsInRange(config: TargetFinderInterface) {
+		let targets = config.potentialTargets.filter((target: ModelAsset) => {
+			if (config.omissionCallback) {
+				if (config.omissionCallback(target)) return false;
 			}
 
 			const targetPosition = target.groupMain.position;
-			const distance = fromPoint.distanceTo(targetPosition);
+			const distance = config.fromPoint.distanceTo(targetPosition);
 
 			// If something is in range
-			if (distance < range) {
+			if (distance < config.range) {
 				return true;
 			} else return false;
 		});
 
+		// Cull to maximumResults
+		if (config.maximumResults !== undefined && targets.length > config.maximumResults) {
+			targets = targets.splice(0, targets.length - config.maximumResults);
+		}
+
 		return targets;
 	}
+}
+
+interface TargetFinderInterface {
+	potentialTargets: (ModelAsset)[],
+	fromPoint: Vector3,
+	range: number,
+	omissionCallback?: Function
+	maximumResults?: number
 }
