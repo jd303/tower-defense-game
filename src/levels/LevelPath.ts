@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
-import { MovePathDefinition, PathDefinition, PathSegment, PathTypes, PathGeometryTypes } from '../data/PathInterfaces';
+import { MovePathDefinition, PathDefinition, PathSegment, PathGeometryTypes } from '../data/PathInterfaces';
 import { Main } from '../core/Main';
 import { Interactable, InteractableOrders } from '../game/InteractionService';
 
@@ -18,12 +17,15 @@ export class LevelPath {
 	/**
 	 * Wave Properties
 	 * */
-	id: number;
+	id: string;
 	corePath: MovePathDefinition = {
 		id: 'core',
+		active: true,
 		segments: [],
 		pathLength: 0,
 		path: new THREE.CurvePath(),
+		pathProgress: 0,
+		pathTravelPercentagePerSec: 0,
 	};
 	variantPaths: MovePathDefinition[] = [];
 	groupMain: THREE.Group; // Contains a pathMesh's groupmain, if created
@@ -55,10 +57,10 @@ export class LevelPath {
 	/**
 	 * Creates a variant path for uniqueness
 	 * */
-	createVariantPath(creepID: string) {
+	createVariantPath() {
 		const sPath = this.main.s('Path');
 
-		const variantPath = sPath.createMovePath(`${this.corePath.id}_${creepID}`, this.corePath.segments, this.getRandomAdjustX(), this.getRandomAdjustZ());
+		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.segments, this.getRandomAdjustX(), this.getRandomAdjustZ());
 		this.variantPaths.push(variantPath);
 		return variantPath;
 	}

@@ -20,6 +20,7 @@ export class TrollDink extends Creep {
 		hp_total: 30,
 		movement: {
 			speed: 2,
+			interception_modifier: 2,
 			type: MovementTypes.walking,
 		},
 		defenses: {

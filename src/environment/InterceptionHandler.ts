@@ -2,6 +2,7 @@ import { Vector3 } from 'three';
 import { ModelAsset } from './ModelAsset';
 import { Creep } from './creeps/Creep';
 import { Hero } from './heroes/Hero';
+import { PathService } from '../game/PathService';
 
 export class InterceptionHandler {
 	/**
@@ -100,13 +101,16 @@ export class InterceptionHandler {
 
 		this.interceptionSlots.forEach((slot, index) => {
 			if (slot.occupant !== undefined) {
+				const sPath: PathService = this.parent.main.s('Path');
 				const parentPosition = this.parent.groupMain.position.clone();
 				const position = parentPosition.add(positions[index]);
+				const path = sPath.createMovePath('intercept', sPath.createStraightPathSegments(slot.occupant.groupMain.position, position));
+				slot.occupant.movePathManager.addPath(path);
+				slot.occupant.movePathManager.setActivePath(path.id, false);
 				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
 				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
 				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
 				console.log("%c Sorry, just put three items in here to better see it", 'color: green');
-				//slot.occupant.animationPointMove(position);
 			}
 		});
 	}

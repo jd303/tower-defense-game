@@ -3,7 +3,7 @@ import { Main } from '../../core/Main';
 import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../../core/TickService';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { HeroStats } from './HeroStats';
-import { MovePathDefinition, PathSegment, PathTypes } from '../../data/PathInterfaces';
+import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
 import { CreepStats } from '../creeps/CreepStats';
@@ -12,6 +12,7 @@ import { Interactable, InteractableOrders, InteractionService } from '../../game
 import { Creep } from '../creeps/Creep';
 import { MovementTypes } from '../../data/MovementTypes';
 import { InterceptionHandler, InterceptionSlotCountInterface } from '../InterceptionHandler';
+import { PathService } from '../../game/PathService';
 
 export class Hero extends ModelAsset {
 	/**
@@ -36,8 +37,6 @@ export class Hero extends ModelAsset {
 	 * Level Properties
 	 * */
 	path: MovePathDefinition;
-	pathTravelPercentagePerSec: number;
-	pathProgress: number = 0;
 
 	/**
 	 * Status
@@ -174,8 +173,10 @@ export class Hero extends ModelAsset {
 	/**
 	 * Resolves what happens at the end of a path
 	 * */
-	resolveEndOfPath(): void {
+	finaliseEndOfPath(): void {
+		console.log("END OF PATH");
 		this.stateMachine.transition(HeroTransitions.stop);
+		this.movePathManager.completeActivePath();
 	}
 
 	/**
@@ -246,28 +247,16 @@ export class Hero extends ModelAsset {
 	 * Registers movement
 	 * */
 	registerMovement(intersect: RaycasterIntersection) {
-		const sPath = this.main.s('Path');
+		console.log("Register Movement");
+		const sPath: PathService = this.main.s('Path');
 
-		// Create path segments
-		const pathSegments: PathSegment[] = [{
-			type: PathTypes.straight,
-			points: [this.groupMain.position, intersect.point.point]
-		}];
-
-		const movePath = sPath.createMovePath(`${this.stats.heroName}_move`, pathSegments);
-		this.pathProgress = 0;
-		this.setPath(movePath);
+		this.movePathManager.removePath('activemovement');
+		const movePath = sPath.createMovePath('activemovement', sPath.createStraightPathSegments(this.groupMain.position, intersect.point.point));
+		this.movePathManager.addPath(movePath);
+		this.movePathManager.setActivePath(movePath.id);
 		this.stateMachine.transition(HeroTransitions.moving);
 
 		this.cancelDefaultClick();
-	}
-
-	/**
-	 * Sets a path for a creep
-	 * */
-	setPath(path: MovePathDefinition) {
-		this.path = path;
-		this.pathTravelPercentagePerSec = this.stats.movement.speed / path.pathLength;
 	}
 
 	/**
@@ -346,6 +335,7 @@ export class Hero extends ModelAsset {
 	 * When Idling
 	 * */
 	stateEnterIdle() {
+		console.log("IDLING");
 		// Listen for interceptions
 		const callback = new TickCallback(`${this.stats.heroName}_intercept`, this.findInterceptees.bind(this));
 		const sTick: TickService = this.main.s('Tick');

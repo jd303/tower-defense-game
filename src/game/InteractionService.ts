@@ -189,7 +189,7 @@ export class InteractionService {
 	 * We have entered Default State
 	 * */
 	enterStateDefault() {
-		console.log("Enter state: Default");
+		console.log("Enter Interaction state: Default");
 		this.defaultTargetMode = true;
 	}
 
@@ -197,7 +197,7 @@ export class InteractionService {
 	 * We entered Board Interaction State
 	 * */
 	enterContextInteraction() {
-		console.log("Entered state: Context Mode");
+		console.log("Entered Interaction state: Context Mode");
 		this.defaultTargetMode = false;
 	}
 
@@ -205,7 +205,7 @@ export class InteractionService {
 	 * We entered a Menu State
 	 * */
 	enterStateMenu() {
-		console.log("Entere state: Menu")
+		console.log("Entere Interaction state: Menu")
 	}
 }
 

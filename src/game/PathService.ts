@@ -20,9 +20,12 @@ export class PathService {
 		const pathLength = path.getLength();
 		const pathDefinition: MovePathDefinition = {
 			id: id,
+			active: false,
 			segments: pathSegments,
 			pathLength: pathLength,
-			path: path
+			path: path,
+			pathProgress: 0,
+			pathTravelPercentagePerSec: 0
 		};
 
 		return pathDefinition;
@@ -61,6 +64,15 @@ export class PathService {
 		});
 
 		return curvePath;
+	}
+
+	createStraightPathSegments(startPos: Vector3, endPos: Vector3) {
+		const pathSegments: PathSegment[] = [{
+			type: PathTypes.straight,
+			points: [startPos, endPos]
+		}];
+
+		return pathSegments;
 	}
 
 	/**

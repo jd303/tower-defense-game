@@ -102,8 +102,10 @@ export class WaveManager {
 				const creep = CreepGenerator.createCreep(creepDefinition, this.level.main);
 				creep.groupMain.position.set(curveStart.x, curveStart.y, curveStart.z);
 
-				const pathVariant = wave.corePath.createVariantPath(creepDefinition.id);
-				creep.setPath(pathVariant);
+				const pathVariant = wave.corePath.createVariantPath();
+				//creep.setPath(pathVariant);
+				creep.movePathManager.addPath(pathVariant);
+				creep.movePathManager.setActivePath(pathVariant.id);
 
 				// Brute force animators in
 				this.level.addCreep(creep);

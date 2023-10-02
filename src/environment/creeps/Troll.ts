@@ -20,6 +20,7 @@ export class Troll extends Creep {
 		hp_total: 40,
 		movement: {
 			speed: 2,
+			interception_modifier: 2,
 			type: MovementTypes.walking,
 		},
 		defenses: {

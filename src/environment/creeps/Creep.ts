@@ -75,6 +75,9 @@ export class Creep extends ModelAsset {
 				name: CreepStates.pathmoving,
 			},
 			{
+				name: CreepStates.interceptedmoving
+			},
+			{
 				name: CreepStates.hurting,
 				autoTransition: StateMachineEvents.Stop,
 				autoTransitionTimeMS: 1000,
@@ -135,7 +138,7 @@ export class Creep extends ModelAsset {
 			},
 			{
 				name: CreepTransitions.intercepted,
-				activatedStates: [CreepStates.intercepted],
+				activatedStates: [CreepStates.intercepted, CreepStates.interceptedmoving],
 				deactivatedStates: [CreepStates.pathmoving, CreepStates.activatingStandingPower, CreepStates.activatingMovingPower],
 			},
 		]);
@@ -208,6 +211,7 @@ export class Creep extends ModelAsset {
 	 * */
 	setIntercepted(byWhom: Hero) {
 		this.intercepter = byWhom;
+		this.stats.movement.speed += this.stats.movement.interception_modifier;
 		this.stateMachine.transition(CreepTransitions.intercepted);
 		console.log("I got intercepted", this);
 	}
@@ -215,6 +219,8 @@ export class Creep extends ModelAsset {
 		console.log("I got disintercepted", this);
 		if (this.intercepter == byWhom) {
 			this.intercepter = null;
+			this.stats.movement.speed -= this.stats.movement.interception_modifier;
+			this.movePathManager.rejoinCorePath();
 			this.stateMachine.transition(CreepTransitions.pathmoving);
 		}
 	}
@@ -246,14 +252,6 @@ export class Creep extends ModelAsset {
 		this.stateMachine.remove();
 		this.main.s('Level').currentLevel.removeCreep(this);
 		this.main.s('Interaction').deregisterDefaultTarget(this);
-	}
-
-	/**
-	 * Sets a path for a creep
-	 * */
-	setPath(path: MovePathDefinition) {
-		this.path = path;
-		this.pathTravelPercentagePerSec = this.stats.movement.speed / path.pathLength;
 	}
 
 	/**
@@ -304,7 +302,7 @@ export class Creep extends ModelAsset {
 	animateCore(timeProperties: TickTimeProperties) {
 		const states = this.stateMachine.activeStates;
 
-		if (states.has(CreepStates.pathmoving)) {
+		if (states.has(CreepStates.pathmoving) || states.has(CreepStates.interceptedmoving)) {
 			this.animationMove(timeProperties);
 		}
 
@@ -327,8 +325,12 @@ export class Creep extends ModelAsset {
 	/**
 	 * Resolves what happens at the end of a path
 	 * */
-	resolveEndOfPath(): void {
-		this.creepEscaped();
+	finaliseEndOfPath(): void {
+		if (this.movePathManager.activePath!.id == 'core') {
+			this.creepEscaped();
+		} else {
+			this.movePathManager.completeActivePath();
+		}
 	}
 
 	/**

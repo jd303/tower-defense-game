@@ -2,22 +2,26 @@ import * as THREE from 'three';
 import { Vector, Vector3 } from 'three';
 
 export interface PathDefinition {
-	id: number;
+	id: string;
 	segments: PathSegment[];
 	pathGeometry: PathGeometryTypes;
+}
+
+export interface MovePathDefinition {
+	id: string;
+	active: boolean;
+	segments: any[];
+	pathLength: number;
+	path: THREE.CurvePath<Vector>;
+	pathTravelPercentagePerSec: number;
+	pathProgress: number;
+	switchToOnComplete?: string;
 }
 
 export interface PathSegment {
 	type: PathTypes;
 	points: Vector3[];
 	controlPoints?: Vector3[];
-}
-
-export interface MovePathDefinition {
-	id: string;
-	segments: any[];
-	pathLength: number;
-	path: THREE.CurvePath<Vector>;
 }
 
 export enum PathGeometryTypes {

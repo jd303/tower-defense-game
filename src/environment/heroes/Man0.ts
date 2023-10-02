@@ -25,7 +25,7 @@ export class Man0 extends Hero {
 			speed: 3.5,
 			type: MovementTypes.walking,
 		},
-		damage: 10,
+		damage: 2,
 		damageType: DamageTypes.piercing,
 		defenses: {
 			piercing: 0,

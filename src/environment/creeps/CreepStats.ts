@@ -80,5 +80,6 @@ interface CreepKillAwards {
 
 interface CreepMovement {
 	speed: number;
+	interception_modifier: number;
 	type: MovementTypes;
 }

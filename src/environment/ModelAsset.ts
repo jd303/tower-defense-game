@@ -6,6 +6,10 @@ import { MovePathDefinition } from '../data/PathInterfaces';
 import { Interactable, InteractableOrders } from '../game/InteractionService';
 import { LocationService } from '../game/LocationService';
 import { LevelService } from '../levels/LevelService';
+import { MovePathManager } from './MovePathManager';
+import { CreepStats } from './creeps/CreepStats';
+import { HeroStats } from './heroes/HeroStats';
+import { TowerStats } from './towers/TowerStats';
 
 export class ModelAsset {
 	/**
@@ -38,9 +42,10 @@ export class ModelAsset {
 	/**
 	 * Movement / Path Properties (Creeps and Heroes)
 	 * */
-	path: MovePathDefinition;
-	pathTravelPercentagePerSec: number;
-	pathProgress: number = 0;
+	movePathManager: MovePathManager = new MovePathManager(this);
+
+	// Statistics
+	stats: HeroStats | CreepStats | TowerStats;
 
 	/**
 	 * Constructor
@@ -123,12 +128,15 @@ export class ModelAsset {
 	 * Moves a Model Asset along a path according to its movement speed
 	 * */
 	animationMove(timeProperties: TickTimeProperties) {
+		const path = this.movePathManager.activePath;
+		if (!path) return new Error('Set animation state to movement with no active path');
+
 		// Calculate travel distance
-		let distanceSinceLastFrame = timeProperties.deltaTime * this.pathTravelPercentagePerSec;
-		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
+		let distanceSinceLastFrame = timeProperties.deltaTime * path.pathTravelPercentagePerSec;
+		path.pathProgress = Math.min(1, path.pathProgress + distanceSinceLastFrame);
 
 		// Set a point and animate
-		const point = this.path.path.getPoint(this.pathProgress) as THREE.Vector3;
+		const point = path.path.getPoint(path.pathProgress) as THREE.Vector3;
 		this.groupMain.position.set(point.x, point.y, point.z);
 
 		// Jiggle animation
@@ -136,15 +144,16 @@ export class ModelAsset {
 		this.groupTransforms.position.y = jiggleY;
 
 		// Set the look at
-		if (this.pathProgress < 0.95) {
-			const pointAhead = this.path.path.getPoint(this.pathProgress + 0.05) as THREE.Vector3;
+		if (path.pathProgress < 0.95) {
+			const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
 			pointAhead.y = jiggleY;
 			this.groupFacing.lookAt(pointAhead);
 		}
 
 		// If this asset has finished its path
-		if (this.pathProgress >= 0.99) {
-			this.resolveEndOfPath();
+		if (path.pathProgress >= 0.99) {
+			const endOfPath: boolean = this.movePathManager.resolveEndOfPath();
+			if (endOfPath) this.finaliseEndOfPath();
 		}
 	}
 
@@ -180,16 +189,22 @@ export class ModelAsset {
 	 * Get expected position when it is moving
 	 * */
 	getExpectedPositionAt(timeInMS: number) {
-		let distanceTravelled = timeInMS / 1000 * this.pathTravelPercentagePerSec;
-		let expectedPathProgress = Math.min(1, this.pathProgress + distanceTravelled);
-		return this.path.path.getPoint(expectedPathProgress) as THREE.Vector3;
+		const path = this.movePathManager.activePath;
+
+		if (path) {
+			let distanceTravelled = timeInMS / 1000 * path.pathTravelPercentagePerSec;
+			let expectedPathProgress = Math.min(1, path.pathProgress + distanceTravelled);
+			return path.path.getPoint(expectedPathProgress) as THREE.Vector3;
+		} else {
+			return this.groupMain.position;
+		}
 	}
 
 	/**
-	 * Resolves what happens at the end of a path
+	 * Finalises what happens at the end of a path
 	 * Overwritten by individual classes
 	 * */
-	resolveEndOfPath() {}
+	finaliseEndOfPath() {}
 
 	/**
 	 * When the Hero is healed

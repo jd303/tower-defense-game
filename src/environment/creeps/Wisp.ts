@@ -20,6 +20,7 @@ export class Wisp extends Creep {
 		hp_total: 10,
 		movement: {
 			speed: 2.75,
+			interception_modifier: 2,
 			type: MovementTypes.flying
 		},
 		defenses: {
