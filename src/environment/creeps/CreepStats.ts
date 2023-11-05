@@ -14,6 +14,7 @@ export class CreepStats {
 	attack_speed: number;
 	attack_damage: number;
 	attack_damagetype: DamageTypes;
+	buffs: CreepStatBuffs;
 
 	/**
 	 * Constructor
@@ -35,6 +36,9 @@ export class CreepStats {
 		this.attack_speed = stats.attack_speed;
 		this.attack_damage = stats.attack_damage;
 		this.attack_damagetype = stats.attack_damagetype;
+		this.buffs = {
+			speed: 0
+		};
 
 		return this;
 	}
@@ -82,4 +86,8 @@ interface CreepMovement {
 	speed: number;
 	interception_modifier: number;
 	type: MovementTypes;
+}
+
+interface CreepStatBuffs {
+	speed: number;
 }

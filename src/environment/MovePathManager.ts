@@ -74,12 +74,13 @@ export class MovePathManager {
 		
 		if (corePath) {
 			const sPath: PathService = this.parent.main.s('Path');
-			const rejoinPoint = corePath.path.getPoint(corePath.pathProgress) as Vector3;
+			corePath.pathProgress += 0.03;
+			const rejoinPoint = corePath.path.getPointAt(corePath.pathProgress) as Vector3;
 			const rejoinPath = sPath.createMovePath('rejoin', sPath.createStraightPathSegments(this.parent.groupMain.position, rejoinPoint));
 			rejoinPath.switchToOnComplete = "core";
+			this.parent.stateMachine.activateStateByName('uninterceptable');
 			this.parent.movePathManager.addPath(rejoinPath);
 			this.parent.movePathManager.setActivePath(rejoinPath.id, false);
-			console.log("REJOIN", corePath);
 		} else {
 			return new Error('Core Path not set');			
 		}

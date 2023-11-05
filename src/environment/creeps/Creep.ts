@@ -34,7 +34,6 @@ export class Creep extends ModelAsset {
 	 * Status
 	 * */
 	states: CreepStates;
-	stateMachine: StateMachine;
 
 	/**
 	 * Combat and Interception
@@ -76,6 +75,11 @@ export class Creep extends ModelAsset {
 			},
 			{
 				name: CreepStates.interceptedmoving
+			},
+			{
+				name: CreepStates.uninterceptable,
+				autoTransition: CreepTransitions.becomeinterceptable,
+				autoTransitionTimeMS: 7500,
 			},
 			{
 				name: CreepStates.hurting,
@@ -141,6 +145,10 @@ export class Creep extends ModelAsset {
 				activatedStates: [CreepStates.intercepted, CreepStates.interceptedmoving],
 				deactivatedStates: [CreepStates.pathmoving, CreepStates.activatingStandingPower, CreepStates.activatingMovingPower],
 			},
+			{
+				name: CreepTransitions.becomeinterceptable,
+				deactivatedStates: [CreepStates.uninterceptable]
+			}
 		]);
 
 		return stateMachine;

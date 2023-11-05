@@ -8,7 +8,8 @@ export enum CreepStates {
 	activatingStandingPower = 'activatingStandingPower',
 	activatingMovingPower = 'activatingStandingPower',
 	intercepted = "intercepted",
-	interceptedmoving = "interceptedmoving"
+	interceptedmoving = "interceptedmoving",
+	uninterceptable = "uninterceptable"
 }
 
 export enum CreepTransitions {
@@ -20,5 +21,6 @@ export enum CreepTransitions {
 	activating_standing_power = "activating_standing_power",
 	healed = "healed",
 	full_heal = "full_heal",
-	intercepted = "intercepted"
+	intercepted = "intercepted",
+	becomeinterceptable = "becomeinterceptable"
 }

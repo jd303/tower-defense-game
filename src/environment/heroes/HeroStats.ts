@@ -13,6 +13,7 @@ export class HeroStats {
 	defenses: DamageTypeDefences;
 	interceptDistance: number;
 	numberIntercepted: number;
+	buffs: HeroStatBuffs;
 
 	/**
 	 * Constructor
@@ -36,6 +37,9 @@ export class HeroStats {
 		};
 		this.interceptDistance = stats.interceptDistance;
 		this.numberIntercepted = stats.numberIntercepted;
+		this.buffs = {
+			speed: 0
+		};
 
 		return this;
 	}
@@ -82,4 +86,8 @@ interface HeroStatSetup {
 interface HeroMovement {
 	speed: number;
 	type: MovementTypes;
+}
+
+interface HeroStatBuffs {
+	speed: number;
 }

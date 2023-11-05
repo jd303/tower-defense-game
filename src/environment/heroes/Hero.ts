@@ -13,6 +13,7 @@ import { Creep } from '../creeps/Creep';
 import { MovementTypes } from '../../data/MovementTypes';
 import { InterceptionHandler, InterceptionSlotCountInterface } from '../InterceptionHandler';
 import { PathService } from '../../game/PathService';
+import { CreepStates } from '../creeps/CreepStates';
 
 export class Hero extends ModelAsset {
 	/**
@@ -42,7 +43,6 @@ export class Hero extends ModelAsset {
 	 * Status
 	 * */
 	states: HeroStates;
-	stateMachine: StateMachine;
 
 	/**
 	 * Health bar
@@ -355,7 +355,7 @@ export class Hero extends ModelAsset {
 		// First, watch and find more interceptees
 		const slotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
 		if (slotCounts.available > 0) {
-			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying;
+			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying || interceptee.stateMachine.activeStates.has(CreepStates.uninterceptable);
 			const interceptables: ModelAsset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
 			if (interceptables.length) this.interceptionHandler.addInterceptees(interceptables);
 		}
