@@ -64,11 +64,11 @@ export class Level0MVP extends Level {
 
 		// Setup a Prop Manager
 		this.propManager = new PropManager(levelDetails.terrain, this.main);
-		this.propManager.registerProp('tree_cone', new Vector3(-15, 2, -22), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('tree_cone', new Vector3(-10, 2, -18), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('tree_cone', new Vector3(-12, 2, -25), new Vector3(0, 0, 0), new Vector3(0.75, 0.75, 0.75));
-		this.propManager.registerProp('mountain_1', new Vector3(55, 9, -50), new Vector3(0, 1.5, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('mountain_1', new Vector3(-65, 4, -20), new Vector3(0, 3, 0), new Vector3(1, 0.5, 1));
+		this.propManager.registerProp('tree_cone', new Vector3(-16, 0, -28), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('tree_cone', new Vector3(-10, 0, -30), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('tree_cone', new Vector3(-12, 0, -22), new Vector3(0, 0, 0), new Vector3(0.75, 0.75, 0.75));
+		this.propManager.registerProp('mountain_1', new Vector3(55, 0, -50), new Vector3(0, 1.5, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('mountain_1', new Vector3(-65, 0, -20), new Vector3(0, 3, 0), new Vector3(1, 0.5, 1));
 		this.propManager.renderPropGroups();
 
 		// Setup a Wave Manager
