@@ -3,7 +3,7 @@ import { WindowService } from './WindowService';
 import { DebugService } from './DebugService';
 import { TickService } from './TickService';
 import { SizesInterface } from './WindowService';
-import { GLTFLoadController } from './LoaderService';
+import { LoaderController } from './LoaderService';
 import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
 import { AudioService } from './AudioService';
@@ -27,7 +27,7 @@ export class Main {
 	/**
 	 * Debug mode
 	 * */
-	debugMode: boolean = false;
+	debugMode: boolean;
 
 	/**
 	 * Constructor
@@ -38,10 +38,10 @@ export class Main {
 		this.sizes = sizes;
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-		this.renderer.outputColorSpace  = THREE.SRGBColorSpace; // || LinearSRGBColorSpace
+		this.renderer.outputColorSpace = THREE.SRGBColorSpace; // || LinearSRGBColorSpace
 
 		// Register core services
-		this.registerService('GLTF', new GLTFLoadController());
+		this.registerService('Loader', new LoaderController());
 		this.registerService('Lighting', new LightingService(this));
 		this.registerService('Camera', new CameraService(this));
 		this.registerService('Audio', new AudioService(this));

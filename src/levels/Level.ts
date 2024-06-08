@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Creep } from '../environment/creeps/Creep';
 import { Tower } from '../environment/towers/Tower';
-import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelPath } from './LevelPath';
@@ -10,6 +9,7 @@ import { TickCallback, TickService, TickTimeProperties } from '../core/TickServi
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { Hero } from '../environment/heroes/Hero';
+import { PropManager } from '../environment/PropManager';
 
 export class Level {
 	/**
@@ -25,10 +25,10 @@ export class Level {
 	/**
 	 * Level Assets
 	 * */
+	propManager: PropManager;
 	terrain: Terrain;
 	creeps: Creep[] = [];
 	towers: Tower[] = [];
-	props: Prop[] = [];
 	heroes: Hero[] = [];
 
 	/**
@@ -79,15 +79,6 @@ export class Level {
 	/**
 	 * Adds a prop to the level
 	 * */
-	addProp(prop: Prop, point: THREE.Vector3) {
-		this.props.push(prop);
-		this.main.scene.add(prop.groupMain);
-		prop.groupMain.position.set(point.x, point.y, point.z);
-	}
-
-	/**
-	 * Adds a prop to the level
-	 * */
 	addHero(hero: Hero, point: THREE.Vector3) {
 		this.heroes.push(hero);
 		this.main.scene.add(hero.groupMain);
@@ -126,7 +117,7 @@ export class Level {
 		const sUI: UIService = this.main.s('UI');
 		const sCamera: CameraService = this.main.s('Camera');
 		sTick.end();
-		
+
 		sUI.removeEconomyUI();
 		sUI.removeTowersUI();
 		sUI.removeHeroesUI();

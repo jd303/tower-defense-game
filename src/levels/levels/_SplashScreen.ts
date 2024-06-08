@@ -1,16 +1,18 @@
 import * as THREE from 'three';
 import { perspectiveCameraDefaults } from '../../config/cameraSettingsDefault';
 import { Main } from '../../core/Main';
-import { TreeCone1 } from '../../environment/props/TreeCone1';
 import { UIService } from '../../game/UIService';
 import { CameraService } from '../../core/CameraService';
 import { LightingService } from '../../core/LightingService';
+import { PropManager } from '../../environment/PropManager';
+import { TerrainTypes } from '../../data/LevelInterfaces';
 
 export class SplashScreen {
 	/**
 	 * System Properties
 	 * */
 	main: Main;
+	propManager: PropManager;
 
 	/**
 	 * Properties
@@ -47,15 +49,11 @@ export class SplashScreen {
 		this.main.scene.add(hill2);
 
 		// Load a tree to use
-		const tree = new TreeCone1(main);
-		tree.groupMain.scale.set(5, 5, 5);
-		tree.groupMain.position.set(-15, -10, -35);
-		this.main.scene.add(tree.groupMain);
-		const tree2 = new TreeCone1(main);
-		tree2.groupMain.scale.set(5, 5, 5);
-		tree2.groupMain.position.set(15, -10, -30);
-		tree2.main.scene.add(tree2.groupMain);
-		
+		this.propManager = new PropManager(TerrainTypes.sand, this.main);
+		this.propManager.registerProp('tree_cone', new THREE.Vector3(-15, -9, -35), new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
+		this.propManager.registerProp('tree_cone', new THREE.Vector3(12, -8, -30), new THREE.Vector3(0, 0, 0), new THREE.Vector3(1.75, 1.75, 1.75));
+		this.propManager.renderPropGroups();
+
 		// Load some creatures to be seen
 		//const troll = new Troll(main);
 		//const Wisp = new Wisp(main);

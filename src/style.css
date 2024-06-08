@@ -23,6 +23,17 @@ body {
 }
 
 /**
+DEBUGS
+*/
+.debug_drawcalls {
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	font-size: 14px;
+}
+
+/**
 UI ELEMENTS
 */
 .ui {

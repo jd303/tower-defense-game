@@ -2,12 +2,9 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { perspectiveCameraDefaults } from '../../config/cameraSettingsDefault';
 import { orthographicCameraLevel } from '../../config/cameraSettingsLevel';
-import { Maths } from '../../core/Maths';
 import { Main } from '../../core/Main';
 import { Level } from '../Level';
 import { LevelPath } from '../LevelPath';
-import { TreeCone1 } from '../../environment/props/TreeCone1';
-import { Mountain_Type1 } from '../../environment/props/Mountain_Type1';
 import { WaveManager } from '../WaveManager';
 import { TowerArcher } from '../../environment/towers/TowerArcher';
 import { TowerBomber } from '../../environment/towers/TowerBomber';
@@ -18,6 +15,7 @@ import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
 import { RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
 import { Man0 } from '../../environment/heroes/Man0';
+import { PropManager } from '../../environment/PropManager';
 
 export class Level0MVP extends Level {
 	/**
@@ -64,57 +62,17 @@ export class Level0MVP extends Level {
 			main.scene.add(levelPath.groupMain);
 		});
 
+		// Setup a Prop Manager
+		this.propManager = new PropManager(levelDetails.terrain, this.main);
+		this.propManager.registerProp('tree_cone', new Vector3(-15, 2, -22), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('tree_cone', new Vector3(-10, 2, -18), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('tree_cone', new Vector3(-12, 2, -25), new Vector3(0, 0, 0), new Vector3(0.75, 0.75, 0.75));
+		this.propManager.registerProp('mountain_1', new Vector3(55, 9, -50), new Vector3(0, 1.5, 0), new Vector3(1, 1, 1));
+		this.propManager.registerProp('mountain_1', new Vector3(-65, 4, -20), new Vector3(0, 3, 0), new Vector3(1, 0.5, 1));
+		this.propManager.renderPropGroups();
+
 		// Setup a Wave Manager
 		this.waveManager = new WaveManager(levelDetails.waves, this, this.main);
-
-		// Create 2 tree groups
-		const position1 = { x: -60, z: -10 };
-		const position2 = { x: 25, z: -25 };
-		const position3 = { x: 30, z: 55 };
-		const position4 = { x: -5, z: 15 };
-		for (let i = 0; i < 200; i++) {
-			const tree = new TreeCone1(main);
-
-			const rando1 = (Math.random() - 0.5) * 30;
-			const rando2 = (Math.random() - 0.5) * 30;
-
-			let positionPick: Vector3;
-			const positionRandom = Math.random();
-			if (positionRandom < 0.25) {
-				positionPick = new Vector3(position1.x, 0, position1.z);
-			} else if (positionRandom < 0.5) {
-				positionPick = new Vector3(position2.x, 0, position2.z);
-			} else if (positionRandom < 0.75) {
-				positionPick = new Vector3(position3.x, 0, position3.z);
-			} else {
-				positionPick = new Vector3(position4.x, 0, position4.z);
-			}
-
-			positionPick.x += rando1;
-			positionPick.z += rando2;
-
-			tree.groupMain.rotation.y = Math.PI * Math.random();
-			//tree.groupMain.rotation.x = Math.PI * -0.07; // Fake an Orthographic look
-			//tree.groupMain.rotation.x = Math.PI * -0.35; // Fake an Orthographic look
-
-			tree.groupMain.traverse((child) => (child.castShadow = true));
-
-			this.addProp(tree, positionPick);
-
-			const scale = Math.random() * 2 + 0.5;
-			tree.groupMain.scale.set(scale, scale, scale);
-		}
-
-		// Create Mountains
-		const mountain1 = new Mountain_Type1(main);
-		this.addProp(mountain1, new Vector3(50, 0, -60));
-		mountain1.groupMain.rotation.y = Math.PI * 0.75;
-		mountain1.groupMain.position.y = -2;
-		mountain1.groupMain.scale.set(3, 3, 3);
-		const mountain2 = new Mountain_Type1(main);
-		this.addProp(mountain2, new Vector3(-80, 0, 0));
-		mountain2.groupMain.rotation.y = Math.PI * -0.5;
-		mountain2.groupMain.scale.set(2, 2, 2);
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
@@ -166,7 +124,7 @@ export class Level0MVP extends Level {
 
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
 		}, 1000);
-		
+
 
 		/**
 		 * DEBUG THINGS

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as lil from 'lil-gui';
 import { Light } from './LightingService';
-import { TickService } from './TickService';
+import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
 
 export class DebugService {
@@ -10,6 +10,11 @@ export class DebugService {
 	 * */
 	main: Main;
 	lilGUI: lil.GUI;
+
+	/**
+	 * References
+	 */
+	debugDivRef: HTMLElement | null;
 
 	/**
 	 * Constructor
@@ -23,6 +28,12 @@ export class DebugService {
 			this.lilGUI.add(tickService, 'pauseTick').name('Pause Tick');
 			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
 			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
+
+			const div = document.createElement('div');
+			div.classList.add('debug_drawcalls');
+			document.body.appendChild(div);
+			this.debugDivRef = div;
+			this.main.s('Tick').registerCallback(new TickCallback("DEBUG_DrawCalls", this.measureDebugDrawCalls.bind(this)));
 		}
 
 		return this;
@@ -144,9 +155,16 @@ export class DebugService {
 	 * */
 	addWorldCube(size: number = 100, colour: number = 0xffffff) {
 		const cubeGeometry = new THREE.BoxGeometry(size, size, size, 1, 1, 1);
-		const cubeMaterial = new THREE.MeshBasicMaterial( { color: colour } );
+		const cubeMaterial = new THREE.MeshBasicMaterial({ color: colour });
 		cubeMaterial.side = THREE.BackSide;
 		const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		this.main.scene.add(cubeMesh);
+	}
+
+	/**
+	 * Writes draw calls to the page
+	 * */
+	measureDebugDrawCalls() {
+		if (this.debugDivRef) this.debugDivRef.textContent = "DC: " + this.main.renderer.info.render.calls;
 	}
 }

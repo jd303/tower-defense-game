@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { MovePathDefinition } from '../data/PathInterfaces';
 import { Interactable, InteractableOrders } from '../game/InteractionService';
 import { LocationService } from '../game/LocationService';
 import { LevelService } from '../levels/LevelService';
@@ -74,39 +73,21 @@ export class ModelAsset {
 	/**
 	 * Loads the model
 	 * */
-	loadModel() {
-		this.main.s('GLTF').loadModel(this.assetPath, this.loadModelComplete.bind(this), this.loadProgress.bind(this), this.loadError.bind(this));
-	}
-
-	/**
-	 * The assets loaded properly
-	 * */
-	loadModelComplete(gltfAsset: any) {
+	async loadModel() {
+		const model = await this.main.s('Loader').loadModel(this.assetPath);
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.add(...gltfAsset.scene.children);
+		this.groupModel.add(...model.scene.children);
 		this.enableShadows();
 	}
 
 	/**
-	 * Add mesh manuall
+	 * Add mesh manually
 	 * */
 	createMesh(geometry: THREE.BufferGeometry, material: THREE.Material) {
 		this.mesh = new THREE.Mesh(geometry, material);
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
 		this.groupModel.add(this.mesh);
 		this.enableShadows();
-	}
-
-	/**
-	 * The assets triggered a progress load
-	 * */
-	loadProgress() {}
-
-	/**
-	 * The assets failed to load
-	 * */
-	loadError(err: any) {
-		console.log('ERR', err);
 	}
 
 	/**
@@ -210,7 +191,7 @@ export class ModelAsset {
 	 * Finalises what happens at the end of a path
 	 * Overwritten by individual classes
 	 * */
-	finaliseEndOfPath() {}
+	finaliseEndOfPath() { }
 
 	/**
 	 * When the Hero is healed
@@ -220,7 +201,7 @@ export class ModelAsset {
 
 		this.stateExitHealing();
 
-		for (let x=0; x<4; x++) {
+		for (let x = 0; x < 4; x++) {
 			const thisCross = ModelCommons.healingCrossMesh();
 			thisCross.position.x += Math.random() - 0.5;
 			thisCross.position.y += Math.random();
@@ -229,7 +210,7 @@ export class ModelAsset {
 
 			healingAnimationGroup.add(thisCross);
 		}
-		
+
 		healingAnimationGroup.name = "HealingAnimation";
 
 		this.groupMain.add(healingAnimationGroup);
@@ -254,15 +235,15 @@ export class ModelAsset {
 	/**
 	 * Overwritten
 	 * */
-	defaultClick() {}
-	select() {}
-	deselect() {}
+	defaultClick() { }
+	select() { }
+	deselect() { }
 }
 
 export class ModelCommons {
 	/* Health Bar Commons */
 	static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
-	static healthBarVertices: Float32Array = new Float32Array( [
+	static healthBarVertices: Float32Array = new Float32Array([
 		-1, 0, 0,
 		1, 0, 0,
 		1, 0.25, 0,
@@ -270,14 +251,14 @@ export class ModelCommons {
 		-1, 0.25, 0,
 		-1, 0, 0,
 	]);
-	
+
 	static healthBarBGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: 'grey' });
 	static healthBarFGMaterial: THREE.Material = new THREE.MeshBasicMaterial({ color: '#7AE33E' });
 
 	/** Healing commons */
 	static healingCrossBeamHorizontal = new THREE.BoxGeometry(0.5, 0.1, 0.05);
 	static healingCrossBeamVertical = new THREE.BoxGeometry(0.10, 0.5, 0.05);
-	static healingCrossMaterial = new THREE.MeshPhongMaterial({color: 0x00ff00});
+	static healingCrossMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
 	static healingCrossMerge = BufferGeometryUtils.mergeGeometries([this.healingCrossBeamHorizontal, this.healingCrossBeamVertical]);
 	static healingCrossMesh = () => { return new THREE.Mesh(this.healingCrossMerge, this.healingCrossMaterial); }
 
