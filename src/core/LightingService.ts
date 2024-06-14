@@ -106,9 +106,10 @@ export class LightingService {
 			(light.threeLight.shadow.camera as any).top = 250;
 			(light.threeLight.shadow.camera as any).near = 0.5;
 			(light.threeLight.shadow.camera as any).far = 250;
-			//directionalLight.shadow.radius = 10; // Adds 'blur' to shadows
-			//directionalLight.shadow.type = THREE.PCFSoftShadowMap;
-			light.threeLight.shadow.normalBias = 0.03;
+			//light.threeLight.shadow.radius = 10; // Adds 'blur' to shadows
+			//(light.threeLight.shadow as any).type = THREE.PCFSoftShadowMap;
+			light.threeLight.shadow.normalBias = 0.4; // 0.03
+
 		}
 	}
 
@@ -133,7 +134,7 @@ export class LightingService {
 	enableLight(lightToEnable: string | Light) {
 		let light = null;
 
-		if (typeof(lightToEnable) == "string") {
+		if (typeof (lightToEnable) == "string") {
 			light = this.getLightByName(lightToEnable);
 		} else if (lightToEnable instanceof Light) {
 			light = lightToEnable;

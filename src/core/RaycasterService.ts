@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { Main } from '../core/Main';
 import { Creep } from '../environment/creeps/Creep';
-import { Prop } from '../environment/Prop';
 import { Terrain } from '../environment/Terrain';
 import { LevelPath } from '../levels/LevelPath';
 import { Tower } from '../environment/towers/Tower';
@@ -93,15 +92,15 @@ export class RaycasterService {
 
 		// Find the first intersection, using our own top-down ordering system
 		let intersected: RaycasterIntersection | null = null;
-		for (let i=0; i <targets.length; i++) {
+		for (let i = 0; i < targets.length; i++) {
 			let subject = targets[i];
 
-			let intersectsTarget = this.raycaster?.intersectObjects( [subject.object['groupMain']] );
+			let intersectsTarget = this.raycaster?.intersectObjects([subject.object['groupMain']]);
 			if (intersectsTarget?.length) {
 
 				// Check that we don't also intersect with a cancelTarget
-				let intersectsCancel = this.raycaster?.intersectObjects( cancelTargets.map(target => target.object['groupMain']) );
-				
+				let intersectsCancel = this.raycaster?.intersectObjects(cancelTargets.map(target => target.object['groupMain']));
+
 				if (!intersectsCancel?.length) {
 					intersected = {
 						point: intersectsTarget[0],
@@ -133,10 +132,10 @@ export class RaycasterService {
 
 		// Find the first intersection, using our own top-down ordering system
 		let intersected: RaycasterIntersection | null = null;
-		for (let i=0; i <this.raycasterSubjects.length; i++) {
+		for (let i = 0; i < this.raycasterSubjects.length; i++) {
 			let subject = this.raycasterSubjects[i];
 
-			let intersects = this.raycaster?.intersectObjects( [subject.object['groupMain']] );
+			let intersects = this.raycaster?.intersectObjects([subject.object['groupMain']]);
 			if (intersects?.length) {
 				intersected = {
 					point: intersects[0],
@@ -161,24 +160,23 @@ export class RaycasterService {
 }
 
 interface ClickHandler {
-	target: Hero | Prop | Creep | Tower | Terrain | LevelPath;
+	target: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
 	onClick: Function;
 	onComplete: Function;
 }
 
 interface RaycasterSubject {
 	order: RaycasterOrders;
-	object: Hero | Prop | Creep | Tower | Terrain | LevelPath;
+	object: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
 }
 
 export interface RaycasterIntersection {
 	point: any,
-	object: Hero | Prop | Creep | Tower | Terrain | LevelPath;
+	object: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
 }
 
 export enum RaycasterOrders {
 	"terrain" = 0,
-	"props" = 1,
-	"towers" = 2,
-	"heroes" = 3,
+	"towers" = 1,
+	"heroes" = 2,
 }

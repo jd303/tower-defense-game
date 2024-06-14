@@ -66,6 +66,9 @@ export class PathService {
 		return curvePath;
 	}
 
+	/**
+	 * Creates a straight path segment
+	 */
 	createStraightPathSegments(startPos: Vector3, endPos: Vector3) {
 		const pathSegments: PathSegment[] = [{
 			type: PathTypes.straight,
@@ -74,6 +77,31 @@ export class PathService {
 
 		return pathSegments;
 	}
+
+	/**
+	 * Creates an array of segments from a list of points
+	 */
+	/*createSegmentArrayFromPoints(points: Vector3[] | { x: number, y: number, z: number }[], controlPoints: Vector3[] | { x: number, y: number, z: number }[] = [], type: PathTypes = PathTypes.bezier): PathSegment[] {
+		const vectorPoints = points.map(point => {
+			const vectorPoint = point instanceof Vector3 && point || new Vector3(point.x, point.y, point.z);
+			return {
+				type: type,
+				points: Vector3[],
+				controlPoints?: Vector3[];
+			}
+		});
+		const segmentsArray = 
+		return [];
+	}*/
+
+	/**
+	 * Convenience function: calls createSegmentArrayFromPoints and createPathFromSegments
+	 */
+	/*createPathFromPoints(points: Vector3[] | { x: number, y: number, z: number }[], type: PathTypes = PathTypes.bezier) {
+		const segmentsArray = this.createSegmentArrayFromPoints(points, type);
+		const path = this.createPathFromSegments(segmentsArray);
+		return path;
+	}*/
 
 	/**
 	 * Makes a copy of an array and a clone of object items

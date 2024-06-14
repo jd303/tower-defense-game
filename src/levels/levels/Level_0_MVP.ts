@@ -13,9 +13,8 @@ import { levelDetails } from './Level_0_MVP_JSON';
 import { EconomyService } from '../../game/EconomyService';
 import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
-import { RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
 import { Man0 } from '../../environment/heroes/Man0';
-import { PropManager } from '../../environment/PropManager';
+import { PropManager, PropZoneStrategy } from '../../environment/PropManager';
 
 export class Level0MVP extends Level {
 	/**
@@ -64,21 +63,20 @@ export class Level0MVP extends Level {
 
 		// Setup a Prop Manager
 		this.propManager = new PropManager(levelDetails.terrain, this.main);
-		this.propManager.registerProp('tree_cone', new Vector3(-16, 0, -28), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('tree_cone', new Vector3(-10, 0, -30), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('tree_cone', new Vector3(-12, 0, -22), new Vector3(0, 0, 0), new Vector3(0.75, 0.75, 0.75));
-		this.propManager.registerProp('mountain_1', new Vector3(55, 0, -50), new Vector3(0, 1.5, 0), new Vector3(1, 1, 1));
-		this.propManager.registerProp('mountain_1', new Vector3(-65, 0, -20), new Vector3(0, 3, 0), new Vector3(1, 0.5, 1));
-		this.propManager.renderPropGroups();
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-16, 0, -28) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-10, 0, -30) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-12, 0, -22), scale: new Vector3(0.75, 0.75, 0.75) });
+		this.propManager.registerProp('mountain_1', { position: new Vector3(55, 0, -50), rotate: new Vector3(0, 1.5, 0) });
+		this.propManager.registerProp('mountain_1', { position: new Vector3(-65, 0, -20), scale: new Vector3(1, 0.5, 1), rotate: new Vector3(0, 3, 0) });
+		this.propManager.registerProp('mesa_1', { position: new Vector3(50, 0, 10) });
+		this.propManager.registerPropZone('tree_cone', { zonePath: [], count: 50, zoneStrategy: PropZoneStrategy.centerOut, scaleRandom: 0.5, rotateRandom: 0.5 });
+		this.propManager.render();
 
 		// Setup a Wave Manager
 		this.waveManager = new WaveManager(levelDetails.waves, this, this.main);
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
-		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.enableRaycaster();
-		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: this.terrain }]); // Listen to clicks on terrain
-		sRaycaster.addRaycasterSubjects(this.levelPaths.map(path => { return { order: RaycasterOrders.props, object: path } })); // Listen to clicks on level paths
+		this.main.s('Debug').listenToTerrainClicks(this.terrain);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
 		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");

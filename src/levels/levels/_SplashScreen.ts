@@ -50,9 +50,9 @@ export class SplashScreen {
 
 		// Load a tree to use
 		this.propManager = new PropManager(TerrainTypes.sand, this.main);
-		this.propManager.registerProp('tree_cone', new THREE.Vector3(-15, -9, -35), new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
-		this.propManager.registerProp('tree_cone', new THREE.Vector3(12, -8, -30), new THREE.Vector3(0, 0, 0), new THREE.Vector3(1.75, 1.75, 1.75));
-		this.propManager.renderPropGroups();
+		this.propManager.registerProp('tree_cone', { position: new THREE.Vector3(-15, -10, -35) });
+		this.propManager.registerProp('tree_cone', { position: new THREE.Vector3(12, -10, -30), scale: new THREE.Vector3(1.75, 1.75, 1.75) });
+		this.propManager.render();
 
 		// Load some creatures to be seen
 		//const troll = new Troll(main);

@@ -3,6 +3,8 @@ import * as lil from 'lil-gui';
 import { Light } from './LightingService';
 import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
+import { RaycasterOrders, RaycasterService } from './RaycasterService';
+import { Terrain } from '../environment/Terrain';
 
 export class DebugService {
 	/**
@@ -29,18 +31,14 @@ export class DebugService {
 			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
 			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
 
-			const div = document.createElement('div');
-			div.classList.add('debug_drawcalls');
-			document.body.appendChild(div);
-			this.debugDivRef = div;
-			this.main.s('Tick').registerCallback(new TickCallback("DEBUG_DrawCalls", this.measureDebugDrawCalls.bind(this)));
+			this.watchDrawCalls();
 		}
 
 		return this;
 	}
 
 	/**
-	 * Adds a debug number control
+	 * Adds a debug number control to lilGUI
 	 * */
 	addDebugNumber(args: { folder: any; objectParent: any; property: string; min: number; max: number; step: number; name: string | null }) {
 		let parent;
@@ -58,6 +56,9 @@ export class DebugService {
 			.name(args.name || args.property);
 	}
 
+	/**
+	 * Allows us to debug a property.  If 'property' is a function, calls the function
+	 */
 	addGUIDebugProperty(objectParent: any, property: string, options: any = null) {
 		const debugItem = this.lilGUI.add(objectParent, property).name(options?.name || property);
 
@@ -67,10 +68,6 @@ export class DebugService {
 			if (options.max) debugItem.min(options.max);
 			if (options.step) debugItem.min(options.step);
 		}
-	}
-
-	addGUIDebugFunction(objectParent: any, property: string, callback: Function, name: string | null = null) {
-		this.lilGUI.add(objectParent, property).name(name || property);
 	}
 
 	/**
@@ -159,6 +156,27 @@ export class DebugService {
 		cubeMaterial.side = THREE.BackSide;
 		const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		this.main.scene.add(cubeMesh);
+	}
+
+	/**
+	 * Writes draw calls to the page
+	 * */
+	listenToTerrainClicks(terrain: Terrain) {
+		const sRaycaster: RaycasterService = this.main.s('Raycaster');
+		sRaycaster.enableRaycaster();
+		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: terrain }]); // Listen to clicks on terrain
+		//sRaycaster.addRaycasterSubjects(this.levelPaths.map(path => { return { order: RaycasterOrders.props, object: path } })); // Used to listen to clicks on props, but props don't exist anymore - if you need it again, you'll need to setup raycasting for all MeshInstances in PropManager
+	}
+
+	/**
+	 * Writes draw calls to the page
+	 * */
+	watchDrawCalls() {
+		const div = document.createElement('div');
+		div.classList.add('debug_drawcalls');
+		document.body.appendChild(div);
+		this.debugDivRef = div;
+		this.main.s('Tick').registerCallback(new TickCallback("DEBUG_DrawCalls", this.measureDebugDrawCalls.bind(this)));
 	}
 
 	/**
