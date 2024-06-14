@@ -9,6 +9,14 @@ export class Maths {
 	}
 
 	/**
+	 * Adds a random range to either side of a number
+	 */
+	static addBipolarRandom(original: number, randomRange: number) {
+		const randomFactor = Math.random() * 2 - 1;
+		return original + randomFactor * randomRange;
+	}
+
+	/**
 	 * Generates numberOfItems positions in a grid of size range x range
 	 */
 	static generateRandomPositions(numberOfItems: number, range: number, minimumDistance: number = 1) {

@@ -45,7 +45,7 @@ export class MovePathManager {
 	resolveEndOfPath(): boolean {
 		if (this.activePath?.switchToOnComplete) {
 			const switchablePath = this.paths.find(path => path.id = this.activePath!.switchToOnComplete!);
-			
+
 			if (switchablePath) {
 				this.removePath(this.activePath.id);
 				this.activePath = switchablePath;
@@ -71,18 +71,19 @@ export class MovePathManager {
 	 * */
 	rejoinCorePath() {
 		const corePath = this.paths.find(path => path.id = "core");
-		
+
 		if (corePath) {
 			const sPath: PathService = this.parent.main.s('Path');
 			corePath.pathProgress += 0.03;
 			const rejoinPoint = corePath.path.getPointAt(corePath.pathProgress) as Vector3;
-			const rejoinPath = sPath.createMovePath('rejoin', sPath.createStraightPathSegments(this.parent.groupMain.position, rejoinPoint));
+			console.log("MIGHE BE TRICKY HERE");
+			const rejoinPath = sPath.createMovePath('rejoin', [{ point: this.parent.groupMain.position }, { point: rejoinPoint }]);
 			rejoinPath.switchToOnComplete = "core";
 			this.parent.stateMachine.activateStateByName('uninterceptable');
 			this.parent.movePathManager.addPath(rejoinPath);
 			this.parent.movePathManager.setActivePath(rejoinPath.id, false);
 		} else {
-			return new Error('Core Path not set');			
+			return new Error('Core Path not set');
 		}
 	}
 }

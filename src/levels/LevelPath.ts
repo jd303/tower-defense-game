@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { MovePathDefinition, PathDefinition, PathSegment, PathGeometryTypes } from '../data/PathInterfaces';
+import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../data/PathInterfaces';
 import { Main } from '../core/Main';
 import { Interactable, InteractableOrders } from '../game/InteractionService';
+import { PathService } from '../game/PathService';
 
 export class LevelPath {
 	/**
@@ -21,7 +22,7 @@ export class LevelPath {
 	corePath: MovePathDefinition = {
 		id: 'core',
 		active: true,
-		segments: [],
+		pathPoints: [],
 		pathLength: 0,
 		path: new THREE.CurvePath(),
 		pathProgress: 0,
@@ -36,7 +37,7 @@ export class LevelPath {
 	constructor(pathDefinition: PathDefinition, main: Main) {
 		this.id = pathDefinition.id;
 		this.main = main;
-		this.setCorePath(pathDefinition.segments);
+		this.setCorePath(pathDefinition.pathPoints);
 		this.createPathGeometry(pathDefinition);
 
 		this.setInteractive(main);
@@ -47,10 +48,11 @@ export class LevelPath {
 	/**
 	 * Sets the core path
 	 * */
-	setCorePath(pathSegments: PathSegment[]) {
-		const sPath = this.main.s('Path');
-		this.corePath.segments = pathSegments;
-		this.corePath.path = sPath.createPathFromSegments(pathSegments);
+	setCorePath(pathPoints: PathPoint[]) {
+		const sPath: PathService = this.main.s('Path');
+		this.corePath.pathPoints = pathPoints;
+		console.log("SETTING FROM", pathPoints);
+		this.corePath.path = sPath.createPathFromPathPoints(pathPoints);
 		this.corePath.pathLength = this.corePath.path.getLength();
 	}
 
@@ -60,7 +62,7 @@ export class LevelPath {
 	createVariantPath() {
 		const sPath = this.main.s('Path');
 
-		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.segments, this.getRandomAdjustX(), this.getRandomAdjustZ());
+		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.pathPoints, this.getRandomAdjustX(), this.getRandomAdjustZ());
 		this.variantPaths.push(variantPath);
 		return variantPath;
 	}

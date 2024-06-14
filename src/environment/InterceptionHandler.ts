@@ -11,14 +11,14 @@ export class InterceptionHandler {
 	parent: Hero;
 	positions = {
 		"occupied_1":
-		[
-			new Vector3(3, 0, 0)
-		],
+			[
+				new Vector3(3, 0, 0)
+			],
 		"occupied_2":
-		[
-			new Vector3(2.5, 0, -1.5),
-			new Vector3(3, 0, 1.5)
-		]
+			[
+				new Vector3(2.5, 0, -1.5),
+				new Vector3(3, 0, 1.5)
+			]
 	};
 
 	/**
@@ -51,13 +51,13 @@ export class InterceptionHandler {
 				this.interceptionSlots = [
 					...this.interceptionSlots,
 					...Array.apply(null,
-							Array(count - this.interceptionSlots.length))
-							.map(() => { return { occupant: undefined, relativeX: 0, relativeZ: 0 } }
+						Array(count - this.interceptionSlots.length))
+						.map(() => { return { occupant: undefined, relativeX: 0, relativeZ: 0 } }
 						)
 				];
 				break;
 			case this.interceptionSlots.length > count:
-				for (let x = this.interceptionSlots.length-1; x > count - 1; x--) {
+				for (let x = this.interceptionSlots.length - 1; x > count - 1; x--) {
 					console.log("%c TODO: REMOVE SLOT IN setInterceptionSlotCount:", 'color: red');
 					console.log("%c TODO: REMOVE SLOT IN setInterceptionSlotCount:", 'color: red');
 					console.log("%c TODO: REMOVE SLOT IN setInterceptionSlotCount:", 'color: red');
@@ -104,7 +104,7 @@ export class InterceptionHandler {
 				const sPath: PathService = this.parent.main.s('Path');
 				const parentPosition = this.parent.groupMain.position.clone();
 				const position = parentPosition.add(positions[index]);
-				const path = sPath.createMovePath('intercept', sPath.createStraightPathSegments(slot.occupant.groupMain.position, position));
+				const path = sPath.createMovePath('intercept', [{ point: slot.occupant.groupMain.position }, { point: position }]);
 				slot.occupant.movePathManager.addPath(path);
 				slot.occupant.movePathManager.setActivePath(path.id, false);
 				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');

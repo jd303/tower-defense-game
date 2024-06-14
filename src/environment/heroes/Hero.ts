@@ -62,7 +62,7 @@ export class Hero extends ModelAsset {
 	 * */
 	constructor(main: Main) {
 		super(main);
-		
+
 		this.stateMachine = this.setDefaultStates();
 		this.setupInteractions();
 		this.setInteractive();
@@ -230,10 +230,10 @@ export class Hero extends ModelAsset {
 			default:
 				if (!this.healthBar) this.createHealthBar();
 				else this.updateHealthBar();
-	
+
 				this.stateMachine.transition(HeroTransitions.took_damage);
 				break;
-			}
+		}
 	}
 
 	/**
@@ -247,11 +247,11 @@ export class Hero extends ModelAsset {
 	 * Registers movement
 	 * */
 	registerMovement(intersect: RaycasterIntersection) {
-		console.log("Register Movement");
 		const sPath: PathService = this.main.s('Path');
 
 		this.movePathManager.removePath('activemovement');
-		const movePath = sPath.createMovePath('activemovement', sPath.createStraightPathSegments(this.groupMain.position, intersect.point.point));
+		const movePath = sPath.createMovePath('activemovement', [{ point: this.groupMain.position }, { point: intersect.point.point }]);
+		console.log(movePath);
 		this.movePathManager.addPath(movePath);
 		this.movePathManager.setActivePath(movePath.id);
 		this.stateMachine.transition(HeroTransitions.moving);
@@ -265,7 +265,7 @@ export class Hero extends ModelAsset {
 	createHealthBar() {
 		const barBG = ModelCommons.healthBarGeometry;
 		const barFG = ModelCommons.healthBarGeometry;
-		barBG.setAttribute( 'position', new THREE.BufferAttribute( ModelCommons.healthBarVertices, 3 ) );
+		barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3));
 		const healthBarGroup = new THREE.Group();
 		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
@@ -329,7 +329,7 @@ export class Hero extends ModelAsset {
 	/**
 	 * Overridden functions
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 
 	/**
 	 * When Idling
@@ -404,8 +404,8 @@ export class Hero extends ModelAsset {
 	/**
 	 * Hero Powers
 	 * */
-	activateStandingPower() {}
-	activateIdlePower() {}
+	activateStandingPower() { }
+	activateIdlePower() { }
 
 	/**
 	 ******************************************************* UI INTERACTIONS
