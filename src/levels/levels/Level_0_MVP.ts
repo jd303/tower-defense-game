@@ -69,7 +69,7 @@ export class Level0MVP extends Level {
 		this.propManager.registerProp('mountain_1', { position: new Vector3(-65, 0, -20), scale: new Vector3(1, 0.5, 1), rotate: new Vector3(0, 3, 0) });
 		this.propManager.registerProp('mesa_1', { position: new Vector3(50, 0, 10) });
 
-		console.log("NEXT UP, shift zone definition here to Level JSON");
+		console.log("NEXT UP, shift zone definition here to Level JSON - OR Remove the zones altogether (sigh) in favour of curated placements");
 		const points = [
 			{ point: new Vector3(-19.84615384615385, 6.8441556963370904e-15, -30.823337043689378) },
 			{ point: new Vector3(-21.815384615384612, 5.316442371261847e-15, -23.943127882151572) },
@@ -90,7 +90,7 @@ export class Level0MVP extends Level {
 			{ point: new Vector3(-7.415384615384617, -6.133859804207103e-15, -36.37555127143003) },
 			{ point: new Vector3(-17.200000000000003, 7.199032143013888e-15, -32.42155847670557) }
 		];
-		this.propManager.registerPropZone('tree_cone', { zonePathPoints: points, densityUnits: 6, zoneStrategy: PropZoneStrategy.centerOut, positionRandom: 1, scaleRandom: 0.5, rotateRandom: 0.5 });
+		this.propManager.registerPropZone('tree_cone', { zonePathPoints: points, densityUnits: 6, zoneStrategy: PropZoneStrategy.centerOut, positionRandom: 3, scaleRandom: 0.5, rotateRandom: 0.5 });
 
 		const points2 = [
 			{ point: new Vector3(-22.676923076923078, 1.222170660060197e-15, -5.504167329230256) },
@@ -113,16 +113,30 @@ export class Level0MVP extends Level {
 			{ point: new Vector3(-20.615384615, 1.1031286304418399e-15, -4.517689726262546) },
 			{ point: new Vector3(-22.676923076923078, 1.222170660060197e-15, -5.504167329230256) }
 		];
+		this.propManager.registerPropZone('tree_cone', { zonePathPoints: points2, densityUnits: 6, zoneStrategy: PropZoneStrategy.centerOut, positionRandom: 3, scaleRandom: 0.5, rotateRandom: 0.5 });
 
-		this.propManager.registerPropZone('tree_cone', { zonePathPoints: points2, densityUnits: 6, zoneStrategy: PropZoneStrategy.centerOut, positionRandom: 1, scaleRandom: 0.5, rotateRandom: 0.5 });
+		const rockPoints = [
+			{ point: new Vector3(-23.378307177266624, 1.706311195879317e-15, -7.684542465940197) },
+			{ point: new Vector3(-24.045651885529978, 1.4392697459890206e-14, -0.818946917217815) },
+			{ point: new Vector3(-18.03954951115977, 1.4007533288607849e-14, 0.9156783010458724) },
+			{ point: new Vector3(-15.164833844794547, -1.3172516941302624e-14, -4.676257611617956) },
+			{ point: new Vector3(-20.400923094245496, 1.922947762375663e-15, -8.660186826087966) }
+		];
+		this.propManager.registerPropZone('rock_1', { zonePathPoints: rockPoints, densityUnits: 2, zoneStrategy: PropZoneStrategy.centerOut, positionRandom: 1.5, scaleRandom: 0.5, rotateRandom: 0.5 });
 
 		this.propManager.render();
+
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-50, 0, -28) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-50, 0, -30) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-50, 0, -32) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-50, 0, -35) });
+		this.propManager.registerProp('tree_cone', { position: new Vector3(-50, 0, -38) });
 
 		// Setup a Wave Manager
 		this.waveManager = new WaveManager(levelDetails.waves, this, this.main);
 
 		// LISTEN TO CLICKS ON TERRAIN TO HELP CREATE PATHS
-		this.main.s('Debug').listenToTerrainClicks(this.terrain);
+		this.main.s('Debug').listenToTerrainLocationClicks(this.terrain);
 
 		// Create Lights (maybe temp, if we can get MatCaps to work
 		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");

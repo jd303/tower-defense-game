@@ -8,6 +8,7 @@ export const TreeProps: PropAsset[] = [
 		name: "tree_cone",
 		assetPath: 'assets/models/nature/Tree_Cone_Merged_1.glb',
 		texturePath: 'assets/models/nature/Tree_Cone_Merged_1.jpg',
-		defaultScale: new Vector3(0.75, 0.75, 0.75)
+		defaultScale: new Vector3(0.5, 0.5, 0.5),
+		shadows: true
 	}
 ]

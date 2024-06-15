@@ -80,7 +80,6 @@ export class PropManager {
 					}
 
 					this.registerProp(propName, { position: new Vector3(x, 0, z), scale: new Vector3(scaleX, scaleY, scaleZ) });
-					console.log(x, z);
 				}
 			}
 		}
@@ -160,7 +159,7 @@ export class PropManager {
 			iMesh.setMatrixAt(x, matrix_random);
 		}
 
-		iMesh.castShadow = true;
+		iMesh.castShadow = propGroup.asset.shadows;
 		iMesh.receiveShadow = true;
 		propGroup.loadedMaterial.needsUpdate = true;
 		this.main.scene.add(iMesh);
@@ -205,6 +204,7 @@ export interface PropAsset {
 	assetPath: string;
 	texturePath: string;
 	defaultScale?: Vector3;
+	shadows: boolean;
 }
 
 export interface PropAssetPlacement {

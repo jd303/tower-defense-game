@@ -5,6 +5,7 @@ import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
 import { RaycasterOrders, RaycasterService } from './RaycasterService';
 import { Terrain } from '../environment/Terrain';
+import { DebugSpline } from './DebugSplineClass';
 
 export class DebugService {
 	/**
@@ -14,9 +15,21 @@ export class DebugService {
 	lilGUI: lil.GUI;
 
 	/**
+	 * Debug Callback properties
+	 */
+	callbacks = {
+		makeSpline: this.makeSpline.bind(this),
+		addSplinePointToStart: this.addSplinePointToStart.bind(this),
+		addSplinePointToEnd: this.addSplinePointToEnd.bind(this),
+		exportSpline: this.exportSpline.bind(this),
+		destroySpline: this.destroySpline.bind(this),
+	}
+
+	/**
 	 * References
 	 */
 	debugDivRef: HTMLElement | null;
+	debugSpline?: DebugSpline;
 
 	/**
 	 * Constructor
@@ -32,6 +45,7 @@ export class DebugService {
 			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
 
 			this.watchDrawCalls();
+			this.addSplineLilGUI();
 		}
 
 		return this;
@@ -161,7 +175,7 @@ export class DebugService {
 	/**
 	 * Writes draw calls to the page
 	 * */
-	listenToTerrainClicks(terrain: Terrain) {
+	listenToTerrainLocationClicks(terrain: Terrain) {
 		const sRaycaster: RaycasterService = this.main.s('Raycaster');
 		sRaycaster.enableRaycaster();
 		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: terrain }]); // Listen to clicks on terrain
@@ -184,5 +198,52 @@ export class DebugService {
 	 * */
 	measureDebugDrawCalls() {
 		if (this.debugDivRef) this.debugDivRef.textContent = "DC: " + this.main.renderer.info.render.calls;
+	}
+
+	/**
+	 * Adds 
+	 */
+	addSplineLilGUI() {
+		const folder = this.lilGUI.addFolder('Spline Tools');
+		folder.open(false);
+		folder.add(this.callbacks, 'makeSpline');
+		folder.add(this.callbacks, 'addSplinePointToStart');
+		folder.add(this.callbacks, 'addSplinePointToEnd');
+		folder.add(this.callbacks, 'exportSpline');
+		folder.add(this.callbacks, 'destroySpline');
+	}
+
+	/**
+	 * Adds a Spline to the scene
+	 */
+	makeSpline() {
+		if (this.debugSpline) this.debugSpline.destroy();
+		this.debugSpline = new DebugSpline(this.main);
+		console.log("Make Spline");
+	}
+
+	/**
+	 * Add points to the spline
+	 */
+	addSplinePointToStart() {
+		this.debugSpline?.addPointToStart();
+	}
+	addSplinePointToEnd() {
+		this.debugSpline?.addPointToEnd();
+	}
+
+	/**
+	 * Exports a Spline to the console
+	 */
+	exportSpline() {
+		console.log("Export spline");
+		this.debugSpline?.exportPoints();
+	}
+
+	/**
+	 * Destroys the spline
+	 */
+	destroySpline() {
+		this.debugSpline?.destroy();
 	}
 }

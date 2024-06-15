@@ -1,12 +1,10 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
 import { Main } from '../core/Main';
 import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { LevelPath } from '../levels/LevelPath';
 import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
-import { CameraService } from './CameraService';
 import { ModelAsset } from '../environment/ModelAsset';
 import { Interactable } from '../game/InteractionService';
 
@@ -17,7 +15,6 @@ export class RaycasterService {
 	raycaster?: THREE.Raycaster | null;
 	clickWatcher: any;
 	raycasterSubjects: RaycasterSubject[] = [];
-	clickHandlers: ClickHandler[] = [];
 
 	/**
 	 * System Properties
@@ -47,13 +44,6 @@ export class RaycasterService {
 		this.raycasterSubjects = this.raycasterSubjects.filter((subject) => {
 			return !subjectsSet.has(subject);
 		});
-	}
-
-	/**
-	 * Removes a click handler
-	 * */
-	removeClickHandler(removedOnClick: Function) {
-		this.clickHandlers = this.clickHandlers.filter((ch) => ch.onClick != removedOnClick);
 	}
 
 	/**
@@ -144,25 +134,7 @@ export class RaycasterService {
 				break;
 			}
 		}
-
-		// If we have intersected
-		if (intersected !== null) {
-
-			this.clickHandlers.forEach((handler) => {
-				if (handler.target == intersected?.object) {
-					handler.onClick(intersected, this.main);
-				}
-
-				if (handler.onComplete) handler.onComplete();
-			});
-		}
 	}
-}
-
-interface ClickHandler {
-	target: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
-	onClick: Function;
-	onComplete: Function;
 }
 
 interface RaycasterSubject {

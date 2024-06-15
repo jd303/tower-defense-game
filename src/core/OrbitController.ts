@@ -19,4 +19,18 @@ export class OrbitController {
 
 		return this;
 	}
+
+	/**
+	 * Enables availability of orbit controls
+	 */
+	enable() {
+		this.controls.enabled = true;
+	}
+
+	/**
+	 * Disables availability of orbit controls
+	 */
+	disable() {
+		this.controls.enabled = false;
+	}
 }

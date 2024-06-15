@@ -17,7 +17,7 @@ export const orthographicCameraLevel: CameraSettings = {
 	x: 0,
 	y: 75,
 	z: 150,
-	minPolarAngle: Math.PI * 0.2,
+	minPolarAngle: Math.PI * 0, //0.2 for better results
 	maxPolarAngle: Math.PI * 0.4,
 	minAzimuthAngle: 0,
 	maxAzimuthAngle: 0,
