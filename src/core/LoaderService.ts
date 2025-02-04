@@ -1,8 +1,9 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import THREE, { TextureLoader } from 'three';
+import { Service } from './Service';
 
-export class LoaderController {
+export class LoaderService extends Service {
 	dracoLoader: DRACOLoader;
 	gltfLoader: GLTFLoader;
 	textureLoader: TextureLoader;
@@ -11,6 +12,8 @@ export class LoaderController {
 	 * Constructor
 	 * */
 	constructor() {
+		super();
+
 		this.dracoLoader = new DRACOLoader();
 		this.dracoLoader.setDecoderPath('/static/draco/');
 

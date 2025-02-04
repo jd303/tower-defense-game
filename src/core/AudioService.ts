@@ -1,4 +1,5 @@
 import { Main } from './Main';
+import { Service } from './Service';
 
 /**
  * Audio Service that uses the Web Audio API
@@ -8,7 +9,7 @@ import { Main } from './Main';
  * Effects are nodes like Gain, Pan, etc.
  * Graphs are full track nodes: tracks connected to effects and the context's destination / output.
  * */
-export class AudioService {
+export class AudioService extends Service {
 	main: Main;
 
 	/**
@@ -26,6 +27,8 @@ export class AudioService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 

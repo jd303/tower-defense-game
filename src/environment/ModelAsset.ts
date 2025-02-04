@@ -11,7 +11,7 @@ import { HeroStats } from './heroes/HeroStats';
 import { TowerStats } from './towers/TowerStats';
 import { StateMachine } from '../core/StateMachine';
 
-export class ModelAsset {
+export abstract class ModelAsset {
 	/**
 	 * Setup Properties
 	 * */

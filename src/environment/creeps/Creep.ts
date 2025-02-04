@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
-import { MovePathDefinition } from '../../data/PathInterfaces';
 import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
@@ -53,7 +52,7 @@ export class Creep extends ModelAsset {
 	 * */
 	constructor(main: Main) {
 		super(main);
-		
+
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(CreepStates.pathmoving);
 
@@ -208,10 +207,10 @@ export class Creep extends ModelAsset {
 			default:
 				if (!this.healthBar) this.createHealthBar();
 				else this.updateHealthBar();
-	
+
 				this.stateMachine.transition(CreepTransitions.took_damage);
 				break;
-			}
+		}
 	}
 
 	/**
@@ -268,7 +267,7 @@ export class Creep extends ModelAsset {
 	createHealthBar() {
 		const barBG = ModelCommons.healthBarGeometry;
 		const barFG = ModelCommons.healthBarGeometry;
-		barBG.setAttribute( 'position', new THREE.BufferAttribute( ModelCommons.healthBarVertices, 3 ) );
+		barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3));
 		const healthBarGroup = new THREE.Group();
 		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
@@ -328,7 +327,7 @@ export class Creep extends ModelAsset {
 	/**
 	 * Overridden functions
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 
 	/**
 	 * Resolves what happens at the end of a path
@@ -349,7 +348,7 @@ export class Creep extends ModelAsset {
 
 		this.stateExitHealing();
 
-		for (let x=0; x<4; x++) {
+		for (let x = 0; x < 4; x++) {
 			const thisCross = ModelCommons.healingCrossMesh();
 			thisCross.position.x += Math.random() - 0.5;
 			thisCross.position.y += Math.random();
@@ -358,7 +357,7 @@ export class Creep extends ModelAsset {
 
 			healingAnimationGroup.add(thisCross);
 		}
-		
+
 		healingAnimationGroup.name = "HealingAnimation";
 
 		this.groupMain.add(healingAnimationGroup);
@@ -397,8 +396,8 @@ export class Creep extends ModelAsset {
 	/**
 	 * Creep Powers
 	 * */
-	activateStandingPower() {}
-	activateIdlePower() {}
+	activateStandingPower() { }
+	activateIdlePower() { }
 
 	/**
 	 ******************************************************* UI INTERACTIONS

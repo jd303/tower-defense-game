@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { Main } from './Main';
 import { Timer } from './Timer';
+import { Service } from './Service';
 
-export class TickService {
+export class TickService extends Service {
 	main: Main;
 	clock = new THREE.Clock();
 	tickFrameCallbacksGame: TickCallback[] = [];
@@ -19,7 +20,7 @@ export class TickService {
 	 * */
 	gameTime: number = 0;
 	pausedTick = false;
-	
+
 	/**
 	 * Debugs
 	 * */
@@ -29,6 +30,8 @@ export class TickService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 
@@ -208,7 +211,7 @@ export class TickService {
 export class TickCallback {
 	name: string;
 	callback: Function;
-	
+
 	constructor(name: string, callback: Function) {
 		this.name = name;
 		this.callback = callback;

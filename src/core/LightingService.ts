@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { Main } from './Main';
+import { Service } from './Service';
 
-export class LightingService {
+export class LightingService extends Service {
 	/**
 	 * System Properties
 	 * */
@@ -17,6 +18,8 @@ export class LightingService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 

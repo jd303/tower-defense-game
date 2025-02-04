@@ -1,10 +1,14 @@
-export class EventService {
+import { Service } from "./Service";
+
+export class EventService extends Service {
 	eventListeners: EventInterface[] = [];
 
 	/**
 	 * Constructor
 	 * */
-	constructor() {}
+	constructor() {
+		super();
+	}
 
 	/**
 	 * Adds an event to the window, bound with a callback to affect the correct item
@@ -23,7 +27,7 @@ export class EventService {
 				window.removeEventListener(listener.name, listener.callback);
 			}
 		});
-		
+
 		this.eventListeners = this.eventListeners.filter(listener => listener.name !== name);
 	}
 

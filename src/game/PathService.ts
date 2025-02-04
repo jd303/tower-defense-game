@@ -1,14 +1,17 @@
-import THREE, { CurvePath, Vector, Vector3 } from "three";
+import THREE, { CurvePath, Vector3 } from "three";
 import { Main } from "../core/Main";
 import { MovePathDefinition, PathPoint } from "../data/PathInterfaces";
+import { Service } from "../core/Service";
 
-export class PathService {
+export class PathService extends Service {
 	main: Main;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 
@@ -16,7 +19,7 @@ export class PathService {
 	 * Creates a Move Path
 	 * */
 	createMovePath(id: string, pathPoints: PathPoint[], adjustX: number = 0, adjustY: number = 0) {
-		const path = this.createPathFromPathPoints(pathPoints, adjustX, adjustY);
+		const path = this.createCurveFromPathPoints(pathPoints, adjustX, adjustY);
 		const pathLength = path.getLength();
 		const pathDefinition: MovePathDefinition = {
 			id: id,
@@ -34,7 +37,7 @@ export class PathService {
 	/**
 	 * Creates a path from PathPoints
 	 */
-	createPathFromPathPoints(points: PathPoint[], adjustX: number = 0, adjustZ: number = 0, closePath: boolean = false) {
+	createCurveFromPathPoints(points: PathPoint[], adjustX: number = 0, adjustZ: number = 0, closePath: boolean = false) {
 		const curvePath = new THREE.CurvePath();
 
 		// Create paths from a combination of path segments

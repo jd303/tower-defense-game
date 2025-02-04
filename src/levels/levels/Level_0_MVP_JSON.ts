@@ -10,85 +10,141 @@ export const levelDetails: LevelDefinition = {
 			pathGeometry: PathGeometryTypes.dirt,
 			pathPoints: [
 				{
-					point: new Vector3(1.25, 0, 95)
+					"incomingControlPoint": {
+						"x": -2.1428571428571317,
+						"y": 0,
+						"z": 30.42857142857143
+					},
+					"point": {
+						"x": 1.000000000000011,
+						"y": 0,
+						"z": 94.42857142857143
+					},
+					"outgoingControlPoint": {
+						"x": 1.5714285714285827,
+						"y": 0,
+						"z": 47
+					}
 				},
 				{
-					point: new Vector3(1.75, 0, 67.75)
+					"incomingControlPoint": {
+						"x": 4.571428571428583,
+						"y": 0,
+						"z": 37.92857142857142
+					},
+					"point": {
+						"x": 7.857142857142868,
+						"y": 0,
+						"z": 35.42857142857143
+					},
+					"outgoingControlPoint": {
+						"x": 14.142857142857155,
+						"y": 0,
+						"z": 29.78571428571429
+					}
 				},
 				{
-					point: new Vector3(2.75, 0, 47),
+					"incomingControlPoint": {
+						"x": 28.642857142857153,
+						"y": 0,
+						"z": 19.857142857142858
+					},
+					"point": {
+						"x": 27.85714285714287,
+						"y": 0,
+						"z": 12.142857142857142
+					},
+					"outgoingControlPoint": {
+						"x": 28,
+						"y": 0,
+						"z": 9.071428571428571
+					}
 				},
 				{
-					point: new Vector3(7, 0, 35.25),
+					"incomingControlPoint": {
+						"x": 28.928571428571423,
+						"y": 0,
+						"z": 3.642857142857146
+					},
+					"point": {
+						"x": 13.714285714285715,
+						"y": 0,
+						"z": -2.6428571428571423
+					},
+					"outgoingControlPoint": {
+						"x": -13.071428571428571,
+						"y": 0,
+						"z": -16.57142857142857
+					}
 				},
 				{
-					point: new Vector3(18.25, 0, 26),
+					"incomingControlPoint": {
+						"x": -29.285714285714285,
+						"y": 0,
+						"z": -10.5
+					},
+					"point": {
+						"x": -28.642857142857142,
+						"y": 0,
+						"z": -25.642857142857142
+					},
+					"outgoingControlPoint": {
+						"x": -28.142857142857146,
+						"y": 0,
+						"z": -30.07142857142857
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(25, 0, 18),
-					point: new Vector3(26, 0, 17),
-					outgoingControlPoint: new Vector3(26, 0, 15)
+					"incomingControlPoint": {
+						"x": -28.928571428571427,
+						"y": 0,
+						"z": -38
+					},
+					"point": {
+						"x": -18.928571428571434,
+						"y": 0,
+						"z": -42.14285714285714
+					},
+					"outgoingControlPoint": {
+						"x": -5.857142857142857,
+						"y": 0,
+						"z": -48.14285714285714
+					}
 				},
 				{
-					point: new Vector3(30, 0, 8),
+					"incomingControlPoint": {
+						"x": 5.21428571428571,
+						"y": 0,
+						"z": -41.92857142857142
+					},
+					"point": {
+						"x": 14.142857142857139,
+						"y": 0,
+						"z": -49.99999999999999
+					},
+					"outgoingControlPoint": {
+						"x": 22.28571428571428,
+						"y": 0,
+						"z": -57.71428571428571
+					}
 				},
 				{
-					point: new Vector3(21, 0, 0),
-				},
-				{
-					point: new Vector3(12, 0, -5.25),
-				},
-				{
-					point: new Vector3(1, 0, -8),
-				},
-				{
-					point: new Vector3(-9, 0, -13),
-				},
-				{
-					point: new Vector3(-20.5, 0, -15),
-				},
-				{
-					point: new Vector3(-26.25, 0, -15),
-				},
-				{
-					point: new Vector3(-29, 0, -20),
-				},
-				{
-					point: new Vector3(-29, 0, -27.75),
-				},
-				{
-					point: new Vector3(-26.75, 0, -34.75),
-				},
-				{
-					point: new Vector3(-22.25, 0, -38.75),
-				},
-				{
-					point: new Vector3(-13.5, 0, -41.25),
-				},
-				{
-					point: new Vector3(-0.25, 0, -46.25),
-				},
-				{
-					point: new Vector3(10.25, 0, -51.5),
-				},
-				{
-					point: new Vector3(17.25, 0, -52.25),
-				},
-				{
-					point: new Vector3(19.75, 0, -57.25),
-				},
-				{
-					point: new Vector3(20.5, 0, -65.75),
-				},
-				{
-					point: new Vector3(21.25, 0, -81),
-				},
-				{
-					point: new Vector3(22, 0, -94.25),
-				},
-				{
-					point: new Vector3(22.25, 0, -99.75),
-				},
+					"incomingControlPoint": {
+						"x": 24.71428571428571,
+						"y": 0,
+						"z": -74.92857142857142
+					},
+					"point": {
+						"x": 24.14285714285714,
+						"y": 0,
+						"z": -99.28571428571428
+					},
+					"outgoingControlPoint": {
+						"x": 28.14285714285714,
+						"y": 0,
+						"z": -88.21428571428571
+					}
+				}
 			],
 		},
 		{
@@ -96,38 +152,106 @@ export const levelDetails: LevelDefinition = {
 			pathGeometry: PathGeometryTypes.dirt,
 			pathPoints: [
 				{
-					point: new Vector3(-61, 0.5, 23),
-					outgoingControlPoint: new Vector3(-45, 0, 25)
+					"incomingControlPoint": {
+						"x": -64.28571428571428,
+						"y": 0,
+						"z": 21.5
+					},
+					"point": {
+						"x": -59.42857142857142,
+						"y": 0,
+						"z": 23.642857142857142
+					},
+					"outgoingControlPoint": {
+						"x": -51.57142857142857,
+						"y": 0,
+						"z": 24.642857142857142
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(-34, 0, 26),
-					point: new Vector3(-30, 0, -10),
-					outgoingControlPoint: new Vector3(-30, 0, -10)
+					"incomingControlPoint": {
+						"x": -45.714285714285715,
+						"y": 0,
+						"z": 24.42857142857143
+					},
+					"point": {
+						"x": -39.714285714285715,
+						"y": 0,
+						"z": 20.071428571428573
+					},
+					"outgoingControlPoint": {
+						"x": -30.642857142857142,
+						"y": 0,
+						"z": 14.571428571428571
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(-30, 0, -35),
-					point: new Vector3(-30, 0, -30),
-					outgoingControlPoint: new Vector3(-20, 0, -45)
+					"incomingControlPoint": {
+						"x": -29.57142857142857,
+						"y": 0,
+						"z": -6.7857142857142865
+					},
+					"point": {
+						"x": -28.928571428571427,
+						"y": 0,
+						"z": -15.714285714285714
+					},
+					"outgoingControlPoint": {
+						"x": -27.642857142857146,
+						"y": 0,
+						"z": -26.07142857142857
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(-20, 0, -45),
-					point: new Vector3(-12, 0, -45),
-					outgoingControlPoint: new Vector3(-6, 0, -45)
+					"incomingControlPoint": {
+						"x": -30.928571428571427,
+						"y": 0,
+						"z": -35.714285714285715
+					},
+					"point": {
+						"x": -18.71428571428572,
+						"y": 0,
+						"z": -42.07142857142857
+					},
+					"outgoingControlPoint": {
+						"x": -5.857142857142857,
+						"y": 0,
+						"z": -48.14285714285714
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(-6, 0, -45),
-					point: new Vector3(12, 0, -45),
-					outgoingControlPoint: new Vector3(2, 0, -44)
+					"incomingControlPoint": {
+						"x": 5.21428571428571,
+						"y": 0,
+						"z": -41.92857142857142
+					},
+					"point": {
+						"x": 14.142857142857139,
+						"y": 0,
+						"z": -49.99999999999999
+					},
+					"outgoingControlPoint": {
+						"x": 22.28571428571428,
+						"y": 0,
+						"z": -57.71428571428571
+					}
 				},
 				{
-					incomingControlPoint: new Vector3(22, 0, -47),
-					point: new Vector3(22, 0, -65),
-					outgoingControlPoint: new Vector3(22, 0, -75)
-				},
-				{
-					incomingControlPoint: new Vector3(22, 0, -75),
-					point: new Vector3(22, 0, -100),
-					outgoingControlPoint: new Vector3(22, 0, -75)
+					"incomingControlPoint": {
+						"x": 24.71428571428571,
+						"y": 0,
+						"z": -74.92857142857142
+					},
+					"point": {
+						"x": 24.14285714285714,
+						"y": 0,
+						"z": -99.28571428571428
+					},
+					"outgoingControlPoint": {
+						"x": 28.14285714285714,
+						"y": 0,
+						"z": -88.21428571428571
+					}
 				}
 			],
 		},

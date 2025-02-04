@@ -60,7 +60,7 @@ export class PropManager {
 		if (!args.rotateRandom) args.rotateRandom = 0;
 
 		const sPath: PathService = this.main.s('Path');
-		const curvePath = sPath.createPathFromPathPoints(args.zonePathPoints, 0, 0, true);
+		const curvePath = sPath.createCurveFromPathPoints(args.zonePathPoints, 0, 0, true);
 		const boundingBox = sPath.getBoundingBoxOfCurvePath(curvePath);
 
 		for (let x = boundingBox.smallestX; x < (boundingBox.largestX - boundingBox.smallestX); x += args.densityUnits) {

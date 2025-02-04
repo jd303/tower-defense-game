@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import * as lil from 'lil-gui';
 import { Main } from './Main';
 import { TickCallback, TickService } from './TickService';
+import { Service } from './Service';
 
-export class ParticleService {
+export class ParticleService extends Service {
 	/**
 	 * Properties
 	 * */
@@ -19,6 +20,8 @@ export class ParticleService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 
 		return this;
@@ -200,13 +203,13 @@ export class ParticleExperience {
 			const colors = this.particleProperties.colorType instanceof Function ? this.particleProperties.colorType() : this.particleProperties.colorType;
 
 			this.positions[i3] = positions.x;
-			this.positions[i3+1] = positions.y;
-			this.positions[i3+2] = positions.z;
+			this.positions[i3 + 1] = positions.y;
+			this.positions[i3 + 2] = positions.z;
 
 			this.colors[i4] = colors.r;
-			this.colors[i4+1] = colors.g;
-			this.colors[i4+2] = colors.b;
-			this.colors[i4+3] = colors.a;
+			this.colors[i4 + 1] = colors.g;
+			this.colors[i4 + 2] = colors.b;
+			this.colors[i4 + 3] = colors.a;
 		}
 	}
 
@@ -217,7 +220,7 @@ export class ParticleExperience {
 		const particlesGeometry = new THREE.BufferGeometry();
 		particlesGeometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3)); // Applies the geometry position attribute using a BufferAttribute
 		particlesGeometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 4)); // Applies the geometry color attribute using a BufferAttribute
-		
+
 		this.geometry = particlesGeometry;
 	}
 
@@ -236,7 +239,7 @@ export class ParticleExperience {
 		const particleTexture = textureLoader.load(this.particleProperties.texture);
 		particleMaterial.transparent = true;
 		particleMaterial.alphaMap = particleTexture;
-		
+
 		// Stops particle graphics from creating alpha spots
 		particleMaterial.depthWrite = false;
 
@@ -253,7 +256,7 @@ export class ParticleExperience {
 	createParticleAnimation() {
 		const particleAnimations = new Float32Array(this.particleProperties.particleCount * 3);
 
-		for (let i=0; i<this.particleProperties.particleCount; i++) {
+		for (let i = 0; i < this.particleProperties.particleCount; i++) {
 			particleAnimations[i] = 0;
 			particleAnimations[i + 1] += Math.random() / 4;
 			particleAnimations[i + 2] = 0;
@@ -272,7 +275,7 @@ export class ParticleExperience {
 	/**
 	 * Called on Tick callback
 	 * */
-	tickCallback() {}
+	tickCallback() { }
 
 	/**
 	 * Removes a particle
@@ -303,11 +306,11 @@ export interface ParticleExperienceProperties {
  * ENUM: Allowed position types
  * */
 export class ParticleSystemPositions {
-	static readonly default = new ParticleSystemPositions('DEFAULT', { x:0, y:0, z:0 });
- 
+	static readonly default = new ParticleSystemPositions('DEFAULT', { x: 0, y: 0, z: 0 });
+
 	// private to disallow creating other instances of this type
-	private constructor(private readonly key: string, public readonly value: any) {}
- 
+	private constructor(private readonly key: string, public readonly value: any) { }
+
 	toValue() {
 		return this.key;
 	}
@@ -318,10 +321,10 @@ export class ParticleSystemPositions {
 * */
 export class ParticleSystemColors {
 	static readonly default = new ParticleSystemColors('DEFAULT', { r: 0, g: 0, b: 0 });
-	static readonly explosionorange = new ParticleSystemColors('EXPLOSION', { r: 0.2, g: 0.2, b: 0.2, a:1 });
+	static readonly explosionorange = new ParticleSystemColors('EXPLOSION', { r: 0.2, g: 0.2, b: 0.2, a: 1 });
 
 	// Private to disallow creating other instances of this type
-	private constructor(private readonly key: string, public readonly value: any) {}
+	private constructor(private readonly key: string, public readonly value: any) { }
 
 	toValue() {
 		return this.key;

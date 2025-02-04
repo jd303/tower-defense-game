@@ -3,11 +3,12 @@ import { WindowService } from './WindowService';
 import { DebugService } from './DebugService';
 import { TickService } from './TickService';
 import { SizesInterface } from './WindowService';
-import { LoaderController } from './LoaderService';
+import { LoaderService } from './LoaderService';
 import { LightingService } from './LightingService';
 import { CameraService } from '../core/CameraService';
 import { AudioService } from './AudioService';
 import { RaycasterService } from './RaycasterService';
+import { Service } from './Service';
 
 export class Main {
 	/**
@@ -41,7 +42,7 @@ export class Main {
 		this.renderer.outputColorSpace = THREE.SRGBColorSpace; // || LinearSRGBColorSpace
 
 		// Register core services
-		this.registerService('Loader', new LoaderController());
+		this.registerService('Loader', new LoaderService());
 		this.registerService('Lighting', new LightingService(this));
 		this.registerService('Camera', new CameraService(this));
 		this.registerService('Audio', new AudioService(this));
@@ -77,7 +78,7 @@ export class Main {
 	/**
 	 * Registers a manager that will be accessible to the main scope
 	 * */
-	registerService(serviceName: string, instance: any) {
+	registerService(serviceName: string, instance: Service) {
 		this.services.push({ name: serviceName, instance: instance });
 	}
 }

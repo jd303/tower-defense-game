@@ -7,8 +7,9 @@ import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
 import { ModelAsset } from '../environment/ModelAsset';
 import { Interactable } from '../game/InteractionService';
+import { Service } from './Service';
 
-export class RaycasterService {
+export class RaycasterService extends Service {
 	/**
 	 * Event Listeners
 	 * */
@@ -25,6 +26,8 @@ export class RaycasterService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 

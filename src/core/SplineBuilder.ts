@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { Main } from './Main';
 import { PathPoint } from '../data/PathInterfaces';
 import { PathService } from '../game/PathService';
-import { RaycasterService } from './RaycasterService';
 
-export class DebugSpline {
+export class SplineBuilder {
 	/**
 	 * Constants
 	 */
 	yVal: number = 4;
+	bezierEnabled: boolean;
 
 	/**
 	 * Properties
@@ -56,10 +56,17 @@ export class DebugSpline {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, makeFromWindowJSON: boolean = false, bezierEnabled: boolean = true) {
 		this.main = main;
 		this.sPath = this.main.s('Path');
-		this.path = this.sPath.createPathFromPathPoints(this.points);
+		this.bezierEnabled = bezierEnabled;
+
+		if (makeFromWindowJSON) {
+			if ((window as any).jsonPoints) this.points = (window as any).jsonPoints;
+			else console.log('%c Unable to load from window.jsonPoints', 'color: red');
+		}
+
+		this.path = this.createPath();
 		this.group = new THREE.Group();
 
 		this.makeLine();
@@ -84,12 +91,17 @@ export class DebugSpline {
 	 */
 	makeControls() {
 		this.destroyHandles();
+
 		this.points.forEach((point: PathPoint, index: number) => {
 			const handleMesh = new THREE.Mesh(this.handleGeometry, this.handleMaterial);
 			handleMesh.position.set(point.point.x, point.point.y, point.point.z);
 			(handleMesh as any).pointIndex = index;
 			(handleMesh as any).pointType = 'point';
 			this.pointHandles.push(handleMesh);
+
+			this.main.scene.add(handleMesh);
+
+			if (!this.bezierEnabled) return;
 
 			const controlIncomingHandleMesh = new THREE.Mesh(this.controlHandleGeometry, this.controlHandleIncomingMaterial);
 			controlIncomingHandleMesh.position.set(point.incomingControlPoint!.x, point.incomingControlPoint!.y, point.incomingControlPoint!.z);
@@ -103,7 +115,7 @@ export class DebugSpline {
 			(controlOutgoingHandleMesh as any).pointType = 'outgoingControlPoint';
 			this.pointOutgoingControlHandles.push(controlOutgoingHandleMesh);
 
-			this.main.scene.add(handleMesh, controlIncomingHandleMesh, controlOutgoingHandleMesh);
+			this.main.scene.add(controlIncomingHandleMesh, controlOutgoingHandleMesh);
 		});
 	}
 
@@ -120,7 +132,7 @@ export class DebugSpline {
 			point: newPoint,
 			outgoingControlPoint: newPointOut,
 		});
-		this.path = this.sPath.createPathFromPathPoints(this.points);
+		this.path = this.createPath();
 		this.makeLine();
 		this.makeControls();
 	}
@@ -134,9 +146,17 @@ export class DebugSpline {
 			point: newPoint,
 			outgoingControlPoint: newPointOut,
 		});
-		this.path = this.sPath.createPathFromPathPoints(this.points);
+		this.path = this.createPath();
 		this.makeLine();
 		this.makeControls();
+	}
+
+	/**
+	 * Creates a path, based on points
+	 */
+	createPath() {
+		if (this.bezierEnabled) return this.sPath.createCurveFromPathPoints(this.points);
+		else return this.sPath.createCurveFromPathPoints(this.points.map((point: PathPoint) => { return { point: point.point } }));
 	}
 
 	/**
@@ -173,7 +193,7 @@ export class DebugSpline {
 			pointReference.x = this.intersectedControlHandle.position.x;
 			pointReference.z = this.intersectedControlHandle.position.z;
 
-			this.path = this.sPath.createPathFromPathPoints(this.points);
+			this.path = this.createPath();
 		}
 
 		this.makeLine();
@@ -209,9 +229,21 @@ export class DebugSpline {
 	/**
 	 * Exports points to the console
 	 */
-	exportPoints() {
-		console.log(this.points);
-		console.log(JSON.stringify(this.points));
+	exportPathPoints() {
+		console.log("Exporting as PathPoint array(s)");
+		if (this.bezierEnabled) {
+			const exportablePoints = this.bezierEnabled && this.points || this.points.map((point) => { return { point: point.point } });
+			console.log(exportablePoints);
+			console.log(JSON.stringify(exportablePoints));
+		} else {
+			console.log(`[ ${this.points.map((point: PathPoint) => `{ point: new Vector3(${point.point.x}, 0, ${point.point.z}) }`)} ]`);
+		}
+	}
+	exportVectorPoints() {
+		console.log("Exporting as Vector array(s)");
+		const exportablePoints = this.bezierEnabled && this.points || this.points.map((point) => { return { point: point.point } });
+		console.log(exportablePoints);
+		console.log(JSON.stringify(exportablePoints));
 	}
 
 	/**

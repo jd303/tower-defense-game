@@ -1,12 +1,15 @@
 import { Main } from './Main';
+import { Service } from './Service';
 
-export class WindowService {
+export class WindowService extends Service {
 	main: Main;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 

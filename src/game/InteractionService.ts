@@ -1,11 +1,12 @@
 import { Main } from '../core/Main';
 import { RaycasterIntersection, RaycasterService } from '../core/RaycasterService';
+import { Service } from '../core/Service';
 import { StateMachine, StateMachineTransitions } from '../core/StateMachine';
 import { ModelAsset } from '../environment/ModelAsset';
 import { Terrain } from '../environment/Terrain';
 import { LevelPath } from '../levels/LevelPath';
 
-export class InteractionService {
+export class InteractionService extends Service {
 	/**
 	 * System Properties
 	 * */
@@ -31,6 +32,8 @@ export class InteractionService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 		this.sRaycaster = this.main.s('Raycaster');
 
@@ -46,7 +49,7 @@ export class InteractionService {
 	 * Sets up the State Machine for interactions
 	 * Helps track which interaction mode we are in
 	 * */
-	setupStates = function() {
+	setupStates = function () {
 		// Add states
 		this.stateMachine.addStates([
 			{
@@ -91,7 +94,7 @@ export class InteractionService {
 		let setAsArray = Array.from(this.defaultTargets);
 		setAsArray = setAsArray.sort((a, b) => a.order < b.order && 1 || -1);
 		this.defaultTargets = new Set(setAsArray);
-		
+
 	}
 	deregisterDefaultTarget(target: Interactable) {
 		this.defaultTargets.delete(target);
@@ -119,7 +122,7 @@ export class InteractionService {
 	 * */
 	defaultClickCallback(target: RaycasterIntersection) {
 		if (this.main.debugMode) {
-			console.log( {x: target.point.point.x, y: target.point.point.y, z: target.point.point.z }, target.object);
+			console.log({ x: target.point.point.x, y: target.point.point.y, z: target.point.point.z }, target.object);
 		}
 
 		const clickedTarget = target.object;

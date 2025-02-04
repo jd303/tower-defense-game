@@ -24,7 +24,7 @@ export const MountainProps: PropAsset[] = [
 		name: "rock_1",
 		assetPath: 'assets/models/nature/Rock_1.glb',
 		texturePath: 'assets/models/nature/Mountain_Merged_1.jpg',
-		defaultScale: new Vector3(1, 1, 1),
+		defaultScale: new Vector3(0.75, 0.75, 0.75),
 		shadows: false
 	}
 ]

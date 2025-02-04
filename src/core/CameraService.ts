@@ -4,8 +4,9 @@ import { Main } from './Main';
 import { OrbitController } from './OrbitController';
 import { FPSController, FPSControlsType } from './FPSController';
 import { TickCallback } from './TickService';
+import { Service } from './Service';
 
-export class CameraService {
+export class CameraService extends Service {
 	/**
 	 * System Properties
 	 * */
@@ -33,6 +34,8 @@ export class CameraService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 	}
 

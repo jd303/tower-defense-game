@@ -5,9 +5,10 @@ import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
 import { RaycasterOrders, RaycasterService } from './RaycasterService';
 import { Terrain } from '../environment/Terrain';
-import { DebugSpline } from './DebugSplineClass';
+import { SplineBuilder } from './SplineBuilder';
+import { Service } from './Service';
 
-export class DebugService {
+export class DebugService extends Service {
 	/**
 	 * Properties
 	 * */
@@ -17,11 +18,13 @@ export class DebugService {
 	/**
 	 * Debug Callback properties
 	 */
-	callbacks = {
+	splineObject = {
+		bezierEnabledOnLoad: true,
 		makeSpline: this.makeSpline.bind(this),
+		makeLineFromWindowJSON: this.makeLineFromWindowJSON.bind(this),
 		addSplinePointToStart: this.addSplinePointToStart.bind(this),
 		addSplinePointToEnd: this.addSplinePointToEnd.bind(this),
-		exportSpline: this.exportSpline.bind(this),
+		exportPoints: this.exportPoints.bind(this),
 		destroySpline: this.destroySpline.bind(this),
 	}
 
@@ -29,12 +32,14 @@ export class DebugService {
 	 * References
 	 */
 	debugDivRef: HTMLElement | null;
-	debugSpline?: DebugSpline;
+	splineBuilder?: SplineBuilder;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main, debugMode: boolean, tickService: TickService) {
+		super();
+
 		this.main = main;
 
 		if (debugMode) {
@@ -206,44 +211,54 @@ export class DebugService {
 	addSplineLilGUI() {
 		const folder = this.lilGUI.addFolder('Spline Tools');
 		folder.open(false);
-		folder.add(this.callbacks, 'makeSpline');
-		folder.add(this.callbacks, 'addSplinePointToStart');
-		folder.add(this.callbacks, 'addSplinePointToEnd');
-		folder.add(this.callbacks, 'exportSpline');
-		folder.add(this.callbacks, 'destroySpline');
+		folder.add(this.splineObject, 'bezierEnabledOnLoad', [false, true]);
+		folder.add(this.splineObject, 'makeSpline');
+		folder.add(this.splineObject, 'makeLineFromWindowJSON');
+		folder.add(this.splineObject, 'addSplinePointToStart');
+		folder.add(this.splineObject, 'addSplinePointToEnd');
+		folder.add(this.splineObject, 'exportPoints');
+		folder.add(this.splineObject, 'destroySpline');
 	}
 
 	/**
 	 * Adds a Spline to the scene
 	 */
 	makeSpline() {
-		if (this.debugSpline) this.debugSpline.destroy();
-		this.debugSpline = new DebugSpline(this.main);
-		console.log("Make Spline");
+		if (this.splineBuilder) this.splineBuilder.destroy();
+		this.splineBuilder = new SplineBuilder(this.main, false, this.splineObject.bezierEnabledOnLoad);
+	}
+
+	/**
+	 * Adds a Spline to the scene, from JSON
+	 */
+	makeLineFromWindowJSON() {
+		if (this.splineBuilder) this.splineBuilder.destroy();
+		this.splineBuilder = new SplineBuilder(this.main, true, this.splineObject.bezierEnabledOnLoad);
 	}
 
 	/**
 	 * Add points to the spline
 	 */
 	addSplinePointToStart() {
-		this.debugSpline?.addPointToStart();
+		this.splineBuilder?.addPointToStart();
 	}
 	addSplinePointToEnd() {
-		this.debugSpline?.addPointToEnd();
+		this.splineBuilder?.addPointToEnd();
 	}
 
 	/**
 	 * Exports a Spline to the console
 	 */
-	exportSpline() {
+	exportPoints() {
 		console.log("Export spline");
-		this.debugSpline?.exportPoints();
+		this.splineBuilder?.exportPathPoints();
+		this.splineBuilder?.exportVectorPoints();
 	}
 
 	/**
 	 * Destroys the spline
 	 */
 	destroySpline() {
-		this.debugSpline?.destroy();
+		this.splineBuilder?.destroy();
 	}
 }

@@ -1,9 +1,10 @@
 import { EventService } from '../core/EventService';
 import { Main } from '../core/Main';
+import { Service } from '../core/Service';
 import { Tower } from '../environment/towers/Tower';
 import { UIRegions } from './UIProperties';
 
-export class UIService {
+export class UIService extends Service {
 	/**
 	 * System Properties
 	 * */
@@ -37,6 +38,8 @@ export class UIService {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
+		super();
+
 		this.main = main;
 
 		this.rootUIElement = document.createElement('div');
@@ -108,8 +111,8 @@ export class UIService {
 		const callback: any = this.updateLabelWithText.bind({ scope: this, target: div });
 
 		const sEvent: EventService = this.main.s('Event');
-		sEvent.addEvent(eventName, callback);		
-		
+		sEvent.addEvent(eventName, callback);
+
 		return div;
 	}
 
@@ -135,7 +138,7 @@ export class UIService {
 	/**
 	 * Creates a popup
 	 * */
-	createPopup(name: string, html: string, classList:string[] = []) {
+	createPopup(name: string, html: string, classList: string[] = []) {
 		const div = document.createElement('div');
 		div.classList.add(name);
 		div.classList.add('popup');

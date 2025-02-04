@@ -52,7 +52,7 @@ export class LevelPath {
 		const sPath: PathService = this.main.s('Path');
 		this.corePath.pathPoints = pathPoints;
 		console.log("SETTING FROM", pathPoints);
-		this.corePath.path = sPath.createPathFromPathPoints(pathPoints);
+		this.corePath.path = sPath.createCurveFromPathPoints(pathPoints);
 		this.corePath.pathLength = this.corePath.path.getLength();
 	}
 
@@ -73,7 +73,7 @@ export class LevelPath {
 	createPathGeometry(pathDefinition: PathDefinition) {
 		if (pathDefinition.pathGeometry == PathGeometryTypes.none) return;
 
-		const lineWidth = 10;
+		const lineWidth = 8;
 		const lineHeight = -0.1;
 
 		// Create the path shape
