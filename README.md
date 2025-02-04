@@ -1,21 +1,3 @@
-# TypeScript + Webpack + Three.js template
+# Tower Defense Game
 
-A minimalistic template for Three.js projects
-
-
-## Installing dependencies
-
-    npm i
-
-## Running the project in watch mode
-
-    npm start
-
-## Building the project
-
-    npm run build
-
-## Linting the code
-
-    npm run lint
-
+A custom architecture Typescript-based ThreeJS game.  A tower defense game where player manage their resources to place towers which will defeat the oncoming waves of enemies.
