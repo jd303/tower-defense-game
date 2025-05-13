@@ -22,7 +22,7 @@ export class Man0 extends Hero {
 		name: "Man0",
 		hp_total: 40,
 		movement: {
-			speed: 3.5,
+			speed: 5.5,
 			type: MovementTypes.walking,
 		},
 		damage: 2,
@@ -44,7 +44,7 @@ export class Man0 extends Hero {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-	super(main);
+		super(main);
 
 		this.loadModel();
 		this.interceptionHandler.setInterceptionSlotCount(this.stats.numberIntercepted);
@@ -55,5 +55,5 @@ export class Man0 extends Hero {
 	/**
 	 * Animations
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 }

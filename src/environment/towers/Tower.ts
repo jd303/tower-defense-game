@@ -10,8 +10,8 @@ import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { UIButton, UIService } from '../../game/UIService';
-import { Interactable, InteractableOrders, InteractionService, InteractionTransitions } from '../../game/InteractionService';
 import { RaycasterIntersection } from '../../core/RaycasterService';
+import { InteractionEvent, InteractionService2, InteractableOrders, Interactable2 } from '../../game/InteractionService2';
 
 export class Tower extends ModelAsset {
 	/**
@@ -22,6 +22,7 @@ export class Tower extends ModelAsset {
 	/**
 	 * Status
 	 */
+	typeName: string = "tower";
 	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
 	baseStats: TowerStats;
@@ -120,7 +121,7 @@ export class Tower extends ModelAsset {
 	/**
 	 * Animate: Overwritten by Towers
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 
 	/**
 	 * Resolve a hit
@@ -151,7 +152,7 @@ export class Tower extends ModelAsset {
 	/**
 	 ******************************************************* UI INTERACTIONS
 	 * */
-	
+
 	/**
 	 * Sets up the Tower, such as the UI
 	 * */
@@ -169,14 +170,13 @@ export class Tower extends ModelAsset {
 	 * */
 	static clickUIButton(event: any, main: Main) {
 		event.stopPropagation();
-		//const sUI: UIService = main.s('UI');
-		const sInteraction = main.s('Interaction');
-		
+		/*const sInteraction = main.s('Interaction');
+
 		if (this.UIButton.selected) {
 			this.endCreateTowerOnTerrain({}, main);
 		} else {
 			this.UIButton.select();
-			
+
 			// Notify the Interaction Service that we want to create a tower
 			const targetSet = new Set();
 			targetSet.add(new Interactable(InteractableOrders.terrain, main.s('Level').currentLevel.terrain));
@@ -188,28 +188,46 @@ export class Tower extends ModelAsset {
 			console.log("CANCC", cancellationSet);
 			sInteraction.registerContextInteraction((intersect: RaycasterIntersection) => this.requestCreateTower(intersect, main), targetSet, cancellationSet);
 			sInteraction.stateMachine.transition(InteractionTransitions.context_selection);
+		}*/
+
+		const sInteraction2: InteractionService2 = main.s('Interaction2');
+		if (this.UIButton.selected) {
+			this.endCreateTowerOnTerrain({}, main);
+		} else {
+			this.UIButton.select();
+
+			// Notify the Interaction Service that we want to create a tower
+			const targetSet = new Set();
+			targetSet.add(new Interactable2('terrain', InteractableOrders.terrain, main.s('Level').currentLevel.terrain));
+			console.log("TODO: Orders are not quite right, not when LevelPaths have to be 'props'");
+			sInteraction2.registerInteractableListener('terrain', 'createTower', this.requestCreateTower.bind(this));
 		}
+
 	}
 
 	/**
 	 * Request to create a Tower
 	 * */
-	static requestCreateTower(intersect: RaycasterIntersection, main: Main) {
-		const sEconomy = main.s('Economy');
+	static requestCreateTower(event: InteractionEvent) {
+		let handled = false;
+		const sEconomy = event.main.s('Economy');
 		let remainingMoney: any;
 
 		switch (this.Factory.costType) {
 			case "money":
 				remainingMoney = sEconomy.getEconomicProperty('money');
 				if (remainingMoney.current >= this.Factory.cost) {
-					remainingMoney = main.s('Economy').adjustEconomyValue(this.Factory.costType, -1*this.Factory.cost);
-					main.s('Event').fire('commerce_money_changed', remainingMoney);
-					this.createTower(intersect, main);
+					remainingMoney = sEconomy.adjustEconomyValue(this.Factory.costType, -1 * this.Factory.cost);
+					event.main.s('Event').fire('commerce_money_changed', remainingMoney);
+					this.createTower(event.raycasterInteraction, event.main);
+					handled = true;
 				}
 				break;
 		}
 
-		this.endCreateTowerOnTerrain({}, main);
+		this.endCreateTowerOnTerrain({}, event.main);
+
+		return { handled: handled, cancelListeners: true };
 	}
 
 	/**
@@ -224,10 +242,8 @@ export class Tower extends ModelAsset {
 	 * Cancels Create Mode
 	 * */
 	static endCreateTowerOnTerrain(event: any, main: Main) {
-		const sUI: UIService = main.s('UI');
-		//sUI.deselectButton(this.UI.UIButton.element);
-		const sInteraction: InteractionService = main.s('Interaction');
-		sInteraction.deregisterContextInteraction();
+		const sInteraction2: InteractionService2 = main.s('Interaction2');
+		sInteraction2.deregisterInteractableListener('terrain', 'createTower');
 
 		this.UIButton.deselect();
 	}

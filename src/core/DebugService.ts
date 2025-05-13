@@ -3,10 +3,11 @@ import * as lil from 'lil-gui';
 import { Light } from './LightingService';
 import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
-import { RaycasterOrders, RaycasterService } from './RaycasterService';
+import { RaycasterIntersection, RaycasterOrders, RaycasterService } from './RaycasterService';
 import { Terrain } from '../environment/Terrain';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
+import { InteractableOrders, InteractionService2, InteractableListener, InteractionEvent } from '../game/InteractionService2';
 
 export class DebugService extends Service {
 	/**
@@ -51,6 +52,7 @@ export class DebugService extends Service {
 
 			this.watchDrawCalls();
 			this.addSplineLilGUI();
+			this.addTerrainPositionWatcher();
 		}
 
 		return this;
@@ -180,16 +182,6 @@ export class DebugService extends Service {
 	/**
 	 * Writes draw calls to the page
 	 * */
-	listenToTerrainLocationClicks(terrain: Terrain) {
-		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.enableRaycaster();
-		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.terrain, object: terrain }]); // Listen to clicks on terrain
-		//sRaycaster.addRaycasterSubjects(this.levelPaths.map(path => { return { order: RaycasterOrders.props, object: path } })); // Used to listen to clicks on props, but props don't exist anymore - if you need it again, you'll need to setup raycasting for all MeshInstances in PropManager
-	}
-
-	/**
-	 * Writes draw calls to the page
-	 * */
 	watchDrawCalls() {
 		const div = document.createElement('div');
 		div.classList.add('debug_drawcalls');
@@ -206,7 +198,7 @@ export class DebugService extends Service {
 	}
 
 	/**
-	 * Adds 
+	 * Adds spline tools
 	 */
 	addSplineLilGUI() {
 		const folder = this.lilGUI.addFolder('Spline Tools');
@@ -260,5 +252,24 @@ export class DebugService extends Service {
 	 */
 	destroySpline() {
 		this.splineBuilder?.destroy();
+	}
+
+	/**
+	 * Listens for clicks on the terrain
+	 */
+	addTerrainPositionWatcher() {
+		const sInteraction: InteractionService2 = this.main.s('Interaction2');
+		sInteraction.registerInteractableListener('terrain', 'getPosition', this.debugTerrainPoint);
+	}
+
+	/**
+	 * Prints the click point when the user clicks on the terrain
+	 */
+	debugTerrainPoint(event: InteractionEvent) {
+		console.group('Debug: Click Terrain');
+		console.log(`${event.raycasterInteraction.point.point.x.toFixed(5)},0,${event.raycasterInteraction.point.point.z.toFixed(5)}`);
+		console.log(event.raycasterInteraction.object);
+		console.groupEnd();
+		return { handled: true, cancelListeners: false };
 	}
 }

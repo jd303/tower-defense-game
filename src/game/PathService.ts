@@ -77,8 +77,32 @@ export class PathService extends Service {
 			curvePath.add(curvePart);
 		});
 
-		if (closePath) curvePath.closePath();
+		if (closePath) {
+			const lastPoint = points[points.length - 1].point;
+			const firstPoint = points[0].point;
+			if (lastPoint.x !== firstPoint.x || lastPoint.y !== firstPoint.y || lastPoint.z !== firstPoint.z) {
+				console.error("Closing path with different end position");
+			}
+			curvePath.closePath();
+		}
+
 		return curvePath;
+	}
+
+	/**
+	 * Takes a curve and smooths it
+	 * @param curvePath 
+	 * @returns THREE.CatmullRomCurve3
+	 */
+	smoothCurve(curvePath: THREE.CurvePath<any>) {
+		const sampledPoints = curvePath.getPoints(50); // or more, depending on desired resolution
+
+		// Smooth it with CatmullRom
+		const smoothCurve = new THREE.CatmullRomCurve3(sampledPoints);
+		smoothCurve.curveType = 'centripetal';
+		smoothCurve.closed = true; // set true if your curve loops
+
+		return smoothCurve;
 	}
 
 	/**
@@ -153,11 +177,35 @@ export class PathService extends Service {
 	}
 
 	/**
+	 * Finds the closest point on a path from a given position
+	 * @param curve 
+	 * @param testPoint 
+	 * @param divisions 
+	 * @returns 
+	 */
+	getClosestPointOnPath(curvePath: CurvePath<any>, comparisonPoint: Vector3, divisions = 200) {
+		const points = curvePath.getPoints(divisions);
+
+		let closestPoint = null;
+		let minDistance = Infinity;
+
+		for (const p of points) {
+			const distance = p.distanceTo(comparisonPoint);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestPoint = p;
+			}
+		}
+
+		return { point: closestPoint, distance: minDistance };
+	}
+
+	/**
 	 * Gets the center point of a curve
 	 */
-	getBoundingBoxOfCurvePath(curvePath: CurvePath<any>) {
+	getBoundingBoxOfCurvePath(curvePath: CurvePath<any>): BoundingBoxPlane {
 		const vertices: Vector3[] = curvePath.getPoints();
-		let smallestX = 0, largestX = 0, smallestZ = 0, largestZ = 0;
+		let smallestX = 1000, largestX = -1000, smallestZ = 1000, largestZ = -1000;
 		let xSum = 0, zSum = 0, areaSum = 0;
 
 		for (let i = 0, len = vertices.length; i < len; i++) {
@@ -185,6 +233,7 @@ export class PathService extends Service {
 		const centroidZ = zSum / (6 * area);
 
 		return {
+			area: area,
 			smallestX: smallestX,
 			largestX: largestX,
 			smallestZ: smallestZ,
@@ -200,4 +249,74 @@ export class PathService extends Service {
 
 		console.log(centroid);  // Output: [2, 1.5]*/
 	}
+
+	/**
+	 * Expands a curve, based on knowing the curve
+	 */
+	offsetCurveXZ(curve: THREE.Curve<any>, offsetDistance: number, segments = 100) {
+		const points = curve.getSpacedPoints(segments);
+		const expanded = [];
+
+		for (let i = 0; i < points.length; i++) {
+			const p = points[i];
+
+			// Get tangent direction (forward)
+			const t = curve.getTangent(i / segments);
+
+			// Only using XZ, ignore Y
+			const tangent2D = new THREE.Vector2(t.x, t.z).normalize();
+
+			// Perpendicular in XZ plane
+			const normal2D = new THREE.Vector2(-tangent2D.y, tangent2D.x);
+
+			// Offset position
+			const offsetPos2D = new THREE.Vector2(p.x, p.z).addScaledVector(normal2D, offsetDistance);
+			const offsetPoint = new THREE.Vector3(offsetPos2D.x, p.y, offsetPos2D.y);
+
+			expanded.push(offsetPoint);
+		}
+
+		return this.createCurveFromPathPoints(expanded.map(point => { return { point: point } }));
+	}
+
+	/**
+	 * Expands a curve, based on knowing the control points.
+	 * Better for straight line curves
+	 * NOTE: Sometimes the path extends the wrong way.  In this case, please redraw the curve with points running the other way around (clockwise, usually)
+	 */
+	offsetPathFromPointsXZ(points: PathPoint[], offset: number, closed = true) {
+		const offsetFixed = (points[1].point.x <= points[0].point.x || points[1].point.z >= points[0].point.z) && offset || -offset;
+		const offsetPoints = [];
+
+		for (let i = 0; i < points.length; i++) {
+			const prev = points[(i - 1 + points.length) % points.length];
+			const curr = points[i];
+			const next = points[(i + 1) % points.length];
+
+			const dirA = new THREE.Vector2(curr.point.x - prev.point.x, curr.point.z - prev.point.z).normalize();
+			const dirB = new THREE.Vector2(next.point.x - curr.point.x, next.point.z - curr.point.z).normalize();
+
+			const normalA = new THREE.Vector2(-dirA.y, dirA.x);
+			const normalB = new THREE.Vector2(-dirB.y, dirB.x);
+			const avgNormal = normalA.add(normalB).normalize().multiplyScalar(offsetFixed);
+
+			offsetPoints.push(new THREE.Vector3(curr.point.x + avgNormal.x, curr.point.y, curr.point.z + avgNormal.y));
+		}
+
+		// Add the final point again if closing
+		if (closed) {
+			offsetPoints.push(new THREE.Vector3(offsetPoints[0].x, offsetPoints[0].y, offsetPoints[0].z))
+		}
+
+		return this.createCurveFromPathPoints(offsetPoints.map(point => { return { point: point } }), 0, 0, true);
+	}
+}
+
+export interface BoundingBoxPlane {
+	area: number,
+	smallestX: number,
+	largestX: number,
+	smallestZ: number,
+	largestZ: number,
+	center: Vector3,
 }

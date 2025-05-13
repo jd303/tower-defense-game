@@ -30,7 +30,7 @@ export class TowerBomber extends Tower {
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.splash,
 			range: 10,
-			radius: 2,
+			radius: 3,
 			speed: 0.75
 		},
 		last_attack_time: 0,
@@ -46,7 +46,7 @@ export class TowerBomber extends Tower {
 		175,
 		"money",
 		TowerBomber,
-		() => {}
+		() => { }
 	);
 
 	/**
@@ -89,8 +89,8 @@ export class TowerBomber extends Tower {
 					new BombShot(this.main),
 					this.stats.attack.speed,
 					() => {
-						new ParticleExperienceExplosionActive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0.5, creep.groupMain.position.z));
-						new ParticleExperienceExplosionPassive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0.5, creep.groupMain.position.z));
+						new ParticleExperienceExplosionActive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0, creep.groupMain.position.z));
+						new ParticleExperienceExplosionPassive(this.main, new THREE.Vector3(creep.groupMain.position.x, 0, creep.groupMain.position.z));
 					}
 				);
 

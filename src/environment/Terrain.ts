@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TerrainTypes } from '../data/LevelInterfaces';
 import { Main } from '../core/Main';
-import { Interactable, InteractableOrders } from '../game/InteractionService';
+import { Interactable2, InteractableOrders } from '../game/InteractionService2';
 
 export class Terrain {
 	/**
@@ -34,7 +34,8 @@ export class Terrain {
 				break;
 		}
 
-		const geometry = new THREE.PlaneGeometry(350, 260, 1, 1);
+		//const geometry = new THREE.PlaneGeometry(350, 260, 1, 1);
+		const geometry = new THREE.PlaneGeometry(700, 520, 1, 1);
 		const mesh = new THREE.Mesh(geometry, material);
 		this.groupMain.add(mesh);
 
@@ -62,7 +63,7 @@ export class Terrain {
 	 * Sets whether this model can be interactive 
 	 * */
 	setInteractive() {
-		const sInteraction = this.main.s('Interaction');
-		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.terrain, this));
+		const sInteraction2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractable(new Interactable2('terrain', InteractableOrders.terrain, this));
 	}
 }

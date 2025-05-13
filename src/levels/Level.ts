@@ -9,7 +9,7 @@ import { TickCallback, TickService, TickTimeProperties } from '../core/TickServi
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { Hero } from '../environment/heroes/Hero';
-import { PropManager } from '../environment/PropManager';
+import { PropManager } from '../environment/props_manager/PropManager';
 
 export class Level {
 	/**

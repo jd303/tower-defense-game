@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TickTimeProperties } from '../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { Interactable, InteractableOrders } from '../game/InteractionService';
 import { LocationService } from '../game/LocationService';
 import { LevelService } from '../levels/LevelService';
 import { MovePathManager } from './MovePathManager';
@@ -10,11 +9,13 @@ import { CreepStats } from './creeps/CreepStats';
 import { HeroStats } from './heroes/HeroStats';
 import { TowerStats } from './towers/TowerStats';
 import { StateMachine } from '../core/StateMachine';
+import { InteractionEvent } from '../game/InteractionService2';
 
 export abstract class ModelAsset {
 	/**
 	 * Setup Properties
 	 * */
+	typeName: string;
 	shadowsEnabled: boolean = false;
 	assetPath: string;
 	assetScale: number = 1; // default
@@ -106,10 +107,7 @@ export abstract class ModelAsset {
 	/**
 	 * Sets whether this model can be interactive 
 	 * */
-	setInteractive() {
-		const sInteraction = this.main.s('Interaction');
-		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.props, this));
-	}
+	setInteractive() { }
 
 	/**
 	 * Moves a Model Asset along a path according to its movement speed
@@ -236,13 +234,14 @@ export abstract class ModelAsset {
 	 * Overwritten
 	 * */
 	defaultClick() { }
-	select() { }
+	select(event: InteractionEvent) { }
 	deselect() { }
 }
 
 export class ModelCommons {
 	/* Health Bar Commons */
-	static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
+	//static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
+	static healthBarGeometry: THREE.BoxGeometry = new THREE.BoxGeometry(2, 0.15, 0.15, 1, 1, 1);
 	static healthBarVertices: Float32Array = new Float32Array([
 		-1, 0, 0,
 		1, 0, 0,

@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 export class Maths {
 	/**
 	 * Rounds a float to the nearest 0.25
@@ -16,10 +14,33 @@ export class Maths {
 		return original + randomFactor * randomRange;
 	}
 
+	static getRandomFloat(min: number, max: number) {
+		return Math.random() * (max - min) + min;
+	}
+
+	/**
+	 * Returns an attenuated value based on a max and min
+	 * @param rangePosition // Where our comparison value is
+	 * @param rangeStart // The minimum value of our comparison range
+	 * @param rangeEnd // The maximum range of our comparison range
+	 * @param attenuationStrength // How much to attenuate, higher is stronger
+	 * @param minVal // Optional: change the minimum attenuated value
+	 * @param minVal // Optional: change the maximum attenuated value
+	 * @returns A number
+	 * Usage: getAttenuatedValue(75, 0, 100, 1, 0, 1) returns 0.25, given that 75 is 75% of the way through 0-100
+	 */
+	static getAttenuatedValue(rangePosition: number, rangeStart = 0, rangeEnd = 100, attenuationStrength = 1, minVal = 0, maxVal = 1) {
+		let t = (rangePosition - rangeStart) / (rangeEnd - rangeStart);
+		t = Math.max(0, Math.min(1, t)); // Clamp to [0, 1]
+		t = 1 - Math.pow(1 - t, attenuationStrength); // Attenuate
+
+		return maxVal - t * (maxVal - minVal);
+	}
+
 	/**
 	 * Generates numberOfItems positions in a grid of size range x range
 	 */
-	static generateRandomPositions(numberOfItems: number, range: number, minimumDistance: number = 1) {
+	/*static generateRandomPositions(numberOfItems: number, range: number, minimumDistance: number = 1) {
 		if (range === 0) throw new Error("Range cannot be 0.");
 
 		const positions = [];
@@ -62,5 +83,5 @@ export class Maths {
 		if (positions.length < numberOfItems) throw new Error("Could not generate enough positions.");
 
 		return positions;
-	}
+	}*/
 }

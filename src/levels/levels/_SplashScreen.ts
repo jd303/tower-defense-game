@@ -4,7 +4,7 @@ import { Main } from '../../core/Main';
 import { UIService } from '../../game/UIService';
 import { CameraService } from '../../core/CameraService';
 import { LightingService } from '../../core/LightingService';
-import { PropManager } from '../../environment/PropManager';
+import { PropManager } from '../../environment/props_manager/PropManager';
 import { TerrainTypes } from '../../data/LevelInterfaces';
 
 export class SplashScreen {

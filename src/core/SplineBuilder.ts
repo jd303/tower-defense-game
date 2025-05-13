@@ -23,7 +23,7 @@ export class SplineBuilder {
 	pointHandles: any[] = [];
 	pointIncomingControlHandles: any[] = [];
 	pointOutgoingControlHandles: any[] = [];
-	path: THREE.CurvePath<THREE.Vector>;
+	path: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3;
 
 	/**
 	 * THREE Objects

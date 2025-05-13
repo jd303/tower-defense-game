@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { WindowService } from './WindowService';
-import { DebugService } from './DebugService';
 import { TickService } from './TickService';
 import { SizesInterface } from './WindowService';
 import { LoaderService } from './LoaderService';
@@ -48,7 +47,6 @@ export class Main {
 		this.registerService('Audio', new AudioService(this));
 		this.registerService('Raycaster', new RaycasterService(this));
 		this.registerService('Tick', new TickService(this));
-		this.registerService('Debug', new DebugService(this, debugMode, this.s('Tick')));
 
 		// Watch the screen
 		this.windowSizer = new WindowService(this);
@@ -57,7 +55,7 @@ export class Main {
 
 		// Next up messages
 		console.log("%c OK, next up:", 'color: red');
-		console.log("%c Create a PathService, and get the hero on the path", 'color: red');
+		console.log("%c Pathfind for the hero, so that they avoid mountains", 'color: red');
 		console.log("%c Improve BombShot geometry, and add an animation, to see if that works.", 'color: red');
 		console.log("%c Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');

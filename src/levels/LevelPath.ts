@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../data/PathInterfaces';
 import { Main } from '../core/Main';
-import { Interactable, InteractableOrders } from '../game/InteractionService';
 import { PathService } from '../game/PathService';
+import { Interactable2, InteractionService2, InteractableOrders } from '../game/InteractionService2';
 
 export class LevelPath {
 	/**
@@ -40,7 +40,7 @@ export class LevelPath {
 		this.setCorePath(pathDefinition.pathPoints);
 		this.createPathGeometry(pathDefinition);
 
-		this.setInteractive(main);
+		this.setInteractive();
 
 		return this;
 	}
@@ -51,7 +51,6 @@ export class LevelPath {
 	setCorePath(pathPoints: PathPoint[]) {
 		const sPath: PathService = this.main.s('Path');
 		this.corePath.pathPoints = pathPoints;
-		console.log("SETTING FROM", pathPoints);
 		this.corePath.path = sPath.createCurveFromPathPoints(pathPoints);
 		this.corePath.pathLength = this.corePath.path.getLength();
 	}
@@ -126,9 +125,9 @@ export class LevelPath {
 	/**
 	 * Sets whether this model can be interactive 
 	 * */
-	setInteractive(main: Main) {
-		const sInteraction = main.s('Interaction');
-		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.terrain, this));
+	setInteractive() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractable(new Interactable2('levelpath', InteractableOrders.creeps, this));
 	}
 
 	getRandomAdjustX() {

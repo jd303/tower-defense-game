@@ -8,6 +8,7 @@ export const perspectiveCameraDefaults: CameraSettings = {
 	x: 0,
 	y: 40,
 	z: 50,
+	clampingEnabled: false
 };
 
 export const orthographicCameraDefaults: CameraSettings = {
@@ -23,4 +24,5 @@ export const orthographicCameraDefaults: CameraSettings = {
 	maxAzimuthAngle: Math.PI * 0.1,
 	minZoom: 0.4,
 	maxZoom: 1.3,
+	clampingEnabled: true
 };

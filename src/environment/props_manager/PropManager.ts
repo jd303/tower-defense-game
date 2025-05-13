@@ -1,12 +1,16 @@
-import THREE, { Matrix4, Texture, Vector3 } from "three";
-import { Main } from "../core/Main";
-import { TerrainTypes } from "../data/LevelInterfaces";
+import THREE, { Texture, Vector3 } from "three";
+import { Main } from "../../core/Main";
+import { TerrainTypes } from "../../data/LevelInterfaces";
+import AllProps from "../props/AllProps";
+import { PropZone, PropZoneArguments } from "./PropZone";
+import { Maths } from "../../core/Maths";
+import { EnvironmentTile } from "../EnvironmentTile";
 
-import AllProps from "./props/AllProps";
-import { PathService } from "../game/PathService";
-import { Maths } from "../core/Maths";
-import { PathPoint } from "../data/PathInterfaces";
-
+/**
+ * A framework for adding props and propzones to the board
+ * Makes use of InstancedMesh, which requires that prop models have only 1 child mesh.
+ * Providing a model with more than 1 child mesh will fail to write the model to the screen
+ */
 export class PropManager {
 	/**
 	 * Core Properties
@@ -14,6 +18,7 @@ export class PropManager {
 	main: Main;
 	tileset: TerrainTypes;
 	propGroups: PropGroup[] = [];
+	environmentTiles: EnvironmentTile[] = [];
 
 	tempTreeTexture: any;
 
@@ -54,35 +59,19 @@ export class PropManager {
 	/**
 	 * Register a zone to generate props in
 	 */
-	registerPropZone(propName: string, args: { zonePathPoints: PathPoint[], densityUnits: number, zoneStrategy: PropZoneStrategy, positionRandom?: number, scaleRandom?: number, rotateRandom?: number }) {
-		if (!args.positionRandom) args.positionRandom = 0;
-		if (!args.scaleRandom) args.scaleRandom = 0;
-		if (!args.rotateRandom) args.rotateRandom = 0;
+	registerPropZone(propNames: string[], args: PropZoneArguments) {
+		const propZonePropsY = 0.2;
+		const propZone = new PropZone(args, this.main);
+		const propPositions: Vector3[] = propZone.createPositions();
+		this.environmentTiles.push(propZone.createEnvironmentTile());
 
-		const sPath: PathService = this.main.s('Path');
-		const curvePath = sPath.createCurveFromPathPoints(args.zonePathPoints, 0, 0, true);
-		const boundingBox = sPath.getBoundingBoxOfCurvePath(curvePath);
+		if (this.main.debugMode) propZone.debugCreateOutlines();
 
-		for (let x = boundingBox.smallestX; x < (boundingBox.largestX - boundingBox.smallestX); x += args.densityUnits) {
-			for (let z = boundingBox.smallestZ; z < (boundingBox.largestZ - boundingBox.smallestZ); z += args.densityUnits) {
-				if (sPath.pointIsInCurvePath(new Vector3(x, 0, z), curvePath)) {
-					x = Maths.addBipolarRandom(x, args.positionRandom);
-					z = Maths.addBipolarRandom(z, args.positionRandom);
-					let scaleX = 1;
-					let scaleY = 1;
-					let scaleZ = 1;
-
-					if (args.scaleRandom) {
-						let scaleAdjust = Maths.addBipolarRandom(1, args.scaleRandom);
-						scaleX = scaleAdjust;
-						scaleY = scaleAdjust;
-						scaleZ = scaleAdjust;
-					}
-
-					this.registerProp(propName, { position: new Vector3(x, 0, z), scale: new Vector3(scaleX, scaleY, scaleZ) });
-				}
-			}
-		}
+		// Place the props
+		propPositions.forEach((position: any) => {
+			const propName = propNames[Math.floor(Math.random() * propNames.length)];
+			this.registerProp(propName, { position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) });
+		});
 	}
 
 	/**
@@ -133,6 +122,13 @@ export class PropManager {
 	 * Assumes only 1 mesh in the Prop Model
 	 */
 	instanceMeshesAndPlace(propGroup: PropGroup) {
+		// Check for instancing
+		if (propGroup.loadedModel.scene.children.length > 1 || propGroup.loadedModel.scene.children[0].children.length > 1) {
+			console.error(`Loaded model ${propGroup.asset.name} likely cannot be instanced`);
+			console.log(propGroup.loadedModel.scene);
+		}
+
+		// Instance away
 		const iMesh = new THREE.InstancedMesh(propGroup.loadedModel.scene.children[0].geometry, propGroup.loadedMaterial, propGroup.propPlacements.length);
 
 		for (let x = 0; x < propGroup.propPlacements.length; x++) {
@@ -217,13 +213,4 @@ export interface PropAssetPlacement {
 	rotX: number;
 	rotY: number;
 	rotZ: number;
-}
-
-export enum PropZoneStrategy {
-	default = 0,
-	centerOut = 1,
-	topToBottom = 2,
-	bottomToTop = 3,
-	leftToRight = 4,
-	rightToLeft = 5
 }

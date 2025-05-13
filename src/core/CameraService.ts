@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
 import { Main } from './Main';
 import { OrbitController } from './OrbitController';
 import { FPSController, FPSControlsType } from './FPSController';
@@ -28,6 +27,7 @@ export class CameraService extends Service {
 		x: 0,
 		y: 0,
 		z: 0,
+		clampingEnabled: false
 	};
 
 	/**
@@ -126,9 +126,6 @@ export class CameraService extends Service {
 			const newMainCam = this.cameras.find((cam) => cam !== this.mainCamera);
 			console.log(newMainCam);
 			this.setMainCamera(newMainCam as Camera);
-
-			this.removeOrbitControls();
-			this.setupOrbitControls();
 		}
 	}
 
@@ -144,16 +141,16 @@ export class CameraService extends Service {
 	 * Sets up orbit handling
 	 * */
 	setupOrbitControls() {
-		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas);
+		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas, this.main.s('Camera').mainCamera.settings.clampingEnabled);
 		this.main.s('Tick').registerCallback(new TickCallback('OrbitController', () => {
 			this.orbitController.controls.update();
 		}), false);
 
 		// Set a max pan
-		var minPan = new THREE.Vector3(-1, -1, -1);
+		/*var minPan = new THREE.Vector3(-1, -1, -1);
 		var maxPan = new THREE.Vector3(1, 1, 1);
 		this.orbitController.controls.target = new Vector3(0, 0, 0);
-		this.orbitController.controls.target.clamp(minPan, maxPan);
+		this.orbitController.controls.target.clamp(minPan, maxPan);*/
 
 		// Set a max rotate
 		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle || -Infinity;
@@ -172,6 +169,14 @@ export class CameraService extends Service {
 	 * */
 	removeOrbitControls() {
 		this.orbitController.controls.dispose();
+	}
+
+	/**
+	 * Convenience method to reset orbit controls
+	 */
+	resetOrbitControls() {
+		this.removeOrbitControls();
+		this.setupOrbitControls();
 	}
 
 	/**
@@ -229,6 +234,7 @@ export interface CameraSettings {
 	maxAzimuthAngle?: number;
 	minZoom?: number;
 	maxZoom?: number;
+	clampingEnabled: boolean;
 }
 
 export interface CameraPositionProperties {

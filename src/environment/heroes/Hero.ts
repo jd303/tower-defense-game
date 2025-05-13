@@ -7,18 +7,18 @@ import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
 import { CreepStats } from '../creeps/CreepStats';
-import { RaycasterIntersection, RaycasterOrders, RaycasterService } from '../../core/RaycasterService';
-import { Interactable, InteractableOrders, InteractionService } from '../../game/InteractionService';
 import { Creep } from '../creeps/Creep';
 import { MovementTypes } from '../../data/MovementTypes';
 import { InterceptionHandler, InterceptionSlotCountInterface } from '../InterceptionHandler';
 import { PathService } from '../../game/PathService';
 import { CreepStates } from '../creeps/CreepStates';
+import { Interactable2, InteractionEvent, InteractionService2, InteractableOrders } from '../../game/InteractionService2';
 
 export class Hero extends ModelAsset {
 	/**
 	 * Stats
 	 * */
+	typeName: string = "hero";
 	stats: HeroStats;
 
 	/**
@@ -43,6 +43,7 @@ export class Hero extends ModelAsset {
 	 * Status
 	 * */
 	states: HeroStates;
+	selected: boolean = false;
 
 	/**
 	 * Health bar
@@ -64,7 +65,6 @@ export class Hero extends ModelAsset {
 		super(main);
 
 		this.stateMachine = this.setDefaultStates();
-		this.setupInteractions();
 		this.setInteractive();
 	}
 
@@ -163,14 +163,6 @@ export class Hero extends ModelAsset {
 	}
 
 	/**
-	 * Adds interactions and movements
-	 * */
-	setupInteractions() {
-		const sRaycaster: RaycasterService = this.main.s('Raycaster');
-		sRaycaster.addRaycasterSubjects([{ order: RaycasterOrders.heroes, object: this }]);
-	}
-
-	/**
 	 * Resolves what happens at the end of a path
 	 * */
 	finaliseEndOfPath(): void {
@@ -246,17 +238,20 @@ export class Hero extends ModelAsset {
 	/**
 	 * Registers movement
 	 * */
-	registerMovement(intersect: RaycasterIntersection) {
+	registerMovement(event: InteractionEvent) {
+		console.log("REGISTER MOVEMENT", this);
 		const sPath: PathService = this.main.s('Path');
 
 		this.movePathManager.removePath('activemovement');
-		const movePath = sPath.createMovePath('activemovement', [{ point: this.groupMain.position }, { point: intersect.point.point }]);
+		const movePath = sPath.createMovePath('activemovement', [{ point: this.groupMain.position }, { point: event.raycasterInteraction.point.point }]);
 		console.log(movePath);
 		this.movePathManager.addPath(movePath);
 		this.movePathManager.setActivePath(movePath.id);
 		this.stateMachine.transition(HeroTransitions.moving);
 
-		this.cancelDefaultClick();
+		this.deselect();
+
+		return { handled: true, cancelListeners: true }
 	}
 
 	/**
@@ -408,36 +403,48 @@ export class Hero extends ModelAsset {
 	activateIdlePower() { }
 
 	/**
+	* Interactions
+	* */
+	setInteractive() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractable(new Interactable2(this.typeName, InteractableOrders.creeps, this));
+
+		// Registers a listener, but duplicates will be ignored
+		sInteraction2.registerInteractableListener('hero', 'selectHero', this.select);
+	}
+
+	/**
 	 ******************************************************* UI INTERACTIONS
 	 * */
-	defaultClick() {
-		console.log("Default Click: Hero");
-		const sInteraction: InteractionService = this.main.s('Interaction');
-		sInteraction.setSelectionState(this, true);
-
-		const targetSet = new Set<Interactable>();
-		targetSet.add(new Interactable(InteractableOrders.terrain, this.main.s('Level').currentLevel.terrain));
-		sInteraction.registerContextInteraction(this.registerMovement.bind(this), targetSet);
-	}
-
-	cancelDefaultClick() {
-		const sInteraction: InteractionService = this.main.s('Interaction');
-		sInteraction.setSelectionState(this, false);
-		sInteraction.deregisterContextInteraction();
-	}
 
 	/**
 	 * Selection Callbacks
 	 * */
-	select() {
-		this.selectionMesh = ModelCommons.selectionCircleMesh();
-		this.selectionMesh.rotation.x = Math.PI * -0.5;
-		this.selectionMesh.position.y = 0.15;
-		this.selectionMesh.position.z = 2.5;
-		this.groupMain.add(this.selectionMesh);
+	select(event: InteractionEvent) {
+		if (this.selected) {
+			this.deselect();
+		} else {
+			this.selected = true;
+			this.selectionMesh = ModelCommons.selectionCircleMesh();
+			this.selectionMesh.rotation.x = Math.PI * -0.5;
+			this.selectionMesh.position.y = 0.15;
+			this.selectionMesh.position.z = 2.5;
+			this.groupMain.add(this.selectionMesh);
+
+			// Register a new listener to make the movement
+			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+			sInteraction2.registerInteractableListener('terrain', 'registerHeroMovement', this.registerMovement.bind(this));
+		}
+
+		return { handled: true, cancelListeners: true }
 	}
 	deselect() {
+		this.selected = false;
 		this.groupMain.remove(this.selectionMesh!);
 		this.selectionMesh = undefined;
+
+		// Register a new listener to make the movement
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.deregisterInteractableListener('terrain', 'registerHeroMovement');
 	}
 }

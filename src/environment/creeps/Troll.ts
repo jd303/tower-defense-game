@@ -40,7 +40,7 @@ export class Troll extends Creep {
 		attack_damage: 10,
 		attack_damagetype: DamageTypes.crushing
 	});
-	healthBarY: 2;
+	healthBarY: 3;
 
 	/**
 	 * Constructor
@@ -56,5 +56,5 @@ export class Troll extends Creep {
 	/**
 	 * Animations
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 }

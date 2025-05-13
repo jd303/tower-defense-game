@@ -6,11 +6,12 @@ import { EconomyService } from './game/EconomyService';
 import { UIService } from './game/UIService';
 import { EventService } from './core/EventService';
 import { SplashScreen } from './levels/levels/_SplashScreen';
-import { InteractionService } from './game/InteractionService';
+import { InteractionService2 } from './game/InteractionService2';
 import { FogOfWarService } from './game/FogOfWarService';
 import { ParticleService } from './core/ParticleService';
 import { PathService } from './game/PathService';
 import { LocationService } from './game/LocationService';
+import { DebugService } from './core/DebugService';
 
 /**
  * Configuration
@@ -28,7 +29,7 @@ const debugMode = true;
 const main = new Main(canvas, sizes, debugMode);
 
 // Create services
-main.registerService('Interaction', new InteractionService(main));
+main.registerService('Interaction2', new InteractionService2(main));
 main.registerService('Path', new PathService(main));
 main.registerService('Location', new LocationService(main));
 main.registerService('Level', new LevelService(main));
@@ -38,6 +39,7 @@ main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
 main.registerService('FogOfWar', new FogOfWarService(main));
 main.registerService('Particle', new ParticleService(main));
+main.registerService('Debug', new DebugService(main, debugMode, main.s('Tick')));
 
 // Loads the working scene
 if (location.hash == '') {

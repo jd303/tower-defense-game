@@ -6,14 +6,15 @@ import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
-import { InteractionService } from '../../game/InteractionService';
 import { Hero } from '../heroes/Hero';
 import { HeroAttackStats } from '../heroes/HeroStats';
+import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
 
 export class Creep extends ModelAsset {
 	/**
 	 * Stats
 	 * */
+	typeName: string = "creep";
 	stats: CreepStats;
 
 	/**
@@ -45,7 +46,7 @@ export class Creep extends ModelAsset {
 	healthBar: THREE.Group | null;
 	healthBarGroupName: string = 'healthbargroup';
 	healthBarName: string = 'healthbar';
-	healthBarY: number = 1;
+	healthBarY: number = 1.25;
 
 	/**
 	 * Constructor
@@ -190,9 +191,7 @@ export class Creep extends ModelAsset {
 	 * Checks the health status and orgnaises health bars
 	 * */
 	checkHealthStatus() {
-
 		switch (true) {
-
 			// The Creep has died
 			case this.stats.hp_current <= 0:
 				this.killCreep();
@@ -258,7 +257,7 @@ export class Creep extends ModelAsset {
 	deleteCreep() {
 		this.stateMachine.remove();
 		this.main.s('Level').currentLevel.removeCreep(this);
-		this.main.s('Interaction').deregisterDefaultTarget(this);
+		this.main.s('Interaction2').deregisterInteractableByObject(this);
 	}
 
 	/**
@@ -267,7 +266,7 @@ export class Creep extends ModelAsset {
 	createHealthBar() {
 		const barBG = ModelCommons.healthBarGeometry;
 		const barFG = ModelCommons.healthBarGeometry;
-		barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3));
+		//barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
 		const healthBarGroup = new THREE.Group();
 		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
 		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
@@ -400,12 +399,29 @@ export class Creep extends ModelAsset {
 	activateIdlePower() { }
 
 	/**
-	 ******************************************************* UI INTERACTIONS
-	 * */
-	defaultClick() {
-		console.log("Default Click: Creep");
-		const sInteraction: InteractionService = this.main.s('Interaction');
-		sInteraction.setSelectionState(this, true);
+	* Interactions
+	* */
+	setInteractive() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractable(new Interactable2(this.typeName, InteractableOrders.creeps, this));
+
+		// Registers a listener, but duplicates will be ignored
+		console.log("TODO: Consider a better place to put this!!");
+		sInteraction2.registerInteractableListener('creep', 'getInfo', this.getInfo);
+	}
+
+	/**
+	 * Get info
+	 */
+	getInfo() {
+		if (this instanceof Creep) {
+			console.group();
+			console.log(`Creep: ${this.constructor.name}`);
+			console.log('Stats:', this.stats);
+			console.groupEnd();
+		}
+
+		return { handled: true, cancelListeners: true };
 	}
 
 	select() {
