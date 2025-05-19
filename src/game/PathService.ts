@@ -1,4 +1,4 @@
-import THREE, { CurvePath, Vector3 } from "three";
+import THREE, { CatmullRomCurve3, CurvePath, Vector3 } from "three";
 import { Main } from "../core/Main";
 import { MovePathDefinition, PathPoint } from "../data/PathInterfaces";
 import { Service } from "../core/Service";
@@ -309,6 +309,61 @@ export class PathService extends Service {
 		}
 
 		return this.createCurveFromPathPoints(offsetPoints.map(point => { return { point: point } }), 0, 0, true);
+	}
+
+	/**
+	 * Converts a CatmullRomCurve3 back to THREE.CurvePath
+	 */
+	convertFromCatmullRomCurve3(catmullRomCurve3: CatmullRomCurve3, samplePoints = 50) {
+		const curvePath = new THREE.CurvePath();
+		const points = catmullRomCurve3.getPoints(samplePoints); // Sample 50 points along the curve
+
+		// Create a series of line segments between the sampled points
+		for (let i = 0; i < points.length - 1; i++) {
+			const lineCurve = new THREE.LineCurve3(points[i], points[i + 1]);
+			curvePath.add(lineCurve);
+		}
+
+		// If the original curve was closed, connect the last point to the first
+		if (catmullRomCurve3.closed) {
+			const lineCurve = new THREE.LineCurve3(points[points.length - 1], points[0]);
+			curvePath.add(lineCurve);
+			curvePath.closePath();
+		}
+
+		return curvePath;
+	}
+
+	/**
+	 * DEBUG: Creates outlines of tiles and internal paths
+	 */
+	debugCreateOutlines(curvePath: THREE.CurvePath<THREE.Vector3> | THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number = 0x000000) {
+		const points = curvePath.getPoints(100);
+		const lineGeometry = new THREE.BufferGeometry().setFromPoints(points as THREE.Vector3[]);
+
+		const lineDistances = new Float32Array(points.length);
+		let distance = 0;
+
+		for (let i = 1; i < points.length; i++) {
+			const distanceAddition = points[i].distanceTo!(points[i - 1]);
+			distance += distanceAddition;
+			lineDistances[i] = distance;
+		}
+
+		lineGeometry.setAttribute('lineDistance', new THREE.BufferAttribute(lineDistances, 1));
+
+		const material = new THREE.LineDashedMaterial({
+			color: color,
+			dashSize: 1,
+			gapSize: 0.5,
+			linewidth: 1 // ignored in most browsers due to WebGL restrictions
+		});
+
+		const line = new THREE.Line(lineGeometry, material);
+		line.position.y = 0.25;
+		line.computeLineDistances(); // call this if you haven’t manually set lineDistance
+
+		this.main.scene.add(line);
 	}
 }
 

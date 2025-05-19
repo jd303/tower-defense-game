@@ -2,13 +2,11 @@ import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
-import { TowerFactory } from './TowerManager';
 
 export class TowerMage extends Tower {
 	/**
@@ -18,16 +16,11 @@ export class TowerMage extends Tower {
 	assetScale = 3.5;
 
 	/**
-	 * Factory
-	 * */
-	static Factory: TowerFactory = new TowerFactory(
-		UIRegions.Tower,
-		'assets/models/towers/Tower.Mage.UI.icon.png',
-		150,
-		'money',
-		TowerMage,
-		() => { }
-	);
+	 * Static details
+	 */
+	static buttonIcon = 'assets/models/towers/Tower.Mage.UI.icon.png';
+	static cost = 150;
+	static costType = 'money';
 
 	/**
 	 * Stats

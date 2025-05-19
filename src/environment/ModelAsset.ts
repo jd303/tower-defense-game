@@ -250,11 +250,11 @@ export abstract class ModelAsset {
 	/**
 	 * Adds a selection mesh to the model
 	 */
-	addSelectionMesh() {
-		this.selectionMesh = ModelCommons.selectionCircleMesh();
+	addSelectionMesh(width: number = 2, thickness: number = 0.25) {
+		this.selectionMesh = ModelCommons.selectionCircleMesh(width, thickness);
 		this.selectionMesh.rotation.x = Math.PI * -0.5;
 		this.selectionMesh.position.y = 0.15;
-		this.selectionMesh.position.z = 2.5;
+		this.selectionMesh.position.z = 0;
 		this.groupMain.add(this.selectionMesh);
 	}
 
@@ -300,13 +300,21 @@ export class ModelCommons {
 	static selectionCircleMaterial = new THREE.MeshBasicMaterial({ color: 0x4298B5 });
 	static selectionCircleGeometry = new THREE.CircleGeometry(2, 32);
 	//static selectionCircleMesh = () => { return new THREE.Mesh(this.selectionCircleGeometry, this.selectionCircleMaterial); }
-	static selectionCircleMesh = () => {
-		const shape = new THREE.Shape();
+	static selectionCircleMesh = (width: number = 4, thickness: number = 0.25) => {
+		const geometry = new THREE.RingGeometry(width - thickness, width, 32); // inner radius, outer radius, segments
+		return new THREE.Mesh(geometry, this.selectionCircleMaterial);
+
+		/*const shape = new THREE.Shape();
 		shape.moveTo(0, 0);
 		shape.bezierCurveTo(2, 0, 2, 2, 2, 2);
 		shape.bezierCurveTo(2, 4, 0, 4, 0, 4);
 		shape.bezierCurveTo(-2, 4, -2, 2, -2, 2);
 		shape.bezierCurveTo(-2, 0, 0, 0, 0, 0);
+
+		shape.bezierCurveTo(width, 0, width, width, width, width);
+		shape.bezierCurveTo(width, 2 * width, 0, 2 * width, 0, 2 * width);
+		shape.bezierCurveTo(-width, 2 * width, -width, width, -width, width);
+		shape.bezierCurveTo(-width, 0, 0, 0, 0, 0);
 
 		const points = shape.getPoints();
 		points.forEach(item => {
@@ -321,6 +329,6 @@ export class ModelCommons {
 		shape.holes.push(holePath);
 		const geometry = new THREE.ShapeGeometry(shape);
 
-		return new THREE.Mesh(geometry, this.selectionCircleMaterial);
+		return new THREE.Mesh(geometry, this.selectionCircleMaterial);*/
 	}
 }

@@ -12,6 +12,9 @@ import { TowerManager } from '../environment/towers/TowerManager';
 import { CreepManager } from '../environment/creeps/CreepManager';
 import { WaveManager } from './WaveManager';
 import { LevelCameraManager } from './LevelCameraManager';
+import { TowerMage } from '../environment/towers/TowerMage';
+import { TowerBomber } from '../environment/towers/TowerBomber';
+import { TowerArcher } from '../environment/towers/TowerArcher';
 
 export class Level {
 	/**
@@ -59,7 +62,7 @@ export class Level {
 		this.levelCameraManager.setup();
 		this.creepManager.setupCreepPaths(this.levelDetails);
 		this.propManager.setup(this.levelDetails);
-		this.towerManager.setup(this.levelDetails);
+		this.towerManager.setup(this.levelDetails, [TowerArcher, TowerMage, TowerBomber]);
 		this.waveManager.setup(this.levelDetails);
 
 		this.renderLevel();

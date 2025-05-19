@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
@@ -11,7 +10,6 @@ import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive }
 import { BombShot } from '../effects/BombShot';
 import { ModelAsset } from '../ModelAsset';
 import { MovementTypes } from '../../data/MovementTypes';
-import { TowerFactory } from './TowerManager';
 
 export class TowerBomber extends Tower {
 	/**
@@ -20,6 +18,13 @@ export class TowerBomber extends Tower {
 	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
 	assetScale = 3.5;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
+
+	/**
+	 * Static details
+	 */
+	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
+	static cost = 175;
+	static costType = 'money';
 
 	/**
 	 * Stats
@@ -37,18 +42,6 @@ export class TowerBomber extends Tower {
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
 	};
-
-	/**
-	 * Factory
-	 * */
-	static Factory: TowerFactory = new TowerFactory(
-		UIRegions.Tower,
-		'assets/models/towers/Tower.Bomber.UI.icon.png',
-		175,
-		"money",
-		TowerBomber,
-		() => { }
-	);
 
 	/**
 	 * Constructor

@@ -5,6 +5,7 @@ import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
 import { Maths } from "../../core/Maths";
 import { EnvironmentTile } from "../EnvironmentTile";
+import { PathService } from "../../game/PathService";
 
 /**
  * A framework for adding props and propzones to the board
@@ -73,9 +74,12 @@ export class PropManager {
 		const propZonePropsY = args.environmentTile.show ? 0.2 : 0;
 		const propZone = new PropZone(args, this.main);
 		const propPositions: Vector3[] = propZone.createPositions();
-		if (args.environmentTile.show) this.environmentTiles.push(propZone.createEnvironmentTile());
 
-		if (this.main.debugMode) propZone.debugCreateOutlines();
+		if (args.environmentTile.show) {
+			const environmentTile = propZone.createEnvironmentTile();
+			this.environmentTiles.push(propZone.createEnvironmentTile());
+			this.main.scene.add(environmentTile.groupMain);
+		}
 
 		// Place the props
 		propPositions.forEach((position: any) => {

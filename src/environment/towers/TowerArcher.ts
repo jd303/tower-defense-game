@@ -2,14 +2,12 @@ import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { UIRegions } from '../../game/UIProperties';
 import { Projectile, ProjectileHitTypes, ProjectileTypes } from '../attacks/Projectile';
 import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { TowerStats } from './TowerStats';
-import { TowerFactory } from './TowerManager';
 
 export class TowerArcher extends Tower {
 	/**
@@ -18,6 +16,13 @@ export class TowerArcher extends Tower {
 	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
 	assetScale = 3.5;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
+
+	/**
+	 * Static details
+	 */
+	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
+	static cost = 100;
+	static costType = 'money';
 
 	/**
 	 * Stats
@@ -35,18 +40,6 @@ export class TowerArcher extends Tower {
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
 	};
-
-	/**
-	* Factory
-	* */
-	static Factory: TowerFactory = new TowerFactory(
-		UIRegions.Tower,
-		'assets/models/towers/Tower.Archer.UI.icon.png',
-		100,
-		'money',
-		TowerArcher,
-		() => { }
-	);
 
 	/**
 	 * Constructor

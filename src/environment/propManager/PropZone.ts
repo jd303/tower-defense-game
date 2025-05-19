@@ -30,6 +30,12 @@ export class PropZone {
 			this.zoneOutlinePath = sPath.smoothCurve(this.zoneOutlinePath);
 		}
 
+		if (this.main.debugMode) {
+			const sPath: PathService = this.main.s('Path');
+			sPath.debugCreateOutlines(this.curvePath);
+			if (args.environmentTile.show) sPath.debugCreateOutlines(this.zoneOutlinePath, 0xff0000);
+		}
+
 		return this;
 	}
 
@@ -118,41 +124,6 @@ export class PropZone {
 
 		return furthestDistance;
 	}*/
-
-	// Creates a debug outline
-	debugCreateOutlines() {
-		createOutline.bind(this)(this.curvePath, 0x000000);
-		if (this.arguments.environmentTile.show) createOutline.bind(this)(this.zoneOutlinePath, 0xFF5555);
-
-		function createOutline(path: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number) {
-			const points = path.getPoints(100);
-			const lineGeometry = new THREE.BufferGeometry().setFromPoints(points as Vector3[]);
-
-			const lineDistances = new Float32Array(points.length);
-			let distance = 0;
-
-			for (let i = 1; i < points.length; i++) {
-				const distanceAddition = points[i].distanceTo!(points[i - 1]);
-				distance += distanceAddition;
-				lineDistances[i] = distance;
-			}
-
-			lineGeometry.setAttribute('lineDistance', new THREE.BufferAttribute(lineDistances, 1));
-
-			const material = new THREE.LineDashedMaterial({
-				color: color,
-				dashSize: 1,
-				gapSize: 0.5,
-				linewidth: 1 // ignored in most browsers due to WebGL restrictions
-			});
-
-			const line = new THREE.Line(lineGeometry, material);
-			line.position.y = 0.25;
-			line.computeLineDistances(); // call this if you haven’t manually set lineDistance
-
-			this.main.scene.add(line);
-		}
-	}
 }
 
 export interface PropZoneArguments {

@@ -21,7 +21,6 @@ export class EnvironmentTile {
 
 		this.groupMain = new THREE.Group();
 		this.groupMain.add(mesh);
-		this.main.scene.add(this.groupMain);
 
 		console.log("TODO, Make this interactive, and rethink interactions");
 		//this.setInteractive(main);

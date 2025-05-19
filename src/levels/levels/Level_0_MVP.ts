@@ -58,10 +58,6 @@ export class Level0MVP extends Level {
 
 		// Setup a UI (towers defaulted, but in the future players should be able to choose)
 		const sUI: UIService = this.main.s('UI');
-		TowerArcher.setupUI(this.main);
-		TowerBomber.setupUI(this.main);
-		TowerMage.setupUI(this.main);
-		//sUI.addLevelUIButtons(this.terrain, [TowerArcher, TowerBomber, TowerMage]);
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
 		sUI.addEconomyLabel('vp', 'vp_changed');
 
@@ -75,7 +71,7 @@ export class Level0MVP extends Level {
 
 		// Create a Hero
 		const HeroMan0 = new Man0(this.main);
-		this.addHero(HeroMan0, new Vector3(-5, 0, 50));
+		this.addHero(HeroMan0, new Vector3(-28, 0, -20));
 
 		// Enable shadows
 		setTimeout(() => {
@@ -83,15 +79,9 @@ export class Level0MVP extends Level {
 			//this.main.renderer.outputEncoding = THREE.sRGBEncoding;
 			this.main.renderer.shadowMap.enabled = true;
 			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-			/*this.props.forEach((prop) => prop.enableShadows(true, false));
-			this.towers.forEach((tower) => tower.enableShadows(true, true));
-			this.creeps.forEach((creep) => creep.enableShadows(true, true));*/
-
 			this.terrain.enableShadows();
-
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
-		}, 1000);
+		}, 100);
 
 
 		/**
