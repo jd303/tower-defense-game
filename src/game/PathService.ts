@@ -335,6 +335,27 @@ export class PathService extends Service {
 	}
 
 	/**
+	 * Fills a curve with shapes
+	 */
+	getShapePlacementsInCurve(curvePath: THREE.CurvePath<THREE.Vector3>, shapeSize: number = 3, shapeGap: number = 2) {
+		const boundingBox = this.getBoundingBoxOfCurvePath(curvePath);
+		const shapePlacements: Vector3[] = [];
+
+		for (let z = boundingBox.smallestZ; z <= boundingBox.largestZ; z += shapeSize + shapeGap) {
+			const isEvenRow = Math.floor((z - boundingBox.smallestZ) / (shapeSize + shapeGap)) % 2 === 0;
+
+			for (let x = boundingBox.smallestX; x <= boundingBox.largestX; x += shapeSize + shapeGap) {
+				const potentialPoint = isEvenRow ? new Vector3(x, 0, z) : new Vector3(x + shapeSize / 2, 0, z);
+				if (this.pointIsInCurvePath(potentialPoint, curvePath as THREE.CurvePath<any>)) {
+					shapePlacements.push(potentialPoint);
+				}
+			}
+		}
+
+		return shapePlacements;
+	}
+
+	/**
 	 * DEBUG: Creates outlines of tiles and internal paths
 	 */
 	debugCreateOutlines(curvePath: THREE.CurvePath<THREE.Vector3> | THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number = 0x000000) {

@@ -10,9 +10,11 @@ export class TowerPlacementZone {
 	 * Definitions
 	 * */
 	main: Main;
+	towerPlacementCommons: TowerPlacementCommons;
 	pathPoints: PathPoint[];
 	environmentTile: EnvironmentTile;
-	placementTile: EnvironmentTile | null;
+	placementTilePositions: THREE.Vector3[] = [];
+	placementTiles: EnvironmentTile[] = [];
 	castShadows: boolean = false;
 	receiveShaodws: boolean = true;
 	curvePath: THREE.CurvePath<any>;
@@ -25,8 +27,9 @@ export class TowerPlacementZone {
 	/**
 	 * Constructor
 	 * */
-	constructor(points: PathPoint[], main: Main) {
+	constructor(points: PathPoint[], towerPlacementCommons: TowerPlacementCommons, main: Main) {
 		this.main = main;
+		this.towerPlacementCommons = towerPlacementCommons;
 		this.pathPoints = points;
 		const sPath: PathService = main.s('Path');
 		const curvePath = sPath.createCurveFromPathPoints(points, 0, 0, true);
@@ -35,6 +38,7 @@ export class TowerPlacementZone {
 		this.environmentTile = new EnvironmentTile(this.curvePath, main, 0xC4B271);
 		this.main.scene.add(this.environmentTile.groupMain);
 		this.groupMain = new THREE.Group();
+		this.placementTilePositions = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
 
 		if (this.main.debugMode) {
 			sPath.debugCreateOutlines(this.curvePath);
@@ -47,32 +51,64 @@ export class TowerPlacementZone {
 	 * Sets whether this model can be interactive 
 	 * */
 	setInteractive(interactive: boolean) {
-		if (this.placementTile) {
-			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		this.placementTiles.forEach((tile) => {
 			if (interactive) {
-				sInteraction2.registerInteractable(new Interactable2('towerPlacementZone', InteractableOrders.pathsAndTiles, this.placementTile));
+				sInteraction2.registerInteractable(new Interactable2('towerPlacementZone', InteractableOrders.pathsAndTiles, tile));
 			} else {
-				sInteraction2.deregisterInteractableByObject(this.placementTile);
+				sInteraction2.deregisterInteractableByObject(tile);
 			}
-		}
+		});
 	}
 
 	/**
 	 * Shows the placement tile
 	 */
 	showPlacementTile(visible: boolean) {
-		const sPath: PathService = this.main.s('Path');
 		if (visible) {
-			const placementTilePath = sPath.offsetPathFromPointsXZ(this.pathPoints, -1);
-			this.placementTile = new EnvironmentTile(placementTilePath, this.main, 0x000000);
-			this.placementTile.groupMain.position.y = 0.25;
-			this.main.scene.add(this.placementTile.groupMain);
+			this.placementTilePositions.forEach((placement) => {
+				const environmentTile = new EnvironmentTile(this.towerPlacementCommons.placementTileCurve, this.main, 0x000000);
+				environmentTile.groupMain.position.set(placement.x, 0.15, placement.z);
+				this.placementTiles.push(environmentTile);
+				this.main.scene.add(environmentTile.groupMain);
+			});
 			this.setInteractive(true);
-		} else if (this.placementTile) {
+		} else {
 			this.setInteractive(false);
-			this.main.scene.remove(this.placementTile.groupMain);
-			this.placementTile = null;
+			this.placementTiles.forEach((tile) => {
+				this.main.scene.remove(tile.groupMain);
+			});
+			this.placementTiles = [];
 		}
+	}
+}
+
+export class TowerPlacementCommons {
+	main: Main;
+	placementTileSize: number = 4;
+	placementTileCurve: THREE.Curve<any>;
+
+	constructor(main: Main) {
+		this.main = main;
+		this.placementTileCurve = this.createPlacementTile();
+	}
+
+	createPlacementTile = () => {
+		console.log("%c TODO NEXT: Disable placement tiles when they're used, and add radius to towers, invalidating placement tiles", "color: red; font-weight: bold;");
+		const sPath: PathService = this.main.s('Path');
+
+		const baseCurve = new THREE.EllipseCurve(
+			0, 0,           // center x, y
+			this.placementTileSize / 2, this.placementTileSize / 2, // xRadius, yRadius
+			0, 2 * Math.PI, // startAngle, endAngle
+			false,          // clockwise
+			0               // rotation
+		);
+		const points = baseCurve.getPoints(20);
+		const vector3Points = points.map(p => { return { point: new THREE.Vector3(p.x, 0, p.y) } });
+		const curve = sPath.createCurveFromPathPoints(vector3Points);
+
+		return curve;
 	}
 }
 

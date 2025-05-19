@@ -3,7 +3,7 @@ import { Main } from '../../core/Main';
 import { UIRegions } from '../../game/UIProperties';
 import { UIButton, UIService } from '../../game/UIService';
 import { Tower } from './Tower';
-import { TowerPlacementZone } from './TowerPlacementZone';
+import { TowerPlacementCommons, TowerPlacementZone } from './TowerPlacementZone';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelDefinition } from '../../data/LevelInterfaces';
 import { InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
@@ -19,6 +19,7 @@ export class TowerManager {
 	/**
 	 * Objects
 	 */
+	towerPlacementCommons: TowerPlacementCommons;
 	towerPlacementZones: TowerPlacementZone[] = [];
 	towers: Tower[] = [];
 
@@ -33,8 +34,10 @@ export class TowerManager {
 	 * Instantiates tower placement zones and UI buttons
 	 * */
 	setup(levelDetails: LevelDefinition, levelTowers: typeof Tower[]) {
+		this.towerPlacementCommons = new TowerPlacementCommons(this.main);
+
 		levelDetails.towerPlacementZones.forEach((placement) => {
-			const towerPlacementZone = new TowerPlacementZone(placement.points, this.main);
+			const towerPlacementZone = new TowerPlacementZone(placement.points, this.towerPlacementCommons, this.main);
 			this.towerPlacementZones.push(towerPlacementZone);
 		});
 
@@ -88,7 +91,7 @@ export class TowerManager {
 	requestAddTower(tower: typeof Tower, event: InteractionEvent, button: UIButton) {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
-			this.addTower(new tower(this.main), event.raycasterInteraction.point.point);
+			this.addTower(new tower(this.main), event.raycasterInteraction.object.groupMain.position);
 		}
 
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
