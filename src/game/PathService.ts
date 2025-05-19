@@ -81,7 +81,7 @@ export class PathService extends Service {
 			const lastPoint = points[points.length - 1].point;
 			const firstPoint = points[0].point;
 			if (lastPoint.x !== firstPoint.x || lastPoint.y !== firstPoint.y || lastPoint.z !== firstPoint.z) {
-				console.error("Closing path with different end position");
+				console.error(`Closing path with different end position ${firstPoint.x}, ${firstPoint.y}, ${firstPoint.z}`);
 			}
 			curvePath.closePath();
 		}
@@ -94,7 +94,7 @@ export class PathService extends Service {
 	 * @param curvePath 
 	 * @returns THREE.CatmullRomCurve3
 	 */
-	smoothCurve(curvePath: THREE.CurvePath<any>) {
+	smoothCurve(curvePath: THREE.CurvePath<any> | THREE.CatmullRomCurve3) {
 		const sampledPoints = curvePath.getPoints(50); // or more, depending on desired resolution
 
 		// Smooth it with CatmullRom

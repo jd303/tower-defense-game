@@ -23,9 +23,13 @@ export class PropZone {
 		this.main = main;
 		this.arguments = args;
 		this.curvePath = sPath.createCurveFromPathPoints(args.zonePathPoints, 0, 0, true);
-		this.zoneOutlinePath = sPath.offsetPathFromPointsXZ(args.zonePathPoints, args.environmentTileDistance, true);
-		this.zoneOutlinePath = sPath.smoothCurve(this.zoneOutlinePath);
 		this.boundingBox = sPath.getBoundingBoxOfCurvePath(this.curvePath);
+
+		if (args.environmentTile.show) {
+			this.zoneOutlinePath = sPath.offsetPathFromPointsXZ(args.zonePathPoints, args.environmentTile!.distance!, true);
+			this.zoneOutlinePath = sPath.smoothCurve(this.zoneOutlinePath);
+		}
+
 		return this;
 	}
 
@@ -88,7 +92,7 @@ export class PropZone {
 	 */
 	createEnvironmentTile() {
 		console.log("TODO: I feel that environment tiles should be centralised, otherwise anything could create them. Consider moving them.");
-		const environmentTile = new EnvironmentTile(this.zoneOutlinePath, this.main, this.arguments.environmentTileColour);
+		const environmentTile = new EnvironmentTile(this.zoneOutlinePath, this.main, this.arguments.environmentTile.colour);
 		return environmentTile;
 	}
 
@@ -118,7 +122,7 @@ export class PropZone {
 	// Creates a debug outline
 	debugCreateOutlines() {
 		createOutline.bind(this)(this.curvePath, 0x000000);
-		createOutline.bind(this)(this.zoneOutlinePath, 0xFF5555);
+		if (this.arguments.environmentTile.show) createOutline.bind(this)(this.zoneOutlinePath, 0xFF5555);
 
 		function createOutline(path: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number) {
 			const points = path.getPoints(100);
@@ -152,6 +156,7 @@ export class PropZone {
 }
 
 export interface PropZoneArguments {
+	propNames: string[],
 	zonePathPoints: PathPoint[],
 	propDensityFactor: number,
 	propScale: number;
@@ -159,8 +164,11 @@ export interface PropZoneArguments {
 	positionRandom: number,
 	scaleRandom: { all?: number, x?: number, y?: number, z?: number },
 	rotateRandom: number,
-	environmentTileDistance: number,
-	environmentTileColour: number
+	environmentTile: {
+		show: boolean,
+		distance?: number,
+		colour?: number
+	}
 }
 
 export interface PropZoneScaling {

@@ -1,15 +1,17 @@
 import * as THREE from 'three';
 import { Creep } from '../environment/creeps/Creep';
-import { Tower } from '../environment/towers/Tower';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
-import { LevelPath } from './LevelPath';
 import { LevelDefinition } from '../data/LevelInterfaces';
 import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { Hero } from '../environment/heroes/Hero';
-import { PropManager } from '../environment/props_manager/PropManager';
+import { PropManager } from '../environment/propManager/PropManager';
+import { TowerManager } from '../environment/towers/TowerManager';
+import { CreepManager } from '../environment/creeps/CreepManager';
+import { WaveManager } from './WaveManager';
+import { LevelCameraManager } from './LevelCameraManager';
 
 export class Level {
 	/**
@@ -20,60 +22,60 @@ export class Level {
 	/**
 	 * Path
 	 * */
-	levelPaths: LevelPath[] = [];
+	levelDetails: LevelDefinition;
 
 	/**
 	 * Level Assets
 	 * */
-	propManager: PropManager;
+	levelCameraManager: LevelCameraManager;
 	terrain: Terrain;
-	creeps: Creep[] = [];
-	towers: Tower[] = [];
+	waveManager: WaveManager;
+	propManager: PropManager;
+	towerManager: TowerManager;
+	creepManager: CreepManager;
 	heroes: Hero[] = [];
 
 	/**
 	 * Constructor
 	 */
-	constructor(main: Main) {
+	constructor(levelDetails: LevelDefinition, main: Main) {
+		this.levelDetails = levelDetails;
 		this.main = main;
 		this.main.s('Level').currentLevel = this;
+		this.levelCameraManager = new LevelCameraManager(this.main);
+		this.terrain = new Terrain(levelDetails.terrain, this.main);
+		this.propManager = new PropManager(this.main);
+		this.towerManager = new TowerManager(this.main);
+		this.creepManager = new CreepManager(this.main);
+		this.waveManager = new WaveManager(this, this.main);
+
+		this.setupLevel();
+	}
+
+	/**
+	 * Sets up all the assets required for the level
+	 */
+	setupLevel() {
+		this.levelCameraManager.setup();
+		this.creepManager.setupCreepPaths(this.levelDetails);
+		this.propManager.setup(this.levelDetails);
+		this.towerManager.setup(this.levelDetails);
+		this.waveManager.setup(this.levelDetails);
+
+		this.renderLevel();
 		this.setupMainTick();
+		this.waveManager.startWaveTimer();
 	}
 
 	/**
-	 * Adds a creep to the level
-	 * */
-	addTerrain(levelDetails: LevelDefinition) {
-		const terrain = new Terrain(levelDetails.terrain, this.main);
-		this.terrain = terrain;
-		this.main.scene.add(terrain.groupMain);
-	}
+	 * Renders all the objects in the level
+	 */
+	renderLevel() {
+		console.log("%c TODO: Migrate all rendering (props, creeps, etc) to here", "color:green");
+		this.main.scene.add(this.terrain.groupMain);
 
-	/**
-	 * Adds a creep to the level
-	 * */
-	addCreep(creep: Creep) {
-		// if (!this.creeps.find((creep) => creep)) this.creeps.push(creep);
-		this.creeps.push(creep);
-		this.main.scene.add(creep.groupMain);
-	}
-
-	/**
-	 * Removes a creep from the level
-	 * */
-	removeCreep(removedCreep: Creep) {
-		this.creeps = this.creeps.filter((creep) => creep !== removedCreep);
-		this.main.scene.remove(removedCreep.groupMain);
-	}
-
-	/**
-	 * Adds a tower to the level
-	 * */
-	addTower(tower: Tower, point: THREE.Vector3) {
-		// if (!this.towers.find((tower) => tower)) this.towers.push(tower);
-		this.towers.push(tower);
-		this.main.scene.add(tower.groupMain);
-		tower.groupMain.position.set(point.x, point.y, point.z);
+		// Start the timer
+		this.main.s('Tick').start();
 	}
 
 	/**
@@ -96,9 +98,10 @@ export class Level {
 	 * Animates creeps and towers and other game items
 	 * */
 	gameplayTickCallback(timeProperties: TickTimeProperties) {
-		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
+
 		this.heroes.forEach((hero) => hero.animateCore(timeProperties));
-		this.towers.forEach((tower) => tower.animateCore(timeProperties));
+		this.creepManager.tick(timeProperties);
+		this.towerManager.tick(timeProperties);
 	}
 
 	/**

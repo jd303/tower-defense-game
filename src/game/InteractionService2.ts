@@ -1,11 +1,13 @@
-import { Raycaster } from 'three';
 import { Main } from '../core/Main';
 import { RaycasterIntersection, RaycasterService } from '../core/RaycasterService';
 import { Service } from '../core/Service';
-import { StateMachine, StateMachineTransitions } from '../core/StateMachine';
 import { ModelAsset } from '../environment/ModelAsset';
 import { Terrain } from '../environment/Terrain';
-import { LevelPath } from '../levels/LevelPath';
+import { EnvironmentTile } from '../environment/EnvironmentTile';
+import { CreepPath } from '../environment/creeps/CreepPath';
+import { Creep } from '../environment/creeps/Creep';
+import { Tower } from '../environment/towers/Tower';
+import { Hero } from '../environment/heroes/Hero';
 
 /**
  * Allows us to manage interaction based on clicks and taps.
@@ -115,14 +117,15 @@ export class InteractionService2 extends Service {
 	}
 }
 
-export type InteractableObject = ModelAsset | Terrain | LevelPath;
+export type InteractableObject = ModelAsset | Terrain | CreepPath | EnvironmentTile;
+export type InteractableTypes = 'creep' | 'creepPath' | 'tower' | 'hero' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain';
 
 export class Interactable2 {
-	name: string;
+	name: InteractableTypes;
 	order: InteractableOrders;
 	object: InteractableObject;
 
-	constructor(name: string, order: InteractableOrders, object: InteractableObject) {
+	constructor(name: InteractableTypes, order: InteractableOrders, object: InteractableObject) {
 		this.name = name;
 		this.order = order;
 		this.object = object;
@@ -147,8 +150,9 @@ export interface InteractionEvent {
 
 export enum InteractableOrders {
 	"terrain" = 0,
-	"props" = 1,
-	"creeps" = 2,
-	"towers" = 3,
-	"heroes" = 4,
+	"pathsAndTiles" = 1,
+	"props" = 2,
+	"creeps" = 3,
+	"towers" = 4,
+	"heroes" = 5,
 }

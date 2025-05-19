@@ -3,11 +3,9 @@ import * as lil from 'lil-gui';
 import { Light } from './LightingService';
 import { TickCallback, TickService } from './TickService';
 import { Main } from './Main';
-import { RaycasterIntersection, RaycasterOrders, RaycasterService } from './RaycasterService';
-import { Terrain } from '../environment/Terrain';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
-import { InteractableOrders, InteractionService2, InteractableListener, InteractionEvent } from '../game/InteractionService2';
+import { InteractionService2, InteractionEvent } from '../game/InteractionService2';
 
 export class DebugService extends Service {
 	/**
@@ -27,6 +25,11 @@ export class DebugService extends Service {
 		addSplinePointToEnd: this.addSplinePointToEnd.bind(this),
 		exportPoints: this.exportPoints.bind(this),
 		destroySpline: this.destroySpline.bind(this),
+	}
+	zoneCreatorObject = {
+		startZoneCreator: this.startZoneCreator.bind(this),
+		endZoneCreator: this.endZoneCreator.bind(this),
+		zoneCreation: []
 	}
 
 	/**
@@ -52,6 +55,7 @@ export class DebugService extends Service {
 
 			this.watchDrawCalls();
 			this.addSplineLilGUI();
+			this.addZoneCreatoreLilGUI();
 			this.addTerrainPositionWatcher();
 		}
 
@@ -271,5 +275,43 @@ export class DebugService extends Service {
 		console.log(event.raycasterInteraction.object);
 		console.groupEnd();
 		return { handled: true, cancelListeners: false };
+	}
+
+	/**
+	 * Adds spline tools
+	 */
+	addZoneCreatoreLilGUI() {
+		const folder = this.lilGUI.addFolder('Zone Creator');
+		folder.open(false);
+		folder.add(this.zoneCreatorObject, 'startZoneCreator');
+		folder.add(this.zoneCreatorObject, 'endZoneCreator');
+	}
+
+	/**
+	 * Enables zone creator mode
+	 */
+	startZoneCreator() {
+		this.zoneCreatorObject.zoneCreation = [];
+
+		setTimeout(() => {
+			const sInteraction: InteractionService2 = this.main.s('Interaction2');
+			sInteraction.registerInteractableListener('terrain', 'zoneCreator', this.registerZoneCreatorPoint.bind(this));
+		}, 500);
+	}
+
+	endZoneCreator() {
+		const sInteraction: InteractionService2 = this.main.s('Interaction2');
+		sInteraction.deregisterInteractableListener('terrain', 'zoneCreator');
+
+		this.zoneCreatorObject.zoneCreation.push(this.zoneCreatorObject.zoneCreation[0]);
+		console.log("Zone:", this.zoneCreatorObject.zoneCreation.map((point: THREE.Vector3) => `{ point: new Vector3(${point.x}, ${point.y}, ${point.z}) },`).join('\n'));
+		console.log("END ZONE",);
+	}
+
+	registerZoneCreatorPoint(event: InteractionEvent) {
+		const newPoint = new THREE.Vector3(event.raycasterInteraction.point.point.x.toFixed(3), 0, event.raycasterInteraction.point.point.z.toFixed(3));
+		(this.zoneCreatorObject.zoneCreation as THREE.Vector3[]).push(newPoint);
+
+		return { handled: true, cancelListeners: true }
 	}
 }

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tower, TowerFactory } from './Tower';
+import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { UIRegions } from '../../game/UIProperties';
@@ -11,13 +11,14 @@ import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive }
 import { BombShot } from '../effects/BombShot';
 import { ModelAsset } from '../ModelAsset';
 import { MovementTypes } from '../../data/MovementTypes';
+import { TowerFactory } from './TowerManager';
 
 export class TowerBomber extends Tower {
 	/**
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
-	assetScale = 1.5;
+	assetScale = 3.5;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 
 	/**
@@ -68,7 +69,7 @@ export class TowerBomber extends Tower {
 
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
 			const omissionCallback = (interceptee: Creep) => interceptee.stats.movement.type == MovementTypes.flying;
-			const creeps = this.sLocation.findTargetsInRange({ potentialTargets: this.main.s('Level').currentLevel.creeps, fromPoint: position, range: this.stats.attack.range, omissionCallback: omissionCallback });
+			const creeps = this.sLocation.findTargetsInRange({ potentialTargets: this.main.s('Level').currentLevel.creepManager.creeps, fromPoint: position, range: this.stats.attack.range, omissionCallback: omissionCallback });
 			const creep: ModelAsset | null = creeps.length ? creeps[0] : null;
 
 			// If we have a target

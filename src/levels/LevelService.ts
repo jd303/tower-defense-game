@@ -40,7 +40,7 @@ export class LevelService {
 		}
 
 		// Fog of war
-		const sFog: FogOfWarService = this.main.s('FogOfWar');
-		sFog.createFogOfWar();
+		/*const sFog: FogOfWarService = this.main.s('FogOfWar');
+		sFog.createFogOfWar();*/
 	}
 }

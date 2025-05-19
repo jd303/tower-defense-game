@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
-import { LevelPath } from '../levels/LevelPath';
 import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
 import { ModelAsset } from '../environment/ModelAsset';
-import { Interactable } from '../game/InteractionService';
+import { Interactable2, InteractableObject } from '../game/InteractionService2';
 import { Service } from './Service';
+import { CreepPath } from '../environment/creeps/CreepPath';
 
 export class RaycasterService extends Service {
 	/**
@@ -53,7 +53,7 @@ export class RaycasterService extends Service {
 	 * When a click occurs, handle it
 	 * Will accept targets, and cancel if it first hits a cancelTarget
 	 * */
-	fireRayToTargets(event: MouseEvent | TouchEvent, targets: Interactable[], singleTarget = false, cancelTargets: Interactable[] = []): RaycasterIntersection[] | RaycasterIntersection | null {
+	fireRayToTargets(event: MouseEvent | TouchEvent, targets: Interactable2[], singleTarget = false, cancelTargets: Interactable2[] = []): RaycasterIntersection[] | RaycasterIntersection | null {
 		const position: THREE.Vector2 = new THREE.Vector2(0, 0);
 		if (event instanceof MouseEvent) {
 			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
@@ -76,7 +76,7 @@ export class RaycasterService extends Service {
 	/**
 	 * Finds the first ray target, or null
 	 */
-	getSingleRayTarget(targets: Interactable[], cancelTargets: Interactable[]) {
+	getSingleRayTarget(targets: Interactable2[], cancelTargets: Interactable2[]) {
 		let intersected: RaycasterIntersection | null = null;
 		for (let i = 0; i < targets.length; i++) {
 			let subject = targets[i];
@@ -104,7 +104,7 @@ export class RaycasterService extends Service {
 	/**
 	 * Finds all ray targets, or []
 	 */
-	getAllRayTargets(targets: Interactable[]) {
+	getAllRayTargets(targets: Interactable2[]) {
 		let intersected: RaycasterIntersection[] = [];
 
 		for (let i = 0; i < targets.length; i++) {
@@ -130,13 +130,13 @@ export class RaycasterService extends Service {
 
 interface RaycasterSubject {
 	order: RaycasterOrders;
-	object: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
+	object: Hero | Creep | Tower | Terrain | CreepPath | ModelAsset;
 }
 
 export interface RaycasterIntersection {
 	name: string;
 	point: any,
-	object: Hero | Creep | Tower | Terrain | LevelPath | ModelAsset;
+	object: InteractableObject;
 }
 
 export enum RaycasterOrders {

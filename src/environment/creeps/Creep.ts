@@ -8,13 +8,14 @@ import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
 import { Hero } from '../heroes/Hero';
 import { HeroAttackStats } from '../heroes/HeroStats';
-import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
+import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 
 export class Creep extends ModelAsset {
 	/**
 	 * Stats
 	 * */
-	typeName: string = "creep";
+	typeName: InteractableTypes = "creep";
+	interactiveOrder: InteractableOrders = InteractableOrders.creeps;
 	stats: CreepStats;
 
 	/**
@@ -256,8 +257,8 @@ export class Creep extends ModelAsset {
 	 * */
 	deleteCreep() {
 		this.stateMachine.remove();
-		this.main.s('Level').currentLevel.removeCreep(this);
-		this.main.s('Interaction2').deregisterInteractableByObject(this);
+		this.main.s('Level').currentLevel.creepManager.removeCreep(this);
+		this.deleteModelAsset();
 	}
 
 	/**
@@ -379,7 +380,7 @@ export class Creep extends ModelAsset {
 		this.groupModel.children.forEach((child: any) => {
 			if (child.isMesh) {
 				if (cast) child.castShadow = true;
-				//if (receive) child.receiveShadow = true;
+				if (receive) child.receiveShadow = true;
 				child.material.needsUpdate = true;
 			}
 		});
@@ -399,36 +400,14 @@ export class Creep extends ModelAsset {
 	activateIdlePower() { }
 
 	/**
-	* Interactions
-	* */
-	setInteractive() {
-		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractable(new Interactable2(this.typeName, InteractableOrders.creeps, this));
-
-		// Registers a listener, but duplicates will be ignored
-		console.log("TODO: Consider a better place to put this!!");
-		sInteraction2.registerInteractableListener('creep', 'getInfo', this.getInfo);
-	}
-
-	/**
 	 * Get info
 	 */
-	getInfo() {
-		if (this instanceof Creep) {
-			console.group();
-			console.log(`Creep: ${this.constructor.name}`);
-			console.log('Stats:', this.stats);
-			console.groupEnd();
-		}
+	creepClicked() {
+		console.group();
+		console.log(`Creep: ${this.constructor.name}`);
+		console.log('Stats:', this.stats);
+		console.groupEnd();
 
 		return { handled: true, cancelListeners: true };
-	}
-
-	select() {
-		console.log("Add a selection graphic: CREEP");
-	}
-
-	deselect() {
-		console.log("Remove the selection graphic: CREEP");
 	}
 }

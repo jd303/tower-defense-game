@@ -12,13 +12,14 @@ import { MovementTypes } from '../../data/MovementTypes';
 import { InterceptionHandler, InterceptionSlotCountInterface } from '../InterceptionHandler';
 import { PathService } from '../../game/PathService';
 import { CreepStates } from '../creeps/CreepStates';
-import { Interactable2, InteractionEvent, InteractionService2, InteractableOrders } from '../../game/InteractionService2';
+import { InteractionEvent, InteractionService2, InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 
 export class Hero extends ModelAsset {
 	/**
 	 * Stats
 	 * */
-	typeName: string = "hero";
+	typeName: InteractableTypes = "hero";
+	interactiveOrder = InteractableOrders.heroes;
 	stats: HeroStats;
 
 	/**
@@ -43,7 +44,6 @@ export class Hero extends ModelAsset {
 	 * Status
 	 * */
 	states: HeroStates;
-	selected: boolean = false;
 
 	/**
 	 * Health bar
@@ -66,6 +66,7 @@ export class Hero extends ModelAsset {
 
 		this.stateMachine = this.setDefaultStates();
 		this.setInteractive();
+		this.setInteractiveHero();
 	}
 
 	/**
@@ -351,7 +352,7 @@ export class Hero extends ModelAsset {
 		const slotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
 		if (slotCounts.available > 0) {
 			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying || interceptee.stateMachine.activeStates.has(CreepStates.uninterceptable);
-			const interceptables: ModelAsset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
+			const interceptables: ModelAsset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creepManager.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
 			if (interceptables.length) this.interceptionHandler.addInterceptees(interceptables);
 		}
 
@@ -405,11 +406,8 @@ export class Hero extends ModelAsset {
 	/**
 	* Interactions
 	* */
-	setInteractive() {
+	setInteractiveHero() {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractable(new Interactable2(this.typeName, InteractableOrders.creeps, this));
-
-		// Registers a listener, but duplicates will be ignored
 		sInteraction2.registerInteractableListener('hero', 'selectHero', this.select);
 	}
 
@@ -425,11 +423,7 @@ export class Hero extends ModelAsset {
 			this.deselect();
 		} else {
 			this.selected = true;
-			this.selectionMesh = ModelCommons.selectionCircleMesh();
-			this.selectionMesh.rotation.x = Math.PI * -0.5;
-			this.selectionMesh.position.y = 0.15;
-			this.selectionMesh.position.z = 2.5;
-			this.groupMain.add(this.selectionMesh);
+			this.addSelectionMesh();
 
 			// Register a new listener to make the movement
 			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
@@ -440,8 +434,7 @@ export class Hero extends ModelAsset {
 	}
 	deselect() {
 		this.selected = false;
-		this.groupMain.remove(this.selectionMesh!);
-		this.selectionMesh = undefined;
+		this.removeSelectionMesh();
 
 		// Register a new listener to make the movement
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tower, TowerFactory } from './Tower';
+import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { UIRegions } from '../../game/UIProperties';
@@ -8,13 +8,14 @@ import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
+import { TowerFactory } from './TowerManager';
 
 export class TowerMage extends Tower {
 	/**
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
-	assetScale = 1.5;
+	assetScale = 3.5;
 
 	/**
 	 * Factory
@@ -25,7 +26,7 @@ export class TowerMage extends Tower {
 		150,
 		'money',
 		TowerMage,
-		() => {}
+		() => { }
 	);
 
 	/**
@@ -63,7 +64,7 @@ export class TowerMage extends Tower {
 		const position = this.groupMain.position;
 
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creep = this.main.s('Level').currentLevel.creeps.find((creep: Creep) => {
+			const creep = this.main.s('Level').currentLevel.creepManager.creeps.find((creep: Creep) => {
 				const creepPosition = creep.groupMain.position;
 				const distance = creepPosition.distanceTo(position);
 
@@ -80,7 +81,7 @@ export class TowerMage extends Tower {
 				const projectile = new Projectile(
 					this.main,
 					this,
-					new THREE.Vector3(this.groupMain.position.x, 3.5, this.groupMain.position.z),
+					new THREE.Vector3(this.groupMain.position.x, 6, this.groupMain.position.z),
 					creep,
 					this.stats.attack.type,
 					this.stats.attack.hitType,

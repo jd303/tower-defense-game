@@ -9,13 +9,14 @@ import { CreepStats } from './creeps/CreepStats';
 import { HeroStats } from './heroes/HeroStats';
 import { TowerStats } from './towers/TowerStats';
 import { StateMachine } from '../core/StateMachine';
-import { InteractionEvent } from '../game/InteractionService2';
+import { Interactable2, InteractableOrders, InteractableTypes, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
 
 export abstract class ModelAsset {
 	/**
 	 * Setup Properties
 	 * */
-	typeName: string;
+	typeName: InteractableTypes;
+	interactiveOrder: InteractableOrders;
 	shadowsEnabled: boolean = false;
 	assetPath: string;
 	assetScale: number = 1; // default
@@ -43,6 +44,7 @@ export abstract class ModelAsset {
 	groupTransforms: THREE.Group; // Middle group - applies minor transformations
 	groupFacing: THREE.Group; // Middle group - applies facing
 	groupModel: THREE.Group; // Innermost group - applies status transforms
+	selected: boolean;
 	selectionMesh?: THREE.Mesh;
 
 	/**
@@ -107,7 +109,15 @@ export abstract class ModelAsset {
 	/**
 	 * Sets whether this model can be interactive 
 	 * */
-	setInteractive() { }
+	setInteractive() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractable(new Interactable2(this.typeName, this.interactiveOrder, this));
+		console.log("Registering interactive", this.typeName, this.interactiveOrder);
+	}
+	unsetInteractive() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.deregisterInteractableByObject(this);
+	}
 
 	/**
 	 * Moves a Model Asset along a path according to its movement speed
@@ -231,9 +241,34 @@ export abstract class ModelAsset {
 	}
 
 	/**
+	 * Actions to take when we delete the model asset (might also be handled more fully elsewhere)
+	 */
+	deleteModelAsset() {
+		this.unsetInteractive();
+	}
+
+	/**
+	 * Adds a selection mesh to the model
+	 */
+	addSelectionMesh() {
+		this.selectionMesh = ModelCommons.selectionCircleMesh();
+		this.selectionMesh.rotation.x = Math.PI * -0.5;
+		this.selectionMesh.position.y = 0.15;
+		this.selectionMesh.position.z = 2.5;
+		this.groupMain.add(this.selectionMesh);
+	}
+
+	/**
+	 * Removes a selection mesh from the model
+	 */
+	removeSelectionMesh() {
+		this.groupMain.remove(this.selectionMesh!);
+		this.selectionMesh = undefined;
+	}
+
+	/**
 	 * Overwritten
 	 * */
-	defaultClick() { }
 	select(event: InteractionEvent) { }
 	deselect() { }
 }

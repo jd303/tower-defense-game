@@ -11,7 +11,8 @@ import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { UIButton, UIService } from '../../game/UIService';
 import { RaycasterIntersection } from '../../core/RaycasterService';
-import { InteractionEvent, InteractionService2, InteractableOrders, Interactable2 } from '../../game/InteractionService2';
+import { InteractableTypes, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
+import { TowerFactory } from './TowerManager';
 
 export class Tower extends ModelAsset {
 	/**
@@ -22,7 +23,7 @@ export class Tower extends ModelAsset {
 	/**
 	 * Status
 	 */
-	typeName: string = "tower";
+	typeName: InteractableTypes = "tower";
 	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
 	baseStats: TowerStats;
@@ -150,6 +151,25 @@ export class Tower extends ModelAsset {
 	}
 
 	/**
+	 * When a tower is clicked
+	 */
+	towerClicked() {
+		console.group();
+		console.log(`Tower: ${this.constructor.name}`);
+		console.log('Stats:', this.stats);
+		console.groupEnd();
+
+		console.log("%c TODO: We need to be able to remove selection by clicking away", 'color: red');
+
+		// Manage selection
+		this.selected = !this.selected;
+		if (this.selected) this.addSelectionMesh();
+		else this.removeSelectionMesh();
+
+		return { handled: true, cancelListeners: true };
+	}
+
+	/**
 	 ******************************************************* UI INTERACTIONS
 	 * */
 
@@ -181,10 +201,10 @@ export class Tower extends ModelAsset {
 			const targetSet = new Set();
 			targetSet.add(new Interactable(InteractableOrders.terrain, main.s('Level').currentLevel.terrain));
 			const cancellationSet = new Set();
-			main.s('Level').currentLevel.levelPaths.forEach((path: any) => {
+			main.s('Level').currentLevel.creepPaths.forEach((path: any) => {
 				cancellationSet.add(new Interactable(InteractableOrders.props, path));
 			});
-			console.log("TODO: Orders are not quite right, not when LevelPaths have to be 'props'");
+			console.log("TODO: Orders are not quite right, not when CreepPaths have to be 'props'");
 			console.log("CANCC", cancellationSet);
 			sInteraction.registerContextInteraction((intersect: RaycasterIntersection) => this.requestCreateTower(intersect, main), targetSet, cancellationSet);
 			sInteraction.stateMachine.transition(InteractionTransitions.context_selection);
@@ -197,10 +217,7 @@ export class Tower extends ModelAsset {
 			this.UIButton.select();
 
 			// Notify the Interaction Service that we want to create a tower
-			const targetSet = new Set();
-			targetSet.add(new Interactable2('terrain', InteractableOrders.terrain, main.s('Level').currentLevel.terrain));
-			console.log("TODO: Orders are not quite right, not when LevelPaths have to be 'props'");
-			sInteraction2.registerInteractableListener('terrain', 'createTower', this.requestCreateTower.bind(this));
+			sInteraction2.registerInteractableListener('towerPlacementZone', 'createTower', this.requestCreateTower.bind(this));
 		}
 
 	}
@@ -234,9 +251,8 @@ export class Tower extends ModelAsset {
 	 * Complete creation
 	 * */
 	static createTower(intersect: RaycasterIntersection, main: Main) {
-		main.s('Level').currentLevel.addTower(new this.Factory.factory(main), intersect.point.point);
+		main.s('Level').currentLevel.towerManager.addTower(new this.Factory.factory(main), intersect.point.point);
 	}
-
 
 	/**
 	 * Cancels Create Mode
@@ -246,40 +262,5 @@ export class Tower extends ModelAsset {
 		sInteraction2.deregisterInteractableListener('terrain', 'createTower');
 
 		this.UIButton.deselect();
-	}
-
-	/**
-	 ******************************************************* UI INTERACTIONS
-	 * */
-	defaultClick() {
-		console.log("Default Click: Tower");
-	}
-}
-
-export class TowerFactory {
-	UIRegion: UIRegions;
-	buttonIcon: string;
-	cost: number;
-	costType: string;
-	factory: any;
-
-	placeCallback: Function | undefined;
-	UIButton: UIButton;
-
-	/**
-	 * Constructor
-	 * */
-	constructor(UIRegion: UIRegions, buttonIcon: string, cost: number, costType: string, factory: any, placeCallback: Function) {
-		this.UIRegion = UIRegion;
-		this.buttonIcon = buttonIcon;
-		this.cost = cost;
-		this.costType = costType;
-		this.factory = factory;
-		this.placeCallback = placeCallback;
-		return this;
-	}
-
-	registerUIButton(button: UIButton) {
-		this.UIButton = button;
 	}
 }

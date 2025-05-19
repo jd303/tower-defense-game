@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Tower, TowerFactory } from './Tower';
+import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { UIRegions } from '../../game/UIProperties';
@@ -9,13 +9,14 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { TowerStats } from './TowerStats';
+import { TowerFactory } from './TowerManager';
 
 export class TowerArcher extends Tower {
 	/**
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
-	assetScale = 1.5;
+	assetScale = 3.5;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
 
 	/**
@@ -34,17 +35,17 @@ export class TowerArcher extends Tower {
 		last_attack_time: 0,
 		attack_cooldown: 50, // not used, uses state system instead
 	};
-	
+
 	/**
 	* Factory
 	* */
-  static Factory: TowerFactory = new TowerFactory(
+	static Factory: TowerFactory = new TowerFactory(
 		UIRegions.Tower,
 		'assets/models/towers/Tower.Archer.UI.icon.png',
 		100,
 		'money',
 		TowerArcher,
-		() => {}
+		() => { }
 	);
 
 	/**
@@ -65,7 +66,7 @@ export class TowerArcher extends Tower {
 		const position = this.groupMain.position;
 
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creep = this.main.s('Level').currentLevel.creeps.find((creep: Creep) => {
+			const creep = this.main.s('Level').currentLevel.creepManager.creeps.find((creep: Creep) => {
 				const creepPosition = creep.groupMain.position;
 				const distance = creepPosition.distanceTo(position);
 

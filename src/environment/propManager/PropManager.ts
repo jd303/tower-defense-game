@@ -1,6 +1,6 @@
 import THREE, { Texture, Vector3 } from "three";
 import { Main } from "../../core/Main";
-import { TerrainTypes } from "../../data/LevelInterfaces";
+import { LevelDefinition, TerrainTypes } from "../../data/LevelInterfaces";
 import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
 import { Maths } from "../../core/Maths";
@@ -16,7 +16,7 @@ export class PropManager {
 	 * Core Properties
 	 * */
 	main: Main;
-	tileset: TerrainTypes;
+	tileset: TerrainTypes = TerrainTypes.grass;
 	propGroups: PropGroup[] = [];
 	environmentTiles: EnvironmentTile[] = [];
 
@@ -25,19 +25,29 @@ export class PropManager {
 	/**
 	 * Constructor
 	 * */
-	constructor(tileset: TerrainTypes, main: Main) {
-		this.tileset = tileset;
+	constructor(main: Main) {
 		this.main = main;
+	}
+
+	/**
+	 * Sets up all props, propzones, and towerPlacementZones
+	 * @param props 
+	 * @param propZones 
+	 */
+	setup(levelDetails: LevelDefinition) {
+		this.tileset = levelDetails.terrain;
+		levelDetails.props?.forEach(prop => this.registerProp(prop));
+		levelDetails.propZones?.forEach(propZone => this.registerPropZone(propZone));
 	}
 
 	/**
 	 * Register a prop to place and render
 	 */
-	registerProp(propName: string, args: { position: Vector3, scale?: Vector3, rotate?: Vector3 }) {
+	registerProp(args: { assetName: string, position: Vector3, scale?: Vector3, rotate?: Vector3 }) {
 		if (!args.scale) args.scale = new Vector3(1, 1, 1);
 		if (!args.rotate) args.rotate = new Vector3(0, 0, 0);
 
-		const prop = this.findProp(this.tileset, propName);
+		const prop = this.findProp(this.tileset, args.assetName);
 		if (prop) {
 			const propAssetPlacement: PropAssetPlacement = {
 				x: args.position.x,
@@ -59,18 +69,18 @@ export class PropManager {
 	/**
 	 * Register a zone to generate props in
 	 */
-	registerPropZone(propNames: string[], args: PropZoneArguments) {
-		const propZonePropsY = 0.2;
+	registerPropZone(args: PropZoneArguments) {
+		const propZonePropsY = args.environmentTile.show ? 0.2 : 0;
 		const propZone = new PropZone(args, this.main);
 		const propPositions: Vector3[] = propZone.createPositions();
-		this.environmentTiles.push(propZone.createEnvironmentTile());
+		if (args.environmentTile.show) this.environmentTiles.push(propZone.createEnvironmentTile());
 
 		if (this.main.debugMode) propZone.debugCreateOutlines();
 
 		// Place the props
 		propPositions.forEach((position: any) => {
-			const propName = propNames[Math.floor(Math.random() * propNames.length)];
-			this.registerProp(propName, { position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) });
+			const propName = args.propNames[Math.floor(Math.random() * args.propNames.length)];
+			this.registerProp({ assetName: propName, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) });
 		});
 	}
 
@@ -104,14 +114,24 @@ export class PropManager {
 	 * */
 	render() {
 		this.propGroups.forEach(async (propGroup) => {
-			const texture = await this.loadPropGroupTexture(propGroup);
 			const model = await this.main.s('Loader').loadModel(propGroup.asset.assetPath);
-			propGroup.loadedMaterial = this.setPropTexture(texture);
+
+			if (propGroup.asset.texturePath) {
+				const texture = await this.loadPropGroupTexture(propGroup);
+				texture.flipY = false;
+				texture.magFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.LinearFilter;
+				propGroup.loadedMaterial = this.setPropTexture(texture);
+			}
+
 			propGroup.loadedModel = model;
 			this.instanceMeshesAndPlace(propGroup);
 		});
 	}
 
+	/**
+	 * Loads the texture for a propGroup
+	 */
 	async loadPropGroupTexture(propGroup: PropGroup) {
 		const textureResult = await this.main.s('Loader').loadTexture(propGroup.asset.texturePath);
 		return textureResult;
@@ -157,8 +177,31 @@ export class PropManager {
 
 		iMesh.castShadow = propGroup.asset.shadows;
 		iMesh.receiveShadow = true;
-		propGroup.loadedMaterial.needsUpdate = true;
+		if (propGroup.loadedMaterial) propGroup.loadedMaterial.needsUpdate = true;
 		this.main.scene.add(iMesh);
+
+		// If set, randomise the colours
+		if (propGroup.colorRandom) {
+			for (let i = 0; i < propGroup.propPlacements.length; i++) {
+				// Adjust colours if set
+				let colorR = propGroup.colorRandom.r && (1 - propGroup.colorRandom.r) + Math.random() * propGroup.colorRandom.r || 1;
+				let colorG = propGroup.colorRandom.g && (1 - propGroup.colorRandom.g) + Math.random() * propGroup.colorRandom.g || 1;
+				let colorB = propGroup.colorRandom.b && (1 - propGroup.colorRandom.b) + Math.random() * propGroup.colorRandom.b || 1;
+
+				// Adjust lightness if set
+				if (propGroup.colorRandom.l) {
+					const random = Math.random() * propGroup.colorRandom.l;
+					colorR = Math.max(0, Math.min(1, colorR + random));
+					colorG = Math.max(0, Math.min(1, colorG + random));
+					colorB = Math.max(0, Math.min(1, colorB + random));
+				}
+
+				const color = new THREE.Color(colorR, colorG, colorB);
+				iMesh.setColorAt(i, color);
+			}
+
+			iMesh.instanceColor!.needsUpdate = true;
+		}
 
 		// TEST: Can we animate individual items?
 		/*setInterval(() => {
@@ -180,7 +223,9 @@ export class PropManager {
 	setPropTexture(texture: Texture) {
 		const material = new THREE.MeshStandardMaterial({ map: texture });
 		material.side = THREE.DoubleSide; // || THREE.FrontSide || THREE.BackSide*/
+		//material.colorWrite = false; // Makes it invisible, but still obscures things behind it!
 		material.metalness = 0.25;
+		material.precision = "lowp"; // "highp", "mediump"
 		material.roughness = 1;
 
 		return material;
@@ -190,6 +235,7 @@ export class PropManager {
 interface PropGroup {
 	asset: PropAsset;
 	propPlacements: PropAssetPlacement[];
+	colorRandom?: { r?: number, g?: number, b?: number, l?: number }, // r, g and b apply a random to individual colours.  l applies to all colours.
 	loadedModel?: any;
 	loadedMaterial?: any;
 }
@@ -198,7 +244,7 @@ export interface PropAsset {
 	tileset: TerrainTypes;
 	name: string;
 	assetPath: string;
-	texturePath: string;
+	texturePath?: string;
 	defaultScale?: Vector3;
 	shadows: boolean;
 }

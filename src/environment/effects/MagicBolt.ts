@@ -11,6 +11,6 @@ export class MagicBolt extends Effect {
 	constructor(main: Main) {
 		super(main);
 
-		this.createMesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'blue' }));
+		this.createMesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 0xFF0083 }));
 	}
 }

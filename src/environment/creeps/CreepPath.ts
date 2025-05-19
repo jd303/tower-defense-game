@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../data/PathInterfaces';
-import { Main } from '../core/Main';
-import { PathService } from '../game/PathService';
-import { Interactable2, InteractionService2, InteractableOrders } from '../game/InteractionService2';
+import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
+import { Main } from '../../core/Main';
+import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../../data/PathInterfaces';
+import { PathService } from '../../game/PathService';
 
-export class LevelPath {
+export class CreepPath {
 	/**
 	 * Core
 	 * */
@@ -105,11 +105,11 @@ export class LevelPath {
 		// Create the geometry and mesh and attach
 		const pathGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings as any);
 		const pathMesh = new THREE.Mesh(pathGeometry, pathMaterial);
-		pathMesh.name = 'LevelPath';
+		pathMesh.name = 'creepPath';
 
 		// Create group
 		this.groupMain = new THREE.Group();
-		this.groupMain.name = 'LevelPath';
+		this.groupMain.name = 'CreepPath';
 		this.groupMain.add(pathMesh);
 
 		// Add shadows
@@ -127,7 +127,7 @@ export class LevelPath {
 	 * */
 	setInteractive() {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractable(new Interactable2('levelpath', InteractableOrders.creeps, this));
+		sInteraction2.registerInteractable(new Interactable2('creepPath', InteractableOrders.creeps, this));
 	}
 
 	getRandomAdjustX() {

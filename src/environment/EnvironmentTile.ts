@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Main } from '../core/Main';
-import { Interactable, InteractableOrders } from '../game/InteractionService';
 
 export class EnvironmentTile {
 	/**
@@ -39,6 +38,9 @@ export class EnvironmentTile {
 		return mesh;
 	}
 
+	/**
+	 * Creates a shape, given a curve
+	 */
 	createShapeFromCurve() {
 		const shape = new THREE.Shape();
 		const divisions = 100;
@@ -54,6 +56,9 @@ export class EnvironmentTile {
 		return shape;
 	}
 
+	/**
+	 * Turns a shape into a bevelled environmnet tile
+	 */
 	createBeveledMeshFromShape(shape: THREE.Shape, options = {}) {
 		const extrudeSettings = {
 			depth: 0.2,
@@ -70,6 +75,11 @@ export class EnvironmentTile {
 		geometry.rotateX(Math.PI / 2); // So it stands up on XZ
 		const material = new THREE.MeshStandardMaterial({ color: this.colour });
 		const mesh = new THREE.Mesh(geometry, material);
+		mesh.receiveShadow = true;
+		material.polygonOffset = true;
+		material.polygonOffsetFactor = 1;
+		material.polygonOffsetUnits = 1;
+		mesh.material.needsUpdate = true;
 		mesh.position.y = 0.1;
 		return mesh;
 	}

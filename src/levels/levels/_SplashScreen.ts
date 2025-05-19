@@ -4,7 +4,7 @@ import { Main } from '../../core/Main';
 import { UIService } from '../../game/UIService';
 import { CameraService } from '../../core/CameraService';
 import { LightingService } from '../../core/LightingService';
-import { PropManager } from '../../environment/props_manager/PropManager';
+import { PropManager } from '../../environment/propManager/PropManager';
 import { TerrainTypes } from '../../data/LevelInterfaces';
 
 export class SplashScreen {
@@ -49,9 +49,9 @@ export class SplashScreen {
 		this.main.scene.add(hill2);
 
 		// Load a tree to use
-		this.propManager = new PropManager(TerrainTypes.sand, this.main);
-		this.propManager.registerProp('tree_cone', { position: new THREE.Vector3(-15, -10, -35) });
-		this.propManager.registerProp('tree_cone', { position: new THREE.Vector3(12, -10, -30), scale: new THREE.Vector3(1.75, 1.75, 1.75) });
+		this.propManager = new PropManager(this.main);
+		this.propManager.registerProp({ assetName: 'tree_cone', position: new THREE.Vector3(-15, -10, -35) });
+		this.propManager.registerProp({ assetName: 'tree_cone', position: new THREE.Vector3(12, -10, -30), scale: new THREE.Vector3(1.75, 1.75, 1.75) });
 		this.propManager.render();
 
 		// Load some creatures to be seen

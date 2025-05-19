@@ -1,6 +1,6 @@
 import { Creep } from '../environment/creeps/Creep';
 import { CreepGroup } from '../environment/creeps/CreepGroup';
-import { LevelPath } from './LevelPath';
+import { CreepPath } from '../environment/creeps/CreepPath';
 import { WaveDefinition } from './WaveDefinition';
 
 export class Wave {
@@ -9,7 +9,7 @@ export class Wave {
 	 * */
 	id: number;
 	difficulty: number;
-	corePath: LevelPath;
+	corePath: CreepPath;
 	waveStartTime: number;
 	creepGroups: CreepGroup[] = [];
 
@@ -39,5 +39,5 @@ export class Wave {
 	/**
 	 * Launches a wave
 	 * */
-	launchWave() {}
+	launchWave() { }
 }

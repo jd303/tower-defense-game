@@ -1,6 +1,6 @@
 import { Vector3 } from "three";
 import { TerrainTypes } from "../../data/LevelInterfaces";
-import { PropAsset } from "../props_manager/PropManager";
+import { PropAsset } from "../propManager/PropManager";
 
 export const MountainProps: PropAsset[] = [
 	// SAND TEXTURE
