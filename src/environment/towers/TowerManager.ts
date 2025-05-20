@@ -78,6 +78,9 @@ export class TowerManager {
 		}
 	}
 
+	/**
+	 * Ends tower creation mode
+	 */
 	endTowerCreation(button: UIButton) {
 		button.deselect();
 		this.towerPlacementZones.forEach((towerPlacementZone) => {
@@ -91,7 +94,9 @@ export class TowerManager {
 	requestAddTower(tower: typeof Tower, event: InteractionEvent, button: UIButton) {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
-			this.addTower(new tower(this.main), event.raycasterInteraction.object.groupMain.position);
+			const newTower = new tower(this.main);
+			this.addTower(newTower, event.raycasterInteraction.object.groupMain.position);
+			(event.raycasterInteraction.object as any).towerZoneShapePlacement.addTowerToTowerZoneShapePlacement(tower);
 		}
 
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');

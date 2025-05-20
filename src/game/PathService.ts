@@ -337,19 +337,28 @@ export class PathService extends Service {
 	/**
 	 * Fills a curve with shapes
 	 */
-	getShapePlacementsInCurve(curvePath: THREE.CurvePath<THREE.Vector3>, shapeSize: number = 3, shapeGap: number = 2) {
+	getShapePlacementsInCurve(curvePath: THREE.CurvePath<THREE.Vector3>, shapeSize: number = 3, shapeGap: number = 2): ShapePlacement[] {
 		const boundingBox = this.getBoundingBoxOfCurvePath(curvePath);
-		const shapePlacements: Vector3[] = [];
+		const shapePlacements: ShapePlacement[] = [];
 
+		let zIndex = 0;
 		for (let z = boundingBox.smallestZ; z <= boundingBox.largestZ; z += shapeSize + shapeGap) {
 			const isEvenRow = Math.floor((z - boundingBox.smallestZ) / (shapeSize + shapeGap)) % 2 === 0;
 
+			let xIndex = 0;
 			for (let x = boundingBox.smallestX; x <= boundingBox.largestX; x += shapeSize + shapeGap) {
 				const potentialPoint = isEvenRow ? new Vector3(x, 0, z) : new Vector3(x + shapeSize / 2, 0, z);
 				if (this.pointIsInCurvePath(potentialPoint, curvePath as THREE.CurvePath<any>)) {
-					shapePlacements.push(potentialPoint);
+					shapePlacements.push({
+						xIndex: xIndex + (isEvenRow && -1 || 0),
+						zIndex: zIndex,
+						point: potentialPoint
+					});
 				}
+
+				xIndex++;
 			}
+			zIndex++;
 		}
 
 		return shapePlacements;
@@ -386,6 +395,12 @@ export class PathService extends Service {
 
 		this.main.scene.add(line);
 	}
+}
+
+export interface ShapePlacement {
+	xIndex: number;
+	zIndex: number;
+	point: Vector3;
 }
 
 export interface BoundingBoxPlane {

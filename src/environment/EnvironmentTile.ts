@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Main } from '../core/Main';
+import { TowerZoneShapePlacement } from './towers/TowerPlacementZone';
 
 export class EnvironmentTile {
 	/**
@@ -9,15 +10,18 @@ export class EnvironmentTile {
 	colour: number;
 	curve: THREE.Curve<any> | THREE.CatmullRomCurve3;
 	groupMain: THREE.Group; // Contains a pathMesh's groupmain, if created
+	towerZoneShapePlacement?: TowerZoneShapePlacement;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(curve: THREE.Curve<any> | THREE.CatmullRomCurve3, main: Main, colour = 0xeeaa88) {
+	constructor(curve: THREE.Curve<any> | THREE.CatmullRomCurve3, main: Main, colour = 0xeeaa88, towerZoneShapePlacement?: TowerZoneShapePlacement) {
 		this.main = main;
 		this.curve = curve;
 		this.colour = colour;
 		const mesh = this.createPathGeometry();
+
+		if (towerZoneShapePlacement) this.towerZoneShapePlacement = towerZoneShapePlacement;
 
 		this.groupMain = new THREE.Group();
 		this.groupMain.add(mesh);

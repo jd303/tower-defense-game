@@ -4,6 +4,7 @@ import { Interactable2, InteractableOrders, InteractionService2 } from '../../ga
 import { EnvironmentTile } from '../EnvironmentTile';
 import { PathPoint } from '../../data/PathInterfaces';
 import { PathService } from '../../game/PathService';
+import { Tower } from './Tower';
 
 export class TowerPlacementZone {
 	/**
@@ -13,7 +14,7 @@ export class TowerPlacementZone {
 	towerPlacementCommons: TowerPlacementCommons;
 	pathPoints: PathPoint[];
 	environmentTile: EnvironmentTile;
-	placementTilePositions: THREE.Vector3[] = [];
+	placementTilePositions: TowerZoneShapePlacement[] = [];
 	placementTiles: EnvironmentTile[] = [];
 	castShadows: boolean = false;
 	receiveShaodws: boolean = true;
@@ -38,7 +39,9 @@ export class TowerPlacementZone {
 		this.environmentTile = new EnvironmentTile(this.curvePath, main, 0xC4B271);
 		this.main.scene.add(this.environmentTile.groupMain);
 		this.groupMain = new THREE.Group();
-		this.placementTilePositions = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
+
+		const shapePlacements = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
+		this.placementTilePositions = shapePlacements.map((placement) => { return new TowerZoneShapePlacement(placement.xIndex, placement.zIndex, placement.point); });
 
 		if (this.main.debugMode) {
 			sPath.debugCreateOutlines(this.curvePath);
@@ -66,9 +69,35 @@ export class TowerPlacementZone {
 	 */
 	showPlacementTile(visible: boolean) {
 		if (visible) {
+			const filledPlacementTiles = this.placementTilePositions.filter((placement) => { return placement.tower != null; });
+			console.log("FILLED", filledPlacementTiles);
+			const blockedTiles: { xIndex: number, zIndex: number }[] = [];
+			filledPlacementTiles.forEach((placement) => {
+				blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex });
+				blockedTiles.push({ xIndex: placement.xIndex - 1, zIndex: placement.zIndex });
+				blockedTiles.push({ xIndex: placement.xIndex + 1, zIndex: placement.zIndex });
+
+				// When zIndex is odd, xIndex changes
+				if (placement.zIndex % 2 !== 0) {
+					blockedTiles.push({ xIndex: placement.xIndex - 1, zIndex: placement.zIndex - 1 });
+					blockedTiles.push({ xIndex: placement.xIndex - 1, zIndex: placement.zIndex + 1 });
+					blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex - 1 });
+					blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex + 1 });
+				}
+				else {
+					blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex - 1 });
+					blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex + 1 });
+					blockedTiles.push({ xIndex: placement.xIndex + 1, zIndex: placement.zIndex - 1 });
+					blockedTiles.push({ xIndex: placement.xIndex + 1, zIndex: placement.zIndex + 1 });
+				}
+			});
+
 			this.placementTilePositions.forEach((placement) => {
-				const environmentTile = new EnvironmentTile(this.towerPlacementCommons.placementTileCurve, this.main, 0x000000);
-				environmentTile.groupMain.position.set(placement.x, 0.15, placement.z);
+				if (placement.tower) return; // Don't show used ones
+				if (blockedTiles.find((blockedTile) => { console.log(blockedTile, placement); return blockedTile.xIndex == placement.xIndex && blockedTile.zIndex == placement.zIndex; })) return; // Don't show blocked tiles
+
+				const environmentTile = new EnvironmentTile(this.towerPlacementCommons.placementTileCurve, this.main, 0x000000, placement);
+				environmentTile.groupMain.position.set(placement.point.x, 0.15, placement.point.z);
 				this.placementTiles.push(environmentTile);
 				this.main.scene.add(environmentTile.groupMain);
 			});
@@ -109,6 +138,27 @@ export class TowerPlacementCommons {
 		const curve = sPath.createCurveFromPathPoints(vector3Points);
 
 		return curve;
+	}
+}
+
+export class TowerZoneShapePlacement {
+	xIndex: number;
+	zIndex: number;
+	point: THREE.Vector3;
+	tower: Tower | null;
+
+	constructor(xIndex: number, zIndex: number, point: THREE.Vector3) {
+		this.xIndex = xIndex;
+		this.zIndex = zIndex;
+		this.point = point;
+		this.tower = null;
+	}
+
+	/**
+	 * Registers a tower to this placement
+	 */
+	addTowerToTowerZoneShapePlacement(tower: Tower) {
+		this.tower = tower;
 	}
 }
 

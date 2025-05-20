@@ -12,6 +12,7 @@ import { UIService } from '../../game/UIService';
 import { EventService } from '../../core/EventService';
 import { Man0 } from '../../environment/heroes/Man0';
 import { CreepPath } from '../../environment/creeps/CreepPath';
+import { SpriteService } from '../../game/SpriteService';
 
 export class Level0MVP extends Level {
 	/**
@@ -82,7 +83,6 @@ export class Level0MVP extends Level {
 			this.terrain.enableShadows();
 			this.main.s('Lighting').addShadowsToLight(directionalLight);
 		}, 100);
-
 
 		/**
 		 * DEBUG THINGS

@@ -8,6 +8,7 @@ import { CameraService } from '../core/CameraService';
 import { AudioService } from './AudioService';
 import { RaycasterService } from './RaycasterService';
 import { Service } from './Service';
+import { SpriteService } from '../game/SpriteService';
 
 export class Main {
 	/**
@@ -46,6 +47,7 @@ export class Main {
 		this.registerService('Camera', new CameraService(this));
 		this.registerService('Audio', new AudioService(this));
 		this.registerService('Raycaster', new RaycasterService(this));
+		this.registerService('Sprite', new SpriteService(this));
 		this.registerService('Tick', new TickService(this));
 
 		// Watch the screen

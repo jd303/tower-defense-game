@@ -13,6 +13,7 @@ import { InterceptionHandler, InterceptionSlotCountInterface } from '../Intercep
 import { PathService } from '../../game/PathService';
 import { CreepStates } from '../creeps/CreepStates';
 import { InteractionEvent, InteractionService2, InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
+import { SpriteService } from '../../game/SpriteService';
 
 export class Hero extends ModelAsset {
 	/**
@@ -29,6 +30,7 @@ export class Hero extends ModelAsset {
 	groupTransforms: THREE.Group; // Inner group - applies minor transformations
 	groupModel: THREE.Group; // Innermost group - applies status transforms
 	mesh: THREE.Mesh;
+	textMessage: THREE.Sprite | null;
 
 	/**
 	 * System Properties
@@ -67,6 +69,12 @@ export class Hero extends ModelAsset {
 		this.stateMachine = this.setDefaultStates();
 		this.setInteractive();
 		this.setInteractiveHero();
+
+		setTimeout(() => {
+			this.stateEnterIdle();
+		}, 500);
+
+		//this.talkSurprised();
 	}
 
 	/**
@@ -206,7 +214,6 @@ export class Hero extends ModelAsset {
 	 * Checks the health status and orgnaises health bars
 	 * */
 	checkHealthStatus() {
-
 		switch (true) {
 
 			// The Creep has died
@@ -360,7 +367,7 @@ export class Hero extends ModelAsset {
 		const updatedSlotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
 		if (updatedSlotCounts.occupied > 0 && !this.stateMachine.isInState(HeroStates.attacking)) {
 			this.stateMachine.transition(HeroTransitions.attacking);
-		} else if (updatedSlotCounts.occupied == 0) {
+		} else if (updatedSlotCounts.occupied == 0 && !this.stateMachine.isInState(HeroStates.idle)) {
 			this.stateMachine.transition(HeroTransitions.stop);
 		}
 	}
@@ -382,6 +389,9 @@ export class Hero extends ModelAsset {
 		const sTick: TickService = this.main.s('Tick');
 		const callback = new TickCallback(`${this.stats.heroName}_attacking`, this.attackInterceptee.bind(this));
 		sTick.registerCallback(callback, true, TickTimeTypes.second);
+
+		console.log("STATE ENTER ATTACK");
+		this.talkSurprised();
 	}
 	stateExitAttack() {
 		const sTick: TickService = this.main.s('Tick');
@@ -409,6 +419,38 @@ export class Hero extends ModelAsset {
 	setInteractiveHero() {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.registerInteractableListener('hero', 'selectHero', this.select);
+	}
+
+	/**
+	 * Have the hero show text
+	 */
+	talk(message: string) {
+		if (this.textMessage) {
+			this.groupMain.remove(this.textMessage);
+		}
+
+		const sSprite: SpriteService = this.main.s('Sprite');
+		this.textMessage = sSprite.makeTextSprite(message, { fontSizePx: 120, fontFamily: 'Arial', fontColour: 'red', bgColour: 'transparent' });
+		this.textMessage.position.set(0, 5, 0);
+		this.groupMain.add(this.textMessage);
+	}
+
+	/**
+	 * Removes a text message
+	 * */
+	removeTextMessage() {
+		if (this.textMessage) {
+			this.groupMain.remove(this.textMessage);
+			this.textMessage = null;
+		}
+	}
+
+	talkSurprised() {
+		console.log("TALKING SURPRISED TALKING SURPRISED TALKING SURPRISED TALKING SURPRISED TALKING SURPRISED TALKING SURPRISED");
+		this.talk("!!!");
+		setTimeout(() => {
+			this.removeTextMessage();
+		}, 1000);
 	}
 
 	/**

@@ -25,6 +25,7 @@ export class TowerBomber extends Tower {
 	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
 	static cost = 175;
 	static costType = 'money';
+	static towerZoneWidth = 3;
 
 	/**
 	 * Stats

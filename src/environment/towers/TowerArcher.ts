@@ -23,6 +23,7 @@ export class TowerArcher extends Tower {
 	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
 	static cost = 100;
 	static costType = 'money';
+	static towerZoneWidth = 0;
 
 	/**
 	 * Stats

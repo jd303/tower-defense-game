@@ -22,6 +22,7 @@ export class Tower extends ModelAsset {
 	static buttonIcon: string;
 	static cost: number;
 	static costType: string;
+	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
 
 	/**
 	 * Status

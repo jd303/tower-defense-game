@@ -21,6 +21,7 @@ export class TowerMage extends Tower {
 	static buttonIcon = 'assets/models/towers/Tower.Mage.UI.icon.png';
 	static cost = 150;
 	static costType = 'money';
+	static towerZoneWidth = 1;
 
 	/**
 	 * Stats
