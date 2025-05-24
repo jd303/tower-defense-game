@@ -57,11 +57,16 @@ export class EconomyService {
 	 * Sets money
 	 * */
 	adjustEconomyValue(property: string, value: number) {
+		let newValue = 0;
 		switch (property) {
 			case "money":
-				return this.adjustValue(this.economy.money, value);
+				newValue = this.adjustValue(this.economy.money, value);
+				this.main.s('Event').fire('commerce_money_changed', newValue);
+				return newValue;
 			case "vp":
-				return this.adjustValue(this.economy.vp, value);
+				newValue = this.adjustValue(this.economy.vp, value);
+				this.main.s('Event').fire('vp_changed', newValue);
+				return newValue;
 		}
 	}
 
@@ -76,9 +81,9 @@ export class EconomyService {
 	/**
 	 * Sets a value for a resource
 	 * */
-	adjustValue(property: any, value: number) {
+	private adjustValue(property: any, value: number) {
 		if (value < 0 && property.current <= 0) return 0;
-		else {	
+		else {
 			property.current += value;
 			return property.current;
 		}

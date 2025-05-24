@@ -138,9 +138,7 @@ export class Level {
 		console.log("A creep passed the line:", creep);
 
 		const sEconomy = this.main.s('Economy');
-		const sEvent = this.main.s('Event');
 		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.vp_loss);
-		sEvent.fire('vp_changed', vpValue);
 
 		if (vpValue <= 0) {
 			this.loseLevel();

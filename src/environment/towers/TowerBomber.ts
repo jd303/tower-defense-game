@@ -16,7 +16,7 @@ export class TowerBomber extends Tower {
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
-	assetScale = 3.5;
+	assetScale = 3;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 
 	/**

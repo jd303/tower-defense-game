@@ -237,8 +237,7 @@ export class Creep extends ModelAsset {
 	 * */
 	killCreep() {
 		const rewards = this.stats.kill_rewards;
-		const newValue = this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
-		this.main.s('Event').fire('commerce_money_changed', newValue);
+		this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
 		if (this.intercepter) this.intercepter.removeInterceptee(this);
 		this.deleteCreep();
 	}

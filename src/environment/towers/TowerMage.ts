@@ -13,7 +13,7 @@ export class TowerMage extends Tower {
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
-	assetScale = 3.5;
+	assetScale = 3;
 
 	/**
 	 * Static details

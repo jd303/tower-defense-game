@@ -76,11 +76,13 @@ export abstract class ModelAsset {
 	/**
 	 * Loads the model
 	 * */
-	async loadModel() {
+	async loadModel(callback?: Function) {
 		const model = await this.main.s('Loader').loadModel(this.assetPath);
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
 		this.groupModel.add(...model.scene.children);
 		this.enableShadows();
+
+		if (callback) callback();
 	}
 
 	/**
@@ -265,6 +267,22 @@ export abstract class ModelAsset {
 		this.groupMain.remove(this.selectionMesh!);
 		this.selectionMesh = undefined;
 	}
+
+	/**
+	 * Converts a loaded material to MeshStandardMaterial
+	 */
+	/*convertMaterialToStandard() {
+		this.groupMain.traverse((child: any) => {
+			if (child.isMesh) {
+				child.material = new THREE.MeshStandardMaterial({
+					map: child.material.map,
+					color: child.material.color,
+					metalness: 0.5,
+					roughness: 0.8,
+				});
+			}
+		});
+	}*/
 
 	/**
 	 * Overwritten

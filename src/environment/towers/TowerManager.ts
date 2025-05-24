@@ -96,6 +96,7 @@ export class TowerManager {
 		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
 			const newTower = new tower(this.main);
 			this.addTower(newTower, event.raycasterInteraction.object.groupMain.position);
+			sEconomy.adjustEconomyValue(tower.costType, -1 * tower.cost);
 			(event.raycasterInteraction.object as any).towerZoneShapePlacement.addTowerToTowerZoneShapePlacement(tower);
 		}
 

@@ -14,7 +14,7 @@ export class TowerArcher extends Tower {
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
-	assetScale = 3.5;
+	assetScale = 3;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
 
 	/**
