@@ -18,7 +18,7 @@ export class Timer {
 		this.durationInMS = durationInMS;
 		this.callback = callback;
 		this.tickService = main.s('Tick');
-		
+
 		const gameTime = this.tickService.gameTime;
 		this.completeGameTime = gameTime + durationInMS / 1000;
 		this.tickService.registerTimer(this, true);
@@ -29,6 +29,13 @@ export class Timer {
 	 * */
 	trigger() {
 		this.callback();
+		this.tickService.deregisterTimer(this);
+	}
+
+	/**
+	 * Cancels the Timer
+	 */
+	cancel() {
 		this.tickService.deregisterTimer(this);
 	}
 }

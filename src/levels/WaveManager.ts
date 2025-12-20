@@ -21,7 +21,7 @@ export class WaveManager {
 	/**
 	 * Wave Properties
 	 * */
-	waveTimer: any;
+	waveTimer: Timer | null;
 	waves: Wave[] = []; // Ephemeral - they are deleted from here once they launch and handled elsewhere
 
 	/**
@@ -71,8 +71,20 @@ export class WaveManager {
 		}
 	}
 
+	/**
+	 * Stops the wave timer
+	 */
 	stopWaveTimer() {
-		clearInterval(this.waveTimer);
+		this.waveTimer?.cancel();
+		this.waveTimer = null;
+	}
+
+	/**
+	 * Clears the wave timer, and forgets all waves
+	 */
+	disposeWaves() {
+		this.stopWaveTimer();
+		this.waves = [];
 	}
 
 	/**

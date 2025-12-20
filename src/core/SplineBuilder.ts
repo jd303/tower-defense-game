@@ -33,12 +33,12 @@ export class SplineBuilder {
 	line?: THREE.Line;
 	controlColourPoint = 0x0000ff;
 	handleMaterial = new THREE.MeshBasicMaterial({ color: this.controlColourPoint });
-	handleGeometry = new THREE.BoxGeometry(0.75, 0.25, 0.75);
+	handleGeometry = new THREE.BoxGeometry(1, 0.25, 1);
 	controlColourIncoming = 0xff0000;
 	controlColourOutgoing = 0x00ff00;
 	controlHandleIncomingMaterial = new THREE.MeshBasicMaterial({ color: this.controlColourIncoming });
 	controlHandleOutgoingMaterial = new THREE.MeshBasicMaterial({ color: this.controlColourOutgoing });
-	controlHandleGeometry = new THREE.BoxGeometry(0.75, 0.25, 0.75);
+	controlHandleGeometry = new THREE.BoxGeometry(1, 0.25, 1);
 	group: THREE.Group;
 
 	/**

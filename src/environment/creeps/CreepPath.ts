@@ -85,7 +85,7 @@ export class CreepPath {
 
 		// Extrude Settings
 		const extrudeSettings = {
-			steps: 50,
+			steps: 200,
 			depth: 1,
 			bevelEnabled: false,
 			extrudePath: this.corePath.path,
@@ -136,5 +136,12 @@ export class CreepPath {
 
 	getRandomAdjustZ() {
 		return Math.random() * this.variantDistance - this.variantDistance / 2;
+	}
+
+	/**
+	 * Removes creep paths from the level
+	 */
+	dispose() {
+		this.main.scene.remove(this.groupMain);
 	}
 }

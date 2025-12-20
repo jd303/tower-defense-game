@@ -3,7 +3,7 @@ import { CameraSettings } from '../core/CameraService';
 export const perspectiveCameraDefaults: CameraSettings = {
 	fov: 25,
 	near: 0.1,
-	far: 350,
+	far: 650,
 	zoom: 1,
 	x: 0,
 	y: 40,

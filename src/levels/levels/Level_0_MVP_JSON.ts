@@ -728,6 +728,12 @@ export const levelDetails: LevelDefinition = {
 			}
 		}
 	],
+	propColourisation: {
+		"tree_cone_2": { g: 0.5 },
+		"tree_spread": { g: 0.5 },
+		"mesa_1": { b: 0.25 },
+		"rubble_1": { l: -0.5 },
+	},
 	waves: [
 		{
 			id: 1,

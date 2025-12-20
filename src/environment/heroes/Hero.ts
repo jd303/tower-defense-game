@@ -482,4 +482,11 @@ export class Hero extends ModelAsset {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.deregisterInteractableListener('terrain', 'registerHeroMovement');
 	}
+
+	/**
+	 * Removes the hero from the game
+	 */
+	dispose() {
+		this.main.scene.remove(this.groupMain);
+	}
 }

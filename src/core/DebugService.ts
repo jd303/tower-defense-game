@@ -6,6 +6,7 @@ import { Main } from './Main';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
 import { InteractionService2, InteractionEvent } from '../game/InteractionService2';
+import { LevelCreator } from '../levels/LevelCreator';
 
 export class DebugService extends Service {
 	/**
@@ -31,6 +32,7 @@ export class DebugService extends Service {
 		endZoneCreator: this.endZoneCreator.bind(this),
 		zoneCreation: []
 	}
+	levelCreator: LevelCreator;
 
 	/**
 	 * References
@@ -54,7 +56,6 @@ export class DebugService extends Service {
 			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
 
 			this.watchDrawCalls();
-			this.addSplineLilGUI();
 			this.addZoneCreatoreLilGUI();
 			this.addTerrainPositionWatcher();
 		}
@@ -202,21 +203,6 @@ export class DebugService extends Service {
 	}
 
 	/**
-	 * Adds spline tools
-	 */
-	addSplineLilGUI() {
-		const folder = this.lilGUI.addFolder('Spline Tools');
-		folder.open(false);
-		folder.add(this.splineObject, 'bezierEnabledOnLoad', [false, true]);
-		folder.add(this.splineObject, 'makeSpline');
-		folder.add(this.splineObject, 'makeLineFromWindowJSON');
-		folder.add(this.splineObject, 'addSplinePointToStart');
-		folder.add(this.splineObject, 'addSplinePointToEnd');
-		folder.add(this.splineObject, 'exportPoints');
-		folder.add(this.splineObject, 'destroySpline');
-	}
-
-	/**
 	 * Adds a Spline to the scene
 	 */
 	makeSpline() {
@@ -285,6 +271,28 @@ export class DebugService extends Service {
 		folder.open(false);
 		folder.add(this.zoneCreatorObject, 'startZoneCreator');
 		folder.add(this.zoneCreatorObject, 'endZoneCreator');
+	}
+
+	/**
+	 * Creates a level creator
+	 */
+	addLevelCreatorLilGUI(levelCreator: LevelCreator) {
+		const levelCreatorFolder = this.lilGUI.addFolder('Level Creator');
+		levelCreatorFolder.open(false);
+		this.levelCreator = levelCreator;
+		this.levelCreator.getLevelCreatorFeatures().forEach((feature: string) => {
+			levelCreatorFolder.add(this.levelCreator, feature);
+		});
+
+		const splineFolder = levelCreatorFolder.addFolder('Spline Tools');
+		splineFolder.open(false);
+		splineFolder.add(this.splineObject, 'bezierEnabledOnLoad', [false, true]);
+		splineFolder.add(this.splineObject, 'makeSpline');
+		splineFolder.add(this.splineObject, 'makeLineFromWindowJSON');
+		splineFolder.add(this.splineObject, 'addSplinePointToStart');
+		splineFolder.add(this.splineObject, 'addSplinePointToEnd');
+		splineFolder.add(this.splineObject, 'exportPoints');
+		splineFolder.add(this.splineObject, 'destroySpline');
 	}
 
 	/**

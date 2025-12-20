@@ -367,7 +367,7 @@ export class PathService extends Service {
 	/**
 	 * DEBUG: Creates outlines of tiles and internal paths
 	 */
-	debugCreateOutlines(curvePath: THREE.CurvePath<THREE.Vector3> | THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number = 0x000000) {
+	debugCreateOutlines(curvePath: THREE.CurvePath<THREE.Vector3> | THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3, color: number = 0x000000): THREE.Line {
 		const points = curvePath.getPoints(100);
 		const lineGeometry = new THREE.BufferGeometry().setFromPoints(points as THREE.Vector3[]);
 
@@ -393,7 +393,7 @@ export class PathService extends Service {
 		line.position.y = 0.25;
 		line.computeLineDistances(); // call this if you haven’t manually set lineDistance
 
-		this.main.scene.add(line);
+		return line;
 	}
 }
 

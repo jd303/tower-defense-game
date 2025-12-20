@@ -1,18 +1,23 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Main } from './Main';
+import { PathService } from '../game/PathService';
 
 export class OrbitController {
 	/**
 	 * Properties
 	 * */
+	main: Main;
 	camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
 	controls: OrbitControls;
-	panClampBounds: ClampBounds = { minX: -95, maxX: 95, minZ: -95, maxZ: 95 };
+	panClampBounds: ClampBounds;
+	panClampBoundsGame: ClampBounds = { minX: -75, maxX: 75, minZ: -95, maxZ: 95 };
+	panClampBoundsDebug: ClampBounds = { minX: -110, maxX: 110, minZ: -120, maxZ: 120 };
 
 	/**
 	 * Constructor
 	 * */
-	constructor(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, canvas: HTMLCanvasElement, clampingEnabled: boolean) {
+	constructor(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, canvas: HTMLCanvasElement, clampingEnabled: boolean, main: Main) {
 		this.camera = camera;
 		this.controls = new OrbitControls(camera, canvas);
 		this.controls.enablePan = true;
@@ -21,8 +26,11 @@ export class OrbitController {
 		this.controls.maxZoom = 0;
 		this.controls.minZoom = 0;
 		this.controls.panSpeed = 1;
+		this.main = main;
+		this.panClampBounds = this.main.debugMode ? this.panClampBoundsDebug : this.panClampBoundsGame;
 
 		if (clampingEnabled) this.setupPanClamp();
+		if (this.main.debugMode) this.drawDebugBounds();
 
 		return this;
 	}
@@ -138,6 +146,21 @@ export class OrbitController {
 			clampTargetToBounds.bind(this)();
 			return true;
 		};
+	}
+
+	/**
+	 * Creates a debug line to show camera bounds
+	 */
+	drawDebugBounds() {
+		const sPath: PathService = this.main.s('Path');
+		const curvePath = sPath.createCurveFromPathPoints([
+			{ point: new THREE.Vector3(75, 0.5, -95) },
+			{ point: new THREE.Vector3(-75, 0.5, -95) },
+			{ point: new THREE.Vector3(-75, 0.5, 95) },
+			{ point: new THREE.Vector3(75, 0.5, 95) },
+		], 0, 0, true);
+		const outline = sPath.debugCreateOutlines(curvePath, 0x0000ff);
+		this.main.scene.add(outline);
 	}
 
 	/*setupPanClamp(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, terrainBounds: any) {

@@ -21,11 +21,6 @@ export class TowerPlacementZone {
 	curvePath: THREE.CurvePath<any>;
 
 	/**
-	 * Three Objects
-	 * */
-	groupMain: THREE.Group;
-
-	/**
 	 * Constructor
 	 * */
 	constructor(points: PathPoint[], towerPlacementCommons: TowerPlacementCommons, main: Main) {
@@ -38,7 +33,6 @@ export class TowerPlacementZone {
 		this.curvePath = sPath.convertFromCatmullRomCurve3(smoothCurve, 100);
 		this.environmentTile = new EnvironmentTile(this.curvePath, main, 0xC4B271);
 		this.main.scene.add(this.environmentTile.groupMain);
-		this.groupMain = new THREE.Group();
 
 		const shapePlacements = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
 		this.placementTilePositions = shapePlacements.map((placement) => { return new TowerZoneShapePlacement(placement.xIndex, placement.zIndex, placement.point); });
@@ -109,6 +103,13 @@ export class TowerPlacementZone {
 			});
 			this.placementTiles = [];
 		}
+	}
+
+	/**
+	 * Disposes this Tower Placement Zone
+	 */
+	dispose() {
+		this.environmentTile.dispose();
 	}
 }
 

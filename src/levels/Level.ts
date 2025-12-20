@@ -2,11 +2,10 @@ import * as THREE from 'three';
 import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
-import { LevelDefinition } from '../data/LevelInterfaces';
+import { LevelDefinition, TerrainTypes } from '../data/LevelInterfaces';
 import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
-import { Hero } from '../environment/heroes/Hero';
 import { PropManager } from '../environment/propManager/PropManager';
 import { TowerManager } from '../environment/towers/TowerManager';
 import { CreepManager } from '../environment/creeps/CreepManager';
@@ -15,6 +14,10 @@ import { LevelCameraManager } from './LevelCameraManager';
 import { TowerMage } from '../environment/towers/TowerMage';
 import { TowerBomber } from '../environment/towers/TowerBomber';
 import { TowerArcher } from '../environment/towers/TowerArcher';
+import { EconomyService } from '../game/EconomyService';
+import { EventService } from '../core/EventService';
+import { HeroManager } from '../environment/heroes/HeroManager';
+import { LevelCreator } from './LevelCreator';
 
 export class Level {
 	/**
@@ -31,12 +34,12 @@ export class Level {
 	 * Level Assets
 	 * */
 	levelCameraManager: LevelCameraManager;
-	terrain: Terrain;
+	terrain: Terrain | null;
 	waveManager: WaveManager;
 	propManager: PropManager;
 	towerManager: TowerManager;
 	creepManager: CreepManager;
-	heroes: Hero[] = [];
+	heroManager: HeroManager;
 
 	/**
 	 * Constructor
@@ -46,13 +49,30 @@ export class Level {
 		this.main = main;
 		this.main.s('Level').currentLevel = this;
 		this.levelCameraManager = new LevelCameraManager(this.main);
-		this.terrain = new Terrain(levelDetails.terrain, this.main);
 		this.propManager = new PropManager(this.main);
 		this.towerManager = new TowerManager(this.main);
 		this.creepManager = new CreepManager(this.main);
 		this.waveManager = new WaveManager(this, this.main);
+		this.heroManager = new HeroManager(this.main);
 
+		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
+		this.setupDebugs(levelDetails);
+	}
+
+	/**
+	 * Sets the level's terrain
+	 * @param terrainType 
+	 */
+	setTerrain(terrainType: TerrainTypes) {
+		if (this.terrain) {
+			console.log("REMOVING FIRST");
+			this.terrain.removeFromScene();
+			this.terrain = null;
+		}
+		console.log(terrainType);
+		this.terrain = new Terrain(terrainType, this.main);
+		this.terrain.addToScene();
 	}
 
 	/**
@@ -64,36 +84,70 @@ export class Level {
 		this.propManager.setup(this.levelDetails);
 		this.towerManager.setup(this.levelDetails, [TowerArcher, TowerMage, TowerBomber]);
 		this.waveManager.setup(this.levelDetails);
-
-		this.renderLevel();
+		this.setupLights();
+		this.setupUI();
+		this.setupEconomy();
+		this.setupHero();
 		this.setupMainTick();
 		this.waveManager.startWaveTimer();
+		this.propManager.render();
 	}
 
 	/**
-	 * Renders all the objects in the level
+	 * Sets up lights
 	 */
-	renderLevel() {
-		console.log("%c TODO: Migrate all rendering (props, creeps, etc) to here", "color:green");
-		this.main.scene.add(this.terrain.groupMain);
+	setupLights() {
+		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");
+		this.main.s('Lighting').enableLight(ambientLight);
+		const directionalLight = this.main.s('Lighting').createDirectionalLight(true);
+		this.main.s('Lighting').enableLight(directionalLight);
+		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
+		this.main.s('Debug').debugLight(ambientLight, 'Ambient Light');
 
-		// Start the timer
-		this.main.s('Tick').start();
+		// Enable shadows
+		setTimeout(() => {
+			//this.main.renderer.physicallyCorrectLights = true;
+			//this.main.renderer.outputEncoding = THREE.sRGBEncoding;
+			this.main.renderer.shadowMap.enabled = true;
+			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			this.terrain?.enableShadows();
+			this.main.s('Lighting').addShadowsToLight(directionalLight);
+		}, 100);
 	}
 
 	/**
-	 * Adds a prop to the level
-	 * */
-	addHero(hero: Hero, point: THREE.Vector3) {
-		this.heroes.push(hero);
-		this.main.scene.add(hero.groupMain);
-		hero.groupMain.position.set(point.x, point.y, point.z);
+	 * Setup a UI (towers defaulted, but in the future players should be able to choose)
+	 */
+	setupUI() {
+		const sUI: UIService = this.main.s('UI');
+		sUI.addEconomyLabel('money', 'commerce_money_changed');
+		sUI.addEconomyLabel('vp', 'vp_changed');
+	}
+
+	/**
+	 * Sets up the economy for the level
+	 */
+	setupEconomy() {
+		const sEconomy: EconomyService = this.main.s('Economy');
+		const sEvent: EventService = this.main.s('Event');
+		sEconomy.setEconomyValue("money", 600);
+		sEvent.fire('commerce_money_changed', 600);
+		sEconomy.setEconomyValue("vp", 20);
+		sEvent.fire("vp_changed", 20);
+	}
+
+	/**
+	 * Sets up the hero for the level
+	 */
+	setupHero() {
+		this.heroManager.createDefaultHero(new THREE.Vector3(-28, 0, -20));
 	}
 
 	/**
 	 * Registers callback for tick
 	 * */
 	setupMainTick() {
+		this.main.s('Tick').start();
 		this.main.s('Tick').registerCallback(new TickCallback("Level", this.gameplayTickCallback.bind(this)));
 	}
 
@@ -101,8 +155,7 @@ export class Level {
 	 * Animates creeps and towers and other game items
 	 * */
 	gameplayTickCallback(timeProperties: TickTimeProperties) {
-
-		this.heroes.forEach((hero) => hero.animateCore(timeProperties));
+		this.heroManager.heroes.forEach((hero) => hero.animateCore(timeProperties));
 		this.creepManager.tick(timeProperties);
 		this.towerManager.tick(timeProperties);
 	}
@@ -143,5 +196,74 @@ export class Level {
 		if (vpValue <= 0) {
 			this.loseLevel();
 		}
+	}
+
+	/**
+	 * Debug objects and helpers
+	 */
+	setupDebugs(levelDetails: LevelDefinition) {
+		// SOME DEBUG OBJECTS OFF TO THE LEFT
+		this.propManager.registerProp({ assetName: 'mountain_2', position: new THREE.Vector3(-130, 0, -50) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'mountain_3', position: new THREE.Vector3(-110, 0, -50) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'mountain_4', position: new THREE.Vector3(-150, 0, -15) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'mountain_5', position: new THREE.Vector3(-130, 0, -15) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'mese_1', position: new THREE.Vector3(-110, 0, -15) }, levelDetails);
+
+		// Setup a Debug to initiate level creation
+		const levelCreator = new LevelCreator(this.main, this);
+		this.main.s('Debug').addLevelCreatorLilGUI(levelCreator);
+
+		/**
+		 * DEBUG Objects
+		 * */
+		/*const mat = new THREE.MeshStandardMaterial();
+		mat.roughness = 0.7;
+		mat.color.set('#888888');
+		const sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere.position.y = 5;
+		sphere.position.z = 2;
+		sphere.castShadow = true;
+		this.scene.add(sphere);
+
+		const sphere2 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere2.scale.set(2, 2, 2);
+		sphere2.position.y = 2;
+		sphere2.position.x = 4;
+		sphere2.castShadow = true;
+		sphere2.receiveShadow = true;
+		this.scene.add(sphere2);
+
+		const sphere3 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
+		sphere3.scale.set(4, 4, 4);
+		sphere3.position.y = 5;
+		sphere3.position.x = 15;
+		sphere3.castShadow = true;
+		sphere3.receiveShadow = true;
+		this.scene.add(sphere3);
+
+		const plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 50), mat);
+		plane.rotation.x = Math.PI * -0.5;
+		plane.position.y = 0.1;
+		plane.receiveShadow = true;
+		this.scene.add(plane);
+		// END DEBUG THINGS*/
+	}
+
+	/**
+	 * Removes all assets from the scene and UI
+	 */
+	disposeLevel() {
+		console.log("%c Disposing the Level has not been fully tested.  Check registered objects in debugger", "color: red");
+		this.terrain?.removeFromScene();
+		this.terrain = null;
+
+		this.waveManager.disposeWaves();
+		this.propManager.disposeProps();
+		this.towerManager.disposeTowers();
+		this.creepManager.disposeCreeps();
+		this.heroManager.disposeHeroes();
+
+		const sUI: UIService = this.main.s('UI');
+		sUI.clearUI();
 	}
 }

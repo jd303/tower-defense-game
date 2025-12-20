@@ -14,6 +14,8 @@ export class PropZone {
 	curvePath: THREE.CurvePath<THREE.Vector>;
 	zoneOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3;
 	boundingBox: BoundingBoxPlane;
+	debugOutline?: THREE.Line;
+	debugZoneOutline?: THREE.Line;
 
 	/**
 	 * Constructor
@@ -32,8 +34,12 @@ export class PropZone {
 
 		if (this.main.debugMode) {
 			const sPath: PathService = this.main.s('Path');
-			sPath.debugCreateOutlines(this.curvePath);
-			if (args.environmentTile.show) sPath.debugCreateOutlines(this.zoneOutlinePath, 0xff0000);
+			this.debugOutline = sPath.debugCreateOutlines(this.curvePath);
+			this.main.scene.add(this.debugOutline);
+			if (args.environmentTile.show) {
+				this.debugZoneOutline = sPath.debugCreateOutlines(this.zoneOutlinePath, 0xff0000);
+				this.main.scene.add(this.debugZoneOutline);
+			}
 		}
 
 		return this;
@@ -124,6 +130,14 @@ export class PropZone {
 
 		return furthestDistance;
 	}*/
+
+	/**
+	 * Removes all elements of a PropZone
+	 */
+	dispose() {
+		this.debugOutline && this.main.scene.remove(this.debugOutline);
+		this.debugZoneOutline && this.main.scene.remove(this.debugZoneOutline);
+	}
 }
 
 export interface PropZoneArguments {

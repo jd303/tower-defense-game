@@ -141,7 +141,7 @@ export class CameraService extends Service {
 	 * Sets up orbit handling
 	 * */
 	setupOrbitControls() {
-		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas, this.main.s('Camera').mainCamera.settings.clampingEnabled);
+		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas, this.main.s('Camera').mainCamera.settings.clampingEnabled, this.main);
 		this.main.s('Tick').registerCallback(new TickCallback('OrbitController', () => {
 			this.orbitController.controls.update();
 		}), false);

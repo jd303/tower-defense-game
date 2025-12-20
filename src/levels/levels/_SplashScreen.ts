@@ -54,10 +54,6 @@ export class SplashScreen {
 		this.propManager.registerProp({ assetName: 'tree_cone', position: new THREE.Vector3(12, -10, -30), scale: new THREE.Vector3(1.75, 1.75, 1.75) });
 		this.propManager.render();
 
-		// Load some creatures to be seen
-		//const troll = new Troll(main);
-		//const Wisp = new Wisp(main);
-
 		// Create Lights
 		const sLighting: LightingService = this.main.s('Lighting');
 		const ambientLight = sLighting.createAmbientLight("WorldAmbient");

@@ -70,4 +70,19 @@ export class CreepManager {
 	tick(timeProperties: TickTimeProperties) {
 		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
 	}
+
+	/**
+	 * Removes all creeps from the scene
+	 */
+	disposeCreeps() {
+		this.creeps.forEach((creep) => {
+			this.main.scene.remove(creep.groupMain);
+		});
+		this.creeps = [];
+
+		this.creepPaths.forEach((creepPath) => {
+			creepPath.dispose();
+		});
+		this.creepPaths = [];
+	}
 }

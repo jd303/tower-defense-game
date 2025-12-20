@@ -9,6 +9,7 @@ export interface LevelDefinition {
 	waves: any[];
 	props?: LevelPropDefinition[];
 	propZones?: PropZoneArguments[];
+	propColourisation?: Record<string, { r?: number, g?: number, b?: number, l?: number }>;
 }
 
 export enum TerrainTypes {

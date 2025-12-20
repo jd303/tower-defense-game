@@ -47,6 +47,20 @@ export class Terrain {
 	}
 
 	/**
+	 * Adds the terrain to the scene
+	 */
+	addToScene() {
+		this.main.scene.add(this.groupMain);
+	}
+
+	/**
+	 * Removes from the scene and removes the terrain item
+	 */
+	removeFromScene() {
+		this.main.scene.remove(this.groupMain);
+	}
+
+	/**
 	 * Enables shadows for terrain
 	 * */
 	enableShadows() {

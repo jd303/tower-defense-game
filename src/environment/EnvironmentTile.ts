@@ -94,4 +94,11 @@ export class EnvironmentTile {
 		/*const sInteraction = main.s('Interaction');
 		sInteraction.registerDefaultTarget(new Interactable(InteractableOrders.terrain, this));*/
 	}
+
+	/**
+	 * Disposes the environment tile
+	 */
+	dispose() {
+		this.main.scene.remove(this.groupMain);
+	}
 }

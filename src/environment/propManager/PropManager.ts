@@ -1,11 +1,10 @@
-import THREE, { Texture, Vector3 } from "three";
+import THREE, { InstancedMesh, Texture, Vector3 } from "three";
 import { Main } from "../../core/Main";
 import { LevelDefinition, TerrainTypes } from "../../data/LevelInterfaces";
 import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
 import { Maths } from "../../core/Maths";
 import { EnvironmentTile } from "../EnvironmentTile";
-import { PathService } from "../../game/PathService";
 
 /**
  * A framework for adding props and propzones to the board
@@ -18,6 +17,7 @@ export class PropManager {
 	 * */
 	main: Main;
 	tileset: TerrainTypes = TerrainTypes.grass;
+	propZones: PropZone[] = [];
 	propGroups: PropGroup[] = [];
 	environmentTiles: EnvironmentTile[] = [];
 
@@ -37,14 +37,14 @@ export class PropManager {
 	 */
 	setup(levelDetails: LevelDefinition) {
 		this.tileset = levelDetails.terrain;
-		levelDetails.props?.forEach(prop => this.registerProp(prop));
-		levelDetails.propZones?.forEach(propZone => this.registerPropZone(propZone));
+		levelDetails.props?.forEach(prop => this.registerProp(prop, levelDetails));
+		levelDetails.propZones?.forEach(propZone => this.registerPropZone(propZone, levelDetails));
 	}
 
 	/**
 	 * Register a prop to place and render
 	 */
-	registerProp(args: { assetName: string, position: Vector3, scale?: Vector3, rotate?: Vector3 }) {
+	registerProp(args: { assetName: string, position: Vector3, scale?: Vector3, rotate?: Vector3 }, levelDetails?: LevelDefinition) {
 		if (!args.scale) args.scale = new Vector3(1, 1, 1);
 		if (!args.rotate) args.rotate = new Vector3(0, 0, 0);
 
@@ -62,7 +62,7 @@ export class PropManager {
 				rotZ: args.rotate.z
 			}
 
-			const propGroup = this.preparePropGroup(prop);
+			const propGroup = this.preparePropGroup(prop, levelDetails);
 			propGroup.propPlacements.push(propAssetPlacement);
 		}
 	}
@@ -70,21 +70,22 @@ export class PropManager {
 	/**
 	 * Register a zone to generate props in
 	 */
-	registerPropZone(args: PropZoneArguments) {
+	registerPropZone(args: PropZoneArguments, levelDetails: LevelDefinition) {
 		const propZonePropsY = args.environmentTile.show ? 0.2 : 0;
 		const propZone = new PropZone(args, this.main);
+		this.propZones.push(propZone);
 		const propPositions: Vector3[] = propZone.createPositions();
 
 		if (args.environmentTile.show) {
 			const environmentTile = propZone.createEnvironmentTile();
-			this.environmentTiles.push(propZone.createEnvironmentTile());
+			this.environmentTiles.push(environmentTile);
 			this.main.scene.add(environmentTile.groupMain);
 		}
 
 		// Place the props
 		propPositions.forEach((position: any) => {
 			const propName = args.propNames[Math.floor(Math.random() * args.propNames.length)];
-			this.registerProp({ assetName: propName, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) });
+			this.registerProp({ assetName: propName, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) }, levelDetails);
 		});
 	}
 
@@ -99,12 +100,14 @@ export class PropManager {
 	/**
 	 * Used to create a prop group for each unique prop
 	 */
-	preparePropGroup(prop: PropAsset): PropGroup {
+	preparePropGroup(prop: PropAsset, levelDetails?: LevelDefinition): PropGroup {
 		let thePropGroup = this.propGroups.find(propGroup => propGroup.asset == prop);
 		if (!thePropGroup) {
 			thePropGroup = {
+				iMesh: null,
 				asset: prop,
-				propPlacements: []
+				propPlacements: [],
+				colourRandom: levelDetails?.propColourisation?.[prop.name]
 			}
 
 			this.propGroups.push(thePropGroup);
@@ -182,19 +185,20 @@ export class PropManager {
 		iMesh.castShadow = propGroup.asset.shadows;
 		iMesh.receiveShadow = true;
 		if (propGroup.loadedMaterial) propGroup.loadedMaterial.needsUpdate = true;
+		propGroup.iMesh = iMesh;
 		this.main.scene.add(iMesh);
 
 		// If set, randomise the colours
-		if (propGroup.colorRandom) {
+		if (propGroup.colourRandom) {
 			for (let i = 0; i < propGroup.propPlacements.length; i++) {
 				// Adjust colours if set
-				let colorR = propGroup.colorRandom.r && (1 - propGroup.colorRandom.r) + Math.random() * propGroup.colorRandom.r || 1;
-				let colorG = propGroup.colorRandom.g && (1 - propGroup.colorRandom.g) + Math.random() * propGroup.colorRandom.g || 1;
-				let colorB = propGroup.colorRandom.b && (1 - propGroup.colorRandom.b) + Math.random() * propGroup.colorRandom.b || 1;
+				let colorR = propGroup.colourRandom.r && (1 - propGroup.colourRandom.r) + Math.random() * propGroup.colourRandom.r || 1;
+				let colorG = propGroup.colourRandom.g && (1 - propGroup.colourRandom.g) + Math.random() * propGroup.colourRandom.g || 1;
+				let colorB = propGroup.colourRandom.b && (1 - propGroup.colourRandom.b) + Math.random() * propGroup.colourRandom.b || 1;
 
 				// Adjust lightness if set
-				if (propGroup.colorRandom.l) {
-					const random = Math.random() * propGroup.colorRandom.l;
+				if (propGroup.colourRandom.l) {
+					const random = Math.random() * propGroup.colourRandom.l;
 					colorR = Math.max(0, Math.min(1, colorR + random));
 					colorG = Math.max(0, Math.min(1, colorG + random));
 					colorB = Math.max(0, Math.min(1, colorB + random));
@@ -234,12 +238,33 @@ export class PropManager {
 
 		return material;
 	}
+
+	/**
+	 * Removes all props from the level
+	 */
+	disposeProps() {
+		this.propGroups.forEach((propGroup: PropGroup) => {
+			this.main.scene.remove(propGroup.iMesh!);
+		});
+		this.propGroups = [];
+
+		this.propZones.forEach((propZone) => {
+			propZone.dispose();
+		});
+		this.propZones = [];
+
+		this.environmentTiles.forEach((environmentTile) => {
+			environmentTile.dispose();
+		});
+		this.environmentTiles = [];
+	}
 }
 
 interface PropGroup {
+	iMesh: InstancedMesh | null;
 	asset: PropAsset;
 	propPlacements: PropAssetPlacement[];
-	colorRandom?: { r?: number, g?: number, b?: number, l?: number }, // r, g and b apply a random to individual colours.  l applies to all colours.
+	colourRandom?: { r?: number, g?: number, b?: number, l?: number }, // r, g and b apply a random to individual colours.  l applies to all colours.
 	loadedModel?: any;
 	loadedMaterial?: any;
 }

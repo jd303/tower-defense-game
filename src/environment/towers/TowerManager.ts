@@ -134,4 +134,19 @@ export class TowerManager {
 	tick(timeProperties: TickTimeProperties) {
 		this.towers.forEach((tower) => tower.animateCore(timeProperties));
 	}
+
+	/**
+	 * Removes all towers from the scene
+	 */
+	disposeTowers() {
+		this.towers.forEach((tower) => {
+			this.main.scene.remove(tower.groupMain);
+		});
+		this.towers = [];
+
+		this.towerPlacementZones.forEach((towerPlacementZone) => {
+			towerPlacementZone.dispose();
+		});
+		this.towerPlacementZones = [];
+	}
 }

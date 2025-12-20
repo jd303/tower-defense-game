@@ -30,6 +30,9 @@ export class LevelCameraManager {
 		if (this.main.debugMode) this.setupDebugs();
 	}
 
+	/**
+	 * Creates Level Camera Debugs
+	 */
 	setupDebugs() {
 		const cameraDebug = {
 			changeMainCam: () => {
