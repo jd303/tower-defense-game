@@ -12,6 +12,7 @@ export class Wisp extends Creep {
 	 * */
 	assetPath: string = 'assets/models/creeps/creep_wisp.glb';
 	assetScale: number = 0.5;
+	assetPositionY = 2;
 
 	/**
 	 * Stats
@@ -98,5 +99,5 @@ export class Wisp extends Creep {
 	/**
 	 * Animations
 	 * */
-	animate(timeProperties: TickTimeProperties) {}
+	animate(timeProperties: TickTimeProperties) { }
 }

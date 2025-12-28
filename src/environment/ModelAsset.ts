@@ -20,6 +20,7 @@ export abstract class ModelAsset {
 	shadowsEnabled: boolean = false;
 	assetPath: string;
 	assetScale: number = 1; // default
+	assetPositionY: number = 0; // default
 	interactive: boolean;
 
 	/**
@@ -45,7 +46,9 @@ export abstract class ModelAsset {
 	groupFacing: THREE.Group; // Middle group - applies facing
 	groupModel: THREE.Group; // Innermost group - applies status transforms
 	selected: boolean;
-	selectionMesh?: THREE.Mesh;
+	selectionGeometry?: THREE.BoxGeometry;
+	selectionGeometryScale: number = 1.5;
+	selectionVisibleMesh?: THREE.Mesh;
 
 	/**
 	 * Movement / Path Properties (Creeps and Heroes)
@@ -79,8 +82,10 @@ export abstract class ModelAsset {
 	async loadModel(callback?: Function) {
 		const model = await this.main.s('Loader').loadModel(this.assetPath);
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
+		this.groupModel.position.y = this.assetPositionY;
 		this.groupModel.add(...model.scene.children);
 		this.enableShadows();
+		this.addSelectionGeometry();
 
 		if (callback) callback();
 	}
@@ -93,6 +98,7 @@ export abstract class ModelAsset {
 		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
 		this.groupModel.add(this.mesh);
 		this.enableShadows();
+		this.addSelectionGeometry();
 	}
 
 	/**
@@ -250,22 +256,45 @@ export abstract class ModelAsset {
 	}
 
 	/**
-	 * Adds a selection mesh to the model
+	* Adds geometry for selection
+	*/
+	addSelectionGeometry() {
+		if (!this.groupModel) return;
+
+		// Get the size
+		const hitboxSize = new THREE.Vector3();
+		const box = new THREE.Box3().setFromObject(this.groupModel);
+		box.getSize(hitboxSize);
+
+		const hitBoxGeometry = new THREE.BoxGeometry(hitboxSize.x, hitboxSize.y, hitboxSize.z);
+		const hitBox = new THREE.Mesh(
+			hitBoxGeometry,
+			new THREE.MeshBasicMaterial({ visible: false })
+		);
+		hitBox.scale.set(this.selectionGeometryScale, 1, this.selectionGeometryScale);
+		hitBox.position.x = 0;
+		hitBox.position.y = this.assetPositionY + (hitboxSize.y / 2);
+
+		this.groupMain.add(hitBox);
+	}
+
+	/**
+	 * Adds a selection visible mesh to the model
 	 */
-	addSelectionMesh(width: number = 2, thickness: number = 0.25) {
-		this.selectionMesh = ModelCommons.selectionCircleMesh(width, thickness);
-		this.selectionMesh.rotation.x = Math.PI * -0.5;
-		this.selectionMesh.position.y = 0.15;
-		this.selectionMesh.position.z = 0;
-		this.groupMain.add(this.selectionMesh);
+	addSelectionVisibleMesh(width: number = 2, thickness: number = 0.25) {
+		this.selectionVisibleMesh = ModelCommons.selectionCircleMesh(width, thickness);
+		this.selectionVisibleMesh.rotation.x = Math.PI * -0.5;
+		this.selectionVisibleMesh.position.y = 0.15;
+		this.selectionVisibleMesh.position.z = 0;
+		this.groupMain.add(this.selectionVisibleMesh);
 	}
 
 	/**
 	 * Removes a selection mesh from the model
 	 */
-	removeSelectionMesh() {
-		this.groupMain.remove(this.selectionMesh!);
-		this.selectionMesh = undefined;
+	removeSelectionVisibleMesh() {
+		this.groupMain.remove(this.selectionVisibleMesh!);
+		this.selectionVisibleMesh = undefined;
 	}
 
 	/**

@@ -101,8 +101,8 @@ export class LightingService extends Service {
 		light.threeLight.castShadow = true;
 
 		if (light.threeLight.shadow) {
-			light.threeLight.shadow.mapSize.width = 2048;
-			light.threeLight.shadow.mapSize.height = 2048;
+			light.threeLight.shadow.mapSize.width = 4096;
+			light.threeLight.shadow.mapSize.height = 4096;
 			(light.threeLight.shadow.camera as any).left = 250;
 			(light.threeLight.shadow.camera as any).right = -250;
 			(light.threeLight.shadow.camera as any).bottom = -250;

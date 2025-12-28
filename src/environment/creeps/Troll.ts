@@ -10,7 +10,7 @@ export class Troll extends Creep {
 	 * Main
 	 * */
 	assetPath: string = 'assets/models/creeps/creep_troll.glb';
-	assetScale: number = 0.5;
+	assetScale: number = 1;
 	shadowsEnabled = true;
 
 	/**

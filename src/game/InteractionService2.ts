@@ -5,9 +5,9 @@ import { ModelAsset } from '../environment/ModelAsset';
 import { Terrain } from '../environment/Terrain';
 import { EnvironmentTile } from '../environment/EnvironmentTile';
 import { CreepPath } from '../environment/creeps/CreepPath';
-import { Creep } from '../environment/creeps/Creep';
-import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
+import { Tower } from '../environment/towers/Tower';
+import { Creep } from '../environment/creeps/Creep';
 
 /**
  * Allows us to manage interaction based on clicks and taps.
@@ -34,6 +34,7 @@ export class InteractionService2 extends Service {
 	 * */
 	interactables: Interactable2[] = [];
 	interactableListeners: InteractableListener[] = [];
+	currentInteractive?: InteractableObject | null = null;
 
 	/**
 	 * Constructor
@@ -70,6 +71,23 @@ export class InteractionService2 extends Service {
 	}
 
 	/**
+	 * Registers and deregisters current interacteds
+	 */
+	registerCurrentInteractive(interactive: InteractableObject) {
+		if (this.currentInteractive && this.currentInteractive == interactive) {
+			this.deregisterCurrentInteractive();
+			return;
+		}
+		else if (this.currentInteractive) this.deregisterCurrentInteractive();
+		if (interactive instanceof Terrain === false) this.currentInteractive = interactive;
+	}
+	deregisterCurrentInteractive(targetedInteractive?: InteractableObject) {
+		console.log("DEREGISTER AND DESELECT");
+		if (this.currentInteractive && 'deselect' in this.currentInteractive) this.currentInteractive.deselect();
+		this.currentInteractive = null;
+	}
+
+	/**
 	 * Listens for all clicks
 	 * */
 	setupClickListener() {
@@ -85,6 +103,7 @@ export class InteractionService2 extends Service {
 	clickListener(event: MouseEvent | TouchEvent) {
 		const targets = this.interactables;
 		const cancelTargets: any[] = [];
+		let target;
 
 		if (this.interactables?.length) {
 			const sRaycaster: RaycasterService = this.main.s('Raycaster');
@@ -94,11 +113,13 @@ export class InteractionService2 extends Service {
 
 				for (let i = 0; i < (matchedTargets as RaycasterIntersection[]).length; i++) {
 					if (handled) break;
-					const target = (matchedTargets as RaycasterIntersection[])[i];
+					target = (matchedTargets as RaycasterIntersection[])[i];
 					handled = this.offerTargetToListeners(target);
 				}
 			}
 		}
+
+		if (target) this.registerCurrentInteractive(target.object)
 	}
 
 	/**
@@ -118,7 +139,7 @@ export class InteractionService2 extends Service {
 }
 
 export type InteractableObject = ModelAsset | Terrain | CreepPath | EnvironmentTile;
-export type InteractableTypes = 'creep' | 'creepPath' | 'tower' | 'hero' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain';
+export type InteractableTypes = 'creep' | 'creepPath' | 'hero' | 'tower' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain';
 
 export class Interactable2 {
 	name: InteractableTypes;

@@ -7,6 +7,7 @@ import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
+import { InteractableOrders } from '../../game/InteractionService2';
 
 export class TowerMage extends Tower {
 	/**
@@ -28,7 +29,7 @@ export class TowerMage extends Tower {
 	 * */
 	static stats = {
 		attack: {
-			damage: 6,
+			damage: 7,
 			damageType: DamageTypes.poison,
 			type: ProjectileTypes.homing,
 			hitType: ProjectileHitTypes.direct,

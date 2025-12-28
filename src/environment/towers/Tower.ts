@@ -8,7 +8,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
-import { InteractableTypes } from '../../game/InteractionService2';
+import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 
 export class Tower extends ModelAsset {
 	/**
@@ -41,7 +41,9 @@ export class Tower extends ModelAsset {
 	/**
 	 * States
 	 * */
+	selectionGeometryScale = 1.1;
 	stateMachine: StateMachine;
+	interactiveOrder = InteractableOrders.towers;
 
 	/**
 	 * Constructor
@@ -151,19 +153,27 @@ export class Tower extends ModelAsset {
 	/**
 	 * When a tower is clicked
 	 */
-	towerClicked() {
-		console.group();
-		console.log(`Tower: ${this.constructor.name}`);
-		console.log('Stats:', this.stats);
-		console.groupEnd();
+	select() {
+		if (this.selected) {
+			this.deselect();
+			this.main.s('Interaction2')
+		} else {
+			this.selected = true;
+			this.addSelectionVisibleMesh(this.stats.attack.range, 0.5)
 
-		console.log("%c TODO: We need to be able to remove selection by clicking away", 'color: red');
+			// Add debugs
+			console.group();
+			console.log(`Tower: ${this.constructor.name}`);
+			console.log('Stats:', this.stats);
+			console.groupEnd();
 
-		// Manage selection
-		this.selected = !this.selected;
-		if (this.selected) this.addSelectionMesh(this.stats.attack.range, 0.5);
-		else this.removeSelectionMesh();
+			console.log("%c TODO: We need to be able to remove selection by clicking away", 'color: red');
+		}
 
 		return { handled: true, cancelListeners: true };
+	}
+	deselect() {
+		this.selected = false;
+		this.removeSelectionVisibleMesh();
 	}
 }

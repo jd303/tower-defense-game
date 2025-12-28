@@ -58,6 +58,7 @@ export class Hero extends ModelAsset {
 	/**
 	 * Combat States
 	 * */
+	selectionGeometryScale = 1.4;
 	interceptionHandler: InterceptionHandler = new InterceptionHandler(this);
 
 	/**
@@ -465,7 +466,7 @@ export class Hero extends ModelAsset {
 			this.deselect();
 		} else {
 			this.selected = true;
-			this.addSelectionMesh();
+			this.addSelectionVisibleMesh();
 
 			// Register a new listener to make the movement
 			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
@@ -476,7 +477,7 @@ export class Hero extends ModelAsset {
 	}
 	deselect() {
 		this.selected = false;
-		this.removeSelectionMesh();
+		this.removeSelectionVisibleMesh();
 
 		// Register a new listener to make the movement
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');

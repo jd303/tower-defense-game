@@ -34,6 +34,7 @@ export class Creep extends ModelAsset {
 	/**
 	 * Status
 	 * */
+	selectionGeometryScale = 1.5;
 	states: CreepStates;
 
 	/**

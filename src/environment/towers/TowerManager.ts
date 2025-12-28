@@ -124,7 +124,7 @@ export class TowerManager {
 	 */
 	registerDefaultTowerListener() {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractableListener('tower', 'towerClickedDefault', this.towers[0].towerClicked);
+		sInteraction2.registerInteractableListener('tower', 'towerClickedDefault', this.towers[0].select);
 		this.defaultTowerClickEnabled = true;
 	}
 

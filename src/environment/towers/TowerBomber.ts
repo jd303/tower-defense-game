@@ -10,6 +10,7 @@ import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive }
 import { BombShot } from '../effects/BombShot';
 import { ModelAsset } from '../ModelAsset';
 import { MovementTypes } from '../../data/MovementTypes';
+import { InteractableOrders } from '../../game/InteractionService2';
 
 export class TowerBomber extends Tower {
 	/**

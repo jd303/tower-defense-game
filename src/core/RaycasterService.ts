@@ -107,7 +107,8 @@ export class RaycasterService extends Service {
 	getAllRayTargets(targets: Interactable2[]) {
 		let intersected: RaycasterIntersection[] = [];
 
-		for (let i = 0; i < targets.length; i++) {
+		const sortedTargets = targets.sort((target1, target2) => target1.order > target2.order && -1 || 1);
+		for (let i = 0; i < sortedTargets.length; i++) {
 			let subject = targets[i];
 
 			let intersectsTarget = this.raycaster?.intersectObjects([subject.object['groupMain']]);
@@ -122,8 +123,6 @@ export class RaycasterService extends Service {
 			}
 		}
 
-		console.log("%c TODO: Brute forcing a sort, but it would be great to add a better sorting option.  This solves a problem where terrain is called before props / towers etc", "color: cyan");
-		intersected.sort((intersectionA) => intersectionA.object instanceof Terrain && 1 || -1);
 		return intersected;
 	}
 }

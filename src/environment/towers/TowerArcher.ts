@@ -8,6 +8,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { TowerStats } from './TowerStats';
+import { InteractableOrders } from '../../game/InteractionService2';
 
 export class TowerArcher extends Tower {
 	/**
@@ -30,11 +31,11 @@ export class TowerArcher extends Tower {
 	 * */
 	static stats: TowerStats = {
 		attack: {
-			damage: 6,
+			damage: 5,
 			damageType: DamageTypes.piercing,
 			type: ProjectileTypes.arc,
 			hitType: ProjectileHitTypes.direct,
-			range: 12,
+			range: 13,
 			speed: 1.5,
 			radius: 0
 		},
