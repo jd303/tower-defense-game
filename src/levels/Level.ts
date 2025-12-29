@@ -18,6 +18,7 @@ import { EconomyService } from '../game/EconomyService';
 import { EventService } from '../core/EventService';
 import { HeroManager } from '../environment/heroes/HeroManager';
 import { LevelCreator } from './LevelCreator';
+import { EnvironmentTile } from '../environment/EnvironmentTile';
 
 export class Level {
 	/**
@@ -257,6 +258,7 @@ export class Level {
 
 		// 2. Create the material (specifically SpriteMaterial)
 		const material = new THREE.SpriteMaterial({ map: texture });
+		material.color.set(0xE8E0C2);
 
 		// 3. Create the Sprite
 		const sprite = new THREE.Sprite(material);
@@ -271,9 +273,20 @@ export class Level {
 		// Tell the texture to only show 1/4th of the width and height
 		texture.repeat.set(1 / cols, 1 / rows);
 
-		for (let x = 0; x < 125; x++) {
-			const posX = Math.random() * 20 - 55;
-			const posZ = Math.random() * 20 - 15;
+		for (let x = 0; x < 150; x++) {
+			const posX = Math.random() * 50 - 85;
+			const posZ = Math.random() * 20 - 85;
+			const scale = 2 + (Math.random() * 2);
+			const trollClone = sprite.clone();
+			sprite.position.x = posX;
+			sprite.position.z = posZ;
+			sprite.scale.set(scale, scale, scale);
+			this.main.scene.add(trollClone);
+		}
+
+		for (let x = 0; x < 150; x++) {
+			const posX = Math.random() * 50 - 19;
+			const posZ = Math.random() * 20 - 85;
 			const scale = 2 + (Math.random() * 2);
 			const trollClone = sprite.clone();
 			sprite.position.x = posX;
@@ -290,7 +303,7 @@ export class Level {
 
 		// 2. Create the material (specifically SpriteMaterial)
 		const material2 = new THREE.SpriteMaterial({ map: texture2 });
-		material2.color.set(0x99AACA);
+		material2.color.set(0xFEF8D4);
 
 		// 3. Create the Sprite
 		const sprite2 = new THREE.Sprite(material2);
@@ -305,9 +318,9 @@ export class Level {
 		// Tell the texture to only show 1/4th of the width and height
 		texture2.repeat.set(1 / cols2, 1 / rows2);
 
-		for (let x = 0; x < 50; x++) {
-			const posX = Math.random() * 20 - 50;
-			const posZ = Math.random() * 20 + 10;
+		for (let x = 0; x < 100; x++) {
+			const posX = Math.random() * 50 - 75;
+			const posZ = Math.random() * 20 - 50;
 			const scale = 0 + (Math.random() * 14);
 			const mountainClone = sprite2.clone();
 			sprite2.position.x = posX;

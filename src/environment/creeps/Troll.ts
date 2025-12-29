@@ -11,7 +11,7 @@ export class Troll extends Creep {
 	 * Main
 	 * */
 	assetPath: string = 'assets/models/creeps/creep_troll.glb';
-	assetScale: number = 1;
+	assetScale: number = 1.25;
 	shadowsEnabled = true;
 
 	/**
@@ -106,7 +106,7 @@ export class Troll extends Creep {
 		const shadowMaterial = new THREE.MeshBasicMaterial({
 			map: shadowTexture,
 			transparent: true,
-			opacity: 1,
+			opacity: 0.75,
 			depthWrite: false // Prevents weird flickering with the floor
 		});
 		/*const shadowMaterial = new THREE.MeshBasicMaterial({

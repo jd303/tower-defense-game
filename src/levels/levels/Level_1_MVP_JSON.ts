@@ -68,7 +68,7 @@ export const levelDetails: LevelDefinition = {
 	],
 	props: [],
 	propZones: [
-		{
+		/*{
 			propNames: ['tree_thin', 'tree_lollipop', 'tree_forked', 'tree_spread'],
 			zonePathPoints: [
 				{ point: new Vector3(-76.578, 0, -97.405) },
@@ -171,7 +171,7 @@ export const levelDetails: LevelDefinition = {
 				attentuationDistance: 1,
 				attenuatedScale: 10
 			}
-		}
+		}*/
 	],
 	propColourisation: {
 		"tree_cone_2": { g: 0.5 },
@@ -193,7 +193,7 @@ export const levelDetails: LevelDefinition = {
 							id: '1',
 							type: 'TrollDink',
 						},
-						/*{
+						{
 							id: '2',
 							type: 'TrollDink',
 						},
@@ -204,7 +204,7 @@ export const levelDetails: LevelDefinition = {
 						{
 							id: '4',
 							type: 'TrollDink',
-						},*/
+						},
 						{
 							id: '5',
 							type: 'Troll',

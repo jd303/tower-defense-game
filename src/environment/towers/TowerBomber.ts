@@ -10,14 +10,13 @@ import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive }
 import { BombShot } from '../effects/BombShot';
 import { ModelAsset } from '../ModelAsset';
 import { MovementTypes } from '../../data/MovementTypes';
-import { InteractableOrders } from '../../game/InteractionService2';
 
 export class TowerBomber extends Tower {
 	/**
 	 * Tower Assets
 	 * */
 	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
-	assetScale = 3;
+	assetScale = 1.25;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 
 	/**
@@ -50,7 +49,8 @@ export class TowerBomber extends Tower {
 	 */
 	constructor(main: Main) {
 		super(main);
-		this.loadModel();
+		//this.loadModel();
+		this.loadSpritesheetTemp();
 		this.stats = { ...TowerBomber.stats };
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
@@ -105,5 +105,47 @@ export class TowerBomber extends Tower {
 
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
+	}
+
+	loadSpritesheetTemp() {
+		const loader = new THREE.TextureLoader();
+		const texture = loader.load('assets/temp/spritesheet-tower-cannon.png');
+		texture.colorSpace = THREE.SRGBColorSpace;
+
+		// 2. Create the material (specifically SpriteMaterial)
+		const material = new THREE.SpriteMaterial({ map: texture });
+
+		// 3. Create the Sprite
+		const sprite = new THREE.Sprite(material);
+
+		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
+		sprite.scale.set(4, 4, 1);
+		sprite.position.set(0, 1.60, 0);
+
+		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
+		this.groupModel.position.y = this.assetPositionY;
+		this.groupModel.add(sprite);
+
+		const cols = 1; // Number of horizontal frames
+		const rows = 1; // Number of vertical frames
+		const totalFrames = 1;
+
+		// Tell the texture to only show 1/4th of the width and height
+		texture.repeat.set(1 / cols, 1 / rows);
+
+		let currentFrame = 0;
+
+		function animateSprite() {
+			currentFrame = (currentFrame + 1) % totalFrames;
+
+			const column = currentFrame % cols;
+			const row = Math.floor(currentFrame / cols);
+
+			// Shift the "window" to the correct frame
+			texture.offset.x = column / cols;
+			texture.offset.y = 1 - (row + 1) / rows; // Y is often inverted in UVs
+		}
+
+		setInterval(animateSprite, 300);
 	}
 }
