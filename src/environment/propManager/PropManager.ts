@@ -273,6 +273,7 @@ export interface PropAsset {
 	tileset: TerrainTypes;
 	name: string;
 	assetPath: string;
+	spritesheetPath?: string
 	texturePath?: string;
 	defaultScale?: Vector3;
 	shadows: boolean;

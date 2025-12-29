@@ -247,6 +247,74 @@ export class Level {
 		plane.receiveShadow = true;
 		this.scene.add(plane);
 		// END DEBUG THINGS*/
+
+		/**
+		 * DEBUG SOME TREES
+		 */
+		const loader = new THREE.TextureLoader();
+		const texture = loader.load('assets/temp/spritesheet-tree.png');
+		texture.colorSpace = THREE.SRGBColorSpace;
+
+		// 2. Create the material (specifically SpriteMaterial)
+		const material = new THREE.SpriteMaterial({ map: texture });
+
+		// 3. Create the Sprite
+		const sprite = new THREE.Sprite(material);
+
+		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
+		sprite.scale.set(4, 4, 1);
+		sprite.position.set(0, 2, 0);
+
+		const cols = 1; // Number of horizontal frames
+		const rows = 1; // Number of vertical frames
+
+		// Tell the texture to only show 1/4th of the width and height
+		texture.repeat.set(1 / cols, 1 / rows);
+
+		for (let x = 0; x < 125; x++) {
+			const posX = Math.random() * 20 - 55;
+			const posZ = Math.random() * 20 - 15;
+			const scale = 2 + (Math.random() * 2);
+			const trollClone = sprite.clone();
+			sprite.position.x = posX;
+			sprite.position.z = posZ;
+			sprite.scale.set(scale, scale, scale);
+			this.main.scene.add(trollClone);
+		}
+
+		/**
+		 * DEBUG SOME Mountains
+		 */
+		const texture2 = loader.load('assets/temp/spritesheet-mountain.png');
+		texture2.colorSpace = THREE.SRGBColorSpace;
+
+		// 2. Create the material (specifically SpriteMaterial)
+		const material2 = new THREE.SpriteMaterial({ map: texture2 });
+		material2.color.set(0x99AACA);
+
+		// 3. Create the Sprite
+		const sprite2 = new THREE.Sprite(material2);
+
+		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
+		sprite2.scale.set(4, 4, 1);
+		sprite2.position.set(0, 2, 0);
+
+		const cols2 = 1; // Number of horizontal frames
+		const rows2 = 1; // Number of vertical frames
+
+		// Tell the texture to only show 1/4th of the width and height
+		texture2.repeat.set(1 / cols2, 1 / rows2);
+
+		for (let x = 0; x < 50; x++) {
+			const posX = Math.random() * 20 - 50;
+			const posZ = Math.random() * 20 + 10;
+			const scale = 0 + (Math.random() * 14);
+			const mountainClone = sprite2.clone();
+			sprite2.position.x = posX;
+			sprite2.position.z = posZ;
+			sprite2.scale.set(scale, scale, scale);
+			this.main.scene.add(mountainClone);
+		}
 	}
 
 	/**

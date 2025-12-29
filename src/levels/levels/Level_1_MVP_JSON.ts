@@ -55,6 +55,15 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-7.678, 0, -24.927) },
 				{ point: new Vector3(-23.221, 0, -25.042) },
 			]
+		},
+		{
+			points: [
+				{ point: new Vector3(-32.891, 0, -14.414) },
+				{ point: new Vector3(-33.005, 0, 0.103) },
+				{ point: new Vector3(-11.348, 0, 1.318) },
+				{ point: new Vector3(-10.948, 0, -14.505) },
+				{ point: new Vector3(-32.891, 0, -14.414) },
+			]
 		}
 	],
 	props: [],
@@ -184,7 +193,7 @@ export const levelDetails: LevelDefinition = {
 							id: '1',
 							type: 'TrollDink',
 						},
-						{
+						/*{
 							id: '2',
 							type: 'TrollDink',
 						},
@@ -195,10 +204,10 @@ export const levelDetails: LevelDefinition = {
 						{
 							id: '4',
 							type: 'TrollDink',
-						},
+						},*/
 						{
 							id: '5',
-							type: 'TrollDink',
+							type: 'Troll',
 						},
 						{
 							id: '6',
