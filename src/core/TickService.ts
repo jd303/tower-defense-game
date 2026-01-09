@@ -224,7 +224,7 @@ export interface TickTimeProperties {
 }
 
 export enum TickTimeTypes {
-	frame,
-	second,
-	halfsecond,
+	frame = "frame",
+	second = "second",
+	halfsecond = "halfsecond",
 }

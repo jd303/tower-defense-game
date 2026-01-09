@@ -3,10 +3,10 @@ import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelDefinition, TerrainTypes } from '../data/LevelInterfaces';
-import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
+import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
-import { PropManager } from '../environment/propManager/PropManager';
+import { SpritePropManager } from '../environment/propManager/SpritePropManager';
 import { TowerManager } from '../environment/towers/TowerManager';
 import { CreepManager } from '../environment/creeps/CreepManager';
 import { WaveManager } from './WaveManager';
@@ -18,7 +18,7 @@ import { EconomyService } from '../game/EconomyService';
 import { EventService } from '../core/EventService';
 import { HeroManager } from '../environment/heroes/HeroManager';
 import { LevelCreator } from './LevelCreator';
-import { EnvironmentTile } from '../environment/EnvironmentTile';
+import { InstancedMeshService } from '../game/InstancedMeshService';
 
 export class Level {
 	/**
@@ -37,7 +37,7 @@ export class Level {
 	levelCameraManager: LevelCameraManager;
 	terrain: Terrain | null;
 	waveManager: WaveManager;
-	propManager: PropManager;
+	propManager: SpritePropManager;
 	towerManager: TowerManager;
 	creepManager: CreepManager;
 	heroManager: HeroManager;
@@ -50,11 +50,11 @@ export class Level {
 		this.main = main;
 		this.main.s('Level').currentLevel = this;
 		this.levelCameraManager = new LevelCameraManager(this.main);
-		this.propManager = new PropManager(this.main);
+		this.propManager = new SpritePropManager(this.main);
 		this.towerManager = new TowerManager(this.main);
-		this.creepManager = new CreepManager(this.main);
+		this.creepManager = new CreepManager(this.main, this);
 		this.waveManager = new WaveManager(this, this.main);
-		this.heroManager = new HeroManager(this.main);
+		this.heroManager = new HeroManager(this.main, this);
 
 		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
@@ -67,11 +67,10 @@ export class Level {
 	 */
 	setTerrain(terrainType: TerrainTypes) {
 		if (this.terrain) {
-			console.log("REMOVING FIRST");
 			this.terrain.removeFromScene();
 			this.terrain = null;
 		}
-		console.log(terrainType);
+		console.log("Terrain Type", terrainType);
 		this.terrain = new Terrain(terrainType, this.main);
 		this.terrain.addToScene();
 	}
@@ -79,19 +78,36 @@ export class Level {
 	/**
 	 * Sets up all the assets required for the level
 	 */
-	setupLevel() {
+	async setupLevel() {
 		this.levelCameraManager.setup();
 		this.creepManager.setupCreepPaths(this.levelDetails);
 		this.propManager.setup(this.levelDetails);
 		this.towerManager.setup(this.levelDetails, [TowerArcher, TowerMage, TowerBomber]);
-		this.waveManager.setup(this.levelDetails);
+		//this.waveManager.setup(this.levelDetails);
 		this.setupLights();
 		this.setupUI();
 		this.setupEconomy();
 		this.setupHero();
 		this.setupMainTick();
+
+		/**
+		 * New Instanced Mesh Generation
+		 */
+		const includedCreeps = [{
+			difficulty: 2,
+			name: 'Troll',
+		}, {
+			difficulty: 1,
+			name: 'Wisp'
+		}, {
+			difficulty: 1,
+			name: 'Lupine'
+		}, {
+			difficulty: 0,
+			name: 'TrollDink'
+		}];
+		this.waveManager.createLevelWaves(1, includedCreeps);
 		this.waveManager.startWaveTimer();
-		this.propManager.render();
 	}
 
 	/**
@@ -140,16 +156,21 @@ export class Level {
 	/**
 	 * Sets up the hero for the level
 	 */
-	setupHero() {
-		this.heroManager.createDefaultHero(new THREE.Vector3(-28, 0, -20));
+	async setupHero() {
+		//await this.heroManager.setupHeroes();
+		await this.heroManager.createDefaultHero(new THREE.Vector3(-28, 0, -20));
 	}
 
 	/**
 	 * Registers callback for tick
 	 * */
 	setupMainTick() {
-		this.main.s('Tick').start();
-		this.main.s('Tick').registerCallback(new TickCallback("Level", this.gameplayTickCallback.bind(this)));
+		const sTick: TickService = this.main.s('Tick');
+		const sInstancedMesh: InstancedMeshService = this.main.s('InstancedMesh');
+		sTick.start();
+		sTick.registerCallback(new TickCallback("Level", this.gameplayTickCallback.bind(this)));
+		sTick.registerCallback(new TickCallback("InstancedMeshes", sInstancedMesh.updateInstancedMeshes.bind(sInstancedMesh)));
+		sTick.registerCallback(new TickCallback("FrameAnimations", this.frameAnimationCallback.bind(this)), true, TickTimeTypes.halfsecond);
 	}
 
 	/**
@@ -159,6 +180,13 @@ export class Level {
 		this.heroManager.heroes.forEach((hero) => hero.animateCore(timeProperties));
 		this.creepManager.tick(timeProperties);
 		this.towerManager.tick(timeProperties);
+	}
+
+	/**
+	 * Animates spritesheet frame animation callback
+	 */
+	frameAnimationCallback() {
+		this.creepManager.frameAnimationTick();
 	}
 
 	/**
@@ -204,11 +232,8 @@ export class Level {
 	 */
 	setupDebugs(levelDetails: LevelDefinition) {
 		// SOME DEBUG OBJECTS OFF TO THE LEFT
-		this.propManager.registerProp({ assetName: 'mountain_2', position: new THREE.Vector3(-130, 0, -50) }, levelDetails);
-		this.propManager.registerProp({ assetName: 'mountain_3', position: new THREE.Vector3(-110, 0, -50) }, levelDetails);
-		this.propManager.registerProp({ assetName: 'mountain_4', position: new THREE.Vector3(-150, 0, -15) }, levelDetails);
-		this.propManager.registerProp({ assetName: 'mountain_5', position: new THREE.Vector3(-130, 0, -15) }, levelDetails);
-		this.propManager.registerProp({ assetName: 'mese_1', position: new THREE.Vector3(-110, 0, -15) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'MountainInitial', position: new THREE.Vector3(-90, 0, -50) }, levelDetails);
+		this.propManager.registerProp({ assetName: 'TreeBulbous', position: new THREE.Vector3(-90, 0, -55) }, levelDetails);
 
 		// Setup a Debug to initiate level creation
 		const levelCreator = new LevelCreator(this.main, this);
@@ -248,86 +273,6 @@ export class Level {
 		plane.receiveShadow = true;
 		this.scene.add(plane);
 		// END DEBUG THINGS*/
-
-		/**
-		 * DEBUG SOME TREES
-		 */
-		const loader = new THREE.TextureLoader();
-		const texture = loader.load('assets/temp/spritesheet-tree.png');
-		texture.colorSpace = THREE.SRGBColorSpace;
-
-		// 2. Create the material (specifically SpriteMaterial)
-		const material = new THREE.SpriteMaterial({ map: texture });
-		material.color.set(0xE8E0C2);
-
-		// 3. Create the Sprite
-		const sprite = new THREE.Sprite(material);
-
-		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
-		sprite.scale.set(4, 4, 1);
-		sprite.position.set(0, 2, 0);
-
-		const cols = 1; // Number of horizontal frames
-		const rows = 1; // Number of vertical frames
-
-		// Tell the texture to only show 1/4th of the width and height
-		texture.repeat.set(1 / cols, 1 / rows);
-
-		for (let x = 0; x < 150; x++) {
-			const posX = Math.random() * 50 - 85;
-			const posZ = Math.random() * 20 - 85;
-			const scale = 2 + (Math.random() * 2);
-			const trollClone = sprite.clone();
-			sprite.position.x = posX;
-			sprite.position.z = posZ;
-			sprite.scale.set(scale, scale, scale);
-			this.main.scene.add(trollClone);
-		}
-
-		for (let x = 0; x < 150; x++) {
-			const posX = Math.random() * 50 - 19;
-			const posZ = Math.random() * 20 - 85;
-			const scale = 2 + (Math.random() * 2);
-			const trollClone = sprite.clone();
-			sprite.position.x = posX;
-			sprite.position.z = posZ;
-			sprite.scale.set(scale, scale, scale);
-			this.main.scene.add(trollClone);
-		}
-
-		/**
-		 * DEBUG SOME Mountains
-		 */
-		const texture2 = loader.load('assets/temp/spritesheet-mountain.png');
-		texture2.colorSpace = THREE.SRGBColorSpace;
-
-		// 2. Create the material (specifically SpriteMaterial)
-		const material2 = new THREE.SpriteMaterial({ map: texture2 });
-		material2.color.set(0xFEF8D4);
-
-		// 3. Create the Sprite
-		const sprite2 = new THREE.Sprite(material2);
-
-		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
-		sprite2.scale.set(4, 4, 1);
-		sprite2.position.set(0, 2, 0);
-
-		const cols2 = 1; // Number of horizontal frames
-		const rows2 = 1; // Number of vertical frames
-
-		// Tell the texture to only show 1/4th of the width and height
-		texture2.repeat.set(1 / cols2, 1 / rows2);
-
-		for (let x = 0; x < 100; x++) {
-			const posX = Math.random() * 50 - 75;
-			const posZ = Math.random() * 20 - 50;
-			const scale = 0 + (Math.random() * 14);
-			const mountainClone = sprite2.clone();
-			sprite2.position.x = posX;
-			sprite2.position.z = posZ;
-			sprite2.scale.set(scale, scale, scale);
-			this.main.scene.add(mountainClone);
-		}
 	}
 
 	/**

@@ -1,26 +1,38 @@
-import * as THREE from 'three';
-import { Main } from '../core/Main';
-import { TickTimeProperties } from '../core/TickService';
+import THREE from "three";
+import { Main } from '../../core/Main';
+import { TickTimeProperties } from '../../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { LocationService } from '../game/LocationService';
-import { LevelService } from '../levels/LevelService';
-import { MovePathManager } from './MovePathManager';
-import { CreepStats } from './creeps/CreepStats';
-import { HeroStats } from './heroes/HeroStats';
-import { TowerStats } from './towers/TowerStats';
-import { StateMachine } from '../core/StateMachine';
-import { Interactable2, InteractableOrders, InteractableTypes, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
+import { LocationService } from '../../game/LocationService';
+import { LevelService } from '../../levels/LevelService';
+import { MovePathManager } from '../MovePathManager';
+import { CreepStats } from '../creeps/CreepStats';
+import { HeroStats } from '../heroes/HeroStats';
+import { TowerStats } from '../towers/TowerStats';
+import { StateMachine } from '../../core/StateMachine';
+import { Interactable2, InteractableOrders, InteractableTypes, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
+import { SpriteAsset } from "./SpriteAsset";
 
-export abstract class ModelAsset {
+export abstract class Asset {
 	/**
 	 * Setup Properties
 	 * */
+	static assetName: string;
+	static assetPath: string;
+	static assetScale: number = 0.4; // default
+	static assetPositionY: number = 0; // default
+
+	/**
+	 * Saved Properties
+	 */
+	assetName: string;
+	assetType: string;
+	assetPositionY: number;
+
+	/**
+	 * 
+	 */
 	typeName: InteractableTypes;
 	interactiveOrder: InteractableOrders;
-	shadowsEnabled: boolean = false;
-	assetPath: string;
-	assetScale: number = 1; // default
-	assetPositionY: number = 0; // default
 	interactive: boolean;
 
 	/**
@@ -31,16 +43,8 @@ export abstract class ModelAsset {
 	sLevel: LevelService;
 
 	/**
-	 * States
-	 */
-	stateMachine: StateMachine;
-
-	/**
 	 * Three Properties
 	 * */
-	geometry: any;
-	material: any;
-	mesh: THREE.Mesh;
 	groupMain: THREE.Group; // Outermost group - transforms the whole group
 	groupTransforms: THREE.Group; // Middle group - applies minor transformations
 	groupFacing: THREE.Group; // Middle group - applies facing
@@ -51,18 +55,29 @@ export abstract class ModelAsset {
 	selectionVisibleMesh?: THREE.Mesh;
 
 	/**
-	 * Movement / Path Properties (Creeps and Heroes)
+	 * Game Asset Properties
 	 * */
+	stateMachine: StateMachine;
 	movePathManager: MovePathManager = new MovePathManager(this);
-
-	// Statistics
 	stats: HeroStats | CreepStats | TowerStats;
+
+	/**
+	 * Health bar
+	 * */
+	healthBar: THREE.Group | null;
+	healthBarGroupName: string = 'healthbargroup';
+	healthBarName: string = 'healthbar';
+	healthBarY: number = 1.25;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, assetName: string, assetType: string) {
 		this.main = main;
+
+		this.assetName = assetName;
+		this.assetType = assetType;
+
 		this.sLocation = this.main.s('Location');
 		this.sLevel = this.main.s('Level');
 
@@ -74,63 +89,26 @@ export abstract class ModelAsset {
 		this.groupFacing.add(this.groupModel);
 		this.groupTransforms.add(this.groupFacing);
 		this.groupMain.add(this.groupTransforms);
-	}
 
-	/**
-	 * Loads the model
-	 * */
-	async loadModel(callback?: Function) {
-		const model = await this.main.s('Loader').loadModel(this.assetPath);
-		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.position.y = this.assetPositionY;
-		this.groupModel.add(...model.scene.children);
-		this.enableShadows();
-		this.addSelectionGeometry();
-
-		if (callback) callback();
-	}
-
-	/**
-	 * Add mesh manually
-	 * */
-	createMesh(geometry: THREE.BufferGeometry, material: THREE.Material) {
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.add(this.mesh);
-		this.enableShadows();
-		this.addSelectionGeometry();
-	}
-
-	/**
-	 * Enabled shadows on the model
-	 * */
-	enableShadows(cast: boolean = true, receive: boolean = false) {
-		this.groupModel.children.forEach((child: any) => {
-			if (child.isMesh && this.shadowsEnabled) {
-				child.castShadow = cast;
-				child.receiveShadow = receive;
-				child.material.needsUpdate = true;
-			}
-		});
+		this.main.scene.add(this.groupMain);
 	}
 
 	/**
 	 * Sets whether this model can be interactive 
 	 * */
-	setInteractive() {
+	public readonly setInteractive = () => {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.registerInteractable(new Interactable2(this.typeName, this.interactiveOrder, this));
-		console.log("Registering interactive", this.typeName, this.interactiveOrder);
 	}
-	unsetInteractive() {
+	public readonly unsetInteractive = () => {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.deregisterInteractableByObject(this);
 	}
 
 	/**
-	 * Moves a Model Asset along a path according to its movement speed
+	 * Moves an Asset along a path according to its movement speed
 	 * */
-	animationMove(timeProperties: TickTimeProperties) {
+	public readonly animationMove = (timeProperties: TickTimeProperties) => {
 		const path = this.movePathManager.activePath;
 		if (!path) return new Error('Set animation state to movement with no active path');
 
@@ -140,17 +118,21 @@ export abstract class ModelAsset {
 
 		// Set a point and animate
 		const point = path.path.getPoint(path.pathProgress) as THREE.Vector3;
-		this.groupMain.position.set(point.x, point.y, point.z);
+		this.setPosition(point);
 
-		// Jiggle animation
-		const jiggleY = Math.sin(timeProperties.elapsedTime * 50) / 20;
-		this.groupTransforms.position.y = jiggleY;
+		if (this instanceof SpriteAsset) {
+			// Set the look at
+			if (path.pathProgress < 0.95) {
+				const currentPoint = path.path.getPoint(path.pathProgress) as THREE.Vector3;
+				const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
+				this.spriteSheetFrameManager.mirrorSpriteSheet(pointAhead.x < currentPoint.x);
+			}
+		} else {
+			// Jiggle animation
+			const jiggleY = Math.sin(timeProperties.elapsedTime * 50) / 20;
+			this.groupTransforms.position.y = jiggleY;
 
-		// Set the look at
-		if (path.pathProgress < 0.95) {
-			const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
-			pointAhead.y = jiggleY;
-			this.groupFacing.lookAt(pointAhead);
+			console.log("SET MODEL ASSET FACING");
 		}
 
 		// If this asset has finished its path
@@ -161,37 +143,35 @@ export abstract class ModelAsset {
 	}
 
 	/**
-	 * Jiggles a model to show it is attacking
-	 * */
-	animationAttack(timeProperties: TickTimeProperties) {
-		// Jiggle animation
-		const jiggleZ = Math.sin(timeProperties.elapsedTime * 50) / 20;
-		this.groupTransforms.position.z = jiggleZ;
-	}
+	 * Sets the position of the asset
+	 */
+	public abstract setPosition(point: THREE.Vector3): void;
 
 	/**
-	 * Shows that a Hero is hurt
+	 * Jiggles an asset to show it is attacking
 	 * */
-	animationHurtMe(timeProperties: TickTimeProperties) {
-		this.groupModel.position.x = Math.sin(timeProperties.elapsedTime * 50) / 12;
-	}
+	animationAttack(timeProperties: TickTimeProperties) { }
+
+	/**
+	 * Shows that an asset is hurt
+	 * */
+	animationHurtMe(timeProperties: TickTimeProperties) { }
 
 	/**
 	 * Animates healing crosses
 	 * */
-	animationHealing() {
-		const healingCrosses = this.groupMain.getObjectByName("HealingAnimation");
-		if (healingCrosses) {
-			healingCrosses.children.forEach((cross, index) => {
-				cross.position.y += index * 0.005 + 0.001;
-			});
-		}
-	}
+	animationHealing() { }
+
+	/**
+	 * Finalises what happens at the end of a path
+	 * Overwritten by individual classes
+	 * */
+	finaliseEndOfPath() { }
 
 	/**
 	 * Get expected position when it is moving
 	 * */
-	getExpectedPositionAt(timeInMS: number) {
+	public readonly getExpectedPositionAt = (timeInMS: number) => {
 		const path = this.movePathManager.activePath;
 
 		if (path) {
@@ -204,15 +184,9 @@ export abstract class ModelAsset {
 	}
 
 	/**
-	 * Finalises what happens at the end of a path
-	 * Overwritten by individual classes
-	 * */
-	finaliseEndOfPath() { }
-
-	/**
 	 * When the Hero is healed
 	 * */
-	stateEnterHealing() {
+	public readonly stateEnterHealing = () => {
 		const healingAnimationGroup = new THREE.Group();
 
 		this.stateExitHealing();
@@ -236,7 +210,7 @@ export abstract class ModelAsset {
 	/**
 	 * When the Creep leaves healing state (also called when entering, to clear it out)
 	 * */
-	stateExitHealing() {
+	public readonly stateExitHealing = () => {
 		const healingAnimationGroup = this.groupMain.getObjectByName("HealingAnimation");
 		if (healingAnimationGroup) this.groupMain.remove(healingAnimationGroup);
 	}
@@ -249,16 +223,51 @@ export abstract class ModelAsset {
 	}
 
 	/**
-	 * Actions to take when we delete the model asset (might also be handled more fully elsewhere)
-	 */
-	deleteModelAsset() {
-		this.unsetInteractive();
+	 * Creates a health bar
+	 * */
+	public readonly createHealthBar = (percentage: number = 1) => {
+		const barBG = ModelCommons.healthBarGeometry;
+		const barFG = ModelCommons.healthBarGeometry;
+		//barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
+		const healthBarGroup = new THREE.Group();
+		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
+		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
+		fgMesh.name = this.healthBarName;
+		healthBarGroup.name = this.healthBarGroupName;
+		healthBarGroup.add(bgMesh);
+		healthBarGroup.add(fgMesh);
+		healthBarGroup.position.y = this.healthBarY;
+		healthBarGroup.position.z = 1;
+		this.healthBar = healthBarGroup;
+		this.groupTransforms.add(healthBarGroup);
+
+		this.updateHealthBar(percentage);
+	}
+
+	/**
+	 * Updates the health bar
+	 * */
+	public readonly updateHealthBar = (percentage: number) => {
+		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
+		healthBarGroup!.scale.x = percentage;
+		//healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) - 1; // left aligned
+		healthBarGroup!.position.x = 0;
+	}
+
+	/**
+	 * Removes a health bar if one exists
+	 * */
+	public readonly removeHealthBar = () => {
+		if (this.healthBar) {
+			this.groupTransforms.remove(this.healthBar);
+			this.healthBar = null;
+		}
 	}
 
 	/**
 	* Adds geometry for selection
 	*/
-	addSelectionGeometry() {
+	public readonly addSelectionGeometry = () => {
 		if (!this.groupModel) return;
 
 		// Get the size
@@ -281,7 +290,7 @@ export abstract class ModelAsset {
 	/**
 	 * Adds a selection visible mesh to the model
 	 */
-	addSelectionVisibleMesh(width: number = 2, thickness: number = 0.25) {
+	public readonly addSelectionVisibleMesh = (width: number = 2, thickness: number = 0.25) => {
 		this.selectionVisibleMesh = ModelCommons.selectionCircleMesh(width, thickness);
 		this.selectionVisibleMesh.rotation.x = Math.PI * -0.5;
 		this.selectionVisibleMesh.position.y = 0.15;
@@ -292,31 +301,28 @@ export abstract class ModelAsset {
 	/**
 	 * Removes a selection mesh from the model
 	 */
-	removeSelectionVisibleMesh() {
+	public readonly removeSelectionVisibleMesh = () => {
 		this.groupMain.remove(this.selectionVisibleMesh!);
 		this.selectionVisibleMesh = undefined;
 	}
 
 	/**
-	 * Converts a loaded material to MeshStandardMaterial
+	 * Creates a default listener for Assets
 	 */
-	/*convertMaterialToStandard() {
-		this.groupMain.traverse((child: any) => {
-			if (child.isMesh) {
-				child.material = new THREE.MeshStandardMaterial({
-					map: child.material.map,
-					color: child.material.color,
-					metalness: 0.5,
-					roughness: 0.8,
-				});
-			}
-		});
-	}*/
+	public readonly registerDefaultListener = () => {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractableListener(this.assetType, `${this.assetType}ClickedDefault`, this.select);
+	}
 
 	/**
 	 * Overwritten
 	 * */
-	select(event: InteractionEvent) { }
+	select(event: InteractionEvent) {
+		return {
+			handled: true,
+			cancelListeners: true,
+		}
+	}
 	deselect() { }
 }
 
@@ -378,4 +384,14 @@ export class ModelCommons {
 
 		return new THREE.Mesh(geometry, this.selectionCircleMaterial);*/
 	}
+}
+
+export interface ShaderMaterialProperties {
+	uniforms: {
+		uFrameCols: { value: number },
+		uFrameRows: { value: number },
+		uSize: { value: number }
+	},
+	alphaTest: number,
+	transparent: boolean
 }

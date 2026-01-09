@@ -39,7 +39,7 @@ export class LoaderService extends Service {
 	 * Loads a texture, returning an awaitable promise
 	 * Uses 'any' for the Function types due to types given in library
 	 * */
-	loadTexture(path: string) {
+	loadTexture(path: string): Promise<THREE.Texture> {
 		return new Promise((resolve, reject) => {
 			this.textureLoader.load(path, resolve, progress, reject);
 

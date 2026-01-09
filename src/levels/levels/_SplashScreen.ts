@@ -4,15 +4,14 @@ import { Main } from '../../core/Main';
 import { UIService } from '../../game/UIService';
 import { CameraService } from '../../core/CameraService';
 import { LightingService } from '../../core/LightingService';
-import { PropManager } from '../../environment/propManager/PropManager';
-import { TerrainTypes } from '../../data/LevelInterfaces';
+import { ModelPropManager } from '../../environment/propManager/ModelPropManager';
 
 export class SplashScreen {
 	/**
 	 * System Properties
 	 * */
 	main: Main;
-	propManager: PropManager;
+	propManager: ModelPropManager;
 
 	/**
 	 * Properties
@@ -49,7 +48,7 @@ export class SplashScreen {
 		this.main.scene.add(hill2);
 
 		// Load a tree to use
-		this.propManager = new PropManager(this.main);
+		this.propManager = new ModelPropManager(this.main);
 		this.propManager.registerProp({ assetName: 'tree_cone', position: new THREE.Vector3(-15, -10, -35) });
 		this.propManager.registerProp({ assetName: 'tree_cone', position: new THREE.Vector3(12, -10, -30), scale: new THREE.Vector3(1.75, 1.75, 1.75) });
 		this.propManager.render();

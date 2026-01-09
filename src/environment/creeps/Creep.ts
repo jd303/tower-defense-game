@@ -2,20 +2,28 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
-import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
 import { Hero } from '../heroes/Hero';
 import { HeroAttackStats } from '../heroes/HeroStats';
-import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
+import { InteractableOrders, InteractableTypes, InteractionService2 } from '../../game/InteractionService2';
+import { MovePathDefinition } from '../../data/PathInterfaces';
+import { MovePathManager } from '../MovePathManager';
+import { CharacterAsset } from '../assets/CharacterAsset';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
-export class Creep extends ModelAsset {
+export abstract class Creep extends CharacterAsset {
+	/**
+	 * Static values
+	 */
+	static instancedMeshInstanceCount: number = 100;
+
 	/**
 	 * Stats
 	 * */
 	typeName: InteractableTypes = "creep";
-	interactiveOrder: InteractableOrders = InteractableOrders.creeps;
+	interactiveOrder = InteractableOrders.creeps;
 	stats: CreepStats;
 
 	/**
@@ -43,23 +51,20 @@ export class Creep extends ModelAsset {
 	intercepter: Hero | null = null;
 
 	/**
-	 * Health bar
+	 * Movement / Path Properties (Creeps and Heroes)
 	 * */
-	healthBar: THREE.Group | null;
-	healthBarGroupName: string = 'healthbargroup';
-	healthBarName: string = 'healthbar';
-	healthBarY: number = 1.25;
+	movePathManager: MovePathManager = new MovePathManager(this);
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
-		super(main);
+	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
+		super(main, assetName, 'creep', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Creep.instancedMeshInstanceCount);
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(CreepStates.pathmoving);
-
 		this.setInteractive();
+		this.setInteractiveCreep();
 	}
 
 	/**
@@ -157,6 +162,14 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
+	 * Adds the creep to a path
+	 */
+	setCreepPath(creepPath: MovePathDefinition) {
+		this.movePathManager.addPath(creepPath);
+		this.movePathManager.setActivePath(creepPath.id);
+	}
+
+	/**
 	 * Resolves when a creep was attacked
 	 * */
 	resolveAttack(attack: TowerAttackStats | HeroAttackStats) {
@@ -206,8 +219,10 @@ export class Creep extends ModelAsset {
 
 			// The Creep has lost some health
 			default:
-				if (!this.healthBar) this.createHealthBar();
-				else this.updateHealthBar();
+				if (!this.healthBar) this.createHealthBar(this.stats.hp_current / this.stats.hp_total);
+				else {
+					this.updateHealthBar(this.stats.hp_current / this.stats.hp_total);
+				}
 
 				this.stateMachine.transition(CreepTransitions.took_damage);
 				break;
@@ -257,50 +272,8 @@ export class Creep extends ModelAsset {
 	 * */
 	deleteCreep() {
 		this.stateMachine.remove();
+		this.deleteInstancedMesh();
 		this.main.s('Level').currentLevel.creepManager.removeCreep(this);
-		this.deleteModelAsset();
-	}
-
-	/**
-	 * Creates a health bar for this creep
-	 * */
-	createHealthBar() {
-		const barBG = ModelCommons.healthBarGeometry;
-		const barFG = ModelCommons.healthBarGeometry;
-		//barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
-		const healthBarGroup = new THREE.Group();
-		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
-		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
-		fgMesh.name = this.healthBarName;
-		healthBarGroup.name = this.healthBarGroupName;
-		healthBarGroup.add(bgMesh);
-		healthBarGroup.add(fgMesh);
-		healthBarGroup.position.y = this.healthBarY;
-		healthBarGroup.position.z = 1;
-		this.healthBar = healthBarGroup;
-		this.groupTransforms.add(healthBarGroup);
-
-		this.updateHealthBar();
-	}
-
-	/**
-	 * Updates the health bar
-	 * */
-	updateHealthBar() {
-		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
-		healthBarGroup!.scale.x = this.stats.hp_current / this.stats.hp_total;
-		//healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) - 1; // left aligned
-		healthBarGroup!.position.x = 0;
-	}
-
-	/**
-	 * Removes a health bar if one exists
-	 * */
-	removeHealthBar() {
-		if (this.healthBar) {
-			this.groupTransforms.remove(this.healthBar);
-			this.healthBar = null;
-		}
 	}
 
 	/**
@@ -341,68 +314,23 @@ export class Creep extends ModelAsset {
 	}
 
 	/**
-	 * When the Creep is healed
-	 * */
-	stateEnterHealing() {
-		const healingAnimationGroup = new THREE.Group();
-
-		this.stateExitHealing();
-
-		for (let x = 0; x < 4; x++) {
-			const thisCross = ModelCommons.healingCrossMesh();
-			thisCross.position.x += Math.random() - 0.5;
-			thisCross.position.y += Math.random();
-			const scale = Math.random() * 0.9 + 0.1;
-			thisCross.scale.set(scale, scale, scale);
-
-			healingAnimationGroup.add(thisCross);
-		}
-
-		healingAnimationGroup.name = "HealingAnimation";
-
-		this.groupMain.add(healingAnimationGroup);
-		healingAnimationGroup.position.z = 2;
-	}
-
-	/**
-	 * When the Creep leaves healing state (also called when entering, to clear it out)
-	 * */
-	stateExitHealing() {
-		const healingAnimationGroup = this.groupMain.getObjectByName("HealingAnimation");
-		if (healingAnimationGroup) this.groupMain.remove(healingAnimationGroup);
-	}
-
-	/**
-	 * Enabled Shadows
-	 * */
-	enableShadows(cast: boolean = true, receive: boolean = false) {
-		// THis should be replaced when moving to ModelAsset
-		this.groupModel.children.forEach((child: any) => {
-			if (child.isMesh) {
-				if (cast) child.castShadow = true;
-				if (receive) child.receiveShadow = true;
-				child.material.needsUpdate = true;
-			}
-		});
-	}
-
-	/**
-	 * Creates a temporary healing animation
-	 * */
-	createHealingEffect() {
-		console.log("%c Creating healing effect", "color: green");
-	}
-
-	/**
 	 * Creep Powers
 	 * */
 	activateStandingPower() { }
 	activateIdlePower() { }
 
 	/**
+	 * Sets this interactive
+	 */
+	setInteractiveCreep() {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractableListener('creep', 'selectCreep', this.select);
+	}
+
+	/**
 	 * Get info
 	 */
-	creepClicked() {
+	select() {
 		console.group();
 		console.log(`Creep: ${this.constructor.name}`);
 		console.log('Stats:', this.stats);

@@ -8,24 +8,45 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ParticleExperienceExplosionActive, ParticleExperienceExplosionPassive } from '../../environment/particles/Explosion';
 import { BombShot } from '../effects/BombShot';
-import { ModelAsset } from '../ModelAsset';
 import { MovementTypes } from '../../data/MovementTypes';
+import { Asset } from '../assets/Asset';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class TowerBomber extends Tower {
 	/**
 	 * Tower Assets
 	 * */
-	assetPath: string = 'assets/models/towers/Tower.Bomber.glb';
 	assetScale = 1.25;
 	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
 
 	/**
 	 * Static details
 	 */
+	static assetName = "TowerBomber";
+	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-bomber.png';
+	static assetScale: number = 0.8;
+	static assetPositionY = 3;
 	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
 	static cost = 175;
 	static costType = 'money';
 	static towerZoneWidth = 3;
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 1 },
+			uFrameRows: { value: 1 },
+			uSize: { value: 8 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "idle",
+			totalFrames: 1,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 1;
 
 	/**
 	 * Stats
@@ -48,10 +69,10 @@ export class TowerBomber extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main);
-		//this.loadModel();
-		this.loadSpritesheetTemp();
+		super(main, TowerBomber.assetName, TowerBomber.assetPositionY, TowerBomber.spriteSheetRows, TowerBomber.spriteSheetCellColCount, TowerBomber.assetScale);
+
 		this.stats = { ...TowerBomber.stats };
+
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
@@ -65,7 +86,7 @@ export class TowerBomber extends Tower {
 		if (this.stateMachine.isInState(TowerStates.scanning)) {
 			const omissionCallback = (interceptee: Creep) => interceptee.stats.movement.type == MovementTypes.flying;
 			const creeps = this.sLocation.findTargetsInRange({ potentialTargets: this.main.s('Level').currentLevel.creepManager.creeps, fromPoint: position, range: this.stats.attack.range, omissionCallback: omissionCallback });
-			const creep: ModelAsset | null = creeps.length ? creeps[0] : null;
+			const creep: Asset | null = creeps.length ? creeps[0] : null;
 
 			// If we have a target
 			if (creep) {
@@ -105,47 +126,5 @@ export class TowerBomber extends Tower {
 
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
-	}
-
-	loadSpritesheetTemp() {
-		const loader = new THREE.TextureLoader();
-		const texture = loader.load('assets/temp/spritesheet-tower-cannon.png');
-		texture.colorSpace = THREE.SRGBColorSpace;
-
-		// 2. Create the material (specifically SpriteMaterial)
-		const material = new THREE.SpriteMaterial({ map: texture });
-
-		// 3. Create the Sprite
-		const sprite = new THREE.Sprite(material);
-
-		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
-		sprite.scale.set(4, 4, 1);
-		sprite.position.set(0, 1.60, 0);
-
-		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.position.y = this.assetPositionY;
-		this.groupModel.add(sprite);
-
-		const cols = 1; // Number of horizontal frames
-		const rows = 1; // Number of vertical frames
-		const totalFrames = 1;
-
-		// Tell the texture to only show 1/4th of the width and height
-		texture.repeat.set(1 / cols, 1 / rows);
-
-		let currentFrame = 0;
-
-		function animateSprite() {
-			currentFrame = (currentFrame + 1) % totalFrames;
-
-			const column = currentFrame % cols;
-			const row = Math.floor(currentFrame / cols);
-
-			// Shift the "window" to the correct frame
-			texture.offset.x = column / cols;
-			texture.offset.y = 1 - (row + 1) / rows; // Y is often inverted in UVs
-		}
-
-		setInterval(animateSprite, 300);
 	}
 }

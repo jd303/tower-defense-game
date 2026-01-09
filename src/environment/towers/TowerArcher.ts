@@ -8,6 +8,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { TowerStats } from './TowerStats';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class TowerArcher extends Tower {
 	/**
@@ -20,10 +21,31 @@ export class TowerArcher extends Tower {
 	/**
 	 * Static details
 	 */
+	static assetName = "TowerArcher";
+	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-archer.png';
+	static assetScale: number = 1;
+	static assetPositionY = 3;
 	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
 	static cost = 100;
 	static costType = 'money';
 	static towerZoneWidth = 0;
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 1 },
+			uFrameRows: { value: 1 },
+			uSize: { value: 8 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "idle",
+			totalFrames: 1,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 1;
 
 	/**
 	 * Stats
@@ -46,10 +68,10 @@ export class TowerArcher extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main);
-		//this.loadModel();
-		this.loadSpritesheetTemp();
+		super(main, TowerArcher.assetName, TowerArcher.assetPositionY, TowerArcher.spriteSheetRows, TowerArcher.spriteSheetCellColCount, TowerArcher.assetScale);
+
 		this.stats = { ...TowerArcher.stats };
+
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
@@ -101,66 +123,5 @@ export class TowerArcher extends Tower {
 
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
-	}
-
-	loadSpritesheetTemp() {
-		const loader = new THREE.TextureLoader();
-		const texture = loader.load('assets/temp/spritesheet-tower-archer.png');
-		texture.colorSpace = THREE.SRGBColorSpace;
-
-		// 2. Create the material (specifically SpriteMaterial)
-		const material = new THREE.SpriteMaterial({ map: texture });
-
-		// 3. Create the Sprite
-		const sprite = new THREE.Sprite(material);
-
-		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
-		sprite.scale.set(4, 4, 1);
-		sprite.position.set(0, 1.60, 0);
-
-		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.position.y = this.assetPositionY;
-		this.groupModel.add(sprite);
-
-		const cols = 1; // Number of horizontal frames
-		const rows = 1; // Number of vertical frames
-		const totalFrames = 1;
-
-		// Tell the texture to only show 1/4th of the width and height
-		texture.repeat.set(1 / cols, 1 / rows);
-
-		let currentFrame = 0;
-
-		function animateSprite() {
-			currentFrame = (currentFrame + 1) % totalFrames;
-
-			const column = currentFrame % cols;
-			const row = Math.floor(currentFrame / cols);
-
-			// Shift the "window" to the correct frame
-			texture.offset.x = column / cols;
-			texture.offset.y = 1 - (row + 1) / rows; // Y is often inverted in UVs
-		}
-
-		setInterval(animateSprite, 300);
-
-		// Create a shadow
-		const shadowTexture = loader.load('assets/temp/shadow-blob.png');
-		const shadowMaterial = new THREE.MeshBasicMaterial({
-			map: shadowTexture,
-			transparent: true,
-			opacity: 0.75,
-			depthWrite: false // Prevents weird flickering with the floor
-		});
-		/*const shadowMaterial = new THREE.MeshBasicMaterial({
-			color: 0x000000
-		});*/
-
-		const shadow = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), shadowMaterial);
-		shadow.rotation.x = -Math.PI / 2; // Lay it flat
-		shadow.position.y = 0.2; // Position it at the troll's feet
-		shadow.scale.set(2, 2, 2);
-
-		this.groupModel.add(shadow);
 	}
 }

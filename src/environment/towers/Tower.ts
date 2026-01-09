@@ -1,7 +1,5 @@
-import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { ModelAsset } from '../ModelAsset';
 import { TowerStats, TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
@@ -9,8 +7,11 @@ import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
+import { CharacterAsset } from '../assets/CharacterAsset';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
-export class Tower extends ModelAsset {
+// Maybe split CharacterAsset out into TowerAsset as well, for this?
+export abstract class Tower extends CharacterAsset {
 	/**
 	 * Core
 	 * */
@@ -23,6 +24,7 @@ export class Tower extends ModelAsset {
 	static cost: number;
 	static costType: string;
 	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
+	static instancedMeshInstanceCount: number = 25;
 
 	/**
 	 * Status
@@ -48,18 +50,11 @@ export class Tower extends ModelAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
-		super(main);
-		this.main = main;
-		this.groupMain = new THREE.Group();
-		this.groupTransforms = new THREE.Group();
-		this.groupModel = new THREE.Group();
-		this.groupTransforms.add(this.groupModel);
-		this.groupMain.add(this.groupTransforms);
+	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
+		super(main, assetName, 'tower', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Tower.instancedMeshInstanceCount);
 
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.transition(TowerStates.attacking);
-
+		this.stateMachine.transition(TowerStates.scanning);
 		this.setInteractive();
 	}
 
@@ -128,7 +123,6 @@ export class Tower extends ModelAsset {
 	 * Resolve a hit
 	 * */
 	resolveHit(projectile: Projectile) {
-		console.log("The Projectile Hit", projectile);
 		const sPositioning: PositionService = this.main.s('Position');
 		let targets: Creep[] = [];
 
@@ -166,8 +160,6 @@ export class Tower extends ModelAsset {
 			console.log(`Tower: ${this.constructor.name}`);
 			console.log('Stats:', this.stats);
 			console.groupEnd();
-
-			console.log("%c TODO: We need to be able to remove selection by clicking away", 'color: red');
 		}
 
 		return { handled: true, cancelListeners: true };

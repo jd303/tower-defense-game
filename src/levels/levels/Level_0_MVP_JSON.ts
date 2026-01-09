@@ -423,13 +423,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-20.500, 0, -22.8571) },
 				{ point: new Vector3(-19.571, 0, -21.928) },
 			],
-			propDensityFactor: 4,
+			propSparseness: 4,
 			propScale: 3,
 			positionRandom: 1.5,
 			scaleRandom: { all: 0.25 },
 			rotateRandom: 0.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 1.25,
 				colour: 0x6B8B42,
 			},
@@ -470,13 +470,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-36.8571, 0, 29.2857) },
 				{ point: new Vector3(-35.4285, 0, 27.7857) }
 			],
-			propDensityFactor: 3,
+			propSparseness: 3,
 			propScale: 4,
 			positionRandom: 3,
 			scaleRandom: { all: 0.25, y: 0.25 },
 			rotateRandom: 2.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 2,
 				colour: 0x6B8B42,
 			},
@@ -526,13 +526,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-76.9067510915006, 0, -39.719276488087914) },
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 			],
-			propDensityFactor: 4,
+			propSparseness: 4,
 			propScale: 3,
 			positionRandom: 3,
 			scaleRandom: { all: 0.5 },
 			rotateRandom: 0.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 2,
 				colour: 0x6B8B42,
 			},
@@ -561,13 +561,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-35.967, 0, 2.984) },
 				{ point: new Vector3(-34.734, 0, -2.850) },
 			],
-			propDensityFactor: 1.5,
+			propSparseness: 1.5,
 			propScale: 3,
 			positionRandom: 1.5,
 			scaleRandom: { all: 1 },
 			rotateRandom: 0.75,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 0,
 				colour: 0x9E8D51
 			}
@@ -589,13 +589,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-44.696, 0, -42.043) },
 				{ point: new Vector3(-34.010, 0, -37.243) },
 			],
-			propDensityFactor: 1.5,
+			propSparseness: 1.5,
 			propScale: 3,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.5, y: 0.5 },
 			rotateRandom: 3,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 0,
 				colour: 0x9E8D51,
 			}
@@ -619,13 +619,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(82.8574, 0, 100.7502) },
 				{ point: new Vector3(95.3855, 0, 46.3055) },
 			],
-			propDensityFactor: 1.5,
+			propSparseness: 1.5,
 			propScale: 6,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.5, y: 0.5 },
 			rotateRandom: 3,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 2,
 				colour: 0x9E8D51,
 			},
@@ -651,14 +651,12 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(5, 0, -76) },
 				{ point: new Vector3(12, 0, -104) },
 			],
-			propDensityFactor: 6,
+			propSparseness: 6,
 			propScale: 0.65,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.1, y: 0.5 },
 			rotateRandom: 0.75,
-			environmentTile: {
-				show: false
-			}
+			environmentTile: false
 		},
 		// North East Mountains
 		{
@@ -671,14 +669,12 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(116, 0, -99) },
 				{ point: new Vector3(35, 0, -99) },
 			],
-			propDensityFactor: 6,
+			propSparseness: 6,
 			propScale: 0.6,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.1, y: 0.5 },
 			rotateRandom: 0.75,
-			environmentTile: {
-				show: false
-			}
+			environmentTile: false
 		},
 		// West Mountains
 		{
@@ -695,14 +691,12 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-79.43101, 0, -36.64880) },
 				{ point: new Vector3(-93.89255, 0, -51.47957) },
 			],
-			propDensityFactor: 6,
+			propSparseness: 6,
 			propScale: 0.8,
 			positionRandom: 5.5,
 			scaleRandom: { y: 0.25 },
 			rotateRandom: 0.75,
-			environmentTile: {
-				show: false
-			}
+			environmentTile: false
 		},
 		// Southern Mesas
 		{
@@ -716,13 +710,13 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(10.470673076923076, 0, 92.60729248958941) },
 				{ point: new Vector3(28.870673076923076, 0, 93.5919078742053) },
 			],
-			propDensityFactor: 3,
+			propSparseness: 3,
 			propScale: 1,
 			positionRandom: 2,
 			scaleRandom: { all: 0.5, y: 0.5 },
 			rotateRandom: 1.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 2,
 				colour: 0x9E8D51,
 			}

@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../../core/TickService';
-import { ModelAsset, ModelCommons } from '../ModelAsset';
 import { HeroStats } from './HeroStats';
 import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
@@ -14,8 +13,17 @@ import { PathService } from '../../game/PathService';
 import { CreepStates } from '../creeps/CreepStates';
 import { InteractionEvent, InteractionService2, InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 import { SpriteService } from '../../game/SpriteService';
+import { Asset } from '../assets/Asset';
+import { MovePathManager } from '../MovePathManager';
+import { CharacterAsset } from '../assets/CharacterAsset';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
-export class Hero extends ModelAsset {
+export abstract class Hero extends CharacterAsset {
+	/**
+	 * Static values
+	 */
+	static instancedMeshInstanceCount: number = 2;
+
 	/**
 	 * Stats
 	 * */
@@ -62,11 +70,17 @@ export class Hero extends ModelAsset {
 	interceptionHandler: InterceptionHandler = new InterceptionHandler(this);
 
 	/**
+	 * Movement / Path Properties (Creeps and Heroes)
+	 * */
+	movePathManager: MovePathManager = new MovePathManager(this);
+
+	/**
 	 * Construtor
 	 * */
-	constructor(main: Main) {
-		super(main);
+	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
+		super(main, assetName, 'hero', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Hero.instancedMeshInstanceCount);
 
+		this.assetType = 'hero';
 		this.stateMachine = this.setDefaultStates();
 		this.setInteractive();
 		this.setInteractiveHero();
@@ -217,20 +231,24 @@ export class Hero extends ModelAsset {
 	checkHealthStatus() {
 		switch (true) {
 
-			// The Creep has died
+			// The Hero has died
 			case this.stats.hp_current <= 0:
 				this.disableHero();
 				break;
 
-			// The Creep has full health
+			// The Hero has full health
 			case this.stats.hp_current >= this.stats.hp_total:
 				this.removeHealthBar();
 				break;
 
-			// The Creep has lost some health
+			// The Hero has lost some health
 			default:
-				if (!this.healthBar) this.createHealthBar();
-				else this.updateHealthBar();
+				if (!this.healthBar) {
+					this.createHealthBar(this.stats.hp_current / this.stats.hp_total);
+				}
+				else {
+					this.updateHealthBar(this.stats.hp_current / this.stats.hp_total);
+				}
 
 				this.stateMachine.transition(HeroTransitions.took_damage);
 				break;
@@ -248,61 +266,23 @@ export class Hero extends ModelAsset {
 	 * Registers movement
 	 * */
 	registerMovement(event: InteractionEvent) {
-		console.log("REGISTER MOVEMENT", this);
+		const endingPoint = event.raycasterInteraction.point.point;
 		const sPath: PathService = this.main.s('Path');
 
 		this.movePathManager.removePath('activemovement');
-		const movePath = sPath.createMovePath('activemovement', [{ point: this.groupMain.position }, { point: event.raycasterInteraction.point.point }]);
-		console.log(movePath);
+		const movePath = sPath.createMovePath('activemovement', [{ point: this.groupMain.position }, { point: endingPoint }]);
+		console.log("REGISTER MOVEMENT", movePath);
 		this.movePathManager.addPath(movePath);
 		this.movePathManager.setActivePath(movePath.id);
 		this.stateMachine.transition(HeroTransitions.moving);
 
+		// Mirror if necessary
+		const startingPoint = this.groupMain.position;
+		this.spriteSheetFrameManager.mirrorSpriteSheet(startingPoint.x > endingPoint.x);
+
 		this.deselect();
 
 		return { handled: true, cancelListeners: true }
-	}
-
-	/**
-	 * Creates a health bar for this creep
-	 * */
-	createHealthBar() {
-		const barBG = ModelCommons.healthBarGeometry;
-		const barFG = ModelCommons.healthBarGeometry;
-		barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3));
-		const healthBarGroup = new THREE.Group();
-		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
-		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
-		fgMesh.name = this.healthBarName;
-		healthBarGroup.name = this.healthBarGroupName;
-		healthBarGroup.add(bgMesh);
-		healthBarGroup.add(fgMesh);
-		healthBarGroup.position.y = this.healthBarY;
-		healthBarGroup.position.z = 1;
-		this.healthBar = healthBarGroup;
-		this.groupTransforms.add(healthBarGroup);
-
-		this.updateHealthBar();
-	}
-
-	/**
-	 * Updates the health bar
-	 * */
-	updateHealthBar() {
-		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
-		healthBarGroup!.scale.x = this.stats.hp_current / this.stats.hp_total;
-		//healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) - 1; // left aligned
-		healthBarGroup!.position.x = 0;
-	}
-
-	/**
-	 * Removes a health bar if one exists
-	 * */
-	removeHealthBar() {
-		if (this.healthBar) {
-			this.groupTransforms.remove(this.healthBar);
-			this.healthBar = null;
-		}
 	}
 
 	/**
@@ -360,7 +340,7 @@ export class Hero extends ModelAsset {
 		const slotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
 		if (slotCounts.available > 0) {
 			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying || interceptee.stateMachine.activeStates.has(CreepStates.uninterceptable);
-			const interceptables: ModelAsset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creepManager.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
+			const interceptables: Asset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creepManager.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
 			if (interceptables.length) this.interceptionHandler.addInterceptees(interceptables);
 		}
 
@@ -379,7 +359,7 @@ export class Hero extends ModelAsset {
 	disengageAsIntercepter() {
 		this.interceptionHandler.disengageAll();
 	}
-	removeInterceptee(removed: ModelAsset) {
+	removeInterceptee(removed: Asset) {
 		this.interceptionHandler.removeInterceptee(removed);
 	}
 
@@ -469,6 +449,7 @@ export class Hero extends ModelAsset {
 			this.addSelectionVisibleMesh();
 
 			// Register a new listener to make the movement
+			console.log("SELECT HERO", this);
 			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 			sInteraction2.registerInteractableListener('terrain', 'registerHeroMovement', this.registerMovement.bind(this));
 		}

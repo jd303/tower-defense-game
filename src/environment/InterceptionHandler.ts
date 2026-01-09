@@ -1,8 +1,8 @@
 import { Vector3 } from 'three';
-import { ModelAsset } from './ModelAsset';
 import { Creep } from './creeps/Creep';
 import { Hero } from './heroes/Hero';
 import { PathService } from '../game/PathService';
+import { Asset } from './assets/Asset';
 
 export class InterceptionHandler {
 	/**
@@ -71,7 +71,7 @@ export class InterceptionHandler {
 		return this.interceptionSlots.find(slot => slot.occupant !== undefined)?.occupant;
 	}
 
-	addInterceptees(newInterceptees: ModelAsset[]) {
+	addInterceptees(newInterceptees: Asset[]) {
 		newInterceptees.forEach(interceptee => {
 			const availableSlot = this.interceptionSlots.find(slot => slot.occupant === undefined);
 
@@ -84,7 +84,7 @@ export class InterceptionHandler {
 		this.setIntercepteePositions();
 	}
 
-	removeInterceptee(interceptee: ModelAsset) {
+	removeInterceptee(interceptee: Asset) {
 		const slot = this.interceptionSlots.find(slot => slot.occupant == interceptee);
 		if (slot) {
 			slot.occupant = undefined;
@@ -126,7 +126,7 @@ export class InterceptionHandler {
 }
 
 export interface InterceptionSlot {
-	occupant?: ModelAsset;
+	occupant?: Asset;
 	relativeX: number;
 	relativeZ: number;
 }

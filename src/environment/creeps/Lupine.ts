@@ -4,14 +4,37 @@ import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStats } from './CreepStats';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Lupine extends Creep {
 	/**
 	 * Main
 	 * */
-	assetPath: string = 'assets/models/creeps/creep_lupine.glb';
-	assetScale: number = 0.25;
-	shadowsEnabled = true;
+	static assetName: string = 'Lupine';
+	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
+	static assetScale: number = 0.25;
+	static assetPositionY: number = 0.5;
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "walk",
+			totalFrames: 2,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 2;
+
+	/**
+	 * Spritesheet & InstancedMesh properties
+	 */
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 2 },
+			uFrameRows: { value: 1 },
+			uSize: { value: 8 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
 
 	/**
 	 * Stats
@@ -46,9 +69,7 @@ export class Lupine extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main);
-
-		this.loadModel();
+		super(main, Lupine.assetName, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.spriteSheetCellColCount, Lupine.assetScale);
 
 		return this;
 	}

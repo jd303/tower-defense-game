@@ -158,6 +158,7 @@ export class OrbitController {
 			{ point: new THREE.Vector3(-75, 0.5, -95) },
 			{ point: new THREE.Vector3(-75, 0.5, 95) },
 			{ point: new THREE.Vector3(75, 0.5, 95) },
+			{ point: new THREE.Vector3(75, 0.5, -95) },
 		], 0, 0, true);
 		const outline = sPath.debugCreateOutlines(curvePath, 0x0000ff);
 		this.main.scene.add(outline);

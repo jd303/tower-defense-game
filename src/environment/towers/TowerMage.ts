@@ -7,21 +7,42 @@ import { Creep } from '../creeps/Creep';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class TowerMage extends Tower {
 	/**
 	 * Tower Assets
 	 * */
-	assetPath: string = 'assets/models/towers/Tower.Mage.glb';
 	assetScale = 2.2;
 
 	/**
 	 * Static details
 	 */
+	static assetName = "TowerMage";
+	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-mage.png';
+	static assetScale: number = 1;
+	static assetPositionY = 3;
 	static buttonIcon = 'assets/models/towers/Tower.Mage.UI.icon.png';
 	static cost = 150;
 	static costType = 'money';
 	static towerZoneWidth = 1;
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 1 },
+			uFrameRows: { value: 1 },
+			uSize: { value: 8 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "idle",
+			totalFrames: 1,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 1;
 
 	/**
 	 * Stats
@@ -44,10 +65,10 @@ export class TowerMage extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main);
-		//this.loadModel();
-		this.loadSpritesheetTemp();
+		super(main, TowerMage.assetName, TowerMage.assetPositionY, TowerMage.spriteSheetRows, TowerMage.spriteSheetCellColCount, TowerMage.assetScale);
+
 		this.stats = { ...TowerMage.stats };
+
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
@@ -99,47 +120,5 @@ export class TowerMage extends Tower {
 
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
-	}
-
-	loadSpritesheetTemp() {
-		const loader = new THREE.TextureLoader();
-		const texture = loader.load('assets/temp/spritesheet-tower-mage.png');
-		texture.colorSpace = THREE.SRGBColorSpace;
-
-		// 2. Create the material (specifically SpriteMaterial)
-		const material = new THREE.SpriteMaterial({ map: texture });
-
-		// 3. Create the Sprite
-		const sprite = new THREE.Sprite(material);
-
-		// 4. Scale it (since it has no geometry, it defaults to 1x1 unit)
-		sprite.scale.set(4, 4, 1);
-		sprite.position.set(0, 1.60, 0);
-
-		this.groupModel.scale.set(this.assetScale, this.assetScale, this.assetScale);
-		this.groupModel.position.y = this.assetPositionY;
-		this.groupModel.add(sprite);
-
-		const cols = 1; // Number of horizontal frames
-		const rows = 1; // Number of vertical frames
-		const totalFrames = 1;
-
-		// Tell the texture to only show 1/4th of the width and height
-		texture.repeat.set(1 / cols, 1 / rows);
-
-		let currentFrame = 0;
-
-		function animateSprite() {
-			currentFrame = (currentFrame + 1) % totalFrames;
-
-			const column = currentFrame % cols;
-			const row = Math.floor(currentFrame / cols);
-
-			// Shift the "window" to the correct frame
-			texture.offset.x = column / cols;
-			texture.offset.y = 1 - (row + 1) / rows; // Y is often inverted in UVs
-		}
-
-		setInterval(animateSprite, 300);
 	}
 }

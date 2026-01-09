@@ -2,6 +2,7 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 //import { DamageTypes } from '../../data/DamageTypes';
 import { Hero } from './Hero';
 import { HeroStats } from './HeroStats';
@@ -10,10 +11,23 @@ export class Man0 extends Hero {
 	/**
 	 * Main
 	 * */
-	assetPath: string = 'assets/models/heroes/Man0.v2.glb';
-	assetScale: number = 0.25;
-	shadowsEnabled = true;
-	interactive = true;
+	static assetName: string = 'Man0';
+	static assetPath: string = 'assets/spritesheets/heroes/spritesheet-man0.png';
+	static assetScale: number = 0.8;
+	static assetPositionY: number = 1.2;
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "walk",
+			totalFrames: 4,
+			currentFrame: 0,
+		},
+		{
+			name: "attack",
+			totalFrames: 4,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 4;
 
 	/**
 	 * Stats
@@ -41,12 +55,24 @@ export class Man0 extends Hero {
 	healthBarY: 2;
 
 	/**
+	 * Spritesheet & InstancedMesh properties
+	 */
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 4 },
+			uFrameRows: { value: 4 },
+			uSize: { value: 10 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
+
+	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main);
+		super(main, Man0.assetName, Man0.assetPositionY, Man0.spriteSheetRows, Man0.spriteSheetCellColCount, Man0.assetScale);
 
-		this.loadModel();
 		this.interceptionHandler.setInterceptionSlotCount(this.stats.numberIntercepted);
 
 		return this;

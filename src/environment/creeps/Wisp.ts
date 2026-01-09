@@ -5,14 +5,37 @@ import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { CreepStats } from './CreepStats';
+import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Wisp extends Creep {
 	/**
 	 * Main
 	 * */
-	assetPath: string = 'assets/models/creeps/creep_wisp.glb';
-	assetScale: number = 0.5;
-	assetPositionY = 2;
+	static assetName: string = 'Wisp';
+	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
+	static assetScale: number = 0.25;
+	static assetPositionY = 3;
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "walk",
+			totalFrames: 2,
+			currentFrame: 0,
+		}
+	]
+	static spriteSheetCellColCount: number = 2;
+
+	/**
+	 * Spritesheet & InstancedMesh properties
+	 */
+	static ShaderMaterialProperties = {
+		uniforms: {
+			uFrameCols: { value: 2 },
+			uFrameRows: { value: 1 },
+			uSize: { value: 8 }
+		},
+		alphaTest: 0.5,
+		transparent: true
+	}
 
 	/**
 	 * Stats
@@ -47,9 +70,8 @@ export class Wisp extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main);
+		super(main, Wisp.assetName, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.spriteSheetCellColCount, Wisp.assetScale);
 
-		this.loadModel();
 		this.modifyStateMachine();
 		this.stateMachine.transition('moving');
 

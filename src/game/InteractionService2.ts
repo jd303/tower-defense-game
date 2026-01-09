@@ -1,13 +1,10 @@
 import { Main } from '../core/Main';
 import { RaycasterIntersection, RaycasterService } from '../core/RaycasterService';
 import { Service } from '../core/Service';
-import { ModelAsset } from '../environment/ModelAsset';
 import { Terrain } from '../environment/Terrain';
 import { EnvironmentTile } from '../environment/EnvironmentTile';
 import { CreepPath } from '../environment/creeps/CreepPath';
-import { Hero } from '../environment/heroes/Hero';
-import { Tower } from '../environment/towers/Tower';
-import { Creep } from '../environment/creeps/Creep';
+import { Asset } from '../environment/assets/Asset';
 
 /**
  * Allows us to manage interaction based on clicks and taps.
@@ -82,7 +79,6 @@ export class InteractionService2 extends Service {
 		if (interactive instanceof Terrain === false) this.currentInteractive = interactive;
 	}
 	deregisterCurrentInteractive(targetedInteractive?: InteractableObject) {
-		console.log("DEREGISTER AND DESELECT");
 		if (this.currentInteractive && 'deselect' in this.currentInteractive) this.currentInteractive.deselect();
 		this.currentInteractive = null;
 	}
@@ -138,7 +134,7 @@ export class InteractionService2 extends Service {
 	}
 }
 
-export type InteractableObject = ModelAsset | Terrain | CreepPath | EnvironmentTile;
+export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile;
 export type InteractableTypes = 'creep' | 'creepPath' | 'hero' | 'tower' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain';
 
 export class Interactable2 {

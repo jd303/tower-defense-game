@@ -1,15 +1,18 @@
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelDefinition } from '../../data/LevelInterfaces';
-import { InteractionService2 } from '../../game/InteractionService2';
+import { Level } from '../../levels/Level';
 import { Creep } from './Creep';
 import { CreepPath } from './CreepPath';
+import { MovePathDefinition } from '../../data/PathInterfaces';
+import { AssetGenerator } from '../assets/AssetGenerator';
 
 export class CreepManager {
 	/**
 	 * Core
 	 */
 	main: Main;
+	level: Level;
 	defaultCreepClickEnabled: boolean = false;
 
 	/**
@@ -21,8 +24,9 @@ export class CreepManager {
 	/**
 	 * Construtor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, level: Level) {
 		this.main = main;
+		this.level = level;
 	}
 
 	/**
@@ -39,11 +43,11 @@ export class CreepManager {
 	/**
 	 * Adds a creep to the level
 	 * */
-	addCreep(creep: Creep) {
-		this.creeps.push(creep);
-		this.main.scene.add(creep.groupMain);
+	async addCreep(creepName: string, creepPath: MovePathDefinition) {
+		const creep = await AssetGenerator.createSpriteAsset(creepName, this.level.main) as Creep;
+		creep.setCreepPath(creepPath);
 
-		if (!this.defaultCreepClickEnabled) this.registerDefaultCreepListener();
+		this.creeps.push(creep);
 	}
 
 	/**
@@ -55,20 +59,17 @@ export class CreepManager {
 	}
 
 	/**
-	 * Registers a default callback for all creep.  Uses the first creep's callback, with the context of the provided creep
+	 * Animate objects based on time
 	 */
-	registerDefaultCreepListener() {
-		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		console.log("TODO: Consider a better place to put this!!");
-		sInteraction2.registerInteractableListener('creep', 'creepClickedDefault', this.creeps[0].creepClicked);
-		this.defaultCreepClickEnabled = true;
+	tick(timeProperties: TickTimeProperties) {
+		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
 	}
 
 	/**
 	 * Animate objects based on time
 	 */
-	tick(timeProperties: TickTimeProperties) {
-		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
+	frameAnimationTick() {
+		this.creeps.forEach((creep) => creep.animationFramePicker());
 	}
 
 	/**

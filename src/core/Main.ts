@@ -9,6 +9,7 @@ import { AudioService } from './AudioService';
 import { RaycasterService } from './RaycasterService';
 import { Service } from './Service';
 import { SpriteService } from '../game/SpriteService';
+import { InstancedMeshService } from '../game/InstancedMeshService';
 
 export class Main {
 	/**
@@ -48,6 +49,7 @@ export class Main {
 		this.registerService('Audio', new AudioService(this));
 		this.registerService('Raycaster', new RaycasterService(this));
 		this.registerService('Sprite', new SpriteService(this));
+		this.registerService('InstancedMesh', new InstancedMeshService(this));
 		this.registerService('Tick', new TickService(this));
 
 		// Watch the screen
@@ -62,7 +64,9 @@ export class Main {
 		console.log("%c Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');
 		console.log("%c Projectile results: explosions, magic reactins, arrows left behind?", 'color: red');
-		console.log("%c Refactor and research BufferGeometries, now that we can't use PlaneBufferGeom", 'color: red');
+		console.log("%c Instanced meshes, when they die, could be properly cleaned up.  Swap them with an item at the end of the array and reduce the array count.", 'color: red');
+		console.log("%c Projectile.ts > createPath() - this could be shifted to PathService.", 'color: red');
+		console.log("%c CharacterAsset > animationAttack() && animationHurtMe() still needed", 'color: red');
 
 		return this;
 	}

@@ -6,12 +6,14 @@ import { PropZone, PropZoneArguments } from "./PropZone";
 import { Maths } from "../../core/Maths";
 import { EnvironmentTile } from "../EnvironmentTile";
 
+// RETIRED WHEN I SHIFTED TO SPRITES 01-2026.  Would still work, but is outdated.
+
 /**
  * A framework for adding props and propzones to the board
  * Makes use of InstancedMesh, which requires that prop models have only 1 child mesh.
  * Providing a model with more than 1 child mesh will fail to write the model to the screen
  */
-export class PropManager {
+export class ModelPropManager {
 	/**
 	 * Core Properties
 	 * */
@@ -71,12 +73,12 @@ export class PropManager {
 	 * Register a zone to generate props in
 	 */
 	registerPropZone(args: PropZoneArguments, levelDetails: LevelDefinition) {
-		const propZonePropsY = args.environmentTile.show ? 0.2 : 0;
+		const propZonePropsY = args.environmentTile ? 0.2 : 0;
 		const propZone = new PropZone(args, this.main);
 		this.propZones.push(propZone);
 		const propPositions: Vector3[] = propZone.createPositions();
 
-		if (args.environmentTile.show) {
+		if (args.environmentTile) {
 			const environmentTile = propZone.createEnvironmentTile();
 			this.environmentTiles.push(environmentTile);
 			this.main.scene.add(environmentTile.groupMain);
@@ -92,7 +94,7 @@ export class PropManager {
 	/**
 	 * Finds a prop from prop definitions
 	 */
-	findProp(tileset: TerrainTypes, name: string): PropAsset | null {
+	findProp(tileset: TerrainTypes, name: string): ModelPropAssetDefinition | null {
 		const prop = AllProps.find(prop => prop.tileset == tileset && prop.name == name);
 		return prop || null;
 	}
@@ -100,7 +102,7 @@ export class PropManager {
 	/**
 	 * Used to create a prop group for each unique prop
 	 */
-	preparePropGroup(prop: PropAsset, levelDetails?: LevelDefinition): PropGroup {
+	preparePropGroup(prop: ModelPropAssetDefinition, levelDetails?: LevelDefinition): PropGroup {
 		let thePropGroup = this.propGroups.find(propGroup => propGroup.asset == prop);
 		if (!thePropGroup) {
 			thePropGroup = {
@@ -262,14 +264,14 @@ export class PropManager {
 
 interface PropGroup {
 	iMesh: InstancedMesh | null;
-	asset: PropAsset;
+	asset: ModelPropAssetDefinition;
 	propPlacements: PropAssetPlacement[];
 	colourRandom?: { r?: number, g?: number, b?: number, l?: number }, // r, g and b apply a random to individual colours.  l applies to all colours.
 	loadedModel?: any;
 	loadedMaterial?: any;
 }
 
-export interface PropAsset {
+export interface ModelPropAssetDefinition {
 	tileset: TerrainTypes;
 	name: string;
 	assetPath: string;

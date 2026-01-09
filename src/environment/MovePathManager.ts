@@ -1,21 +1,21 @@
-import { ModelAsset } from './ModelAsset';
 import { MovePathDefinition } from '../data/PathInterfaces';
 import { TowerStats } from './towers/TowerStats';
 import { Vector3 } from 'three';
 import { PathService } from '../game/PathService';
+import { Asset } from './assets/Asset';
 
 export class MovePathManager {
 	/**
 	 * Core Properties
 	 * */
-	parent: ModelAsset;
+	parent: Asset;
 	paths: MovePathDefinition[] = [];
 	activePath?: MovePathDefinition;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(parent: ModelAsset) {
+	constructor(parent: Asset) {
 		this.parent = parent;
 	}
 

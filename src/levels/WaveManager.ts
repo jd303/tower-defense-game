@@ -1,8 +1,6 @@
-import { Vector3 } from 'three';
 import { Level } from './Level';
 import { Wave } from './Wave';
 import { WaveDefinition } from './WaveDefinition';
-import { CreepGenerator } from '../environment/creeps/CreepGenerator';
 import { Timer } from '../core/Timer';
 import { Main } from '../core/Main';
 import { LevelDefinition } from '../data/LevelInterfaces';
@@ -22,7 +20,7 @@ export class WaveManager {
 	 * Wave Properties
 	 * */
 	waveTimer: Timer | null;
-	waves: Wave[] = []; // Ephemeral - they are deleted from here once they launch and handled elsewhere
+	waves: Wave[] = [];
 
 	/**
 	 * Constructor
@@ -93,27 +91,64 @@ export class WaveManager {
 	triggerWave() {
 		const wave = this.waves[0];
 		this.waves = this.waves.splice(1);
-		console.log("TRIGGER WAVE", wave);
-		const curveStart = wave.corePath.corePath.path.getPoint(0) as Vector3;
 
 		// Create creep groups
-		wave.creepGroups.forEach((creepGroup) => {
-			// Create creeps
-			creepGroup.creeps.forEach((creepDefinition: any) => {
-				const creep = CreepGenerator.createCreep(creepDefinition, this.level.main);
-				creep.groupMain.position.set(curveStart.x, curveStart.y, curveStart.z);
-
-				const pathVariant = wave.corePath.createVariantPath();
-				//creep.setPath(pathVariant);
-				creep.movePathManager.addPath(pathVariant);
-				creep.movePathManager.setActivePath(pathVariant.id);
-
-				// Brute force animators in
-				this.level.creepManager.addCreep(creep);
-			});
+		console.log("REINSTATE, OR IGNORE, THE CONCEPT OF CREEPGROUPS (Curently using creep, but calling it creepGroup)");
+		wave.creepNames.forEach((creepName: string) => {
+			const creepPath = wave.corePath.createVariantPath();
+			this.level.creepManager.addCreep(creepName, creepPath);
 		});
 
 		const nextWave = this.waves[0];
 		if (nextWave) this.waveTimer = new Timer(this.triggerWave.bind(this), nextWave.waveStartTime, this.main);
 	}
+
+	/**
+	 * Creates waves for a particular difficulty
+	 */
+	createLevelWaves(difficulty: number, includedCreeps: IncludedCreepDefinitions[]) {
+		difficulty = 1;
+		const numberOfWaves = 2 * difficulty;
+		const creepDifficulty = difficulty * 20;
+		const creepWaveDifficulty = Math.ceil(creepDifficulty / numberOfWaves);
+		/*const minWaveTime = 2000 - (difficulty * 100);
+		const maxWaveTime = Math.max(5000 - (difficulty * 1000), minWaveTime);*/
+		//const waveTime = 20000 / difficulty;
+		const waveTime = 5000 / difficulty;
+
+		const waves = Array.from({ length: numberOfWaves }, (_, i) => {
+			let thisCreepWaveDifficulty = 0;
+			const creeps = [];
+
+			while (thisCreepWaveDifficulty < creepWaveDifficulty) {
+				const newCreep = includedCreeps[Math.floor(Math.random() * includedCreeps.length)]
+				creeps.push(newCreep.name);
+				thisCreepWaveDifficulty += newCreep.difficulty
+			}
+
+			console.log("TODO: SETUP CREEP / WAVE PATHS PROPERLY");
+			const wavePathID = '1';
+			const wavePath = this.level.creepManager.creepPaths.find((path) => path.id == wavePathID);
+
+			const wave = new Wave({
+				id: i,
+				waveStartTime: waveTime,
+				pathID: wavePathID,
+				difficulty: 1,
+				creepNames: creeps
+			});
+
+			if (wavePath) wave.corePath = wavePath;
+
+			return wave;
+		});
+
+		this.waves = waves;
+		return waves;
+	}
 }
+
+export interface IncludedCreepDefinitions {
+	difficulty: number,
+	name: string
+}[];

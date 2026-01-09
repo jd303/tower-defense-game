@@ -1,6 +1,6 @@
 import { Vector3 } from "three";
 import { Main } from "../core/Main"
-import { ModelAsset } from "../environment/ModelAsset";
+import { Asset } from "../environment/assets/Asset";
 
 export class LocationService {
 	/**
@@ -20,7 +20,7 @@ export class LocationService {
 	 * @param {Function} omissionCallback A function to call which, if true, omits this from the selection criteria
 	 * */
 	findTargetsInRange(config: TargetFinderInterface) {
-		let targets = config.potentialTargets.filter((target: ModelAsset) => {
+		let targets = config.potentialTargets.filter((target: Asset) => {
 			if (config.omissionCallback) {
 				if (config.omissionCallback(target)) return false;
 			}
@@ -44,7 +44,7 @@ export class LocationService {
 }
 
 interface TargetFinderInterface {
-	potentialTargets: (ModelAsset)[],
+	potentialTargets: (Asset)[],
 	fromPoint: Vector3,
 	range: number,
 	omissionCallback?: Function

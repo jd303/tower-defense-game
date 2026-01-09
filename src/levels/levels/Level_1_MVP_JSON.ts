@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
-	terrain: TerrainTypes.sand,
+	terrain: TerrainTypes.grass,
 	paths: [
 		{
 			id: 1,
@@ -68,8 +68,8 @@ export const levelDetails: LevelDefinition = {
 	],
 	props: [],
 	propZones: [
-		/*{
-			propNames: ['tree_thin', 'tree_lollipop', 'tree_forked', 'tree_spread'],
+		{
+			propNames: ['TreeBulbous', 'TreeTall'],
 			zonePathPoints: [
 				{ point: new Vector3(-76.578, 0, -97.405) },
 				{ point: new Vector3(-77.492, 0, -66) },
@@ -85,15 +85,15 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(99.437, 0, -96.530) },
 				{ point: new Vector3(-76.578, 0, -97.405) },
 			],
-			propDensityFactor: 2.25,
-			propScale: 2,
+			propSparseness: 3,
+			propScale: 4,
 			positionRandom: 1.5,
-			scaleRandom: { all: 0.25 },
+			scaleRandom: { all: 2 },
 			rotateRandom: 0.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 1.25,
-				colour: 0x6B8B42,
+				colour: 0x547621,
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -102,12 +102,49 @@ export const levelDetails: LevelDefinition = {
 					{ point: new Vector3(-15.19903, 0, -85.96763) },
 					{ point: new Vector3(40.45580, 0, -81.25774) }
 				],
-				attentuationDistance: 20,
-				attenuatedScale: 0.5
+				attentuationDistance: 5,
+				attenuatedScale: 1
 			}
 		},
 		{
-			propNames: ['tree_thin', 'tree_lollipop', 'tree_forked', 'tree_spread'],
+			propNames: ['TreeBulbous', 'TreeTall', 'LogSubmerged'],
+			zonePathPoints: [
+				{ point: new Vector3(-36.461, 0, -13.132) },
+				{ point: new Vector3(-51.146, 0, -12.828) },
+				{ point: new Vector3(-53.946, 0, -10.162) },
+				{ point: new Vector3(-54.061, 0, 28.538) },
+				{ point: new Vector3(-50.289, 0, 33.184) },
+				{ point: new Vector3(6.796, 0, 33.413) },
+				{ point: new Vector3(14.846, 0, 24.399) },
+				{ point: new Vector3(27.132, 0, 24.018) },
+				{ point: new Vector3(34.732, 0, 33.084) },
+				{ point: new Vector3(83.132, 0, 33.160) },
+				{ point: new Vector3(89.312, 0, -12.430) },
+				{ point: new Vector3(72.169, 0, -12.582) },
+				{ point: new Vector3(64.341, 0, -18.448) },
+				{ point: new Vector3(60.969, 0, -18.295) },
+				{ point: new Vector3(54.969, 0, -14.182) },
+				{ point: new Vector3(-4.173, 0, -13.191) },
+				{ point: new Vector3(-7.488, 0, -10.754) },
+				{ point: new Vector3(-8.631, 0, 2.959) },
+				{ point: new Vector3(-11.373, 0, 5.930) },
+				{ point: new Vector3(-34.663, 0, 5.373) },
+				{ point: new Vector3(-37.863, 0, 0.726) },
+				{ point: new Vector3(-36.461, 0, -13.132) },
+			],
+			propSparseness: 3,
+			propScale: 4,
+			positionRandom: 1.5,
+			scaleRandom: { all: 2 },
+			rotateRandom: 0.5,
+			environmentTile: {
+				type: "land",
+				distance: 1.25,
+				colour: 0x547621,
+			},
+		},
+		{
+			propNames: ['TreeBulbous', 'TreeTall'],
 			zonePathPoints: [
 				{ point: new Vector3(-72.226, 0, -53.610) },
 				{ point: new Vector3(-16.626, 0, -53.667) },
@@ -125,38 +162,36 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-78.067, 0, -54.500) },
 				{ point: new Vector3(-72.226, 0, -53.610) }
 			],
-			propDensityFactor: 2.25,
-			propScale: 1,
+			propSparseness: 2.25,
+			propScale: 4,
 			positionRandom: 1.5,
-			scaleRandom: { all: 0.25 },
+			scaleRandom: { all: 2 },
 			rotateRandom: 0.5,
 			environmentTile: {
-				show: true,
+				type: "land",
 				distance: 1,
-				colour: 0x6B8B42,
+				colour: 0x547621,
 			},
 		},
 		{
-			propNames: ['rock_1'],
+			propNames: ['MountainInitial'],
 			zonePathPoints: [
-				{ point: new Vector3(72.358, 0, -68.730) },
-				{ point: new Vector3(62.130, 0, -60.759) },
-				{ point: new Vector3(65.273, 0, -47.101) },
-				{ point: new Vector3(65.330, 0, -29.896) },
-				{ point: new Vector3(64.130, 0, -22.788) },
-				{ point: new Vector3(74.130, 0, -13.131) },
-				{ point: new Vector3(94.764, 0, -12.411) },
-				{ point: new Vector3(94.730, 0, -67.545) },
-				{ point: new Vector3(72.358, 0, -68.730) },
+				{ point: new Vector3(72.358, 0, -70) },
+				{ point: new Vector3(62.130, 0, -62) },
+				{ point: new Vector3(65.273, 0, -49) },
+				{ point: new Vector3(65.330, 0, -31) },
+				{ point: new Vector3(64.130, 0, -24) },
+				{ point: new Vector3(74.130, 0, -15) },
+				{ point: new Vector3(94.764, 0, -14) },
+				{ point: new Vector3(94.730, 0, -69) },
+				{ point: new Vector3(72.358, 0, -70) },
 			],
-			propDensityFactor: 2.5,
-			propScale: 4,
-			positionRandom: 0.5,
-			scaleRandom: { all: 2, y: 4 },
+			propSparseness: 5,
+			propScale: 1,
+			positionRandom: 2,
+			scaleRandom: { all: 5 },
 			rotateRandom: 0.5,
-			environmentTile: {
-				show: false,
-			},
+			environmentTile: false,
 			dynamicScaling: {
 				scalePoints: [
 					{ point: new Vector3(75.286, 0, -64.668) },
@@ -171,13 +206,46 @@ export const levelDetails: LevelDefinition = {
 				attentuationDistance: 1,
 				attenuatedScale: 10
 			}
-		}*/
+		},
+		{
+			propNames: ['WaveSubtle'],
+			zonePathPoints: [
+				{ point: new Vector3(-67.143, 0, -23.425) },
+				{ point: new Vector3(-63.600, 0, -21.825) },
+				{ point: new Vector3(-64.743, 0, -18.549) },
+				{ point: new Vector3(-66.400, 0, -9.941) },
+				{ point: new Vector3(-66.629, 0, 30.281) },
+				{ point: new Vector3(-63.771, 0, 37.138) },
+				{ point: new Vector3(-60.743, 0, 42.927) },
+				{ point: new Vector3(-52.571, 0, 46.203) },
+				{ point: new Vector3(-50.400, 0, 48.488) },
+				{ point: new Vector3(-50.552, 0, 55.437) },
+				{ point: new Vector3(-56.952, 0, 59.703) },
+				{ point: new Vector3(-67.066, 0, 62.978) },
+				{ point: new Vector3(-77.923, 0, 63.207) },
+				{ point: new Vector3(-88.552, 0, 59.322) },
+				{ point: new Vector3(-94.609, 0, 29.688) },
+				{ point: new Vector3(-90.037, 0, -14.191) },
+				{ point: new Vector3(-83.735, 0, -22.156) },
+				{ point: new Vector3(-67.143, 0, -23.425) },
+			],
+			propSparseness: 5,
+			propScale: 2,
+			positionRandom: 3,
+			scaleRandom: { all: 1 },
+			rotateRandom: 0.5,
+			environmentTile: {
+				type: "sea",
+				distance: -1.3,
+				colour: 0x82aeff,
+			},
+		}
 	],
 	propColourisation: {
-		"tree_cone_2": { g: 0.5 },
-		"tree_spread": { g: 0.5 },
-		"mesa_1": { b: 0.25 },
-		"rubble_1": { l: -0.5 },
+		"TreeBulbous": { r: 0.35, b: 0.25, l: -0.3 },
+		"TreeFir": { r: 0.75, b: 0.33, l: -0.5 },
+		"TreeTall": { r: 0.75, b: 0.33, l: -0.5 },
+		"MountainInitial": { r: 0.1, l: -0.25 },
 	},
 	waves: [
 		{

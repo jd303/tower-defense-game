@@ -3,5 +3,5 @@ export interface WaveDefinition {
 	waveStartTime: number;
 	pathID: string;
 	difficulty: number;
-	creepGroups: any[];
+	creepNames: string[];
 }

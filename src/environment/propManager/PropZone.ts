@@ -3,7 +3,7 @@ import { PathPoint } from "../../data/PathInterfaces";
 import { BoundingBoxPlane, PathService } from "../../game/PathService";
 import { Main } from "../../core/Main";
 import { Maths } from "../../core/Maths";
-import { EnvironmentTile } from "../EnvironmentTile";
+import { EnvironmentTile, EnvironmentTileProperties } from "../EnvironmentTile";
 
 export class PropZone {
 	/**
@@ -27,16 +27,16 @@ export class PropZone {
 		this.curvePath = sPath.createCurveFromPathPoints(args.zonePathPoints, 0, 0, true);
 		this.boundingBox = sPath.getBoundingBoxOfCurvePath(this.curvePath);
 
-		if (args.environmentTile.show) {
+		if (args.environmentTile) {
 			this.zoneOutlinePath = sPath.offsetPathFromPointsXZ(args.zonePathPoints, args.environmentTile!.distance!, true);
-			this.zoneOutlinePath = sPath.smoothCurve(this.zoneOutlinePath);
+			this.zoneOutlinePath = sPath.smoothPathByPoints(this.zoneOutlinePath, 0.2, 4);
 		}
 
 		if (this.main.debugMode) {
 			const sPath: PathService = this.main.s('Path');
 			this.debugOutline = sPath.debugCreateOutlines(this.curvePath);
 			this.main.scene.add(this.debugOutline);
-			if (args.environmentTile.show) {
+			if (args.environmentTile) {
 				this.debugZoneOutline = sPath.debugCreateOutlines(this.zoneOutlinePath, 0xff0000);
 				this.main.scene.add(this.debugZoneOutline);
 			}
@@ -51,9 +51,10 @@ export class PropZone {
 	createPositions() {
 		const sPath: PathService = this.main.s('Path');
 
+		// Create positions and initial scale
 		let positions: any[] = []; // TODO: Type this
-		for (let x = this.boundingBox.smallestX; x < this.boundingBox.largestX; x += this.arguments.propDensityFactor) {
-			for (let z = this.boundingBox.smallestZ; z < this.boundingBox.largestZ; z += this.arguments.propDensityFactor) {
+		for (let x = this.boundingBox.smallestX; x < this.boundingBox.largestX; x += this.arguments.propSparseness) {
+			for (let z = this.boundingBox.smallestZ; z < this.boundingBox.largestZ; z += this.arguments.propSparseness) {
 				const point = new Vector3(x, 0, z);
 				point.x = Maths.addBipolarRandom(point.x, this.arguments.positionRandom);
 				point.z = Maths.addBipolarRandom(point.z, this.arguments.positionRandom);
@@ -70,7 +71,7 @@ export class PropZone {
 				const closestPoint = scaling.scalePoints.reduce((min, item) => item.point.distanceTo(point.position) < min.point.distanceTo(point.position) ? item : min);
 				const distanceToClosestPoint = point.position.distanceTo(closestPoint.point);
 				let attenuatedValue = Maths.getAttenuatedValue(distanceToClosestPoint, 0, scaling.attentuationDistance, 1, scaling.attenuatedScale, this.arguments.propScale);
-				point.scale = { x: attenuatedValue, y: attenuatedValue, z: attenuatedValue };
+				point.scale = { x: point.scale.x + attenuatedValue, y: point.scale.y + attenuatedValue, z: point.scale.z + attenuatedValue };
 			});
 			positions = positions.filter(position => position.scale.x > 0 && position.scale.y > 0 && position.scale.z > 0);
 		}
@@ -104,7 +105,7 @@ export class PropZone {
 	 */
 	createEnvironmentTile() {
 		console.log("TODO: I feel that environment tiles should be centralised, otherwise anything could create them. Consider moving them.");
-		const environmentTile = new EnvironmentTile(this.zoneOutlinePath, this.main, this.arguments.environmentTile.colour);
+		const environmentTile = new EnvironmentTile(this.zoneOutlinePath, this.main, this.arguments.environmentTile as EnvironmentTileProperties);
 		return environmentTile;
 	}
 
@@ -143,17 +144,13 @@ export class PropZone {
 export interface PropZoneArguments {
 	propNames: string[],
 	zonePathPoints: PathPoint[],
-	propDensityFactor: number,
+	propSparseness: number,
 	propScale: number;
 	dynamicScaling?: PropZoneScaling,
 	positionRandom: number,
 	scaleRandom: { all?: number, x?: number, y?: number, z?: number },
 	rotateRandom: number,
-	environmentTile: {
-		show: boolean,
-		distance?: number,
-		colour?: number
-	}
+	environmentTile: EnvironmentTileProperties | false
 }
 
 export interface PropZoneScaling {

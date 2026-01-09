@@ -1,13 +1,15 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { Hero } from './Hero';
-import { Man0 } from './Man0';
+import { Level } from '../../levels/Level';
+import { AssetGenerator } from '../assets/AssetGenerator';
 
 export class HeroManager {
 	/**
 	 * System Properties
 	 * */
 	main: Main;
+	level: Level;
 
 	/**
 	 * Stats
@@ -17,18 +19,20 @@ export class HeroManager {
 	/**
 	 * Construtor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, level: Level) {
 		this.main = main;
+		this.level = level;
 	}
 
 	/**
 	 * Creates a hero
 	 */
-	createDefaultHero(point: THREE.Vector3) {
-		const man0 = new Man0(this.main);
-		this.heroes.push(man0);
-		this.main.scene.add(man0.groupMain);
-		man0.groupMain.position.set(point.x, point.y, point.z);
+	async createDefaultHero(point: THREE.Vector3) {
+		const hero = await AssetGenerator.createSpriteAsset('Man0', this.level.main) as Hero;
+		hero.registerOnLoadCallback(() => {
+			hero.setPosition(point);
+		});
+		this.heroes.push(hero);
 	}
 
 	/**

@@ -100,7 +100,6 @@ export class Projectile {
 		}
 
 		this.projectilePath.add(curveSegment);
-		console.log('NEXT UP: MOVE PATH AND CURVE CODE INTO OWN CLASS, SO NOT REPEATING IN PROJECTILE AND CREEP');
 	}
 
 	/**

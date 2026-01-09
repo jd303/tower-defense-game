@@ -2,12 +2,13 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { UIRegions } from '../../game/UIProperties';
 import { UIButton, UIService } from '../../game/UIService';
-import { Tower } from './Tower';
 import { TowerPlacementCommons, TowerPlacementZone } from './TowerPlacementZone';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelDefinition } from '../../data/LevelInterfaces';
 import { InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
 import { EconomyService } from '../../game/EconomyService';
+import { AssetGenerator } from '../assets/AssetGenerator';
+import { Tower } from './Tower';
 
 export class TowerManager {
 	/**
@@ -94,8 +95,7 @@ export class TowerManager {
 	requestAddTower(tower: typeof Tower, event: InteractionEvent, button: UIButton) {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
-			const newTower = new tower(this.main);
-			this.addTower(newTower, event.raycasterInteraction.object.groupMain.position);
+			this.addTower(tower.assetName, event.raycasterInteraction.object.groupMain.position);
 			sEconomy.adjustEconomyValue(tower.costType, -1 * tower.cost);
 			(event.raycasterInteraction.object as any).towerZoneShapePlacement.addTowerToTowerZoneShapePlacement(tower);
 		}
@@ -111,10 +111,15 @@ export class TowerManager {
 	/**
 	 * Add a tower to the game
 	 */
-	addTower(tower: Tower, point: THREE.Vector3) {
-		this.towers.push(tower);
-		this.main.scene.add(tower.groupMain);
-		tower.groupMain.position.set(point.x, point.y, point.z);
+	async addTower(assetName: string, point: THREE.Vector3) {
+		const newTower = await AssetGenerator.createSpriteAsset(assetName, this.main) as Tower;
+		this.towers.push(newTower);
+
+		setTimeout(() => {
+			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");
+			newTower.setPosition(point);
+			console.log(newTower.instancedMesh);
+		}, 500);
 
 		if (!this.defaultTowerClickEnabled) this.registerDefaultTowerListener();
 	}

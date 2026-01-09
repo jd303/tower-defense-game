@@ -1,5 +1,3 @@
-import { Creep } from '../environment/creeps/Creep';
-import { CreepGroup } from '../environment/creeps/CreepGroup';
 import { CreepPath } from '../environment/creeps/CreepPath';
 import { WaveDefinition } from './WaveDefinition';
 
@@ -11,7 +9,7 @@ export class Wave {
 	difficulty: number;
 	corePath: CreepPath;
 	waveStartTime: number;
-	creepGroups: CreepGroup[] = [];
+	creepNames: string[] = [];
 
 	/**
 	 * Constructor
@@ -20,20 +18,7 @@ export class Wave {
 		this.id = waveDefinition.id;
 		this.waveStartTime = waveDefinition.waveStartTime;
 		this.difficulty = waveDefinition.difficulty;
-		this.creepGroups = waveDefinition.creepGroups;
-	}
-
-	/**
-	 * Add Creep
-	 * */
-	addCreep(creep: Creep, groupID: string) {
-		let group = this.creepGroups.find((group) => group.id == groupID);
-		if (!group) {
-			const newGroup = new CreepGroup(groupID);
-			this.creepGroups.push(newGroup);
-		} else {
-			this.creepGroups.push(group);
-		}
+		this.creepNames = waveDefinition.creepNames;
 	}
 
 	/**

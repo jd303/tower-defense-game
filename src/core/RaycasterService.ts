@@ -4,10 +4,10 @@ import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { Tower } from '../environment/towers/Tower';
 import { Hero } from '../environment/heroes/Hero';
-import { ModelAsset } from '../environment/ModelAsset';
 import { Interactable2, InteractableObject } from '../game/InteractionService2';
 import { Service } from './Service';
 import { CreepPath } from '../environment/creeps/CreepPath';
+import { Asset } from '../environment/assets/Asset';
 
 export class RaycasterService extends Service {
 	/**
@@ -129,7 +129,7 @@ export class RaycasterService extends Service {
 
 interface RaycasterSubject {
 	order: RaycasterOrders;
-	object: Hero | Creep | Tower | Terrain | CreepPath | ModelAsset;
+	object: Hero | Creep | Tower | Terrain | CreepPath | Asset;
 }
 
 export interface RaycasterIntersection {

@@ -58,7 +58,7 @@ export class CreepPath {
 	/**
 	 * Creates a variant path for uniqueness
 	 * */
-	createVariantPath() {
+	createVariantPath(): MovePathDefinition {
 		const sPath = this.main.s('Path');
 
 		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.pathPoints, this.getRandomAdjustX(), this.getRandomAdjustZ());
@@ -85,7 +85,7 @@ export class CreepPath {
 
 		// Extrude Settings
 		const extrudeSettings = {
-			steps: 200,
+			steps: 750,
 			depth: 1,
 			bevelEnabled: false,
 			extrudePath: this.corePath.path,
@@ -95,7 +95,8 @@ export class CreepPath {
 		let pathMaterial;
 		switch (pathDefinition.pathGeometry) {
 			case PathGeometryTypes.dirt:
-				pathMaterial = new THREE.MeshStandardMaterial({ color: 0xbfa340 });
+				//pathMaterial = new THREE.MeshStandardMaterial({ color: 0xbfa340 });
+				pathMaterial = new THREE.ShaderMaterial({ vertexShader: creepPathVertexShader, fragmentShader: creepPathFragmentShader/*, flatShading: true*/ });
 				break;
 			case PathGeometryTypes.rock:
 				pathMaterial = new THREE.MeshStandardMaterial({ color: 0x666666 });
@@ -145,3 +146,73 @@ export class CreepPath {
 		this.main.scene.remove(this.groupMain);
 	}
 }
+
+const creepPathVertexShader = `
+	varying vec2 vUv;
+	varying float vHeight;
+	varying float vDisplacement; // New: Pass the "bumpiness" value
+
+	float hash(vec2 p) {
+		return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+	}
+
+	float noise(vec2 p) {
+		vec2 i = floor(p);
+		vec2 f = fract(p);
+		float a = hash(i);
+		float b = hash(i + vec2(0.0, 0.0));
+		vec2 u = f * f * (3.0 - 2.0 * f);
+		return mix(a, b, u.x);
+	}
+
+	void main() {
+		vUv = uv;
+		vHeight = position.y;
+
+		// 1. Calculate Noise
+		float d = noise(position.xz * 3.0);  // was 3.0
+		vDisplacement = d; // Save this for the fragment shader
+
+		vec3 newPosition = position;
+		
+		// 2. Displace ONLY the sides
+		// If we are at the "bottom" or "sides" of the rectangle extrusion
+		if(position.y < 0.1) {
+			newPosition.xz += normal.xz * d * 0.3; // Move outward based on noise
+		}
+
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+	}
+`;
+
+const creepPathFragmentShader = `
+	varying vec2 vUv;
+	varying float vHeight;
+	varying float vDisplacement;
+
+	void main() {
+		// 1. Base Colors
+		vec3 sandColor = vec3(0.76, 0.70, 0.50);
+		vec3 dirtColor = vec3(0.5, 0.45, 0.25);
+
+		// 2. The Top vs Side Logic (from height)
+		float topMask = smoothstep(0.3, 0.45, vHeight);
+
+		// 3. Fake Lighting (Ambient Occlusion)
+		// We darken the color where the displacement noise is low.
+		// This makes the "bumpy" parts pop.
+		float shadow = mix(1.8, 1.9, vDisplacement); 
+
+		// 4. Edge Blend (Creeping dirt on the top edges)
+		float edgeCreep = abs(vUv.y - 0.5) * 2.0;
+		float dirtOnTop = smoothstep(0.6, 0.95, edgeCreep);
+
+		// 5. Final Mix
+		vec3 topFinal = mix(sandColor, dirtColor, dirtOnTop);
+		vec3 finalColor = mix(dirtColor, topFinal, topMask);
+
+		// 6. APPLY THE SHADOWS
+		// This multiplies the color by our noise-based light map
+		gl_FragColor = vec4(finalColor * shadow, 1.0);
+	}
+`;

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
-import { EnvironmentTile } from '../EnvironmentTile';
+import { EnvironmentTile, EnvironmentTileProperties } from '../EnvironmentTile';
 import { PathPoint } from '../../data/PathInterfaces';
 import { PathService } from '../../game/PathService';
 import { Tower } from './Tower';
@@ -20,6 +20,12 @@ export class TowerPlacementZone {
 	receiveShaodws: boolean = true;
 	curvePath: THREE.CurvePath<any>;
 
+	static environmentTileProperties: EnvironmentTileProperties = {
+		type: "land",
+		colour: 0xC4B271,
+		distance: 1
+	}
+
 	/**
 	 * Constructor
 	 * */
@@ -29,9 +35,9 @@ export class TowerPlacementZone {
 		this.pathPoints = points;
 		const sPath: PathService = main.s('Path');
 		const curvePath = sPath.createCurveFromPathPoints(points, 0, 0, true);
-		const smoothCurve = sPath.smoothCurve(curvePath);
-		this.curvePath = sPath.convertFromCatmullRomCurve3(smoothCurve, 100);
-		this.environmentTile = new EnvironmentTile(this.curvePath, main, 0xC4B271);
+		const smoothPath = sPath.smoothPathByPoints(curvePath);
+		this.curvePath = sPath.convertFromCatmullRomCurve3(smoothPath, 100);
+		this.environmentTile = new EnvironmentTile(this.curvePath, main, TowerPlacementZone.environmentTileProperties);
 		this.main.scene.add(this.environmentTile.groupMain);
 
 		const shapePlacements = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
@@ -64,7 +70,6 @@ export class TowerPlacementZone {
 	showPlacementTile(visible: boolean) {
 		if (visible) {
 			const filledPlacementTiles = this.placementTilePositions.filter((placement) => { return placement.tower != null; });
-			console.log("FILLED", filledPlacementTiles);
 			const blockedTiles: { xIndex: number, zIndex: number }[] = [];
 			filledPlacementTiles.forEach((placement) => {
 				blockedTiles.push({ xIndex: placement.xIndex, zIndex: placement.zIndex });
@@ -88,9 +93,9 @@ export class TowerPlacementZone {
 
 			this.placementTilePositions.forEach((placement) => {
 				if (placement.tower) return; // Don't show used ones
-				if (blockedTiles.find((blockedTile) => { console.log(blockedTile, placement); return blockedTile.xIndex == placement.xIndex && blockedTile.zIndex == placement.zIndex; })) return; // Don't show blocked tiles
+				if (blockedTiles.find((blockedTile) => blockedTile.xIndex == placement.xIndex && blockedTile.zIndex == placement.zIndex)) return; // Don't show blocked tiles
 
-				const environmentTile = new EnvironmentTile(this.towerPlacementCommons.placementTileCurve, this.main, 0x000000, placement);
+				const environmentTile = new EnvironmentTile(this.towerPlacementCommons.placementTileCurve, this.main, TowerPlacementZone.environmentTileProperties, placement);
 				environmentTile.groupMain.position.set(placement.point.x, 0.15, placement.point.z);
 				this.placementTiles.push(environmentTile);
 				this.main.scene.add(environmentTile.groupMain);

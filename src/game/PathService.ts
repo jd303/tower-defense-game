@@ -18,7 +18,7 @@ export class PathService extends Service {
 	/**
 	 * Creates a Move Path
 	 * */
-	createMovePath(id: string, pathPoints: PathPoint[], adjustX: number = 0, adjustY: number = 0) {
+	createMovePath(id: string, pathPoints: PathPoint[], adjustX: number = 0, adjustY: number = 0): MovePathDefinition {
 		const path = this.createCurveFromPathPoints(pathPoints, adjustX, adjustY);
 		const pathLength = path.getLength();
 		const pathDefinition: MovePathDefinition = {
@@ -90,19 +90,71 @@ export class PathService extends Service {
 	}
 
 	/**
-	 * Takes a curve and smooths it
+	 * Smooths a path by converting it to a curve and returning the points
 	 * @param curvePath 
-	 * @returns THREE.CatmullRomCurve3
+	 * @returns 
 	 */
-	smoothCurve(curvePath: THREE.CurvePath<any> | THREE.CatmullRomCurve3) {
-		const sampledPoints = curvePath.getPoints(50); // or more, depending on desired resolution
+	smoothPathByConversion(curvePath: THREE.CurvePath<any>) {
+		const sampledPoints = curvePath.getPoints(100); // or more, depending on desired resolution
 
 		// Smooth it with CatmullRom
 		const smoothCurve = new THREE.CatmullRomCurve3(sampledPoints);
-		smoothCurve.curveType = 'centripetal';
+		smoothCurve.curveType = 'centripetal'; // centripetal | chordal | catmullrom
 		smoothCurve.closed = true; // set true if your curve loops
 
 		return smoothCurve;
+	}
+
+	/**
+	 * Takes a curve and smooths it by modifying points.  Creates a path
+	 * @param curvePath 
+	 * @param radius Lower numbers produce tighter curves
+	 * @returns THREE.CatmullRomCurve3
+	 */
+	smoothPathByPoints(curvePath: THREE.CurvePath<any>, radius: number = 1, segments: number = 6) {
+		radius = Math.max(0.1, radius);
+		segments = Math.max(1, segments);
+
+		const points = curvePath.getPoints(20);
+
+		const newPath = [];
+		newPath.push(points[0]);
+
+		for (let i = 1; i < points.length - 1; i++) {
+			const p1 = points[i - 1];
+			const p2 = points[i]; // The "Harsh Corner"
+			const p3 = points[i + 1];
+
+			// 1. Calculate directions
+			const dir1 = new THREE.Vector3().subVectors(p1, p2).normalize();
+			const dir2 = new THREE.Vector3().subVectors(p3, p2).normalize();
+
+			// 2. Determine actual offset (cannot be longer than half the segment length)
+			const len1 = p1.distanceTo(p2);
+			const len2 = p3.distanceTo(p2);
+			const actualRadius = Math.min(radius, len1 / 2, len2 / 2);
+
+			// 3. Find the start and end of the curve
+			const startPoint = new THREE.Vector3().addVectors(p2, dir1.multiplyScalar(actualRadius));
+			const endPoint = new THREE.Vector3().addVectors(p2, dir2.multiplyScalar(actualRadius));
+
+			// 4. Generate points along a Quadratic Bezier curve
+			// The corner (p2) acts as the control point
+			for (let j = 0; j <= segments; j++) {
+				const t = j / segments;
+				const pt = new THREE.Vector3();
+
+				// Quadratic Bezier Formula: (1-t)^2*P0 + 2(1-t)*t*P1 + t^2*P2
+				pt.x = Math.pow(1 - t, 2) * startPoint.x + 2 * (1 - t) * t * p2.x + Math.pow(t, 2) * endPoint.x;
+				pt.y = Math.pow(1 - t, 2) * startPoint.y + 2 * (1 - t) * t * p2.y + Math.pow(t, 2) * endPoint.y;
+				pt.z = Math.pow(1 - t, 2) * startPoint.z + 2 * (1 - t) * t * p2.z + Math.pow(t, 2) * endPoint.z;
+
+				newPath.push(pt);
+			}
+		}
+
+		newPath.push(points[points.length - 1]); // End at the last point
+		return new THREE.CatmullRomCurve3(newPath);
 	}
 
 	/**

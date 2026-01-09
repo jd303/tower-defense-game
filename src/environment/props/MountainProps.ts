@@ -1,8 +1,8 @@
 import { Vector3 } from "three";
 import { TerrainTypes } from "../../data/LevelInterfaces";
-import { PropAsset } from "../propManager/PropManager";
+import { SpritePropAssetDefinition } from "../propManager/SpritePropManager";
 
-export const MountainProps: PropAsset[] = [
+export const MountainProps: SpritePropAssetDefinition[] = [
 	// SAND TEXTURE
 	//// LARGE
 	{
