@@ -6,11 +6,12 @@ export class TreeFir extends PropAsset {
 	 * Setup Properties
 	 * */
 	static assetName: string = "TreeFir";
+	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-fir.png';
 	static assetPositionY: number = 3;
 	static assetScale: number = 2;
 	static instancedMeshAssetScale: number = 2;
-	static instancedMeshCount: number = 2000;
+	static instancedMeshInstanceCount: number = 2000;
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },
@@ -20,9 +21,12 @@ export class TreeFir extends PropAsset {
 		alphaTest: 0.5,
 		transparent: true
 	}
+	static AnimationAttributes = {
+		animationSpeed: 2
+	}
 
 	constructor(main: Main) {
-		super(main, TreeFir.assetName, TreeFir.assetPositionY, TreeFir.instancedMeshAssetScale, TreeFir.instancedMeshCount);
+		super(main, TreeFir.assetName, TreeFir.assetType, TreeFir.spriteSheetRows, TreeFir.assetPositionY, TreeFir.instancedMeshAssetScale, TreeFir.instancedMeshInstanceCount);
 	}
 
 }

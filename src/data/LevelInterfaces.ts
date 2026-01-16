@@ -6,7 +6,6 @@ export interface LevelDefinition {
 	terrain: TerrainTypes;
 	paths: any[];
 	towerPlacementZones: TowerPlacementZoneDefinition[];
-	waves: any[];
 	props?: LevelPropDefinition[];
 	propZones?: PropZoneArguments[];
 	propColourisation?: Record<string, { r?: number, g?: number, b?: number, l?: number }>; // Retained for legacy with 

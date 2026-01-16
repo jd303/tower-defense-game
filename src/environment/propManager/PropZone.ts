@@ -142,7 +142,7 @@ export class PropZone {
 }
 
 export interface PropZoneArguments {
-	propNames: string[],
+	propNames: Record<string, any>[],
 	zonePathPoints: PathPoint[],
 	propSparseness: number,
 	propScale: number;

@@ -1,22 +1,29 @@
 import THREE from "three";
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { InteractableOrders } from '../../game/InteractionService2';
+import { EventHandlingResult, InteractableOrders, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
 import { SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
+import { Stats } from '../Stats';
+import { MovePathManager } from "../MovePathManager";
 
 export abstract class CharacterAsset extends SpriteAsset {
 	/**
 	 * Setup Properties
 	 * */
+	movePathManager: MovePathManager = new MovePathManager(this);
 	interactiveOrder: InteractableOrders;
+	stats: Stats;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
-		super(main, assetName, assetType, assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
+		super(main, assetName, assetType, assetPositionY, spriteSheetRows, instancedMeshAssetScale, instancedMeshInstanceCount);
 
-		this.registerOnLoadCallback(this.createSelectionGeometry.bind(this));
+		this.registerOnLoadCallback(() => {
+			this.createSelectionGeometry();
+			this.registerDefaultListener();
+		});
 	}
 
 	/**
@@ -30,6 +37,33 @@ export abstract class CharacterAsset extends SpriteAsset {
 		const mesh = new THREE.Mesh(geometry, material);
 		mesh.position.y = this.instancedMeshPosition.position.y;
 		this.groupMain.add(mesh);
+	}
+
+	/**
+	 * Animates by moving along a movePath
+	 */
+	animationMove = (timeProperties: TickTimeProperties) => {
+		const path = this.movePathManager.activePath;
+		if (!path) return new Error('Set animation state to movement with no active path');
+
+		// Calculate travel distance
+		let distanceSinceLastFrame = timeProperties.deltaTime * path.pathTravelPercentagePerSec;
+		path.pathProgress = Math.min(1, path.pathProgress + distanceSinceLastFrame);
+
+		// Set a point and animate
+		const point = path.path.getPoint(path.pathProgress) as THREE.Vector3;
+		this.setPosition(point);
+
+		// Set the look at
+		const currentPoint = path.path.getPoint(path.pathProgress) as THREE.Vector3;
+		const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
+		pointAhead && this.spriteSheetFrameManager && this.spriteSheetFrameManager.mirrorSpriteSheet(pointAhead.x < currentPoint.x);
+
+		// If this asset has finished its path
+		if (path.pathProgress >= 0.99) {
+			const endOfPath: boolean = this.movePathManager.resolveEndOfPath();
+			if (endOfPath) this.finaliseEndOfPath();
+		}
 	}
 
 	/**
@@ -57,4 +91,39 @@ export abstract class CharacterAsset extends SpriteAsset {
 			});
 		}
 	}
+
+	/**
+	 * Returns the expected position of a creature on a movepath
+	 */
+	public getExpectedPositionAt(timeInMS: number) {
+		const path = this.movePathManager.activePath;
+
+		if (path) {
+			let distanceTravelled = timeInMS / 1000 * path.pathTravelPercentagePerSec;
+			let expectedPathProgress = Math.min(1, path.pathProgress + distanceTravelled);
+			return path.path.getPoint(expectedPathProgress) as THREE.Vector3;
+		} else {
+			return this.groupMain.position;
+		}
+	}
+
+	/**
+	 * Character States
+	 */
+	stateEnterStunned() {
+		console.log("%c ENTERING STUNNED", 'color: pink');
+	}
+	stateExitStunned() {
+		console.log("%c LEAVING STUNNED", 'color: pink');
+	}
+
+	/**
+	 * Interaction
+	 * */
+	public readonly registerDefaultListener = () => {
+		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
+		sInteraction2.registerInteractableListener(this.assetType, `${this.assetType}ClickedDefault`, this.select);
+	}
+	abstract select(event: InteractionEvent): EventHandlingResult;
+	abstract deselect(): void;
 }

@@ -5,6 +5,7 @@ import { TickTimeProperties } from '../../core/TickService';
 import { Creep } from '../creeps/Creep';
 import { Tower } from '../towers/Tower';
 import { Effect } from '../Effect';
+import { CharacterAsset } from '../assets/CharacterAsset';
 
 export class Projectile {
 	/**
@@ -16,6 +17,7 @@ export class Projectile {
 	/**
 	 * Visual Asset Properties
 	 * */
+	static travelType: ProjectileTravelTypes;
 	projectileGroup: THREE.Group;
 	projectileAsset: Effect;
 
@@ -24,26 +26,29 @@ export class Projectile {
 	 * */
 	startingPoint: THREE.Vector3;
 	projectilePath: THREE.CurvePath<Vector>;
+	pathLength: number;
 
 	/**
 	 * Definitions
 	 * */
-	projectileType: ProjectileTypes;
+	projectileType: ProjectileTravelTypes;
 	hitType: ProjectileHitTypes;
 	projectileSpeed: number; // Expressed as a float that will be multiplied, e.g. 1.1 is faster and 0.9 is slower
 	pathProgress: number = 0;
 	target: Creep;
+	isAccurate: boolean;
 	hitCallback?: Function;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, tower: Tower, startingPoint: THREE.Vector3, target: Creep, type: ProjectileTypes, hitType: ProjectileHitTypes, asset: Effect, projectileSpeed: number = 1, hitCallback?: Function) {
+	constructor(main: Main, tower: Tower, startingPoint: THREE.Vector3, target: Creep, isAccurate: boolean, travelType: ProjectileTravelTypes, hitType: ProjectileHitTypes, asset: Effect, projectileSpeed: number = 1, hitCallback?: Function) {
 		this.main = main;
 		this.tower = tower;
 		this.startingPoint = startingPoint;
 		this.target = target;
-		this.projectileType = type;
+		this.isAccurate = isAccurate;
+		this.projectileType = travelType;
 		this.hitType = hitType;
 		this.projectileAsset = asset;
 		this.projectileSpeed = projectileSpeed;
@@ -65,56 +70,91 @@ export class Projectile {
 		// Points 2 and 3 should be control points, not starting and target
 		this.projectilePath = new THREE.CurvePath();
 		let curveSegment: THREE.Curve<Vector>;
-		let arcedUpStart: THREE.Vector3;
+		let distanceToTarget: number;
+		const arcUp = 10;
+		const arcControlPoint1: THREE.Vector3 = new THREE.Vector3();
+		const arcControlPoint2: THREE.Vector3 = new THREE.Vector3();
+		let destination;
 
 		// Create a path based on its type
 		switch (this.projectileType) {
 			// Arc Projectiles
-			case ProjectileTypes.arc:
-				arcedUpStart = this.startingPoint.clone();
-				arcedUpStart.y = arcedUpStart.y + 10;
+			case ProjectileTravelTypes.arc:
+				distanceToTarget = this.startingPoint.distanceTo(this.target.groupMain.position);
+				destination = (this.target as CharacterAsset).getExpectedPositionAt(2000 * (distanceToTarget / this.projectileSpeed));
+
+				if (!this.isAccurate) {
+					destination.x += Math.random() * 4 - 2;
+					destination.z += Math.random() * 4 - 2;
+				}
+
+				arcControlPoint1.x = this.startingPoint.x;
+				arcControlPoint1.y = this.startingPoint.y + arcUp;
+				arcControlPoint1.z = this.startingPoint.z;
+
+				arcControlPoint2.x = destination.x;
+				arcControlPoint2.y = destination.y + arcUp / 2;
+				arcControlPoint2.z = destination.z;
 
 				curveSegment = new THREE.CubicBezierCurve3(
 					this.startingPoint,
-					arcedUpStart,
-					this.target.getExpectedPositionAt(1000),
-					this.target.getExpectedPositionAt(1000)
+					arcControlPoint1,
+					arcControlPoint2,
+					destination
 				);
 				break;
 
 			// Direct Projectiles
-			case ProjectileTypes.direct:
-				curveSegment = new THREE.LineCurve3(this.startingPoint, this.target.groupMain.position);
+			case ProjectileTravelTypes.direct:
+				distanceToTarget = this.startingPoint.distanceTo(this.target.groupMain.position);
+				destination = this.target.getExpectedPositionAt(2000 * (distanceToTarget / this.projectileSpeed));
+				if (!this.isAccurate) {
+					destination.x += Math.random() * 4 - 2;
+					destination.z += Math.random() * 4 - 2;
+				}
+
+				curveSegment = new THREE.LineCurve3(this.startingPoint, destination);
 				break;
 
 			// Homing projectiles
-			case ProjectileTypes.homing:
+			case ProjectileTravelTypes.homing:
 			default:
+				destination = this.target.groupMain.position; // Keep this reference to creep's position, to force homing
+				if (!this.isAccurate) {
+					destination.x += Math.random() * 4 - 2;
+					destination.z += Math.random() * 4 - 2;
+				}
+
 				curveSegment = new THREE.CubicBezierCurve3(
 					this.startingPoint,
 					this.startingPoint,
-					this.target.groupMain.position,
-					this.target.groupMain.position
+					destination,
+					destination
 				);
 				break;
 		}
 
 		this.projectilePath.add(curveSegment);
+		this.pathLength = this.projectilePath.getLength();
 	}
 
 	/**
 	 * Animates the projectile
 	 * */
 	animate(timeProperties: TickTimeProperties) {
-		let distanceSinceLastFrame = timeProperties.deltaTime * this.projectileSpeed;
-		this.pathProgress = Math.min(1, this.pathProgress + distanceSinceLastFrame);
+		let distanceMovedThisFrame = timeProperties.deltaTime * this.projectileSpeed;
+		let progressIncrement = distanceMovedThisFrame / this.pathLength;
+		this.pathProgress = Math.min(1, this.pathProgress + progressIncrement);
+
 		const point = this.projectilePath.getPoint(this.pathProgress) as Vector3;
 		this.projectileGroup.position.set(point.x, point.y, point.z);
 
 		if (this.pathProgress >= 1) {
 			this.remove();
-			this.runHitCallback();
-			this.tower.resolveHit(this);
+			if (this.isAccurate || this.hitType == ProjectileHitTypes.splash) {
+				this.runHitCallback();
+				this.tower.resolveHit(this);
+			}
 		}
 	}
 
@@ -134,7 +174,7 @@ export class Projectile {
 	}
 }
 
-export enum ProjectileTypes {
+export enum ProjectileTravelTypes {
 	arc,
 	direct,
 	instant,

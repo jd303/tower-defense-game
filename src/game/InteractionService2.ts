@@ -30,6 +30,7 @@ export class InteractionService2 extends Service {
 	 * Interactables and Handlers
 	 * */
 	interactables: Interactable2[] = [];
+	modalInteractableListener: InteractableListener | null;
 	interactableListeners: InteractableListener[] = [];
 	currentInteractive?: InteractableObject | null = null;
 
@@ -59,12 +60,25 @@ export class InteractionService2 extends Service {
 	/**
 	 * Registers and deregisters a new interactable
 	 */
-	registerInteractableListener(targetName: string, eventName: string, callback: (event: InteractionEvent) => EventHandlingResult) {
+	registerInteractableListener(targetName: string, eventName: string, callback: (event: InteractionEvent) => EventHandlingResult, exclusiveInteraction: boolean = false) {
 		const existingListener = this.interactableListeners.find(listener => listener.targetName == targetName && listener.eventName == eventName);
-		if (!existingListener) this.interactableListeners.push({ targetName: targetName, eventName: eventName, callback: callback });
+		if (!existingListener) {
+			if (this.modalInteractableListener) return console.error("Cannot add listeners during modal mode");
+
+			if (exclusiveInteraction) {
+				this.modalInteractableListener = { targetName: targetName, eventName: eventName, callback: callback, exclusiveInteraction: exclusiveInteraction };
+			} else {
+				this.interactableListeners.push({ targetName: targetName, eventName: eventName, callback: callback, exclusiveInteraction: exclusiveInteraction });
+			}
+		}
 	}
 	deregisterInteractableListener(targetName: string, eventName: string) {
-		this.interactableListeners = this.interactableListeners.filter(listener => listener.targetName != targetName && listener.eventName != eventName);
+		if (this.modalInteractableListener) {
+			if (this.modalInteractableListener?.targetName != targetName) return console.error("Cannot remove listeners during modal mode");
+			else this.modalInteractableListener = null;
+		} else {
+			this.interactableListeners = this.interactableListeners.filter(listener => listener.targetName != targetName && listener.eventName != eventName);
+		}
 	}
 
 	/**
@@ -79,7 +93,7 @@ export class InteractionService2 extends Service {
 		if (interactive instanceof Terrain === false) this.currentInteractive = interactive;
 	}
 	deregisterCurrentInteractive(targetedInteractive?: InteractableObject) {
-		if (this.currentInteractive && 'deselect' in this.currentInteractive) this.currentInteractive.deselect();
+		if (this.currentInteractive && 'deselect' in this.currentInteractive) (this.currentInteractive as any).deselect();
 		this.currentInteractive = null;
 	}
 
@@ -122,11 +136,18 @@ export class InteractionService2 extends Service {
 	 * Offers each matched target to a listener to handle
 	 */
 	offerTargetToListeners(target: RaycasterIntersection) {
-		for (let i = 0; i < this.interactableListeners.length; i++) {
-			const listener = this.interactableListeners[i];
-			if (listener.targetName == target.name) {
-				const { handled, cancelListeners } = listener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
+		if (this.modalInteractableListener) {
+			if (this.modalInteractableListener.targetName == target.name) {
+				const { handled, cancelListeners } = this.modalInteractableListener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
 				if (handled && cancelListeners) return true;
+			}
+		} else {
+			for (let i = 0; i < this.interactableListeners.length; i++) {
+				const listener = this.interactableListeners[i];
+				if (listener.targetName == target.name) {
+					const { handled, cancelListeners } = listener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
+					if (handled && cancelListeners) return true;
+				}
 			}
 		}
 
@@ -152,7 +173,8 @@ export class Interactable2 {
 export interface InteractableListener {
 	targetName: string;
 	eventName: string;
-	callback: (event: InteractionEvent) => EventHandlingResult
+	callback: (event: InteractionEvent) => EventHandlingResult;
+	exclusiveInteraction: boolean;
 }
 
 export interface EventHandlingResult {

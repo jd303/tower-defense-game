@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../../core/TickService';
-import { HeroStats } from './HeroStats';
+import { Stats } from '../Stats';
 import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
@@ -22,14 +22,14 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Static values
 	 */
-	static instancedMeshInstanceCount: number = 2;
+	static instancedMeshInstanceCount: number = 1;
 
 	/**
 	 * Stats
 	 * */
 	typeName: InteractableTypes = "hero";
 	interactiveOrder = InteractableOrders.heroes;
-	stats: HeroStats;
+	stats: Stats;
 
 	/**
 	 * Three Assets
@@ -77,8 +77,8 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Construtor
 	 * */
-	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
-		super(main, assetName, 'hero', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Hero.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
+		super(main, assetName, 'hero', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Hero.instancedMeshInstanceCount);
 
 		this.assetType = 'hero';
 		this.stateMachine = this.setDefaultStates();
@@ -208,9 +208,9 @@ export abstract class Hero extends CharacterAsset {
 	 * @param { number } difference Positive or negative number to adjust the heros' health
 	 * */
 	adjustHealthByNumber(difference: number) {
-		const minHealth = Math.max(0, this.stats.hp_current + difference);
-		const maxHealth = Math.min(this.stats.hp_total, minHealth);
-		this.stats.hp_current = maxHealth;
+		const minHealth = Math.max(0, this.stats.activeStats.life!.current + difference);
+		const maxHealth = Math.min(this.stats.activeStats.life!.total, minHealth);
+		this.stats.activeStats.life!.current = maxHealth;
 
 		this.checkHealthStatus();
 	}
@@ -220,7 +220,7 @@ export abstract class Hero extends CharacterAsset {
 	 * @param { number } percentage Percentage of health to set
 	 * */
 	setHealthByPercentage(percentage: number) {
-		this.stats.hp_current = this.stats.hp_total * percentage / 100;
+		this.stats.activeStats.life!.current = this.stats.activeStats.life!.total * percentage / 100;
 
 		this.checkHealthStatus();
 	}
@@ -232,22 +232,22 @@ export abstract class Hero extends CharacterAsset {
 		switch (true) {
 
 			// The Hero has died
-			case this.stats.hp_current <= 0:
+			case this.stats.activeStats.life!.current <= 0:
 				this.disableHero();
 				break;
 
 			// The Hero has full health
-			case this.stats.hp_current >= this.stats.hp_total:
+			case this.stats.activeStats.life!.current >= this.stats.activeStats.life!.total:
 				this.removeHealthBar();
 				break;
 
 			// The Hero has lost some health
 			default:
 				if (!this.healthBar) {
-					this.createHealthBar(this.stats.hp_current / this.stats.hp_total);
+					this.createHealthBar(this.stats.activeStats.life!.current / this.stats.activeStats.life!.total);
 				}
 				else {
-					this.updateHealthBar(this.stats.hp_current / this.stats.hp_total);
+					this.updateHealthBar(this.stats.activeStats.life!.current / this.stats.activeStats.life!.total);
 				}
 
 				this.stateMachine.transition(HeroTransitions.took_damage);
@@ -279,6 +279,9 @@ export abstract class Hero extends CharacterAsset {
 		// Mirror if necessary
 		const startingPoint = this.groupMain.position;
 		this.spriteSheetFrameManager.mirrorSpriteSheet(startingPoint.x > endingPoint.x);
+
+		// Set the animation
+		this.spriteSheetFrameManager.changeAnimation("walk");
 
 		this.deselect();
 
@@ -321,14 +324,16 @@ export abstract class Hero extends CharacterAsset {
 	stateEnterIdle() {
 		console.log("IDLING");
 		// Listen for interceptions
-		const callback = new TickCallback(`${this.stats.heroName}_intercept`, this.findInterceptees.bind(this));
+		const callback = new TickCallback(`${this.assetName}_intercept`, this.findInterceptees.bind(this));
 		const sTick: TickService = this.main.s('Tick');
 		sTick.registerCallback(callback, true, TickTimeTypes.second);
+
+		this.spriteSheetFrameManager.changeAnimation("idle");
 	}
 	stateExitIdle() {
 		console.log("EXIT IDLE (likely due to stop)");
 		const sTick: TickService = this.main.s('Tick');
-		sTick.deregisterCallback(`${this.stats.heroName}_intercept`);
+		sTick.deregisterCallback(`${this.assetName}_intercept`);
 		this.disengageAsIntercepter();
 	}
 
@@ -339,8 +344,8 @@ export abstract class Hero extends CharacterAsset {
 		// First, watch and find more interceptees
 		const slotCounts: InterceptionSlotCountInterface = this.interceptionHandler.slotCounts;
 		if (slotCounts.available > 0) {
-			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.movement.type == MovementTypes.flying || interceptee.stateMachine.activeStates.has(CreepStates.uninterceptable);
-			const interceptables: Asset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creepManager.creeps, fromPoint: this.groupMain.position, range: this.stats.interceptDistance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
+			const omissionCallback = (interceptee: Creep) => interceptee.intercepter !== null || interceptee.stats.activeStats.movement!.type == MovementTypes.flying || interceptee.stateMachine.activeStates.has(CreepStates.uninterceptable);
+			const interceptables: Asset[] = this.sLocation.findTargetsInRange({ potentialTargets: this.sLevel.currentLevel.creepManager.creeps, fromPoint: this.groupMain.position, range: this.stats.activeStats.interception!.distance, omissionCallback: omissionCallback, maximumResults: slotCounts.available });
 			if (interceptables.length) this.interceptionHandler.addInterceptees(interceptables);
 		}
 
@@ -368,21 +373,25 @@ export abstract class Hero extends CharacterAsset {
 	 * */
 	stateEnterAttack() {
 		const sTick: TickService = this.main.s('Tick');
-		const callback = new TickCallback(`${this.stats.heroName}_attacking`, this.attackInterceptee.bind(this));
+		const callback = new TickCallback(`${this.assetName}_attacking`, this.attackInterceptee.bind(this));
 		sTick.registerCallback(callback, true, TickTimeTypes.second);
+
+		this.spriteSheetFrameManager.changeAnimation("attack");
 
 		console.log("STATE ENTER ATTACK");
 		this.talkSurprised();
 	}
 	stateExitAttack() {
 		const sTick: TickService = this.main.s('Tick');
-		sTick.deregisterCallback(`${this.stats.heroName}_attacking`);
+		sTick.deregisterCallback(`${this.assetName}_attacking`);
+
+		this.spriteSheetFrameManager.changeAnimation("walk");
 	}
 	attackInterceptee() {
 		console.log("ATTACK");
 		const attackTarget: Creep = this.interceptionHandler.firstAttackableCreep as Creep;
 		if (attackTarget) {
-			attackTarget.resolveAttack(this.stats.attack);
+			attackTarget.resolveAttack(this.stats.activeStats.attack!);
 		} else {
 			this.stateMachine.transition(HeroTransitions.stop);
 		}

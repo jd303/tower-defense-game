@@ -67,6 +67,13 @@ export class Main {
 		console.log("%c Instanced meshes, when they die, could be properly cleaned up.  Swap them with an item at the end of the array and reduce the array count.", 'color: red');
 		console.log("%c Projectile.ts > createPath() - this could be shifted to PathService.", 'color: red');
 		console.log("%c CharacterAsset > animationAttack() && animationHurtMe() still needed", 'color: red');
+		console.log("%c InstancedMeshService > updateInstancedMeshes() is a performance consideration", 'color: red');
+		console.log("%c Let's identify when a spriteasset has animations and not, so we can not set attributes and animate.  Change shader and setInstancedMeshInitialSettings.  Also disable uTime update in InstancedMeshService > SpriteSheetInstancedMesh()", 'color: red');
+		console.log("%c Clean up Asset.ts.  YOu can probably move MovePathManager out to something more reasonable.", 'color: red');
+		console.log("%c I need to stop animating creeps that have died.  Is that possible?  Is that going to give us much performance improvements?", 'color: red');
+		console.log("%c In environment tile, we need to send uTime not using a setInterval", 'color: red');
+		console.log("%c Projectile Splash effect doesn't seem to work?", 'color: red');
+		console.log("%c Feedback when a Projectile misses.", 'color: red');
 
 		return this;
 	}

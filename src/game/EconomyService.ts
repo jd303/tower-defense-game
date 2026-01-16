@@ -4,11 +4,14 @@ export class EconomyService {
 	/**
 	 * Player's economy data
 	 * */
-	economy = {
+	economy: EconomyData = {
 		money: {
 			current: 0
 		},
-		vp: {
+		hearts: {
+			current: 0
+		},
+		power: {
 			current: 0
 		}
 	}
@@ -32,8 +35,10 @@ export class EconomyService {
 		switch (property) {
 			case "money":
 				return this.economy.money;
-			case "vp":
-				return this.economy.vp;
+			case "power":
+				return this.economy.power;
+			case "hearts":
+				return this.economy.hearts;
 		}
 	}
 
@@ -63,9 +68,13 @@ export class EconomyService {
 				newValue = this.adjustValue(this.economy.money, value);
 				this.main.s('Event').fire('commerce_money_changed', newValue);
 				return newValue;
-			case "vp":
-				newValue = this.adjustValue(this.economy.vp, value);
-				this.main.s('Event').fire('vp_changed', newValue);
+			case "hearts":
+				newValue = this.adjustValue(this.economy.hearts, value);
+				this.main.s('Event').fire('hearts_changed', newValue);
+				return newValue;
+			case "power":
+				newValue = this.adjustValue(this.economy.power, value);
+				this.main.s('Event').fire('power_changed', newValue);
 				return newValue;
 		}
 	}
@@ -87,5 +96,17 @@ export class EconomyService {
 			property.current += value;
 			return property.current;
 		}
+	}
+}
+
+export interface EconomyData {
+	money: {
+		current: number
+	}
+	hearts: {
+		current: number
+	}
+	power: {
+		current: number
 	}
 }

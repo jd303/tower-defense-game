@@ -15,6 +15,7 @@ export interface MovePathDefinition {
 	path: THREE.CurvePath<Vector>;
 	pathTravelPercentagePerSec: number;
 	pathProgress: number;
+	callbackOnComplete?: any[],
 	switchToOnComplete?: string;
 }
 

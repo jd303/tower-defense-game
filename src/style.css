@@ -3,6 +3,7 @@
 	--z-index-UI: 10;
 	--towers-height: 50px;
 	--standard-padding: 20px;
+	--ui-distance-from-edge: 10px;
 }
 
 * {
@@ -47,28 +48,36 @@ UI ELEMENTS
 	pointer-events: none;
 }
 
-.ui .towers {
-	position: absolute;
-	bottom: 10px;
-	width: 100%;
-	height: var(--towers-height);
-	text-align: center;
-}
+.ui {
+	.towers, .powers {
+		position: absolute;
+		bottom: var(--ui-distance-from-edge);
+		width: 100%;
+		height: var(--towers-height);
+		text-align: center;
 
-.ui .towers button {
-	border: 1px solid grey;
-	height: var(--towers-height);
-	box-sizing: border-box;
+		button {
+			border: 1px solid grey;
+			height: var(--towers-height);
+			box-sizing: border-box;
 
-	pointer-events: all;
-}
+			pointer-events: all;
 
-.ui button[data-selected='true'] {
-	border: 4px solid white;
-}
+			&[data-selected='true'] {
+				border: 4px solid white;
+			}
 
-.ui .towers button img {
-	height: var(--towers-height);
+			img {
+				height: var(--towers-height);
+			}
+		}
+	}
+
+	.powers {
+		left: var(--ui-distance-from-edge);
+		width: 25%;
+		text-align: left;
+	}
 }
 
 .ui .economy {

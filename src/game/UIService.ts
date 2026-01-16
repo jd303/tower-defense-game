@@ -16,6 +16,7 @@ export class UIService extends Service {
 	rootUIElement: HTMLElement;
 	menuUIElement: HTMLElement;
 	towersUIElement: HTMLElement;
+	powersUIElement: HTMLElement;
 	heroesUIElement: HTMLElement;
 	economyUIElement: HTMLElement;
 
@@ -48,6 +49,8 @@ export class UIService extends Service {
 		this.menuUIElement.classList.add('menu');
 		this.towersUIElement = document.createElement('div');
 		this.towersUIElement.classList.add('towers');
+		this.powersUIElement = document.createElement('div');
+		this.powersUIElement.classList.add('powers');
 		this.heroesUIElement = document.createElement('div');
 		this.heroesUIElement.classList.add('heroes');
 		this.economyUIElement = document.createElement('div');
@@ -55,6 +58,7 @@ export class UIService extends Service {
 
 		this.rootUIElement.appendChild(this.menuUIElement);
 		this.rootUIElement.appendChild(this.towersUIElement);
+		this.rootUIElement.appendChild(this.powersUIElement);
 		this.rootUIElement.appendChild(this.heroesUIElement);
 		this.rootUIElement.appendChild(this.economyUIElement);
 
@@ -83,6 +87,11 @@ export class UIService extends Service {
 			// Towers
 			case UIRegions.Tower:
 				this.towersUIElement.appendChild(button.element);
+				this.UIButtons.push(button);
+				break;
+			// Towers
+			case UIRegions.Power:
+				this.powersUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
 		}

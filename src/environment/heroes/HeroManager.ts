@@ -36,6 +36,16 @@ export class HeroManager {
 	}
 
 	/**
+	 * Finds heroes within a range of a point
+	 */
+	findHeroesInRangeOf(testPosition: THREE.Vector3, range: number) {
+		return this.heroes.filter((hero: Hero) => {
+			const heroPosition = hero.groupMain.position;
+			return heroPosition.distanceTo(testPosition) <= range;
+		});
+	}
+
+	/**
 	 * Removes the hero from the game
 	 */
 	disposeHeroes() {

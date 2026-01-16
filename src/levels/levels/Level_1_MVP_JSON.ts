@@ -69,7 +69,7 @@ export const levelDetails: LevelDefinition = {
 	props: [],
 	propZones: [
 		{
-			propNames: ['TreeBulbous', 'TreeTall'],
+			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
 			zonePathPoints: [
 				{ point: new Vector3(-76.578, 0, -97.405) },
 				{ point: new Vector3(-77.492, 0, -66) },
@@ -107,7 +107,7 @@ export const levelDetails: LevelDefinition = {
 			}
 		},
 		{
-			propNames: ['TreeBulbous', 'TreeTall', 'LogSubmerged'],
+			propNames: [{ name: 'TreeBulbous', chance: 0.65 }, { name: 'TreeTall', chance: 0.3 }, { name: 'LogSubmerged', chance: 0.05 }],
 			zonePathPoints: [
 				{ point: new Vector3(-36.461, 0, -13.132) },
 				{ point: new Vector3(-51.146, 0, -12.828) },
@@ -132,7 +132,7 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-37.863, 0, 0.726) },
 				{ point: new Vector3(-36.461, 0, -13.132) },
 			],
-			propSparseness: 3,
+			propSparseness: 2.25,
 			propScale: 4,
 			positionRandom: 1.5,
 			scaleRandom: { all: 2 },
@@ -144,7 +144,7 @@ export const levelDetails: LevelDefinition = {
 			},
 		},
 		{
-			propNames: ['TreeBulbous', 'TreeTall'],
+			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
 			zonePathPoints: [
 				{ point: new Vector3(-72.226, 0, -53.610) },
 				{ point: new Vector3(-16.626, 0, -53.667) },
@@ -174,7 +174,7 @@ export const levelDetails: LevelDefinition = {
 			},
 		},
 		{
-			propNames: ['MountainInitial'],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(72.358, 0, -70) },
 				{ point: new Vector3(62.130, 0, -62) },
@@ -208,7 +208,7 @@ export const levelDetails: LevelDefinition = {
 			}
 		},
 		{
-			propNames: ['WaveSubtle'],
+			propNames: [{ name: 'WaveSubtle', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-67.143, 0, -23.425) },
 				{ point: new Vector3(-63.600, 0, -21.825) },
@@ -247,199 +247,4 @@ export const levelDetails: LevelDefinition = {
 		"TreeTall": { r: 0.75, b: 0.33, l: -0.5 },
 		"MountainInitial": { r: 0.1, l: -0.25 },
 	},
-	waves: [
-		{
-			id: 1,
-			waveStartTime: 0,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Troll',
-						},
-						{
-							id: '6',
-							type: 'Wisp',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 2,
-			waveStartTime: 4000,
-			pathID: '2',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'Wisp',
-						},
-						{
-							id: '5',
-							type: 'Lupine',
-						},
-						{
-							id: '6',
-							type: 'Lupine',
-						},
-						{
-							id: '7',
-							type: 'Lupine',
-						},
-						{
-							id: '8',
-							type: 'Lupine',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 3,
-			waveStartTime: 10000,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Lupine',
-						},
-						{
-							id: '6',
-							type: 'Lupine',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 4,
-			waveStartTime: 17500,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Troll',
-						},
-						{
-							id: '6',
-							type: 'Troll',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 5,
-			waveStartTime: 24000,
-			pathID: '2',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Troll',
-						},
-						{
-							id: '6',
-							type: 'Troll',
-						},
-					],
-				},
-			],
-		},
-	],
 };

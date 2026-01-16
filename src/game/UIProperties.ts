@@ -1,6 +1,5 @@
-import { TowerStats } from "../environment/towers/TowerStats";
-
 export enum UIRegions {
 	Tower = 'tower',
+	Power = 'power',
 	HeroAbility = 'heroability',
 }

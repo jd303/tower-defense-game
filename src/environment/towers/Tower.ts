@@ -1,6 +1,7 @@
+import THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { TowerStats, TowerStatesLegacy } from './TowerStats';
+import { TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
@@ -9,6 +10,7 @@ import { Creep } from '../creeps/Creep';
 import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
+
 
 // Maybe split CharacterAsset out into TowerAsset as well, for this?
 export abstract class Tower extends CharacterAsset {
@@ -32,8 +34,6 @@ export abstract class Tower extends CharacterAsset {
 	typeName: InteractableTypes = "tower";
 	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
-	baseStats: TowerStats;
-	stats: TowerStats;
 
 	/**
 	 * Objects
@@ -50,8 +50,8 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
-		super(main, assetName, 'tower', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Tower.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
+		super(main, assetName, 'tower', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Tower.instancedMeshInstanceCount);
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(TowerStates.scanning);
@@ -117,7 +117,46 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Animate: Overwritten by Towers
 	 * */
-	animate(timeProperties: TickTimeProperties) { }
+	animate(timeProperties: TickTimeProperties) {
+		const position = this.groupMain.position;
+
+		if (this.stateMachine.isInState(TowerStates.scanning)) {
+			const creepsInRange = this.sLevel.currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
+
+			// If we have a target
+			if (creepsInRange.length) {
+				this.stateMachine.transition(TowerTransitions.attacking);
+
+				const isAccurate = Math.random() < this.stats.activeStats.attack!.accuracy;
+
+				const activeProjectile = new Projectile(
+					this.main,
+					this,
+					new THREE.Vector3(this.groupMain.position.x, 5, this.groupMain.position.z),
+					creepsInRange[0],
+					isAccurate,
+					this.stats.activeStats.projectile!.travelType,
+					this.stats.activeStats.projectile!.hitType,
+					new this.stats.activeStats.projectile!.effect(this.main),
+					this.stats.activeStats.projectile!.speed,
+				);
+
+				this.projectiles.push(activeProjectile);
+			}
+		}
+
+		if (this.stateMachine.isInState(TowerStates.attacking)) {
+			if (this.states.attacking.attackStartTime + this.states.attacking.attackDuration < new Date().getTime()) {
+				this.states.attacking.isAttacking = false;
+				this.groupModel.position.z = 0;
+			} else {
+				this.groupModel.position.z = Math.sin(timeProperties.elapsedTime * 50) / 10;
+			}
+		}
+
+		// Animate Projectiles
+		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
+	}
 
 	/**
 	 * Resolve a hit
@@ -128,11 +167,11 @@ export abstract class Tower extends CharacterAsset {
 
 		switch (projectile.hitType) {
 			case ProjectileHitTypes.direct:
-				projectile.target.resolveAttack(this.stats.attack);
+				projectile.target.resolveAttack(this.stats.activeStats.attack!);
 				break;
 			case ProjectileHitTypes.splash:
-				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, this.stats.attack.radius);
-				targets.forEach(creep => creep.resolveAttack(this.stats.attack));
+				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, this.stats.activeStats.projectile!.splashRadius);
+				targets.forEach(creep => creep.resolveAttack(this.stats.activeStats.attack!));
 				break;
 		}
 	}
@@ -153,7 +192,7 @@ export abstract class Tower extends CharacterAsset {
 			this.main.s('Interaction2')
 		} else {
 			this.selected = true;
-			this.addSelectionVisibleMesh(this.stats.attack.range, 0.5)
+			this.addSelectionVisibleMesh(this.stats.activeStats.attack!.range, 0.5)
 
 			// Add debugs
 			console.group();

@@ -11,3 +11,6 @@ export abstract class Effect extends ModelAsset {
 		super(main, assetName, 'effect');
 	}
 }
+
+// Define a generic type for classes that extend Effect
+export type EffectConstructor = new (main: Main) => Effect;

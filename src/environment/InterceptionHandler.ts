@@ -105,12 +105,8 @@ export class InterceptionHandler {
 				const parentPosition = this.parent.groupMain.position.clone();
 				const position = parentPosition.add(positions[index]);
 				const path = sPath.createMovePath('intercept', [{ point: slot.occupant.groupMain.position }, { point: position }]);
-				slot.occupant.movePathManager.addPath(path);
-				slot.occupant.movePathManager.setActivePath(path.id, false);
-				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
-				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
-				console.log("%c TODO: MOVE ASSETS PROPERLY PLEASE", 'color: red');
-				console.log("%c Sorry, just put three items in here to better see it", 'color: green');
+				(slot.occupant as Creep).movePathManager.addPath(path);
+				(slot.occupant as Creep).movePathManager.setActivePath(path.id, false);
 			}
 		});
 	}

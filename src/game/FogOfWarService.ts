@@ -90,7 +90,7 @@ export class FogOfWarService {
 			activeTemplateWidth = Math.round(activeTemplateWidth + widthSteps);
 			activeTemplateHeight = Math.round(activeTemplateHeight + heightSteps);
 		}
-		
+
 		this.matrix = activeTemplate;
 	}
 
@@ -143,7 +143,7 @@ export class FogOfWarService {
 	 * */
 	createMaterial(matrixWidth: number = this.matrixSize, matrixHeight: number = this.matrixSize) {
 		const size = matrixWidth * matrixHeight;
-		const data = new Uint8Array( 4 * size );
+		const data = new Uint8Array(4 * size);
 
 		for (let y = 0; y < matrixHeight; y++) {
 			for (let x = 0; x < matrixWidth; x++) {
@@ -153,15 +153,15 @@ export class FogOfWarService {
 				const stride = matrixIndex * 4;
 				const alpha = matrixItem * 255;
 
-				data[ stride ] = alpha;
-				data[ stride + 1 ] = alpha;
-				data[ stride + 2 ] = alpha;
-				data[ stride + 3 ] = alpha;
+				data[stride] = alpha;
+				data[stride + 1] = alpha;
+				data[stride + 2] = alpha;
+				data[stride + 3] = alpha;
 			}
 		}
 
 		// Create a Data Texture
-		const texture = new THREE.DataTexture( data, matrixWidth, matrixHeight);
+		const texture = new THREE.DataTexture(data, matrixWidth, matrixHeight);
 		texture.flipY = true;
 		texture.wrapS = THREE.ClampToEdgeWrapping;
 		texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -174,9 +174,9 @@ export class FogOfWarService {
 		this.texture = texture;
 
 		if (this.debugRed) {
-			this.material = new THREE.MeshBasicMaterial( {color: 0xFF0000, alphaMap:this.texture, transparent: false } );
+			this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000, alphaMap: this.texture, transparent: false });
 		} else {
-			this.material = new THREE.MeshBasicMaterial( {color: 0x000000, alphaMap:this.texture, transparent: true } );
+			this.material = new THREE.MeshBasicMaterial({ color: 0x000000, alphaMap: this.texture, transparent: true });
 		}
 	}
 
@@ -196,7 +196,7 @@ export class FogOfWarService {
 	 * Creates THREE Mesh
 	 * */
 	createMesh() {
-		this.fogOfWarMesh = new THREE.Mesh( this.geometry, this.material ); 
+		this.fogOfWarMesh = new THREE.Mesh(this.geometry, this.material);
 		this.fogOfWarMesh.position.y = 3;
 		this.fogOfWarMesh.rotation.set(Math.PI * -0.5, 0, 0);
 	}

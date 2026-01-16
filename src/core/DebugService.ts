@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as lil from 'lil-gui';
 import { Light } from './LightingService';
-import { TickCallback, TickService } from './TickService';
+import { TickCallback, TickService, TickSpeed } from './TickService';
 import { Main } from './Main';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
@@ -37,6 +37,7 @@ export class DebugService extends Service {
 	/**
 	 * References
 	 */
+	currentGameSpeed: TickSpeed;
 	debugDivRef: HTMLElement | null;
 	splineBuilder?: SplineBuilder;
 
@@ -53,7 +54,7 @@ export class DebugService extends Service {
 
 			this.lilGUI.add(tickService, 'pauseTick').name('Pause Tick');
 			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
-			this.lilGUI.add(tickService, 'speedTick').name('Speed Tick');
+			this.lilGUI.add(this, 'cycleTickSpeed').name('Cycle Tick Speed');
 
 			this.watchDrawCalls();
 			this.addZoneCreatoreLilGUI();
@@ -61,6 +62,17 @@ export class DebugService extends Service {
 		}
 
 		return this;
+	}
+
+	/**
+	 * Cycles through game speeds
+	 */
+	cycleTickSpeed() {
+		const sTick: TickService = this.main.s('Tick');
+
+		const gameSpeed = this.currentGameSpeed == TickSpeed.fast && TickSpeed.slow || this.currentGameSpeed == TickSpeed.slow && TickSpeed.default || TickSpeed.fast;
+		this.currentGameSpeed = gameSpeed;
+		sTick.setGameSpeed(gameSpeed);
 	}
 
 	/**

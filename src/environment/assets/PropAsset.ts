@@ -1,5 +1,5 @@
 import { Main } from '../../core/Main';
-import { SpriteAsset } from "./SpriteAsset";
+import { SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
 
 export abstract class PropAsset extends SpriteAsset {
 	/**
@@ -9,12 +9,12 @@ export abstract class PropAsset extends SpriteAsset {
 	static assetPositionY: number;
 	static assetScale: number;
 	static instancedMeshAssetScale: number;
-	static instancedMeshCount: number;
+	static instancedMeshInstanceCount: number;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetPositionY: number, instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
-		super(main, assetName, 'prop', assetPositionY, [], 0, instancedMeshAssetScale, instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, spriteSheetRows: SpriteSheetRow[], assetPositionY: number, instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
+		super(main, assetName, assetType, assetPositionY, spriteSheetRows, instancedMeshAssetScale, instancedMeshInstanceCount);
 	}
 }

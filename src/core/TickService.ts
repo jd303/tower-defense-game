@@ -24,7 +24,8 @@ export class TickService extends Service {
 	/**
 	 * Debugs
 	 * */
-	debugDeltaChange: number = 0;
+	masterSpeed: TickSpeed = TickSpeed.default;
+	previousMasterSpeed: TickSpeed = TickSpeed.default;
 
 	/**
 	 * Constructor
@@ -67,7 +68,7 @@ export class TickService extends Service {
 		// If running
 		if (!this.pausedTick) {
 			// Setup time properties
-			const deltaTime = this.clock.getDelta() + this.debugDeltaChange;
+			const deltaTime = this.clock.getDelta() * this.masterSpeed;
 			this.gameTime += deltaTime;
 			const { isTickSecond, isTickHalfSecond } = this.checkTickFraction(deltaTime);
 
@@ -151,8 +152,13 @@ export class TickService extends Service {
 	/**
 	 * Unpauses game objects
 	 * */
-	speedTick() {
-		this.debugDeltaChange = this.debugDeltaChange === 0 && 0.05 || 0;
+	setGameSpeed(gameSpeed?: TickSpeed) {
+		if (gameSpeed) {
+			this.previousMasterSpeed = this.masterSpeed;
+			this.masterSpeed = gameSpeed;
+		} else {
+			this.masterSpeed = this.previousMasterSpeed;
+		}
 	}
 
 	/**
@@ -221,6 +227,16 @@ export class TickCallback {
 export interface TickTimeProperties {
 	elapsedTime: number;
 	deltaTime: number;
+}
+
+export enum TickSpeed {
+	slowest = 0.1,
+	slower = 0.33,
+	slow = 0.5,
+	default = 1,
+	fast = 2,
+	faster = 2.5,
+	fastest = 3
 }
 
 export enum TickTimeTypes {

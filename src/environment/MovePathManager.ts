@@ -2,20 +2,20 @@ import { MovePathDefinition } from '../data/PathInterfaces';
 import { TowerStats } from './towers/TowerStats';
 import { Vector3 } from 'three';
 import { PathService } from '../game/PathService';
-import { Asset } from './assets/Asset';
+import { CharacterAsset } from './assets/CharacterAsset';
 
 export class MovePathManager {
 	/**
 	 * Core Properties
 	 * */
-	parent: Asset;
+	parent: CharacterAsset;
 	paths: MovePathDefinition[] = [];
 	activePath?: MovePathDefinition;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(parent: Asset) {
+	constructor(parent: CharacterAsset) {
 		this.parent = parent;
 	}
 
@@ -34,7 +34,7 @@ export class MovePathManager {
 			this.paths.forEach(path => path.active = false);
 			path.active = true;
 			this.activePath = path;
-			this.activePath.pathTravelPercentagePerSec = this.parent.stats.movement.speed / path.pathLength;
+			this.activePath.pathTravelPercentagePerSec = this.parent.stats.activeStats.movement!.speed / path.pathLength;
 
 			if (switchToPrevious && startingPath) {
 				this.activePath.switchToOnComplete = startingPath.id;
@@ -43,6 +43,10 @@ export class MovePathManager {
 	}
 
 	resolveEndOfPath(): boolean {
+		if (this.activePath?.callbackOnComplete?.length) {
+			this.activePath.callbackOnComplete!.forEach(callback => callback());
+		}
+
 		if (this.activePath?.switchToOnComplete) {
 			const switchablePath = this.paths.find(path => path.id = this.activePath!.switchToOnComplete!);
 

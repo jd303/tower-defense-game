@@ -43,9 +43,9 @@ export class TowerManager {
 		});
 
 		const sUI: UIService = this.main.s('UI');
-		levelTowers.forEach((tower: typeof Tower) => {
-			const button = sUI.createIconButton(tower.buttonIcon, UIRegions.Tower);
-			button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.towerCreationUIButton.bind(this, event, tower, button)());
+		levelTowers.forEach(async (towerType: typeof Tower) => {
+			const button = sUI.createIconButton(towerType.buttonIcon, UIRegions.Tower);
+			button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.towerCreationUIButton.bind(this, event, towerType, button)());
 			sUI.addButtonToUI(button);
 		});
 	}
@@ -118,7 +118,7 @@ export class TowerManager {
 		setTimeout(() => {
 			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");
 			newTower.setPosition(point);
-			console.log(newTower.instancedMesh);
+			console.log(newTower);
 		}, 500);
 
 		if (!this.defaultTowerClickEnabled) this.registerDefaultTowerListener();
@@ -131,6 +131,16 @@ export class TowerManager {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.registerInteractableListener('tower', 'towerClickedDefault', this.towers[0].select);
 		this.defaultTowerClickEnabled = true;
+	}
+
+	/**
+	 * Finds towers within a range of a point
+	 */
+	findTowersInRangeOf(testPosition: THREE.Vector3, range: number) {
+		return this.towers.filter((tower: Tower) => {
+			const towerPosition = tower.groupMain.position;
+			return towerPosition.distanceTo(testPosition) <= range;
+		});
 	}
 
 	/**

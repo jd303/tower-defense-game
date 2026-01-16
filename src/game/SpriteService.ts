@@ -1,6 +1,7 @@
 import THREE from "three";
 import { Main } from "../core/Main"
 import { LoaderService } from "../core/LoaderService";
+import { SpriteAsset } from "../environment/assets/SpriteAsset";
 
 export class SpriteService {
 	/**
@@ -16,6 +17,17 @@ export class SpriteService {
 	 * */
 	constructor(main: Main) {
 		this.main = main;
+	}
+
+	/**
+	 * Sources or creates a SpriteSheet
+	 */
+	async sourceSpriteSheet(assetName: string, assetClass: typeof SpriteAsset) {
+		const cols = assetClass.ShaderMaterialProperties.uniforms.uFrameCols.value;
+		const rows = assetClass.ShaderMaterialProperties.uniforms.uFrameRows.value;
+		const frames = cols * rows;
+
+		return this.spriteSheets[assetName] || await this.createSpriteSheet(assetName, assetClass.assetPath, cols, rows, frames);
 	}
 
 	/**
@@ -44,28 +56,36 @@ export class SpriteService {
 	 */
 	createVertexShader() {
 		this.vertexShader = `
-        attribute float animationCol;
-        attribute float animationRow;  // NEW: Per-instance row attribute
-        attribute float mirrorX;       // NEW: Per-instance mirror flag (0.0 or 1.0)
+		  attribute float animationRow;
+		  attribute float cellsInRow;
+		  attribute float animationSpeed;
+		  attribute float animationOffset;
+        attribute float mirrorX;
         
         varying vec2 vUv;
         varying vec3 vInstanceColor;
-        varying float vMirrorX;        // NEW: Pass mirror flag to fragment shader
+        varying float vMirrorX;
         
+		  uniform float uTime;
         uniform float uFrameCols;
         uniform float uFrameRows;
         uniform float uSize;
 
         void main() {
             vInstanceColor = instanceColor;
-            vMirrorX = mirrorX;  // NEW: Pass to fragment shader
+            vMirrorX = mirrorX;
+
+				float staggeredTime = uTime + animationOffset;
+            float timeScaled = staggeredTime * animationSpeed;
             
             float frameWidth = 1.0 / uFrameCols;
             float frameHeight = 1.0 / uFrameRows;
-            float col = mod(animationCol, uFrameCols);
-            
-            // NEW: Use the animationRow attribute instead of calculating from frame
             float row = animationRow;
+				float col = floor(mod(uTime * animationSpeed, cellsInRow)) * step(1.1, cellsInRow);
+
+				if (mirrorX > 0.5) {
+					col = (uFrameCols - 1.0) - col;
+				}
 
             vUv.x = (uv.x + col) * frameWidth;
             vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
@@ -84,19 +104,16 @@ export class SpriteService {
         uniform sampler2D uMap;
         varying vec2 vUv;
         varying vec3 vInstanceColor;
-        varying float vMirrorX;  // NEW: Receive mirror flag
+        varying float vMirrorX;
 
         void main() {
             vec2 uv = vUv;
             
-            // NEW: Mirror on X axis if flag is set
             if (vMirrorX > 0.5) {
-                // Calculate the frame boundaries
                 float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
                 float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
                 float frameEndX = frameStartX + frameWidth;
-                
-                // Mirror within the current frame
+					 
                 float localU = (vUv.x - frameStartX) / frameWidth;
                 localU = 1.0 - localU;
                 uv.x = frameStartX + localU * frameWidth;
@@ -104,10 +121,8 @@ export class SpriteService {
             
             vec4 color = texture2D(uMap, uv);
             
-            // Apply gamma correction to the texture
+            // Apply gamma correction to the texture and colorise
             color.rgb = pow(color.rgb, vec3(0.5));
-
-            // Multiply texture by our instance color (tinting)
             color.rgb *= vInstanceColor;
 
             if (color.a < 0.1) discard;
@@ -191,6 +206,11 @@ export class SpriteSheet {
 		this.texture = await sLoader.loadTexture(this.texturePath);
 		this.texture.colorSpace = THREE.SRGBColorSpace;
 		this.texture.premultiplyAlpha = false;
+		this.texture.wrapS = THREE.ClampToEdgeWrapping;
+		this.texture.wrapT = THREE.ClampToEdgeWrapping;
+		this.texture.magFilter = THREE.NearestFilter;
+		//this.texture.minFilter = THREE.NearestFilter; // Too sharp, but removes the black line
+		this.texture.minFilter = THREE.LinearMipMapLinearFilter; // smoother, but a black line to fix
 
 		this.spriteMaterial = new THREE.SpriteMaterial({ map: this.texture });
 		const sprite = new THREE.Sprite(this.spriteMaterial);

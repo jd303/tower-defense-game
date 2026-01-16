@@ -5,52 +5,74 @@ import { MovementTypes } from '../../data/MovementTypes';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 //import { DamageTypes } from '../../data/DamageTypes';
 import { Hero } from './Hero';
-import { HeroStats } from './HeroStats';
+import { AttackRangeTypes, Stats } from '../Stats';
 
 export class Man0 extends Hero {
 	/**
 	 * Main
 	 * */
+	static assetType = 'hero';
 	static assetName: string = 'Man0';
 	static assetPath: string = 'assets/spritesheets/heroes/spritesheet-man0.png';
 	static assetScale: number = 0.8;
 	static assetPositionY: number = 1.2;
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
+			name: "idle",
+			totalFrames: 1,
+			currentFrame: 0,
+		},
+		{
 			name: "walk",
-			totalFrames: 4,
+			totalFrames: 2,
 			currentFrame: 0,
 		},
 		{
 			name: "attack",
-			totalFrames: 4,
+			totalFrames: 2,
 			currentFrame: 0,
 		}
 	]
-	static spriteSheetCellColCount: number = 4;
 
 	/**
 	 * Stats
 	 * */
-	stats = new HeroStats({
-		name: "Man0",
-		hp_total: 40,
+	stats = new Stats({
 		movement: {
 			speed: 5.5,
 			type: MovementTypes.walking,
 		},
-		damage: 2,
-		damageType: DamageTypes.piercing,
+		interception: {
+			distance: 5,
+			interceptionCount: 2
+		},
+		life: {
+			total: 40,
+			current: 40,
+		},
 		defenses: {
 			piercing: 0,
 			crushing: 0,
-			arcane: 0,
+			arcane: -10,
 			poison: 0,
 			lightning: 0,
-			fire: -10,
+			fire: 0,
 		},
-		interceptDistance: 5,
-		numberIntercepted: 2
+		kill_rewards: {
+			economic_property: "money",
+			value: 5
+		},
+		vp_loss: {
+			value: 1
+		},
+		attack: {
+			speed: 15,
+			accuracy: 1.0,
+			damage: 5,
+			damageType: DamageTypes.piercing,
+			rangeType: AttackRangeTypes.melee,
+			range: 0
+		}
 	});
 	healthBarY: 2;
 
@@ -66,14 +88,17 @@ export class Man0 extends Hero {
 		alphaTest: 0.5,
 		transparent: true
 	}
+	static AnimationAttributes = {
+		animationSpeed: 4
+	}
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Man0.assetName, Man0.assetPositionY, Man0.spriteSheetRows, Man0.spriteSheetCellColCount, Man0.assetScale);
+		super(main, Man0.assetName, Man0.assetType, Man0.assetPositionY, Man0.spriteSheetRows, Man0.assetScale);
 
-		this.interceptionHandler.setInterceptionSlotCount(this.stats.numberIntercepted);
+		this.interceptionHandler.setInterceptionSlotCount(this.stats.activeStats.interception!.interceptionCount);
 
 		return this;
 	}

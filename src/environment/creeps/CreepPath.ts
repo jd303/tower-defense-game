@@ -13,6 +13,7 @@ export class CreepPath {
 	/**
 	 * Setup Properties
 	 * */
+	pathWidth: number = 9;
 	variantDistance: number = 5;
 
 	/**
@@ -72,7 +73,7 @@ export class CreepPath {
 	createPathGeometry(pathDefinition: PathDefinition) {
 		if (pathDefinition.pathGeometry == PathGeometryTypes.none) return;
 
-		const lineWidth = 8;
+		const lineWidth = this.pathWidth;
 		const lineHeight = -0.1;
 
 		// Create the path shape

@@ -98,4 +98,11 @@ export abstract class ModelAsset extends Asset {
 	deleteModelAsset() {
 		this.unsetInteractive();
 	}
+
+	/**
+	 * Disposes of this asset, but keeps the spritesheet and instancedmesh
+	 */
+	dispose() {
+		console.error("WE NEED TO DISPOSE HERE");
+	}
 }

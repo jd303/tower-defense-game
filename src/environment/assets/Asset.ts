@@ -4,13 +4,9 @@ import { TickTimeProperties } from '../../core/TickService';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { LocationService } from '../../game/LocationService';
 import { LevelService } from '../../levels/LevelService';
-import { MovePathManager } from '../MovePathManager';
-import { CreepStats } from '../creeps/CreepStats';
-import { HeroStats } from '../heroes/HeroStats';
-import { TowerStats } from '../towers/TowerStats';
 import { StateMachine } from '../../core/StateMachine';
-import { Interactable2, InteractableOrders, InteractableTypes, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
-import { SpriteAsset } from "./SpriteAsset";
+import { Interactable2, InteractableOrders, InteractableTypes, InteractionService2 } from '../../game/InteractionService2';
+import { Stats } from "../Stats";
 
 export abstract class Asset {
 	/**
@@ -58,8 +54,7 @@ export abstract class Asset {
 	 * Game Asset Properties
 	 * */
 	stateMachine: StateMachine;
-	movePathManager: MovePathManager = new MovePathManager(this);
-	stats: HeroStats | CreepStats | TowerStats;
+	stats: Stats;
 
 	/**
 	 * Health bar
@@ -108,39 +103,7 @@ export abstract class Asset {
 	/**
 	 * Moves an Asset along a path according to its movement speed
 	 * */
-	public readonly animationMove = (timeProperties: TickTimeProperties) => {
-		const path = this.movePathManager.activePath;
-		if (!path) return new Error('Set animation state to movement with no active path');
-
-		// Calculate travel distance
-		let distanceSinceLastFrame = timeProperties.deltaTime * path.pathTravelPercentagePerSec;
-		path.pathProgress = Math.min(1, path.pathProgress + distanceSinceLastFrame);
-
-		// Set a point and animate
-		const point = path.path.getPoint(path.pathProgress) as THREE.Vector3;
-		this.setPosition(point);
-
-		if (this instanceof SpriteAsset) {
-			// Set the look at
-			if (path.pathProgress < 0.95) {
-				const currentPoint = path.path.getPoint(path.pathProgress) as THREE.Vector3;
-				const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
-				this.spriteSheetFrameManager.mirrorSpriteSheet(pointAhead.x < currentPoint.x);
-			}
-		} else {
-			// Jiggle animation
-			const jiggleY = Math.sin(timeProperties.elapsedTime * 50) / 20;
-			this.groupTransforms.position.y = jiggleY;
-
-			console.log("SET MODEL ASSET FACING");
-		}
-
-		// If this asset has finished its path
-		if (path.pathProgress >= 0.99) {
-			const endOfPath: boolean = this.movePathManager.resolveEndOfPath();
-			if (endOfPath) this.finaliseEndOfPath();
-		}
-	}
+	public readonly animationMove = (timeProperties: TickTimeProperties) => { }
 
 	/**
 	 * Sets the position of the asset
@@ -169,21 +132,6 @@ export abstract class Asset {
 	finaliseEndOfPath() { }
 
 	/**
-	 * Get expected position when it is moving
-	 * */
-	public readonly getExpectedPositionAt = (timeInMS: number) => {
-		const path = this.movePathManager.activePath;
-
-		if (path) {
-			let distanceTravelled = timeInMS / 1000 * path.pathTravelPercentagePerSec;
-			let expectedPathProgress = Math.min(1, path.pathProgress + distanceTravelled);
-			return path.path.getPoint(expectedPathProgress) as THREE.Vector3;
-		} else {
-			return this.groupMain.position;
-		}
-	}
-
-	/**
 	 * When the Hero is healed
 	 * */
 	public readonly stateEnterHealing = () => {
@@ -192,7 +140,7 @@ export abstract class Asset {
 		this.stateExitHealing();
 
 		for (let x = 0; x < 4; x++) {
-			const thisCross = ModelCommons.healingCrossMesh();
+			const thisCross = AssetCommons.healingCrossMesh();
 			thisCross.position.x += Math.random() - 0.5;
 			thisCross.position.y += Math.random();
 			const scale = Math.random() * 0.9 + 0.1;
@@ -226,18 +174,18 @@ export abstract class Asset {
 	 * Creates a health bar
 	 * */
 	public readonly createHealthBar = (percentage: number = 1) => {
-		const barBG = ModelCommons.healthBarGeometry;
-		const barFG = ModelCommons.healthBarGeometry;
-		//barBG.setAttribute('position', new THREE.BufferAttribute(ModelCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
+		const barBG = AssetCommons.healthBarGeometry;
+		const barFG = AssetCommons.healthBarGeometry;
+		//barBG.setAttribute('position', new THREE.BufferAttribute(AssetCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
 		const healthBarGroup = new THREE.Group();
-		const bgMesh = new THREE.Mesh(barBG, ModelCommons.healthBarBGMaterial);
-		const fgMesh = new THREE.Mesh(barFG, ModelCommons.healthBarFGMaterial);
+		const bgMesh = new THREE.Mesh(barBG, AssetCommons.healthBarBGMaterial);
+		const fgMesh = new THREE.Mesh(barFG, AssetCommons.healthBarFGMaterial);
 		fgMesh.name = this.healthBarName;
 		healthBarGroup.name = this.healthBarGroupName;
 		healthBarGroup.add(bgMesh);
 		healthBarGroup.add(fgMesh);
 		healthBarGroup.position.y = this.healthBarY;
-		healthBarGroup.position.z = 1;
+		healthBarGroup.position.z = 2;
 		this.healthBar = healthBarGroup;
 		this.groupTransforms.add(healthBarGroup);
 
@@ -250,7 +198,7 @@ export abstract class Asset {
 	public readonly updateHealthBar = (percentage: number) => {
 		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
 		healthBarGroup!.scale.x = percentage;
-		//healthBarGroup!.position.x = (this.stats.hp_current / this.stats.hp_total) - 1; // left aligned
+		//healthBarGroup!.position.x = (this.stats.activeStats.life.current / this.stats.activeStats.life.total) - 1; // left aligned
 		healthBarGroup!.position.x = 0;
 	}
 
@@ -291,7 +239,7 @@ export abstract class Asset {
 	 * Adds a selection visible mesh to the model
 	 */
 	public readonly addSelectionVisibleMesh = (width: number = 2, thickness: number = 0.25) => {
-		this.selectionVisibleMesh = ModelCommons.selectionCircleMesh(width, thickness);
+		this.selectionVisibleMesh = AssetCommons.selectionCircleMesh(width, thickness);
 		this.selectionVisibleMesh.rotation.x = Math.PI * -0.5;
 		this.selectionVisibleMesh.position.y = 0.15;
 		this.selectionVisibleMesh.position.z = 0;
@@ -307,26 +255,12 @@ export abstract class Asset {
 	}
 
 	/**
-	 * Creates a default listener for Assets
+	 * When completely removing this object
 	 */
-	public readonly registerDefaultListener = () => {
-		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractableListener(this.assetType, `${this.assetType}ClickedDefault`, this.select);
-	}
-
-	/**
-	 * Overwritten
-	 * */
-	select(event: InteractionEvent) {
-		return {
-			handled: true,
-			cancelListeners: true,
-		}
-	}
-	deselect() { }
+	abstract dispose(): void;
 }
 
-export class ModelCommons {
+export abstract class AssetCommons {
 	/* Health Bar Commons */
 	//static healthBarGeometry: THREE.BufferGeometry = new THREE.BufferGeometry();
 	static healthBarGeometry: THREE.BoxGeometry = new THREE.BoxGeometry(2, 0.15, 0.15, 1, 1, 1);
@@ -384,14 +318,4 @@ export class ModelCommons {
 
 		return new THREE.Mesh(geometry, this.selectionCircleMaterial);*/
 	}
-}
-
-export interface ShaderMaterialProperties {
-	uniforms: {
-		uFrameCols: { value: number },
-		uFrameRows: { value: number },
-		uSize: { value: number }
-	},
-	alphaTest: number,
-	transparent: boolean
 }

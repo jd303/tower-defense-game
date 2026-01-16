@@ -1,6 +1,5 @@
 import { Level } from './Level';
 import { Wave } from './Wave';
-import { WaveDefinition } from './WaveDefinition';
 import { Timer } from '../core/Timer';
 import { Main } from '../core/Main';
 import { LevelDefinition } from '../data/LevelInterfaces';
@@ -34,31 +33,7 @@ export class WaveManager {
 	/**
 	 * Sets up waves
 	 */
-	setup(levelDetails: LevelDefinition) {
-		this.waves = this.prepareWaveDefinitions(levelDetails.waves);
-	}
-
-	/**
-	 * Prepare the assets and requireemnts of the wave
-	 * */
-	prepareWaveDefinitions(waveDefinitions: WaveDefinition[]) {
-		let waves: Wave[] = [];
-
-		// Create waves
-		waveDefinitions.forEach((waveDefinition) => {
-			// Setup a Wave
-			const wave = new Wave(waveDefinition);
-
-			// Check that the path exists
-			const wavePath = this.level.creepManager.creepPaths.find((path) => path.id == waveDefinition.pathID);
-			if (wavePath) wave.corePath = wavePath;
-			else return console.error("No CreepPath to attach Wave to."); // Just break if no path exists
-
-			waves.push(wave);
-		});
-
-		return waves;
-	}
+	setup(levelDetails: LevelDefinition) { }
 
 	/**
 	 * Starts the Wave Timer
@@ -92,8 +67,7 @@ export class WaveManager {
 		const wave = this.waves[0];
 		this.waves = this.waves.splice(1);
 
-		// Create creep groups
-		console.log("REINSTATE, OR IGNORE, THE CONCEPT OF CREEPGROUPS (Curently using creep, but calling it creepGroup)");
+		// Create creeps
 		wave.creepNames.forEach((creepName: string) => {
 			const creepPath = wave.corePath.createVariantPath();
 			this.level.creepManager.addCreep(creepName, creepPath);

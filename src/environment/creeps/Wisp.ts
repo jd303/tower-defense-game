@@ -4,25 +4,18 @@ import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStates, CreepTransitions } from './CreepStates';
-import { CreepStats } from './CreepStats';
+import { AttackRangeTypes, Stats } from '../Stats';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Wisp extends Creep {
 	/**
 	 * Main
 	 * */
-	static assetName: string = 'Wisp';
+	static assetType = 'creep';
+	static assetName: string = 'CreepWisp';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
 	static assetScale: number = 0.25;
 	static assetPositionY = 3;
-	static spriteSheetRows: SpriteSheetRow[] = [
-		{
-			name: "walk",
-			totalFrames: 2,
-			currentFrame: 0,
-		}
-	]
-	static spriteSheetCellColCount: number = 2;
 
 	/**
 	 * Spritesheet & InstancedMesh properties
@@ -36,16 +29,28 @@ export class Wisp extends Creep {
 		alphaTest: 0.5,
 		transparent: true
 	}
+	static AnimationAttributes = {
+		animationSpeed: 2
+	}
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "walk",
+			totalFrames: 2,
+			currentFrame: 0,
+		}
+	]
 
 	/**
 	 * Stats
 	 * */
-	stats = new CreepStats({
-		hp_total: 10,
+	stats = new Stats({
 		movement: {
 			speed: 2.75,
-			interception_modifier: 2,
-			type: MovementTypes.flying
+			type: MovementTypes.flying,
+		},
+		life: {
+			total: 10,
+			current: 10,
 		},
 		defenses: {
 			piercing: 0,
@@ -59,18 +64,25 @@ export class Wisp extends Creep {
 			economic_property: "money",
 			value: 15
 		},
-		vp_loss: 1,
-		attack_speed: 10,
-		attack_damage: 10,
-		attack_damagetype: DamageTypes.arcane
+		vp_loss: {
+			value: 1
+		},
+		attack: {
+			speed: 10,
+			accuracy: 1.0,
+			damage: 10,
+			damageType: DamageTypes.arcane,
+			rangeType: AttackRangeTypes.melee,
+			range: 0
+		}
 	});
-	healthBarY: 1;
+	healthBarY: 5;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Wisp.assetName, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.spriteSheetCellColCount, Wisp.assetScale);
+		super(main, Wisp.assetName, Wisp.assetType, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.assetScale);
 
 		this.modifyStateMachine();
 		this.stateMachine.transition('moving');
@@ -108,7 +120,7 @@ export class Wisp extends Creep {
 		const creepsThatArentMe = creepsAroundMe.filter((creep: Creep) => creep !== this);
 
 		const combinedHealthPercentage =
-			creepsThatArentMe.reduce((percentage: number, creep: Creep) => percentage + (creep.stats.hp_current / creep.stats.hp_total) * 100, 0);
+			creepsThatArentMe.reduce((percentage: number, creep: Creep) => percentage + (creep.stats.activeStats.life!.current / creep.stats.activeStats.life!.total) * 100, 0);
 		const averageHealthPercentage = combinedHealthPercentage / creepsThatArentMe.length;
 
 		creepsThatArentMe.forEach((creep: Creep) => {

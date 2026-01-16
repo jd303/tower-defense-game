@@ -1,7 +1,8 @@
 import THREE from "three";
 import { Main } from '../core/Main';
 import { SpriteSheet } from "../game/SpriteService";
-import { ShaderMaterialProperties } from "../environment/assets/Asset";
+import { ShaderMaterialProperties, SpriteAsset } from "../environment/assets/SpriteAsset";
+import { TickCallback, TickService, TickTimeProperties } from "../core/TickService";
 
 export class InstancedMeshService {
 	/**
@@ -19,6 +20,37 @@ export class InstancedMeshService {
 	 * */
 	constructor(main: Main) {
 		this.main = main;
+	}
+
+	/**
+	 * Sources an instanced mesh or creates one
+	 */
+	async sourceInstancedMesh(assetName: string, assetClass: typeof SpriteAsset, spriteSheet: SpriteSheet, instancedMeshInstanceCount: number) {
+		if (this.instancedMeshes[assetName]) {
+			return this.instancedMeshes[assetName];
+		} else {
+			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetName, spriteSheet, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount);
+
+			if (instancedMesh) {
+				const positioner = new THREE.Object3D();
+				positioner.position.set(-100 + Math.random() * 5, assetClass.assetPositionY + assetClass.assetScale / 2, -90 + Math.random() * 5);
+				positioner.scale.set(assetClass.assetScale, assetClass.assetScale, assetClass.assetScale);
+				positioner.updateMatrix();
+
+				// Setup with initial settings
+				instancedMesh.geometry.attributes.animationRow.setX(0, 0);
+				instancedMesh.geometry.attributes.animationSpeed.setX(0, 0);
+				instancedMesh.geometry.attributes.cellsInRow.setX(0, 0);
+
+				for (let x = 0; x < instancedMesh.iMesh.count; x++) {
+					instancedMesh.iMesh.setMatrixAt(x, positioner.matrix);
+				}
+
+				this.main.scene.add(instancedMesh.iMesh);
+			}
+
+			return instancedMesh;
+		}
 	}
 
 	/**
@@ -45,13 +77,14 @@ export class InstancedMeshService {
 			...materialProperties,
 			uniforms: {
 				...materialProperties.uniforms,
+				uTime: { value: 0 },
 				uMap: { value: spriteSheet.texture },
 			},
 			vertexShader,
 			fragmentShader
 		});
 
-		const iMesh = new SpriteSheetInstancedMesh(this.main, material, assetCount);
+		const iMesh = new SpriteSheetInstancedMesh(this.main, assetName, material, assetCount);
 		this.instancedMeshes[assetName] = iMesh;
 
 		return iMesh;
@@ -70,7 +103,8 @@ export class InstancedMeshService {
 	updateInstancedMeshes() {
 		Object.keys(this.instancedMeshes).forEach((iMeshRecord: any) => {
 			this.instancedMeshes[iMeshRecord].iMesh.instanceMatrix.needsUpdate = true;
-			this.instancedMeshes[iMeshRecord].geometry.attributes.animationCol.needsUpdate = true;
+			//this.instancedMeshes[iMeshRecord].geometry.attributes.animationRow.needsUpdate = true;
+			//this.instancedMeshes[iMeshRecord].geometry.attributes.animationSpeed.needsUpdate = true;
 		});
 	}
 }
@@ -137,27 +171,54 @@ export class InstancedMesh {
 
 		return new THREE.Vector3(finalWidth, finalHeight, 1)
 	}
+
+	/**
+	 * Resets the instanced mesh
+	 */
+	resetIndexes() {
+		this.iMeshTotalIndexes = 0;
+	}
 }
 
 /**
  * An Instanced Mesh, with an attached spritesheet
  */
 class SpriteSheetInstancedMesh extends InstancedMesh {
-	constructor(main: Main, material: THREE.Material, assetCount: number = 100) {
+	constructor(main: Main, assetName: string, material: THREE.Material, assetCount: number = 100) {
 		const geometry = new THREE.PlaneGeometry(1, 1);
-
 		super(main, geometry, material, assetCount);
-		geometry.setAttribute('animationCol', new THREE.InstancedBufferAttribute(new Float32Array(assetCount), 1));
-		geometry.attributes.animationCol.needsUpdate = true;
 
-		// Add animationRow attribute (0-indexed row number)
+		// Add animationRow attribute
 		const animationRowArray = new Float32Array(assetCount);
 		geometry.setAttribute('animationRow', new THREE.InstancedBufferAttribute(animationRowArray, 1));
+
+		// Add currentCellsInRow attribute
+		const cellsInRowArray = new Float32Array(assetCount);
+		geometry.setAttribute('cellsInRow', new THREE.InstancedBufferAttribute(cellsInRowArray, 1));
 
 		// Add mirrorX attribute (0.0 = no mirror, 1.0 = mirror)
 		const mirrorXArray = new Float32Array(assetCount);
 		geometry.setAttribute('mirrorX', new THREE.InstancedBufferAttribute(mirrorXArray, 1));
 
+		// Add animationSpeed
+		const animationSpeedArray = new Float32Array(assetCount);
+		geometry.setAttribute('animationSpeed', new THREE.InstancedBufferAttribute(animationSpeedArray, 1));
+
+		// Add animationTimeOffset
+		const animationTimeOffsetArray = new Float32Array(assetCount);
+		geometry.setAttribute('animationTimeOffset', new THREE.InstancedBufferAttribute(animationTimeOffsetArray, 1));
+
+		// Animate the uTime
+		const sTick: TickService = this.main.s('Tick');
+		sTick.registerCallback(new TickCallback(`spritesheet-${assetName}`, this.updateTime.bind(this)));
+
 		return this;
+	}
+
+	/**
+	 * Updates the uTime of a SpriteSheet
+	 */
+	updateTime(event: TickTimeProperties) {
+		(this.iMesh.material as THREE.ShaderMaterial).uniforms.uTime.value = event.elapsedTime;
 	}
 }

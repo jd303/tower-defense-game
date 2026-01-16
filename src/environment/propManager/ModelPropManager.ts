@@ -86,8 +86,12 @@ export class ModelPropManager {
 
 		// Place the props
 		propPositions.forEach((position: any) => {
-			const propName = args.propNames[Math.floor(Math.random() * args.propNames.length)];
-			this.registerProp({ assetName: propName, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) }, levelDetails);
+			const random = Math.random();
+			let sum = 0;
+			const pickedItem = args.propNames.find(item => (sum += item.chance) >= random);
+			if (!pickedItem) throw new Error("Cannot choose a propName");
+
+			this.registerProp({ assetName: pickedItem.name, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) }, levelDetails);
 		});
 	}
 

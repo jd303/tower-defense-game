@@ -403,7 +403,7 @@ export const levelDetails: LevelDefinition = {
 	propZones: [
 		// Northern Forest
 		{
-			propNames: ['tree_thin', 'tree_lollipop', 'tree_forked', 'tree_spread'],
+			propNames: [{ name: 'tree_thin', chance: 0.25 }, { name: 'tree_lollipop', chance: 0.25 }, { name: 'tree_forked', chance: 0.25 }, { name: 'tree_spread', chance: 0.25 }],
 			zonePathPoints: [
 				{ point: new Vector3(-19.571, 0, -21.928) },
 				{ point: new Vector3(6.928, 0, -15.0000) },
@@ -449,7 +449,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Southern Forest
 		{
-			propNames: ['tree_cone', 'tree_cone_2'],
+			propNames: [{ name: 'tree_cone', chance: 0.5 }, { name: 'tree_cone_2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(-35.4285, 0, 27.7857) },
 				{ point: new Vector3(-19.78571428571429, 0, 5.214285714285714) },
@@ -493,7 +493,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Western Forest
 		{
-			propNames: ['tree_cone', 'tree_cone', 'tree_cone', 'tree_cone_2'],
+			propNames: [{ name: 'tree_cone', chance: 0.75 }, { name: 'tree_cone_2', chance: 0.25 }],
 			zonePathPoints: [
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 				{ point: new Vector3(-75, 0, -60) },
@@ -548,7 +548,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Small Rock Pile
 		{
-			propNames: ['rubble_1'],
+			propNames: [{ name: 'rubble_1', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.734, 0, -2.850) },
 				{ point: new Vector3(-36.067, 0, -3.916) },
@@ -574,7 +574,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North West Rubble
 		{
-			propNames: ['rubble_1'],
+			propNames: [{ name: 'rubble_1', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.010, 0, -37.243) },
 				{ point: new Vector3(-30.696, 0, -37.929) },
@@ -602,7 +602,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// South East Rubble
 		{
-			propNames: ['rubble_1'],
+			propNames: [{ name: 'rubble_1', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(95.3855, 0, 46.3055) },
 				{ point: new Vector3(48.7394, 0, 36.58245) },
@@ -641,7 +641,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North west Mountains
 		{
-			propNames: ['mountain_1', 'mountain_2'],
+			propNames: [{ name: 'mountain_1', chance: 0.5 }, { name: 'mountain_2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(12, 0, -104) },
 				{ point: new Vector3(-80, 0, -104) },
@@ -660,7 +660,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North East Mountains
 		{
-			propNames: ['mountain_1', 'mountain_2'],
+			propNames: [{ name: 'mountain_1', chance: 0.5 }, { name: 'mountain_2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(35, 0, -99) },
 				{ point: new Vector3(35, 0, -71) },
@@ -678,7 +678,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// West Mountains
 		{
-			propNames: ['mountain_3', 'mountain_5'],
+			propNames: [{ name: 'mountain_3', chance: 0.5 }, { name: 'mountain_5', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(-93.89255, 0, -51.47957) },
 				{ point: new Vector3(-100.16947, 0, -1.01802) },
@@ -700,7 +700,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Southern Mesas
 		{
-			propNames: ['mesa_1'],
+			propNames: [{ name: 'mesa_1', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(28.870673076923076, 0, 93.5919078742053) },
 				{ point: new Vector3(27.70144230769231, 0, 73.71498479727228) },
@@ -728,175 +728,4 @@ export const levelDetails: LevelDefinition = {
 		"mesa_1": { b: 0.25 },
 		"rubble_1": { l: -0.5 },
 	},
-	waves: [
-		{
-			id: 1,
-			waveStartTime: 0,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'TrollDink',
-						},
-						{
-							id: '6',
-							type: 'Wisp',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 2,
-			waveStartTime: 4000,
-			pathID: '2',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'Wisp',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 3,
-			waveStartTime: 10000,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 4,
-			waveStartTime: 17500,
-			pathID: '1',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Troll',
-						},
-						{
-							id: '6',
-							type: 'Troll',
-						},
-					],
-				},
-			],
-		},
-		{
-			id: 5,
-			waveStartTime: 24000,
-			pathID: '2',
-			difficulty: 5,
-			creepGroups: [
-				{
-					id: '1',
-					creeps: [
-						{
-							id: '1',
-							type: 'TrollDink',
-						},
-						{
-							id: '2',
-							type: 'TrollDink',
-						},
-						{
-							id: '3',
-							type: 'TrollDink',
-						},
-						{
-							id: '4',
-							type: 'TrollDink',
-						},
-						{
-							id: '5',
-							type: 'Troll',
-						},
-						{
-							id: '6',
-							type: 'Troll',
-						},
-					],
-				},
-			],
-		},
-	],
 };

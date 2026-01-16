@@ -3,25 +3,18 @@ import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
-import { CreepStats } from './CreepStats';
+import { AttackRangeTypes, Stats } from '../Stats';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Lupine extends Creep {
 	/**
 	 * Main
 	 * */
-	static assetName: string = 'Lupine';
+	static assetType = 'creep';
+	static assetName: string = 'CreepLupine';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
 	static assetScale: number = 0.25;
 	static assetPositionY: number = 0.5;
-	static spriteSheetRows: SpriteSheetRow[] = [
-		{
-			name: "walk",
-			totalFrames: 2,
-			currentFrame: 0,
-		}
-	]
-	static spriteSheetCellColCount: number = 2;
 
 	/**
 	 * Spritesheet & InstancedMesh properties
@@ -35,16 +28,28 @@ export class Lupine extends Creep {
 		alphaTest: 0.5,
 		transparent: true
 	}
+	static AnimationAttributes = {
+		animationSpeed: 2
+	}
+	static spriteSheetRows: SpriteSheetRow[] = [
+		{
+			name: "walk",
+			totalFrames: 2,
+			currentFrame: 0,
+		}
+	]
 
 	/**
 	 * Stats
 	 * */
-	stats = new CreepStats({
-		hp_total: 25,
+	stats = new Stats({
 		movement: {
 			speed: 4,
-			interception_modifier: 2,
 			type: MovementTypes.walking,
+		},
+		life: {
+			total: 25,
+			current: 25,
 		},
 		defenses: {
 			piercing: 0,
@@ -58,10 +63,17 @@ export class Lupine extends Creep {
 			economic_property: "money",
 			value: 5
 		},
-		vp_loss: 1,
-		attack_speed: 15,
-		attack_damage: 10,
-		attack_damagetype: DamageTypes.crushing
+		vp_loss: {
+			value: 1
+		},
+		attack: {
+			speed: 15,
+			accuracy: 1.0,
+			damage: 10,
+			damageType: DamageTypes.piercing,
+			rangeType: AttackRangeTypes.melee,
+			range: 0
+		}
 	});
 	healthBarY: 3;
 
@@ -69,7 +81,7 @@ export class Lupine extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Lupine.assetName, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.spriteSheetCellColCount, Lupine.assetScale);
+		super(main, Lupine.assetName, Lupine.assetType, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.assetScale);
 
 		return this;
 	}

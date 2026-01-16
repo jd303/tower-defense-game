@@ -58,8 +58,9 @@ export class SpritePropManager {
 	 */
 	async registerProp(args: LevelPropDefinition, levelDetails?: LevelDefinition) {
 		const assetClass = await AssetGenerator.createSpriteAsset(args.assetName, this.main) as SpriteAsset;
+		const colourisation = levelDetails?.propColourisation && levelDetails?.propColourisation[args.assetName];
 		assetClass.registerOnLoadCallback(() => {
-			assetClass.setColourisation(levelDetails?.propColourisation);
+			colourisation && assetClass.setColourisation(colourisation);
 			assetClass.setPosition(args.position);
 			if (args.scale) assetClass.setScale(args.scale);
 		});
@@ -82,8 +83,12 @@ export class SpritePropManager {
 
 		// Place the props
 		propPositions.forEach((position: any) => {
-			const propName = args.propNames[Math.floor(Math.random() * args.propNames.length)];
-			this.registerProp({ assetName: propName, position: new THREE.Vector3(position.position.x, propZonePropsY, position.position.z), scale: new THREE.Vector3(position.scale.x, position.scale.y, position.scale.z) }, levelDetails);
+			const random = Math.random();
+			let sum = 0;
+			const pickedItem = args.propNames.find(item => (sum += item.chance) >= random);
+			if (!pickedItem) throw new Error("Cannot choose a propName");
+
+			this.registerProp({ assetName: pickedItem.name, position: new THREE.Vector3(position.position.x, propZonePropsY, position.position.z), scale: new THREE.Vector3(position.scale.x, position.scale.y, position.scale.z) }, levelDetails);
 		});
 	}
 

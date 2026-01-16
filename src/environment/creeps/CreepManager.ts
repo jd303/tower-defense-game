@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { LevelDefinition } from '../../data/LevelInterfaces';
@@ -59,17 +60,20 @@ export class CreepManager {
 	}
 
 	/**
-	 * Animate objects based on time
+	 * Finds creeps within range of 
 	 */
-	tick(timeProperties: TickTimeProperties) {
-		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
+	findCreepsInRangeOf(testPosition: THREE.Vector3, range: number) {
+		return this.creeps.filter((creep: Creep) => {
+			const creepPosition = creep.groupMain.position;
+			return creepPosition.distanceTo(testPosition) <= range;
+		});
 	}
 
 	/**
 	 * Animate objects based on time
 	 */
-	frameAnimationTick() {
-		this.creeps.forEach((creep) => creep.animationFramePicker());
+	tick(timeProperties: TickTimeProperties) {
+		this.creeps.forEach((creep) => creep.animateCore(timeProperties));
 	}
 
 	/**

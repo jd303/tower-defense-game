@@ -3,7 +3,7 @@ import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
 import { LevelDefinition, TerrainTypes } from '../data/LevelInterfaces';
-import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../core/TickService';
+import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { SpritePropManager } from '../environment/propManager/SpritePropManager';
@@ -11,14 +11,13 @@ import { TowerManager } from '../environment/towers/TowerManager';
 import { CreepManager } from '../environment/creeps/CreepManager';
 import { WaveManager } from './WaveManager';
 import { LevelCameraManager } from './LevelCameraManager';
-import { TowerMage } from '../environment/towers/TowerMage';
-import { TowerBomber } from '../environment/towers/TowerBomber';
-import { TowerArcher } from '../environment/towers/TowerArcher';
 import { EconomyService } from '../game/EconomyService';
 import { EventService } from '../core/EventService';
 import { HeroManager } from '../environment/heroes/HeroManager';
 import { LevelCreator } from './LevelCreator';
 import { InstancedMeshService } from '../game/InstancedMeshService';
+import { PowersManager } from '../environment/powers/PowersManager';
+import { UserLoadoutManager } from '../userData/UserLoadoutManager';
 
 export class Level {
 	/**
@@ -30,6 +29,7 @@ export class Level {
 	 * Path
 	 * */
 	levelDetails: LevelDefinition;
+	userLoadoutManager: UserLoadoutManager;
 
 	/**
 	 * Level Assets
@@ -41,6 +41,7 @@ export class Level {
 	towerManager: TowerManager;
 	creepManager: CreepManager;
 	heroManager: HeroManager;
+	powersManager: PowersManager;
 
 	/**
 	 * Constructor
@@ -55,6 +56,8 @@ export class Level {
 		this.creepManager = new CreepManager(this.main, this);
 		this.waveManager = new WaveManager(this, this.main);
 		this.heroManager = new HeroManager(this.main, this);
+		this.powersManager = new PowersManager(this.main, this);
+		this.userLoadoutManager = new UserLoadoutManager(this.main);
 
 		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
@@ -82,12 +85,12 @@ export class Level {
 		this.levelCameraManager.setup();
 		this.creepManager.setupCreepPaths(this.levelDetails);
 		this.propManager.setup(this.levelDetails);
-		this.towerManager.setup(this.levelDetails, [TowerArcher, TowerMage, TowerBomber]);
-		//this.waveManager.setup(this.levelDetails);
 		this.setupLights();
 		this.setupUI();
 		this.setupEconomy();
 		this.setupHero();
+		this.setupTowers();
+		this.setupPowers();
 		this.setupMainTick();
 
 		/**
@@ -95,16 +98,16 @@ export class Level {
 		 */
 		const includedCreeps = [{
 			difficulty: 2,
-			name: 'Troll',
+			name: 'CreepTroll',
 		}, {
 			difficulty: 1,
-			name: 'Wisp'
+			name: 'CreepWisp'
 		}, {
 			difficulty: 1,
-			name: 'Lupine'
+			name: 'CreepLupine'
 		}, {
 			difficulty: 0,
-			name: 'TrollDink'
+			name: 'CreepTrollDink'
 		}];
 		this.waveManager.createLevelWaves(1, includedCreeps);
 		this.waveManager.startWaveTimer();
@@ -138,7 +141,8 @@ export class Level {
 	setupUI() {
 		const sUI: UIService = this.main.s('UI');
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
-		sUI.addEconomyLabel('vp', 'vp_changed');
+		sUI.addEconomyLabel('power', 'power_changed');
+		sUI.addEconomyLabel('hearts', 'hearts_changed');
 	}
 
 	/**
@@ -147,18 +151,38 @@ export class Level {
 	setupEconomy() {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		const sEvent: EventService = this.main.s('Event');
-		sEconomy.setEconomyValue("money", 600);
-		sEvent.fire('commerce_money_changed', 600);
-		sEconomy.setEconomyValue("vp", 20);
-		sEvent.fire("vp_changed", 20);
+
+		const userEconomyData = this.userLoadoutManager.getEconomyData();
+		sEconomy.setEconomyValue("money", userEconomyData.money.current);
+		sEvent.fire('commerce_money_changed', userEconomyData.money.current);
+		sEconomy.setEconomyValue("hearts", userEconomyData.hearts.current);
+		sEvent.fire("hearts_changed", userEconomyData.hearts.current);
+		sEconomy.setEconomyValue("power", userEconomyData.power.current);
+		sEvent.fire("power_changed", userEconomyData.power.current);
 	}
 
 	/**
 	 * Sets up the hero for the level
 	 */
 	async setupHero() {
-		//await this.heroManager.setupHeroes();
+		//const heroes = this.userLoadoutManager.getEquippedHeroes();
 		await this.heroManager.createDefaultHero(new THREE.Vector3(-28, 0, -20));
+	}
+
+	/**
+	 * Sets up towers for the level
+	 */
+	async setupTowers() {
+		const towers = await this.userLoadoutManager.getEquippedTowers();
+		this.towerManager.setup(this.levelDetails, towers);
+	}
+
+	/**
+	 * Sets up powers for the level
+	 */
+	async setupPowers() {
+		const powers = await this.userLoadoutManager.getEquippedPowers();
+		this.powersManager.setup(powers);
 	}
 
 	/**
@@ -170,7 +194,6 @@ export class Level {
 		sTick.start();
 		sTick.registerCallback(new TickCallback("Level", this.gameplayTickCallback.bind(this)));
 		sTick.registerCallback(new TickCallback("InstancedMeshes", sInstancedMesh.updateInstancedMeshes.bind(sInstancedMesh)));
-		sTick.registerCallback(new TickCallback("FrameAnimations", this.frameAnimationCallback.bind(this)), true, TickTimeTypes.halfsecond);
 	}
 
 	/**
@@ -180,13 +203,6 @@ export class Level {
 		this.heroManager.heroes.forEach((hero) => hero.animateCore(timeProperties));
 		this.creepManager.tick(timeProperties);
 		this.towerManager.tick(timeProperties);
-	}
-
-	/**
-	 * Animates spritesheet frame animation callback
-	 */
-	frameAnimationCallback() {
-		this.creepManager.frameAnimationTick();
 	}
 
 	/**
@@ -220,7 +236,7 @@ export class Level {
 		console.log("A creep passed the line:", creep);
 
 		const sEconomy = this.main.s('Economy');
-		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.vp_loss);
+		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.activeStats.vp_loss!.value);
 
 		if (vpValue <= 0) {
 			this.loseLevel();

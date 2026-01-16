@@ -3,7 +3,6 @@ import { Main } from '../../core/Main';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
 import { CreepStates, CreepTransitions } from './CreepStates';
-import { CreepStats } from './CreepStats';
 import { TowerAttackStats } from '../towers/TowerStats';
 import { Hero } from '../heroes/Hero';
 import { HeroAttackStats } from '../heroes/HeroStats';
@@ -12,6 +11,7 @@ import { MovePathDefinition } from '../../data/PathInterfaces';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { AttackStats, Stats } from '../Stats';
 
 export abstract class Creep extends CharacterAsset {
 	/**
@@ -24,7 +24,8 @@ export abstract class Creep extends CharacterAsset {
 	 * */
 	typeName: InteractableTypes = "creep";
 	interactiveOrder = InteractableOrders.creeps;
-	stats: CreepStats;
+	stats: Stats;
+	newStats: Stats;
 
 	/**
 	 * Three Assets
@@ -58,8 +59,8 @@ export abstract class Creep extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], spriteSheetCellColCount: number, instancedMeshAssetScale: number) {
-		super(main, assetName, 'creep', assetPositionY, spriteSheetRows, spriteSheetCellColCount, instancedMeshAssetScale, Creep.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
+		super(main, assetName, 'creep', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Creep.instancedMeshInstanceCount);
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(CreepStates.pathmoving);
@@ -172,7 +173,7 @@ export abstract class Creep extends CharacterAsset {
 	/**
 	 * Resolves when a creep was attacked
 	 * */
-	resolveAttack(attack: TowerAttackStats | HeroAttackStats) {
+	resolveAttack(attack: AttackStats) {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
@@ -185,9 +186,9 @@ export abstract class Creep extends CharacterAsset {
 	 * @param { number } difference Positive or negative number to adjust the creeps' health
 	 * */
 	adjustHealthByNumber(difference: number) {
-		const minHealth = Math.max(0, this.stats.hp_current + difference);
-		const maxHealth = Math.min(this.stats.hp_total, minHealth);
-		this.stats.hp_current = maxHealth;
+		const minHealth = Math.max(0, this.stats.activeStats.life!.current + difference);
+		const maxHealth = Math.min(this.stats.activeStats.life!.total, minHealth);
+		this.stats.activeStats.life!.current = maxHealth;
 
 		this.checkHealthStatus();
 	}
@@ -197,7 +198,7 @@ export abstract class Creep extends CharacterAsset {
 	 * @param { number } percentage Percentage of health to set
 	 * */
 	setHealthByPercentage(percentage: number) {
-		this.stats.hp_current = this.stats.hp_total * percentage / 100;
+		this.stats.activeStats.life!.current = this.stats.activeStats.life!.total * percentage / 100;
 
 		this.checkHealthStatus();
 	}
@@ -208,20 +209,20 @@ export abstract class Creep extends CharacterAsset {
 	checkHealthStatus() {
 		switch (true) {
 			// The Creep has died
-			case this.stats.hp_current <= 0:
+			case this.stats.activeStats.life!.current <= 0:
 				this.killCreep();
 				break;
 
 			// The Creep has full health
-			case this.stats.hp_current >= this.stats.hp_total:
+			case this.stats.activeStats.life!.current >= this.stats.activeStats.life!.total:
 				this.removeHealthBar();
 				break;
 
 			// The Creep has lost some health
 			default:
-				if (!this.healthBar) this.createHealthBar(this.stats.hp_current / this.stats.hp_total);
+				if (!this.healthBar) this.createHealthBar(this.stats.activeStats.life!.current / this.stats.activeStats.life!.total);
 				else {
-					this.updateHealthBar(this.stats.hp_current / this.stats.hp_total);
+					this.updateHealthBar(this.stats.activeStats.life!.current / this.stats.activeStats.life!.total);
 				}
 
 				this.stateMachine.transition(CreepTransitions.took_damage);
@@ -234,7 +235,7 @@ export abstract class Creep extends CharacterAsset {
 	 * */
 	setIntercepted(byWhom: Hero) {
 		this.intercepter = byWhom;
-		this.stats.movement.speed += this.stats.movement.interception_modifier;
+		this.stats.addModifier('intercepted_speed', { movement: { speed: 5 } });
 		this.stateMachine.transition(CreepTransitions.intercepted);
 		console.log("I got intercepted", this);
 	}
@@ -242,7 +243,7 @@ export abstract class Creep extends CharacterAsset {
 		console.log("I got disintercepted", this);
 		if (this.intercepter == byWhom) {
 			this.intercepter = null;
-			this.stats.movement.speed -= this.stats.movement.interception_modifier;
+			this.stats.removeModifier('intercepted_speed');
 			this.movePathManager.rejoinCorePath();
 			this.stateMachine.transition(CreepTransitions.pathmoving);
 		}
@@ -252,8 +253,8 @@ export abstract class Creep extends CharacterAsset {
 	 * A creep has died
 	 * */
 	killCreep() {
-		const rewards = this.stats.kill_rewards;
-		this.main.s('Economy').adjustEconomyValue(rewards.economic_property, rewards.value);
+		const rewards = this.stats.activeStats.kill_rewards;
+		this.main.s('Economy').adjustEconomyValue(rewards!.economic_property, rewards!.value);
 		if (this.intercepter) this.intercepter.removeInterceptee(this);
 		this.deleteCreep();
 	}
@@ -272,7 +273,7 @@ export abstract class Creep extends CharacterAsset {
 	 * */
 	deleteCreep() {
 		this.stateMachine.remove();
-		this.deleteInstancedMesh();
+		this.dispose();
 		this.main.s('Level').currentLevel.creepManager.removeCreep(this);
 	}
 
@@ -328,7 +329,7 @@ export abstract class Creep extends CharacterAsset {
 	}
 
 	/**
-	 * Get info
+	 * Interaction
 	 */
 	select() {
 		console.group();
@@ -337,5 +338,7 @@ export abstract class Creep extends CharacterAsset {
 		console.groupEnd();
 
 		return { handled: true, cancelListeners: true };
+	}
+	deselect() {
 	}
 }
