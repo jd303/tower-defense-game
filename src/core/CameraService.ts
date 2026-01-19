@@ -20,6 +20,7 @@ export class CameraService extends Service {
 	mainCamera: Camera;
 
 	defaultCameraSettings: CameraSettings = {
+		name: 'default',
 		fov: 25,
 		near: 0.1,
 		far: 350,
@@ -210,6 +211,16 @@ export class CameraService extends Service {
 			}
 		});
 	}
+
+	/**
+	 * Disposes all cameras
+	 */
+	disposeAll() {
+		this.cameras.forEach(camera => {
+			camera.threeCamera.parent?.remove();
+		});
+		this.cameras = [];
+	}
 }
 
 export class Camera {
@@ -221,6 +232,7 @@ export class Camera {
 }
 
 export interface CameraSettings {
+	name: string;
 	near: number;
 	far: number;
 	zoom: number;

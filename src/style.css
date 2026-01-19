@@ -1,7 +1,7 @@
 :root {
 	--z-index-game: 1;
 	--z-index-UI: 10;
-	--towers-height: 50px;
+	--button-height: 50px;
 	--standard-padding: 20px;
 	--ui-distance-from-edge: 10px;
 }
@@ -49,18 +49,15 @@ UI ELEMENTS
 }
 
 .ui {
-	.towers, .powers {
+	> * {
 		position: absolute;
-		bottom: var(--ui-distance-from-edge);
-		width: 100%;
-		height: var(--towers-height);
-		text-align: center;
 
 		button {
 			border: 1px solid grey;
-			height: var(--towers-height);
+			height: var(--button-height);
 			box-sizing: border-box;
 
+			cursor: pointer;
 			pointer-events: all;
 
 			&[data-selected='true'] {
@@ -68,19 +65,31 @@ UI ELEMENTS
 			}
 
 			img {
-				height: var(--towers-height);
+				height: var(--button-height);
 			}
 		}
 	}
 
-	.powers {
+	.region_menu {
+		top: 0;
+		left: var(--ui-distance-from-edge);
+	}
+
+	.region_towers, .region_powers {
+		bottom: var(--ui-distance-from-edge);
+		width: 100%;
+		height: var(--button-height);
+		text-align: center;
+	}
+
+	.region_powers {
 		left: var(--ui-distance-from-edge);
 		width: 25%;
 		text-align: left;
 	}
 }
 
-.ui .economy {
+.ui .region_economy {
 	display: flex;
 	gap: 5px;
 	position: fixed;
@@ -92,7 +101,7 @@ UI ELEMENTS
 	margin: auto;
 }
 
-.ui .economy .label {
+.ui .region_economy .label {
 	width: 50px;
 	height: 50px;
 	color: #fff;

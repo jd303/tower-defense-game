@@ -1,6 +1,7 @@
 import { CameraSettings } from '../core/CameraService';
 
 export const perspectiveCameraLevel: CameraSettings = {
+	name: 'cam-level-persp',
 	fov: 25,
 	near: 0.1,
 	far: 350,
@@ -12,6 +13,7 @@ export const perspectiveCameraLevel: CameraSettings = {
 };
 
 export const orthographicCameraLevel: CameraSettings = {
+	name: 'cam-level-ortho',
 	near: 0.01,
 	far: 1000,
 	zoom: 0.7,

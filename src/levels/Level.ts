@@ -73,7 +73,6 @@ export class Level {
 			this.terrain.removeFromScene();
 			this.terrain = null;
 		}
-		console.log("Terrain Type", terrainType);
 		this.terrain = new Terrain(terrainType, this.main);
 		this.terrain.addToScene();
 	}
@@ -189,6 +188,7 @@ export class Level {
 	 * Registers callback for tick
 	 * */
 	setupMainTick() {
+		console.log("SETUP MAIN TICK");
 		const sTick: TickService = this.main.s('Tick');
 		const sInstancedMesh: InstancedMeshService = this.main.s('InstancedMesh');
 		sTick.start();
@@ -224,7 +224,7 @@ export class Level {
 
 		sUI.removeEconomyUI();
 		sUI.removeTowersUI();
-		sUI.removeHeroesUI();
+		sUI.removePowersUI();
 		sUI.createPopup("lose-level", "Sorry, you lost the level.  Sad face", ['bubble-in']);
 		sCamera.removeOrbitControls();
 	}
@@ -300,10 +300,10 @@ export class Level {
 		this.terrain = null;
 
 		this.waveManager.disposeWaves();
-		this.propManager.disposeProps();
-		this.towerManager.disposeTowers();
-		this.creepManager.disposeCreeps();
-		this.heroManager.disposeHeroes();
+		this.propManager.disposeAll();
+		this.towerManager.disposeAll();
+		this.creepManager.disposeAll();
+		this.heroManager.disposeAll();
 
 		const sUI: UIService = this.main.s('UI');
 		sUI.clearUI();

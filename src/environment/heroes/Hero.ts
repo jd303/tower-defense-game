@@ -331,7 +331,7 @@ export abstract class Hero extends CharacterAsset {
 		this.spriteSheetFrameManager.changeAnimation("idle");
 	}
 	stateExitIdle() {
-		console.log("EXIT IDLE (likely due to stop)");
+		console.log("EXIT IDLE");
 		const sTick: TickService = this.main.s('Tick');
 		sTick.deregisterCallback(`${this.assetName}_intercept`);
 		this.disengageAsIntercepter();
@@ -472,12 +472,5 @@ export abstract class Hero extends CharacterAsset {
 		// Register a new listener to make the movement
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.deregisterInteractableListener('terrain', 'registerHeroMovement');
-	}
-
-	/**
-	 * Removes the hero from the game
-	 */
-	dispose() {
-		this.main.scene.remove(this.groupMain);
 	}
 }

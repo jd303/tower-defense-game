@@ -59,7 +59,7 @@ export class InstancedMeshService {
 	createInstancedMesh(assetName: string, geometry: THREE.PlaneGeometry, material: THREE.ShaderMaterial, assetCount: number = 100) {
 		if (this.instancedMeshes[assetName]) return console.error(`Cannot recreate ${assetName} Instanced Mesh`);
 
-		const iMesh = new InstancedMesh(this.main, geometry, material, assetCount);
+		const iMesh = new InstancedMesh(this.main, assetName, this, geometry, material, assetCount);
 		this.instancedMeshes[assetName] = iMesh;
 
 		return iMesh;
@@ -84,10 +84,17 @@ export class InstancedMeshService {
 			fragmentShader
 		});
 
-		const iMesh = new SpriteSheetInstancedMesh(this.main, assetName, material, assetCount);
+		const iMesh = new SpriteSheetInstancedMesh(this.main, assetName, this, material, assetCount);
 		this.instancedMeshes[assetName] = iMesh;
 
 		return iMesh;
+	}
+
+	/**
+	 * Removes an instanced Mesh
+	 */
+	removeInstancedMesh(assetName: string) {
+		delete this.instancedMeshes[assetName];
 	}
 
 	/**
@@ -114,12 +121,19 @@ export class InstancedMeshService {
  */
 export class InstancedMesh {
 	main: Main;
+	assetName: string;
 	iMesh: THREE.InstancedMesh;
 	iMeshTotalIndexes: number = 0;
 	geometry: THREE.PlaneGeometry;
+	instancedMeshService: InstancedMeshService;
 
-	constructor(main: Main, geometry: THREE.PlaneGeometry /* MIGHT HAVE TO RETHINK THIS GEOMETRY TYPE FOR OTHER INSTANCEDMESHES */, material: THREE.Material, assetCount: number = 100) {
+	/**
+	 * Constructor
+	 */
+	constructor(main: Main, assetName: string, instancedMeshService: InstancedMeshService, geometry: THREE.PlaneGeometry /* MIGHT HAVE TO RETHINK THIS GEOMETRY TYPE FOR OTHER INSTANCEDMESHES */, material: THREE.Material, assetCount: number = 100) {
 		this.main = main;
+		this.assetName = assetName;
+		this.instancedMeshService = instancedMeshService;
 		this.geometry = geometry;
 
 		const mesh = new THREE.InstancedMesh(geometry, material, assetCount);
@@ -178,15 +192,25 @@ export class InstancedMesh {
 	resetIndexes() {
 		this.iMeshTotalIndexes = 0;
 	}
+
+	/**
+	 * Dispose
+	 */
+	dispose() {
+		this.main.scene.remove(this.iMesh);
+		(this.iMesh.material as THREE.Material).dispose();
+		this.iMesh.geometry.dispose();
+		this.instancedMeshService.removeInstancedMesh(this.assetName);
+	}
 }
 
 /**
  * An Instanced Mesh, with an attached spritesheet
  */
 class SpriteSheetInstancedMesh extends InstancedMesh {
-	constructor(main: Main, assetName: string, material: THREE.Material, assetCount: number = 100) {
+	constructor(main: Main, assetName: string, instancedMeshService: InstancedMeshService, material: THREE.Material, assetCount: number = 100) {
 		const geometry = new THREE.PlaneGeometry(1, 1);
-		super(main, geometry, material, assetCount);
+		super(main, assetName, instancedMeshService, geometry, material, assetCount);
 
 		// Add animationRow attribute
 		const animationRowArray = new Float32Array(assetCount);

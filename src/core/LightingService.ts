@@ -163,6 +163,17 @@ export class LightingService extends Service {
 			this.lightHelpers = this.lightHelpers.filter((x) => x != lh);
 		});
 	}
+
+	/**
+	 * Disposes of all lights
+	 */
+	disposeAll() {
+		this.lights.forEach(light => {
+			this.main.scene.remove(light.threeLight);
+			light.threeLight.dispose();
+		});
+		this.lights = [];
+	}
 }
 
 export class Light {

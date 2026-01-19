@@ -39,6 +39,7 @@ export class WaveManager {
 	 * Starts the Wave Timer
 	 */
 	startWaveTimer() {
+		console.log("START WAVE TIMER", this.waves);
 		if (this.waves.length) {
 			this.waveTimer = new Timer(this.triggerWave.bind(this), this.waves[0].waveStartTime, this.main);
 		}

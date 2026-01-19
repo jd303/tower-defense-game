@@ -17,6 +17,7 @@ export class SpritePropManager {
 	 * */
 	main: Main;
 	tileset: TerrainTypes = TerrainTypes.grass;
+	spriteAssets: SpriteAsset[] = [];
 	propZones: PropZone[] = [];
 	propGroups: PropGroup[] = [];
 	environmentTiles: EnvironmentTile[] = [];
@@ -57,12 +58,13 @@ export class SpritePropManager {
 	 * Register a prop to place and render
 	 */
 	async registerProp(args: LevelPropDefinition, levelDetails?: LevelDefinition) {
-		const assetClass = await AssetGenerator.createSpriteAsset(args.assetName, this.main) as SpriteAsset;
+		const assetInstance = await AssetGenerator.createSpriteAsset(args.assetName, this.main) as SpriteAsset;
 		const colourisation = levelDetails?.propColourisation && levelDetails?.propColourisation[args.assetName];
-		assetClass.registerOnLoadCallback(() => {
-			colourisation && assetClass.setColourisation(colourisation);
-			assetClass.setPosition(args.position);
-			if (args.scale) assetClass.setScale(args.scale);
+		this.spriteAssets.push(assetInstance);
+		assetInstance.registerOnLoadCallback(() => {
+			colourisation && assetInstance.setColourisation(colourisation);
+			assetInstance.setPosition(args.position);
+			if (args.scale) assetInstance.setScale(args.scale);
 		});
 	}
 
@@ -103,8 +105,9 @@ export class SpritePropManager {
 	/**
 	 * Removes all props from the level
 	 */
-	disposeProps() {
+	disposeAll() {
 		this.propGroups.forEach((propGroup: PropGroup) => {
+			propGroup.iMesh?.dispose();
 			this.main.scene.remove(propGroup.iMesh!);
 		});
 		this.propGroups = [];
@@ -118,6 +121,11 @@ export class SpritePropManager {
 			environmentTile.dispose();
 		});
 		this.environmentTiles = [];
+
+		this.spriteAssets.forEach((spriteAsset: SpriteAsset) => {
+			spriteAsset.dispose();
+		});
+		this.spriteAssets = [];
 	}
 }
 

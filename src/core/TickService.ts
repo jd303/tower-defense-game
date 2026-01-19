@@ -40,9 +40,12 @@ export class TickService extends Service {
 	 * Starts the Tick Service
 	 * */
 	start() {
-		this.clock.start();
-		this.gameTime = 0;
-		this.tick();
+		if (!this.clock.running) {
+			this.clock.start();
+			this.pausedTick = false;
+			this.gameTime = 0;
+			this.tick();
+		}
 	}
 
 	/**

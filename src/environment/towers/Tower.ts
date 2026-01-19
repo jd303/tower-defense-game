@@ -207,4 +207,12 @@ export abstract class Tower extends CharacterAsset {
 		this.selected = false;
 		this.removeSelectionVisibleMesh();
 	}
+
+	/**
+	 * Dispose
+	 */
+	dispose() {
+		(this.instancedMesh.iMesh.material as THREE.Material).dispose();
+		this.instancedMesh.iMesh.geometry.dispose();
+	}
 }

@@ -248,7 +248,7 @@ export class ModelPropManager {
 	/**
 	 * Removes all props from the level
 	 */
-	disposeProps() {
+	disposeAll() {
 		this.propGroups.forEach((propGroup: PropGroup) => {
 			this.main.scene.remove(propGroup.iMesh!);
 		});

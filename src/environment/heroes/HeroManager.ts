@@ -48,7 +48,7 @@ export class HeroManager {
 	/**
 	 * Removes the hero from the game
 	 */
-	disposeHeroes() {
+	disposeAll() {
 		this.heroes.forEach((hero) => {
 			hero.dispose();
 		});

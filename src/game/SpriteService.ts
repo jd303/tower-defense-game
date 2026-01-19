@@ -8,7 +8,7 @@ export class SpriteService {
 	 * Core
 	 * */
 	main: Main;
-	spriteSheets: Record<string, SpriteSheet> = {};
+	spriteSheets: Record<string, SpriteSheet | Promise<SpriteSheet>> = {};
 	vertexShader: string;
 	fragmentShader: string;
 
@@ -27,7 +27,15 @@ export class SpriteService {
 		const rows = assetClass.ShaderMaterialProperties.uniforms.uFrameRows.value;
 		const frames = cols * rows;
 
-		return this.spriteSheets[assetName] || await this.createSpriteSheet(assetName, assetClass.assetPath, cols, rows, frames);
+		// If the spritesheet exists and is still loading, return the Promise, else create it
+		if (this.spriteSheets[assetName]) {
+			if (this.spriteSheets[assetName] instanceof Promise) {
+				return await this.spriteSheets[assetName];
+			} else return this.spriteSheets[assetName];
+		} else {
+			this.spriteSheets[assetName] = this.createSpriteSheet(assetName, assetClass.assetPath, cols, rows, frames);
+			return await this.spriteSheets[assetName];
+		}
 	}
 
 	/**
@@ -37,11 +45,20 @@ export class SpriteService {
 		if (!this.vertexShader) this.createVertexShader();
 		if (!this.fragmentShader) this.createFragmentShader();
 
-		const spriteSheet = new SpriteSheet(this.main, path, new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), sheetCols, sheetRows, sheetFrames, this);
+		console.log("Creating SpriteSheet", assetName);
+
+		const spriteSheet = new SpriteSheet(this.main, assetName, path, new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), sheetCols, sheetRows, sheetFrames, this);
 		await spriteSheet.setup();
 		this.spriteSheets[assetName] = spriteSheet;
 
 		return spriteSheet;
+	}
+
+	/**
+	 * Removes a spritesheet
+	 */
+	removeSpriteSheet(assetName: string) {
+		delete this.spriteSheets[assetName];
 	}
 
 	/**
@@ -170,6 +187,7 @@ export class SpriteSheet {
 	/**
 	 * Setup properties
 	 */
+	assetName: string;
 	texturePath: string;
 	scale: THREE.Vector3;
 	position: THREE.Vector3;
@@ -183,11 +201,15 @@ export class SpriteSheet {
 	 */
 	main: Main;
 	texture: THREE.Texture;
+	sprite: THREE.Sprite;
 	spriteMaterial: THREE.SpriteMaterial;
-	shaderMaterial: THREE.ShaderMaterial;
 
-	constructor(main: Main, texturePath: string, scale: THREE.Vector3, position: THREE.Vector3, sheetCols: number, sheetRows: number, sheetFrames: number, spriteService: SpriteService) {
+	/**
+	 * Constructor
+	 */
+	constructor(main: Main, assetName: string, texturePath: string, scale: THREE.Vector3, position: THREE.Vector3, sheetCols: number, sheetRows: number, sheetFrames: number, spriteService: SpriteService) {
 		this.main = main;
+		this.assetName = assetName;
 		this.texturePath = texturePath;
 		this.scale = scale;
 		this.position = position;
@@ -213,11 +235,23 @@ export class SpriteSheet {
 		this.texture.minFilter = THREE.LinearMipMapLinearFilter; // smoother, but a black line to fix
 
 		this.spriteMaterial = new THREE.SpriteMaterial({ map: this.texture });
-		const sprite = new THREE.Sprite(this.spriteMaterial);
-		sprite.scale.set(this.scale.x, this.scale.y, this.scale.z);
-		sprite.position.set(this.position.x, this.position.y, this.position.z);
+		this.sprite = new THREE.Sprite(this.spriteMaterial);
+		this.sprite.scale.set(this.scale.x, this.scale.y, this.scale.z);
+		this.sprite.position.set(this.position.x, this.position.y, this.position.z);
+		console.log("LOADED TEXTURE", this.texture);
+		console.log("LOADED Sprite", this.spriteMaterial);
 
 		this.texture.repeat.set(1 / this.sheetCols, 1 / this.sheetRows);
+	}
+
+	/**
+	 * Dispose
+	 */
+	dispose() {
+		this.main.scene.remove(this.sprite);
+		this.spriteMaterial.dispose();
+		this.texture.dispose();
+		this.spriteService.removeSpriteSheet(this.assetName);
 	}
 }
 

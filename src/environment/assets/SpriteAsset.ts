@@ -209,17 +209,21 @@ export abstract class SpriteAsset extends Asset {
 	/**
 	 * Actions to take when we delete the instanced mesh
 	 */
-	deleteInstancedMesh() {
+	hideInstancedMesh() {
 		this.setInstancedMeshPosition(new THREE.Vector3(-100, 0, -100), true);
 	}
 
 	/**
-	 * Disposes of this asset, but keeps the spritesheet and instancedmesh
+	 * Disposes of this asset
 	 */
 	dispose() {
-		this.deleteInstancedMesh();
+		this.hideInstancedMesh();
 		this.selectionGeometry?.dispose();
 		this.main.scene.remove(this.groupMain);
+		this.main.scene.remove(this.instancedMesh.iMesh);
+
+		this.instancedMesh.dispose();
+		this.spriteSheet.dispose();
 	}
 }
 

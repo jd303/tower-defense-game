@@ -153,9 +153,10 @@ export class TowerManager {
 	/**
 	 * Removes all towers from the scene
 	 */
-	disposeTowers() {
+	disposeAll() {
 		this.towers.forEach((tower) => {
 			this.main.scene.remove(tower.groupMain);
+			tower.dispose();
 		});
 		this.towers = [];
 

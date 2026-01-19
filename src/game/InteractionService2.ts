@@ -5,6 +5,7 @@ import { Terrain } from '../environment/Terrain';
 import { EnvironmentTile } from '../environment/EnvironmentTile';
 import { CreepPath } from '../environment/creeps/CreepPath';
 import { Asset } from '../environment/assets/Asset';
+import { MapNode } from '../screens/MapScreen';
 
 /**
  * Allows us to manage interaction based on clicks and taps.
@@ -155,8 +156,8 @@ export class InteractionService2 extends Service {
 	}
 }
 
-export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile;
-export type InteractableTypes = 'creep' | 'creepPath' | 'hero' | 'tower' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain';
+export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile | MapNode;
+export type InteractableTypes = 'creep' | 'creepPath' | 'hero' | 'tower' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain' | 'ui-component';
 
 export class Interactable2 {
 	name: InteractableTypes;
@@ -188,10 +189,11 @@ export interface InteractionEvent {
 }
 
 export enum InteractableOrders {
-	"terrain" = 0,
-	"pathsAndTiles" = 1,
-	"props" = 2,
-	"creeps" = 3,
-	"towers" = 4,
-	"heroes" = 5,
+	"default" = 0,
+	"terrain" = 1,
+	"pathsAndTiles" = 2,
+	"props" = 3,
+	"creeps" = 4,
+	"towers" = 5,
+	"heroes" = 6,
 }

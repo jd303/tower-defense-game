@@ -79,9 +79,10 @@ export class CreepManager {
 	/**
 	 * Removes all creeps from the scene
 	 */
-	disposeCreeps() {
+	disposeAll() {
 		this.creeps.forEach((creep) => {
 			this.main.scene.remove(creep.groupMain);
+			creep.dispose();
 		});
 		this.creeps = [];
 

@@ -22,6 +22,11 @@ export class Main {
 	renderer: THREE.WebGLRenderer;
 
 	/**
+	 * Stores the current Screen
+	 */
+	screen: Screen;
+
+	/**
 	 * Services
 	 * */
 	services: any[] = [];

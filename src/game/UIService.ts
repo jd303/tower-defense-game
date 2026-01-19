@@ -17,7 +17,7 @@ export class UIService extends Service {
 	menuUIElement: HTMLElement;
 	towersUIElement: HTMLElement;
 	powersUIElement: HTMLElement;
-	heroesUIElement: HTMLElement;
+	tlMenuUIElement: HTMLElement;
 	economyUIElement: HTMLElement;
 
 	/**
@@ -46,20 +46,20 @@ export class UIService extends Service {
 		this.rootUIElement = document.createElement('div');
 		this.rootUIElement.classList.add('ui');
 		this.menuUIElement = document.createElement('div');
-		this.menuUIElement.classList.add('menu');
+		this.menuUIElement.classList.add('region_menu');
 		this.towersUIElement = document.createElement('div');
-		this.towersUIElement.classList.add('towers');
+		this.towersUIElement.classList.add('region_towers');
 		this.powersUIElement = document.createElement('div');
-		this.powersUIElement.classList.add('powers');
-		this.heroesUIElement = document.createElement('div');
-		this.heroesUIElement.classList.add('heroes');
+		this.powersUIElement.classList.add('region_powers');
+		this.tlMenuUIElement = document.createElement('div');
+		this.tlMenuUIElement.classList.add('region_tlMenu');
 		this.economyUIElement = document.createElement('div');
-		this.economyUIElement.classList.add('economy');
+		this.economyUIElement.classList.add('region_economy');
 
 		this.rootUIElement.appendChild(this.menuUIElement);
 		this.rootUIElement.appendChild(this.towersUIElement);
 		this.rootUIElement.appendChild(this.powersUIElement);
-		this.rootUIElement.appendChild(this.heroesUIElement);
+		this.rootUIElement.appendChild(this.tlMenuUIElement);
 		this.rootUIElement.appendChild(this.economyUIElement);
 
 		this.attach();
@@ -92,6 +92,11 @@ export class UIService extends Service {
 			// Towers
 			case UIRegions.Power:
 				this.powersUIElement.appendChild(button.element);
+				this.UIButtons.push(button);
+				break;
+			// Menu
+			case UIRegions.Menu:
+				this.menuUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
 		}
@@ -157,6 +162,14 @@ export class UIService extends Service {
 	}
 
 	/**
+	 * Deletes a popup
+	 * */
+	deletePopup(name: string) {
+		const popup = document.querySelector(`.popup.${name}`);
+		popup?.parentElement?.removeChild(popup);
+	}
+
+	/**
 	 * Attach the UI to the document
 	 * */
 	attach() {
@@ -180,8 +193,8 @@ export class UIService extends Service {
 	/**
 	 * Removes Hero buttons and UI
 	 * */
-	removeHeroesUI() {
-		this.heroesUIElement.innerHTML = "";
+	removePowersUI() {
+		this.powersUIElement.innerHTML = "";
 	}
 
 	/**
@@ -195,7 +208,10 @@ export class UIService extends Service {
 	 * Removes all elements from the UI and clears all interactions
 	 * */
 	clearUI() {
-		this.rootUIElement.innerHTML = "";
+		this.removeMenusUI();
+		this.removeTowersUI();
+		this.removePowersUI();
+		this.removeEconomyUI();
 	}
 }
 

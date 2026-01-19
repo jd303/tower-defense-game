@@ -5,13 +5,16 @@ import { PositionService } from './environment/PositionService';
 import { EconomyService } from './game/EconomyService';
 import { UIService } from './game/UIService';
 import { EventService } from './core/EventService';
-import { SplashScreen } from './levels/levels/_SplashScreen';
 import { InteractionService2 } from './game/InteractionService2';
 import { FogOfWarService } from './game/FogOfWarService';
 import { ParticleService } from './core/ParticleService';
 import { PathService } from './game/PathService';
 import { LocationService } from './game/LocationService';
 import { DebugService } from './core/DebugService';
+import { ScreenService } from './core/ScreenService';
+import { SplashScreen } from './screens/SplashScreen';
+import { LevelScreen } from './screens/LevelScreen';
+import { MapScreen } from './screens/MapScreen';
 
 /**
  * Configuration
@@ -40,21 +43,19 @@ main.registerService('Event', new EventService());
 main.registerService('FogOfWar', new FogOfWarService(main));
 main.registerService('Particle', new ParticleService(main));
 main.registerService('Debug', new DebugService(main, debugMode, main.s('Tick')));
+main.registerService('Screen', new ScreenService(main));
 
-// Loads the working scene
-if (location.hash == '') {
-	new SplashScreen(main);
-} else {
-	main.s('Level').loadLevel('Level_0_MVP');
-}
-
-// Load an alternate debug scene
-/*main.s('Camera').createPerspectiveCamera(true);
-main.s('Tick').tick();
-main.s('Camera').setupOrbitControls();
-main.s('Debug').createDebugSphere();
-const ambientLight = main.s('Lighting').addAmbientLight();
-const directionalLight = main.s('Lighting').addDirectionalLight(true);
-main.s('Debug').debugLight(directionalLight, 'Directional Light');
-main.s('Debug').debugLight(ambientLight, 'Ambient Light');
-*/
+// Setup Screens
+main.s('Screen').registerScreen({
+	hash: 'splash',
+	screenType: SplashScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'game',
+	screenType: LevelScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'map',
+	screenType: MapScreen
+});
+main.s('Screen').loaded();
