@@ -388,13 +388,13 @@ export const levelDetails: LevelDefinition = {
 	],
 	props: [
 		{
-			assetName: 'mountain_4',
+			assetName: 'MountainInitial',
 			position: new Vector3(65, 0, 72),
 			scale: new Vector3(1.25, 0.75, 1.25),
 			rotate: new Vector3(0, -1, 0)
 		},
 		{
-			assetName: 'mountain_5',
+			assetName: 'MountainInitial',
 			position: new Vector3(50, 0, 85),
 			scale: new Vector3(1, 1, 1),
 			rotate: new Vector3(0, 1.5, 0)
@@ -403,7 +403,7 @@ export const levelDetails: LevelDefinition = {
 	propZones: [
 		// Northern Forest
 		{
-			propNames: [{ name: 'tree_thin', chance: 0.25 }, { name: 'tree_lollipop', chance: 0.25 }, { name: 'tree_forked', chance: 0.25 }, { name: 'tree_spread', chance: 0.25 }],
+			propNames: [{ name: 'TreeFir', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-19.571, 0, -21.928) },
 				{ point: new Vector3(6.928, 0, -15.0000) },
@@ -431,7 +431,7 @@ export const levelDetails: LevelDefinition = {
 			environmentTile: {
 				type: "land",
 				distance: 1.25,
-				colour: 0x6B8B42,
+				colour: 0x878B42,
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -449,7 +449,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Southern Forest
 		{
-			propNames: [{ name: 'tree_cone', chance: 0.5 }, { name: 'tree_cone_2', chance: 0.5 }],
+			propNames: [{ name: 'TreeFir', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-35.4285, 0, 27.7857) },
 				{ point: new Vector3(-19.78571428571429, 0, 5.214285714285714) },
@@ -478,7 +478,7 @@ export const levelDetails: LevelDefinition = {
 			environmentTile: {
 				type: "land",
 				distance: 2,
-				colour: 0x6B8B42,
+				colour: 0x878B42,
 			},
 			dynamicScaling:
 			{
@@ -493,7 +493,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Western Forest
 		{
-			propNames: [{ name: 'tree_cone', chance: 0.75 }, { name: 'tree_cone_2', chance: 0.25 }],
+			propNames: [{ name: 'TreeFir', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 				{ point: new Vector3(-75, 0, -60) },
@@ -534,7 +534,7 @@ export const levelDetails: LevelDefinition = {
 			environmentTile: {
 				type: "land",
 				distance: 2,
-				colour: 0x6B8B42,
+				colour: 0x878B42,
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -548,7 +548,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Small Rock Pile
 		{
-			propNames: [{ name: 'rubble_1', chance: 1 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.734, 0, -2.850) },
 				{ point: new Vector3(-36.067, 0, -3.916) },
@@ -574,7 +574,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North West Rubble
 		{
-			propNames: [{ name: 'rubble_1', chance: 1 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.010, 0, -37.243) },
 				{ point: new Vector3(-30.696, 0, -37.929) },
@@ -602,7 +602,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// South East Rubble
 		{
-			propNames: [{ name: 'rubble_1', chance: 1 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(95.3855, 0, 46.3055) },
 				{ point: new Vector3(48.7394, 0, 36.58245) },
@@ -641,7 +641,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North west Mountains
 		{
-			propNames: [{ name: 'mountain_1', chance: 0.5 }, { name: 'mountain_2', chance: 0.5 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(12, 0, -104) },
 				{ point: new Vector3(-80, 0, -104) },
@@ -660,7 +660,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North East Mountains
 		{
-			propNames: [{ name: 'mountain_1', chance: 0.5 }, { name: 'mountain_2', chance: 0.5 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(35, 0, -99) },
 				{ point: new Vector3(35, 0, -71) },
@@ -678,7 +678,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// West Mountains
 		{
-			propNames: [{ name: 'mountain_3', chance: 0.5 }, { name: 'mountain_5', chance: 0.5 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-93.89255, 0, -51.47957) },
 				{ point: new Vector3(-100.16947, 0, -1.01802) },
@@ -700,7 +700,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Southern Mesas
 		{
-			propNames: [{ name: 'mesa_1', chance: 1 }],
+			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(28.870673076923076, 0, 93.5919078742053) },
 				{ point: new Vector3(27.70144230769231, 0, 73.71498479727228) },
@@ -723,9 +723,7 @@ export const levelDetails: LevelDefinition = {
 		}
 	],
 	propColourisation: {
-		"tree_cone_2": { g: 0.5 },
-		"tree_spread": { g: 0.5 },
-		"mesa_1": { b: 0.25 },
-		"rubble_1": { l: -0.5 },
+		"TreeFir": { b: 1, g: 0.25 },
+		"MountainInitial": { l: -0.5 },
 	},
 };

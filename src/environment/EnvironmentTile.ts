@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Main } from '../core/Main';
 import { TowerZoneShapePlacement } from './towers/TowerPlacementZone';
-import { CameraService } from '../core/CameraService';
 
 export class EnvironmentTile {
 	/**

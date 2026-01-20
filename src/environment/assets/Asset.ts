@@ -25,11 +25,12 @@ export abstract class Asset {
 	assetPositionY: number;
 
 	/**
-	 * 
+	 * Setup Properties
 	 */
 	typeName: InteractableTypes;
 	interactiveOrder: InteractableOrders;
 	interactive: boolean;
+	createGroups: boolean = true;
 
 	/**
 	 * System Properties
@@ -41,10 +42,7 @@ export abstract class Asset {
 	/**
 	 * Three Properties
 	 * */
-	groupMain: THREE.Group; // Outermost group - transforms the whole group
-	groupTransforms: THREE.Group; // Middle group - applies minor transformations
-	groupFacing: THREE.Group; // Middle group - applies facing
-	groupModel: THREE.Group; // Innermost group - applies status transforms
+	groupMain: THREE.Group; // Main group for asset
 	selected: boolean;
 	selectionGeometry?: THREE.BoxGeometry;
 	selectionGeometryScale: number = 1.5;
@@ -55,14 +53,6 @@ export abstract class Asset {
 	 * */
 	stateMachine: StateMachine;
 	stats: Stats;
-
-	/**
-	 * Health bar
-	 * */
-	healthBar: THREE.Group | null;
-	healthBarGroupName: string = 'healthbargroup';
-	healthBarName: string = 'healthbar';
-	healthBarY: number = 1.25;
 
 	/**
 	 * Constructor
@@ -77,14 +67,7 @@ export abstract class Asset {
 		this.sLevel = this.main.s('Level');
 
 		this.groupMain = new THREE.Group();
-		this.groupTransforms = new THREE.Group();
-		this.groupFacing = new THREE.Group();
-		this.groupModel = new THREE.Group();
-
-		this.groupFacing.add(this.groupModel);
-		this.groupTransforms.add(this.groupFacing);
-		this.groupMain.add(this.groupTransforms);
-
+		this.groupMain.name = `main-${assetName}`;
 		this.main.scene.add(this.groupMain);
 	}
 
@@ -171,56 +154,14 @@ export abstract class Asset {
 	}
 
 	/**
-	 * Creates a health bar
-	 * */
-	public readonly createHealthBar = (percentage: number = 1) => {
-		const barBG = AssetCommons.healthBarGeometry;
-		const barFG = AssetCommons.healthBarGeometry;
-		//barBG.setAttribute('position', new THREE.BufferAttribute(AssetCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
-		const healthBarGroup = new THREE.Group();
-		const bgMesh = new THREE.Mesh(barBG, AssetCommons.healthBarBGMaterial);
-		const fgMesh = new THREE.Mesh(barFG, AssetCommons.healthBarFGMaterial);
-		fgMesh.name = this.healthBarName;
-		healthBarGroup.name = this.healthBarGroupName;
-		healthBarGroup.add(bgMesh);
-		healthBarGroup.add(fgMesh);
-		healthBarGroup.position.y = this.healthBarY;
-		healthBarGroup.position.z = 2;
-		this.healthBar = healthBarGroup;
-		this.groupTransforms.add(healthBarGroup);
-
-		this.updateHealthBar(percentage);
-	}
-
-	/**
-	 * Updates the health bar
-	 * */
-	public readonly updateHealthBar = (percentage: number) => {
-		const healthBarGroup = this.groupTransforms.getObjectByName(this.healthBarGroupName);
-		healthBarGroup!.scale.x = percentage;
-		//healthBarGroup!.position.x = (this.stats.activeStats.life.current / this.stats.activeStats.life.total) - 1; // left aligned
-		healthBarGroup!.position.x = 0;
-	}
-
-	/**
-	 * Removes a health bar if one exists
-	 * */
-	public readonly removeHealthBar = () => {
-		if (this.healthBar) {
-			this.groupTransforms.remove(this.healthBar);
-			this.healthBar = null;
-		}
-	}
-
-	/**
 	* Adds geometry for selection
 	*/
 	public readonly addSelectionGeometry = () => {
-		if (!this.groupModel) return;
+		if (!this.groupMain) return;
 
 		// Get the size
 		const hitboxSize = new THREE.Vector3();
-		const box = new THREE.Box3().setFromObject(this.groupModel);
+		const box = new THREE.Box3().setFromObject(this.groupMain);
 		box.getSize(hitboxSize);
 
 		const hitBoxGeometry = new THREE.BoxGeometry(hitboxSize.x, hitboxSize.y, hitboxSize.z);

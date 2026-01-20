@@ -114,8 +114,7 @@ export class SplashScreen extends Screen {
 		const sUI: UIService = this.main.s('UI');
 		sUI.createPopup("Menu", `
 			<h1>Tower Defense</h1>
-			<a href="/#map" onClick="window.location.hash = 'map';">Map</a> -
-			<a href="/#game" onClick="window.location.hash = 'game';">Load game</a>
+			<a href="/#map" onClick="window.location.hash = 'map';">Map</a>
 		`);
 	}
 
@@ -123,7 +122,7 @@ export class SplashScreen extends Screen {
 	 * Removes all assets
 	 */
 	override dispose() {
-		this.disposeLevelCommons();
+		this.disposeScreenCommons();
 		this.stopTick();
 		this.propManager.disposeAll();
 		this.meshes.forEach(mesh => this.main.scene.remove(mesh));

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickCallback, TickService, TickTimeProperties, TickTimeTypes } from '../../core/TickService';
-import { Stats } from '../Stats';
+import { CharacterStats } from '../Stats';
 import { MovePathDefinition } from '../../data/PathInterfaces';
 import { StateMachine, StateMachineEvents, StateMachineTransitions } from '../../core/StateMachine';
 import { HeroStates, HeroTransitions } from './HeroStates';
@@ -29,15 +29,11 @@ export abstract class Hero extends CharacterAsset {
 	 * */
 	typeName: InteractableTypes = "hero";
 	interactiveOrder = InteractableOrders.heroes;
-	stats: Stats;
+	stats: CharacterStats;
 
 	/**
 	 * Three Assets
 	 * */
-	groupMain: THREE.Group; // Outermost group - transforms the whole model
-	groupTransforms: THREE.Group; // Inner group - applies minor transformations
-	groupModel: THREE.Group; // Innermost group - applies status transforms
-	mesh: THREE.Mesh;
 	textMessage: THREE.Sprite | null;
 
 	/**

@@ -18,6 +18,8 @@ import { LevelCreator } from './LevelCreator';
 import { InstancedMeshService } from '../game/InstancedMeshService';
 import { PowersManager } from '../environment/powers/PowersManager';
 import { UserLoadoutManager } from '../userData/UserLoadoutManager';
+import { LightingService } from '../core/LightingService';
+import { DebugService } from '../core/DebugService';
 
 export class Level {
 	/**
@@ -61,7 +63,7 @@ export class Level {
 
 		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
-		this.setupDebugs(levelDetails);
+		if (this.main.debugMode) this.setupDebugs(levelDetails);
 	}
 
 	/**
@@ -116,12 +118,13 @@ export class Level {
 	 * Sets up lights
 	 */
 	setupLights() {
-		const ambientLight = this.main.s('Lighting').createAmbientLight("WorldAmbient");
-		this.main.s('Lighting').enableLight(ambientLight);
-		const directionalLight = this.main.s('Lighting').createDirectionalLight(true);
-		this.main.s('Lighting').enableLight(directionalLight);
-		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
+		const sLighting: LightingService = this.main.s('Lighting');
+		const ambientLight = sLighting.createAmbientLight("WorldAmbient", '#ffffff', 3);
+		sLighting.enableLight(ambientLight);
 		this.main.s('Debug').debugLight(ambientLight, 'Ambient Light');
+		const directionalLight = sLighting.createDirectionalLight('WorldDirectional', new THREE.Vector3(40, 40, 40), '#ffffff', 2);
+		sLighting.enableLight(directionalLight);
+		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
 
 		// Enable shadows
 		setTimeout(() => {
@@ -164,8 +167,11 @@ export class Level {
 	 * Sets up the hero for the level
 	 */
 	async setupHero() {
-		//const heroes = this.userLoadoutManager.getEquippedHeroes();
-		await this.heroManager.createDefaultHero(new THREE.Vector3(-28, 0, -20));
+		const heroUpgrades = await this.userLoadoutManager.userLoadout.heroUpgrades;
+		this.heroManager.heroUpgrades = heroUpgrades;
+
+		const heroes = await this.userLoadoutManager.getEquippedHeroes();
+		heroes.forEach(hero => this.heroManager.createHero(hero.assetName, new THREE.Vector3(-28, 0, -20)));
 	}
 
 	/**
@@ -173,7 +179,10 @@ export class Level {
 	 */
 	async setupTowers() {
 		const towers = await this.userLoadoutManager.getEquippedTowers();
-		this.towerManager.setup(this.levelDetails, towers);
+		await this.towerManager.setup(this.levelDetails, towers);
+
+		const towerUpgrades = await this.userLoadoutManager.userLoadout.towerUpgrades;
+		this.towerManager.towerUpgrades = towerUpgrades;
 	}
 
 	/**
@@ -181,6 +190,8 @@ export class Level {
 	 */
 	async setupPowers() {
 		const powers = await this.userLoadoutManager.getEquippedPowers();
+		const powerUpgrades = await this.userLoadoutManager.userLoadout.powerUpgrades;
+		this.powersManager.powerUpgrades = powerUpgrades;
 		this.powersManager.setup(powers);
 	}
 
@@ -247,48 +258,28 @@ export class Level {
 	 * Debug objects and helpers
 	 */
 	setupDebugs(levelDetails: LevelDefinition) {
+		const sDebug: DebugService = this.main.s('Debug');
+		const sTick: TickService = this.main.s('Tick');
+
+		sDebug.lilGUI.add(sTick, 'pauseTick').name('Pause Tick');
+		sDebug.lilGUI.add(sTick, 'unpauseTick').name('Unpause Tick');
+		sDebug.lilGUI.add(sDebug, 'cycleTickSpeed').name('Cycle Tick Speed');
+
+		sDebug.watchDrawCalls();
+		sDebug.addTerrainPositionWatcher();
+
 		// SOME DEBUG OBJECTS OFF TO THE LEFT
 		this.propManager.registerProp({ assetName: 'MountainInitial', position: new THREE.Vector3(-90, 0, -50) }, levelDetails);
 		this.propManager.registerProp({ assetName: 'TreeBulbous', position: new THREE.Vector3(-90, 0, -55) }, levelDetails);
 
 		// Setup a Debug to initiate level creation
 		const levelCreator = new LevelCreator(this.main, this);
-		this.main.s('Debug').addLevelCreatorLilGUI(levelCreator);
+		this.main.s('Debug').addLevelEditorLilGUI(levelCreator);
 
 		/**
 		 * DEBUG Objects
 		 * */
-		/*const mat = new THREE.MeshStandardMaterial();
-		mat.roughness = 0.7;
-		mat.color.set('#888888');
-		const sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
-		sphere.position.y = 5;
-		sphere.position.z = 2;
-		sphere.castShadow = true;
-		this.scene.add(sphere);
-
-		const sphere2 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
-		sphere2.scale.set(2, 2, 2);
-		sphere2.position.y = 2;
-		sphere2.position.x = 4;
-		sphere2.castShadow = true;
-		sphere2.receiveShadow = true;
-		this.scene.add(sphere2);
-
-		const sphere3 = new THREE.Mesh(new THREE.SphereBufferGeometry(1), mat);
-		sphere3.scale.set(4, 4, 4);
-		sphere3.position.y = 5;
-		sphere3.position.x = 15;
-		sphere3.castShadow = true;
-		sphere3.receiveShadow = true;
-		this.scene.add(sphere3);
-
-		const plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 50), mat);
-		plane.rotation.x = Math.PI * -0.5;
-		plane.position.y = 0.1;
-		plane.receiveShadow = true;
-		this.scene.add(plane);
-		// END DEBUG THINGS*/
+		//sDebug.addDebugSphere({ position: new THREE.Vector3(0, 5, 30), scale: new THREE.Vector3(5, 5, 5) });
 	}
 
 	/**

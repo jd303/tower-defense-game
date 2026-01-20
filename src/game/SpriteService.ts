@@ -45,8 +45,6 @@ export class SpriteService {
 		if (!this.vertexShader) this.createVertexShader();
 		if (!this.fragmentShader) this.createFragmentShader();
 
-		console.log("Creating SpriteSheet", assetName);
-
 		const spriteSheet = new SpriteSheet(this.main, assetName, path, new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), sheetCols, sheetRows, sheetFrames, this);
 		await spriteSheet.setup();
 		this.spriteSheets[assetName] = spriteSheet;
@@ -238,8 +236,6 @@ export class SpriteSheet {
 		this.sprite = new THREE.Sprite(this.spriteMaterial);
 		this.sprite.scale.set(this.scale.x, this.scale.y, this.scale.z);
 		this.sprite.position.set(this.position.x, this.position.y, this.position.z);
-		console.log("LOADED TEXTURE", this.texture);
-		console.log("LOADED Sprite", this.spriteMaterial);
 
 		this.texture.repeat.set(1 / this.sheetCols, 1 / this.sheetRows);
 	}

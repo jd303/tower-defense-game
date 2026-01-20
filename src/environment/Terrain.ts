@@ -22,6 +22,7 @@ export class Terrain {
 	constructor(terrainType: TerrainTypes, main: Main) {
 		this.main = main;
 		this.groupMain = new THREE.Group();
+		this.groupMain.name = "Terrain";
 
 		// Determin the terrain type
 		let material;

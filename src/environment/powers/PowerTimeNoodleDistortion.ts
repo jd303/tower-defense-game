@@ -3,6 +3,7 @@ import { Main } from '../../core/Main';
 import { Level } from '../../levels/Level';
 import { Power } from './Power';
 import { TickService, TickSpeed } from '../../core/TickService';
+import { PowerStats } from '../Stats';
 
 export class PowerTimeNoodleDistortion extends Power {
 	/**
@@ -10,8 +11,6 @@ export class PowerTimeNoodleDistortion extends Power {
 	 */
 	static assetName = 'PowerTimeNoodleDistortion';
 	static buttonIcon = 'assets/models/powers/Power.TimeNoodleDistortion.UI.icon.png';
-	static powerCost = 5;
-	static radiusOfEffect = 5;
 
 	/**
 	 * Unique properties for this Power
@@ -19,6 +18,14 @@ export class PowerTimeNoodleDistortion extends Power {
 	launchTime: number;
 	growingMesh: THREE.Mesh;
 	shrinkingMesh: THREE.Mesh;
+
+	/**
+	 * Stats
+	 */
+	static stats = new PowerStats({
+		cost: 5,
+		duration: 10000
+	})
 
 	/**
 	 * Constructor
@@ -40,6 +47,6 @@ export class PowerTimeNoodleDistortion extends Power {
 
 		setTimeout(() => {
 			sTick.setGameSpeed();
-		}, 10000);
+		}, PowerTimeNoodleDistortion.stats.activeStats.duration!);
 	}
 }

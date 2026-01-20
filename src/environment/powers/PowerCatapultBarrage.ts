@@ -5,6 +5,7 @@ import { Power } from './Power';
 import { AssetGenerator } from '../assets/AssetGenerator';
 import { SpriteAsset } from '../assets/SpriteAsset';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
+import { PowerStats } from '../Stats';
 
 export class PowerCatapultBarrage extends Power {
 	/**
@@ -12,11 +13,6 @@ export class PowerCatapultBarrage extends Power {
 	 */
 	static assetName = 'PowerCatapultBarrage';
 	static buttonIcon = 'assets/models/powers/Power.CatapultBarrage.UI.icon.png';
-	static powerCost = 10;
-	static shortRange = 2.5;
-	static shortRangeDamage = 3;
-	static midRange = 5;
-	static midRangeDamage = 1;
 
 	/**
 	 * Unique properties for this Power
@@ -24,6 +20,16 @@ export class PowerCatapultBarrage extends Power {
 	launchTime: number;
 	rocks: SpriteAsset[] = [];
 	rockStartPositions: Record<string, any>[] = []; // { 0: { "travelPercent": 0.5, "speedAdjust": 0.1 } }
+
+	/**
+	 * Stats
+	 */
+	static stats = new PowerStats({
+		cost: 10,
+		damage: 3,
+		radiusPrimary: 2.5,
+		radiusSecondary: 5
+	})
 
 	/**
 	 * Constructor
@@ -87,6 +93,8 @@ export class PowerCatapultBarrage extends Power {
 		const xTravelDuration = 2;
 
 		this.rocks.forEach((rock, index) => {
+			if (!rock.instancedMesh || !rock.instancedMesh.iMesh) return; // InstancedMesh load race condition blunt fix
+
 			const rockPosition = rock.instancedMeshPosition;
 			const startData = this.rockStartPositions[index];
 
@@ -161,14 +169,14 @@ export class PowerCatapultBarrage extends Power {
 		const rock = this.rocks[rockIndex];
 
 		// Then apply damage
-		const creepsInShortRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.shortRange);
-		let creepsInMidRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.midRange);
+		const creepsInShortRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusPrimary!);
+		let creepsInMidRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusSecondary!);
 		creepsInMidRange = creepsInMidRange.filter(midRangeCreep => !creepsInShortRange.find(shortRangeCreep => midRangeCreep == shortRangeCreep));
-		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * PowerCatapultBarrage.shortRangeDamage));
-		creepsInMidRange.forEach(creep => creep.adjustHealthByNumber(-1 * PowerCatapultBarrage.midRangeDamage));
+		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * PowerCatapultBarrage.stats.activeStats.damage!));
+		creepsInMidRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage! / 3)));
 
 		// The dispose
-		rock.dispose();
 		this.rocks.splice(rockIndex, 1);
+		if (!this.rocks.length) rock.dispose();
 	}
 }

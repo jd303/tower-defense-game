@@ -3,6 +3,7 @@ import { Main } from '../../core/Main';
 import { Level } from '../../levels/Level';
 import { Power, PowerCommons } from './Power';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
+import { PowerStats } from '../Stats';
 
 export class PowerTowerMotivation extends Power {
 	/**
@@ -10,7 +11,6 @@ export class PowerTowerMotivation extends Power {
 	 */
 	static assetName = 'PowerTowerMotivation';
 	static buttonIcon = 'assets/models/powers/Power.TowerMotivation.UI.icon.png';
-	static powerCost = 20;
 	static radiusOfEffect = 10;
 	static powerDuration = 7500;
 	static towerMotivationBuff = {
@@ -27,6 +27,13 @@ export class PowerTowerMotivation extends Power {
 	launchTime: number;
 	mesh1: THREE.Mesh;
 	mesh2: THREE.Mesh;
+
+	/**
+	 * Stats
+	 */
+	static stats = new PowerStats({
+		cost: 20
+	})
 
 	/**
 	 * Constructor

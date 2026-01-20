@@ -22,8 +22,7 @@ export class ScreenService extends Service {
 	 * Runs on page load
 	 */
 	loaded() {
-		const hash = window.location.hash.replace("#", "");
-		this.loadScreen(hash);
+		this.hashChange();
 	}
 
 	/**
@@ -38,7 +37,8 @@ export class ScreenService extends Service {
 	 */
 	hashChange() {
 		const hash = window.location.hash.replace("#", "");
-		this.loadScreen(hash);
+		const hashParts = hash.split("/");
+		this.loadScreen(hashParts[0], hashParts[1]);
 	}
 
 	/**
@@ -51,17 +51,17 @@ export class ScreenService extends Service {
 	/**
 	 * Load Screen
 	 */
-	loadScreen(hash: string) {
+	loadScreen(screenName: string, screenArgument?: string) {
 		if (this.currentScreen) this.currentScreen.dispose();
 
-		const screenType = this.screens.find(screen => screen.hash == hash);
+		const screenType = this.screens.find(screen => screen.hash == screenName);
 		if (screenType) {
 			const screen = new screenType.screenType(this.main);
 			this.currentScreen = screen;
-			screen.load();
+			screen.loadScreen(screenArgument);
 		} else {
 			if (this.screens[0]) {
-				console.error(`Unable to find screen for hash ${hash}, defaulting to first`);
+				console.error(`Unable to find screen for hash ${screenName}, defaulting to first`);
 				this.loadScreen(this.screens[0].hash);
 			} else {
 				console.error(`Critical Error: Screens not setup properly`);

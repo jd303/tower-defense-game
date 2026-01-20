@@ -5,7 +5,7 @@ import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
-import { AttackRangeTypes, StatBlock, Stats } from '../Stats';
+import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerArcher extends Tower {
 	/**
@@ -49,7 +49,7 @@ export class TowerArcher extends Tower {
 	/**
 	 * Stats
 	 * */
-	static stats: StatBlock = {
+	static stats: StatBlockCharacter = {
 		attack: {
 			speed: 1,
 			accuracy: 0.5,
@@ -73,7 +73,7 @@ export class TowerArcher extends Tower {
 	constructor(main: Main) {
 		super(main, TowerArcher.assetName, 'tower', TowerArcher.assetPositionY, TowerArcher.spriteSheetRows, TowerArcher.assetScale);
 
-		this.stats = new Stats({ ...TowerArcher.stats });
+		this.stats = new CharacterStats({ ...TowerArcher.stats });
 
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;

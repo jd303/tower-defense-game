@@ -9,6 +9,7 @@ import { InteractionEvent, InteractionService2 } from '../../game/InteractionSer
 import { EconomyService } from '../../game/EconomyService';
 import { AssetGenerator } from '../assets/AssetGenerator';
 import { Tower } from './Tower';
+import { StatBlockCharacterModification } from '../Stats';
 
 export class TowerManager {
 	/**
@@ -23,6 +24,7 @@ export class TowerManager {
 	towerPlacementCommons: TowerPlacementCommons;
 	towerPlacementZones: TowerPlacementZone[] = [];
 	towers: Tower[] = [];
+	towerUpgrades: Record<string, StatBlockCharacterModification[]> = {};
 
 	/**
 	 * Constructor
@@ -115,6 +117,8 @@ export class TowerManager {
 		const newTower = await AssetGenerator.createSpriteAsset(assetName, this.main) as Tower;
 		this.towers.push(newTower);
 
+		newTower.stats.addUpgrades(this.towerUpgrades[assetName]);
+
 		setTimeout(() => {
 			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");
 			newTower.setPosition(point);
@@ -155,6 +159,7 @@ export class TowerManager {
 	 */
 	disposeAll() {
 		this.towers.forEach((tower) => {
+			tower.disposeAllProjectiles();
 			this.main.scene.remove(tower.groupMain);
 			tower.dispose();
 		});

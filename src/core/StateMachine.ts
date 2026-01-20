@@ -95,6 +95,13 @@ export class StateMachine {
 	}
 
 	/**
+	 * Activates the initial state (first defined)
+	 */
+	activateInitialState() {
+		this.activateStateByName(this.states[0].name);
+	}
+
+	/**
 	 * Activates a state
 	 * */
 	activateStateByName(stateName: string) {

@@ -27,7 +27,9 @@ export class InstancedMeshService {
 	 */
 	async sourceInstancedMesh(assetName: string, assetClass: typeof SpriteAsset, spriteSheet: SpriteSheet, instancedMeshInstanceCount: number) {
 		if (this.instancedMeshes[assetName]) {
-			return this.instancedMeshes[assetName];
+			if (this.instancedMeshes[assetName] instanceof Promise) {
+				return await this.instancedMeshes[assetName];
+			} else return this.instancedMeshes[assetName];
 		} else {
 			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetName, spriteSheet, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount);
 

@@ -150,7 +150,7 @@ export class Projectile {
 		this.projectileGroup.position.set(point.x, point.y, point.z);
 
 		if (this.pathProgress >= 1) {
-			this.remove();
+			this.tower.disposeProjectile(this);
 			if (this.isAccurate || this.hitType == ProjectileHitTypes.splash) {
 				this.runHitCallback();
 				this.tower.resolveHit(this);
@@ -168,9 +168,8 @@ export class Projectile {
 	/**
 	 * Gets rid of the Projectile
 	 * */
-	remove() {
+	dispose() {
 		this.main.scene.remove(this.projectileGroup);
-		this.tower.removeProjectile(this);
 	}
 }
 

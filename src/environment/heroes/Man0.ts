@@ -5,7 +5,7 @@ import { MovementTypes } from '../../data/MovementTypes';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 //import { DamageTypes } from '../../data/DamageTypes';
 import { Hero } from './Hero';
-import { AttackRangeTypes, Stats } from '../Stats';
+import { AttackRangeTypes, CharacterStats } from '../Stats';
 
 export class Man0 extends Hero {
 	/**
@@ -37,7 +37,7 @@ export class Man0 extends Hero {
 	/**
 	 * Stats
 	 * */
-	stats = new Stats({
+	stats = new CharacterStats({
 		movement: {
 			speed: 5.5,
 			type: MovementTypes.walking,

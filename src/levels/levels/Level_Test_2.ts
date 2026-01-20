@@ -64,7 +64,18 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-10.948, 0, -14.505) },
 				{ point: new Vector3(-32.891, 0, -14.414) },
 			]
-		}
+		},
+		{
+			points: [
+				{ "point": new Vector3(12.357142857142858, 4, 34) },
+				{ "point": new Vector3(11.714285714285715, 4, 32) },
+				{ "point": new Vector3(15.928571428571432, 4, 27) },
+				{ "point": new Vector3(25.571428571428573, 4, 27) },
+				{ "point": new Vector3(30.071428571428573, 4, 32) },
+				{ "point": new Vector3(29.071428571428573, 4, 34) },
+				{ "point": new Vector3(12.357142857142858, 4, 34) },
+			]
+		},
 	],
 	props: [],
 	propZones: [
@@ -173,6 +184,30 @@ export const levelDetails: LevelDefinition = {
 				colour: 0x547621,
 			},
 		},
+		{
+			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
+			zonePathPoints: [
+				{ "point": new Vector3(-46.5, 4, 50.92857142857143) },
+				{ "point": new Vector3(84.85714285714286, 4, 49.857142857142854) },
+				{ "point": new Vector3(87.14285714285715, 4, 108.71428571428571) },
+				{ "point": new Vector3(-80.28571428571426, 4, 107.42857142857142) },
+				{ "point": new Vector3(-82.4285714285714, 4, 71.57142857142856) },
+				{ "point": new Vector3(-54.99999999999997, 4, 68.28571428571426) },
+				{ "point": new Vector3(-46.357142857142826, 4, 58.142857142857125) },
+				{ "point": new Vector3(-46.5, 4, 50.92857142857143) },
+			],
+			propSparseness: 3,
+			propScale: 4,
+			positionRandom: 1.5,
+			scaleRandom: { all: 2 },
+			rotateRandom: 0.5,
+			environmentTile: {
+				type: "land",
+				distance: 1,
+				colour: 0x547621,
+			},
+		},
+
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [

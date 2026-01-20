@@ -53,8 +53,8 @@ export class PropZone {
 
 		// Create positions and initial scale
 		let positions: any[] = []; // TODO: Type this
-		for (let x = this.boundingBox.smallestX; x < this.boundingBox.largestX; x += this.arguments.propSparseness) {
-			for (let z = this.boundingBox.smallestZ; z < this.boundingBox.largestZ; z += this.arguments.propSparseness) {
+		for (let x = this.boundingBox.smallestX; x < this.boundingBox.largestX; x += Math.max(this.arguments.propSparseness, 1)) {
+			for (let z = this.boundingBox.smallestZ; z < this.boundingBox.largestZ; z += Math.max(this.arguments.propSparseness, 1)) {
 				const point = new Vector3(x, 0, z);
 				point.x = Maths.addBipolarRandom(point.x, this.arguments.positionRandom);
 				point.z = Maths.addBipolarRandom(point.z, this.arguments.positionRandom);

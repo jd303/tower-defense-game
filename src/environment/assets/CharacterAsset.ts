@@ -3,8 +3,9 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { EventHandlingResult, InteractableOrders, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
 import { SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
-import { Stats } from '../Stats';
+import { CharacterStats } from '../Stats';
 import { MovePathManager } from "../MovePathManager";
+import { AssetCommons } from "./Asset";
 
 export abstract class CharacterAsset extends SpriteAsset {
 	/**
@@ -12,7 +13,15 @@ export abstract class CharacterAsset extends SpriteAsset {
 	 * */
 	movePathManager: MovePathManager = new MovePathManager(this);
 	interactiveOrder: InteractableOrders;
-	stats: Stats;
+	stats: CharacterStats;
+
+	/**
+	 * Health bar
+	 * */
+	healthBar: THREE.Group | null;
+	healthBarGroupName: string = 'healthbargroup';
+	healthBarName: string = 'healthbar';
+	healthBarY: number = 1.25;
 
 	/**
 	 * Constructor
@@ -23,6 +32,7 @@ export abstract class CharacterAsset extends SpriteAsset {
 		this.registerOnLoadCallback(() => {
 			this.createSelectionGeometry();
 			this.registerDefaultListener();
+			this.stateMachine.activateInitialState();
 		});
 	}
 
@@ -115,6 +125,48 @@ export abstract class CharacterAsset extends SpriteAsset {
 	}
 	stateExitStunned() {
 		console.log("%c LEAVING STUNNED", 'color: pink');
+	}
+
+	/**
+	 * Creates a health bar
+	 * */
+	public readonly createHealthBar = (percentage: number = 1) => {
+		const barBG = AssetCommons.healthBarGeometry;
+		const barFG = AssetCommons.healthBarGeometry;
+		//barBG.setAttribute('position', new THREE.BufferAttribute(AssetCommons.healthBarVertices, 3)); // Used when healthBarGeometry was THREE.BufferGeometry
+		const healthBarGroup = new THREE.Group();
+		const bgMesh = new THREE.Mesh(barBG, AssetCommons.healthBarBGMaterial);
+		const fgMesh = new THREE.Mesh(barFG, AssetCommons.healthBarFGMaterial);
+		fgMesh.name = this.healthBarName;
+		healthBarGroup.name = this.healthBarGroupName;
+		healthBarGroup.add(bgMesh);
+		healthBarGroup.add(fgMesh);
+		healthBarGroup.position.y = this.healthBarY;
+		healthBarGroup.position.z = 2;
+		this.healthBar = healthBarGroup;
+		this.groupMain.add(healthBarGroup);
+
+		this.updateHealthBar(percentage);
+	}
+
+	/**
+	 * Updates the health bar
+	 * */
+	public readonly updateHealthBar = (percentage: number) => {
+		const healthBarGroup = this.groupMain.getObjectByName(this.healthBarGroupName);
+		healthBarGroup!.scale.x = percentage;
+		//healthBarGroup!.position.x = (this.stats.activeStats.life.current / this.stats.activeStats.life.total) - 1; // left aligned
+		healthBarGroup!.position.x = 0;
+	}
+
+	/**
+	 * Removes a health bar if one exists
+	 * */
+	public readonly removeHealthBar = () => {
+		if (this.healthBar) {
+			this.groupMain.remove(this.healthBar);
+			this.healthBar = null;
+		}
 	}
 
 	/**

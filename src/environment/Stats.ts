@@ -4,38 +4,35 @@ import { ProjectileHitTypes, ProjectileTravelTypes } from "./attacks/Projectile"
 import { EffectConstructor } from "./Effect";
 
 export class Stats {
-	activeStats: StatBlock; // Live statistics
-	baseStats: StatBlock; // The entity's base stats
-	permanentUpgrades: StatBlockModification[] = []; // Permanent user upgrades 
+	activeStats: StatBlockCharacter | StatBlockPower; // Live statistics
+	baseStats: StatBlockCharacter | StatBlockPower; // The entity's base stats
+	permanentUpgrades: (StatBlockCharacterModification | StatBlockPowerModification)[] = []; // Permanent user upgrades 
 	temporaryModifiers: StatBlockModificationDefinition[] = []; // 
 
 	/**
 	 * Constructor
 	 * */
-	constructor(baseStats: StatBlock) {
+	constructor(baseStats: StatBlockCharacter | StatBlockPower) {
 		this.baseStats = baseStats;
 		this.calculateActiveStats();
 	}
 
 	/**
-	 * Returns a stat value
-	 */
-	getStat() {
-		console.log("GETTING A STAT VALUE");
-	}
-
-	/**
 	 * Register / add an upgrade to this entity
 	 */
-	addUpgrade(upgrade: StatBlockModification) {
+	addUpgrade(upgrade: StatBlockCharacterModification | StatBlockPowerModification) {
 		this.permanentUpgrades.push(upgrade);
+		this.calculateActiveStats();
+	}
+	addUpgrades(upgrades: StatBlockCharacterModification[] | StatBlockPowerModification[]) {
+		this.permanentUpgrades = this.permanentUpgrades.concat(upgrades);
 		this.calculateActiveStats();
 	}
 
 	/**
 	 * Register / add a temporary modifier to this entity
 	 */
-	addModifier(name: string, modifier: StatBlockModification) {
+	addModifier(name: string, modifier: StatBlockCharacterModification) {
 		this.temporaryModifiers.push({
 			name: name,
 			statBlock: modifier
@@ -54,33 +51,13 @@ export class Stats {
 	/**
 	 * Calculates active values of stats
 	 */
-	calculateActiveStats() {
-		this.activeStats = {
-			movement: this.baseStats.movement && { ...this.baseStats.movement },
-			interception: this.baseStats.interception && { ...this.baseStats.interception },
-			attack: this.baseStats.attack && { ...this.baseStats.attack },
-			projectile: this.baseStats.projectile && { ...this.baseStats.projectile },
-			life: this.baseStats.life && { ...this.baseStats.life },
-			defenses: this.baseStats.defenses && { ...this.baseStats.defenses },
-			kill_rewards: this.baseStats.kill_rewards && { ...this.baseStats.kill_rewards },
-			vp_loss: this.baseStats.vp_loss && { ...this.baseStats.vp_loss },
-		}
-
-		// Add upgrades and Modifiers
-		this.permanentUpgrades.forEach(upgrade => this.mergeWithActive(this.activeStats, upgrade));
-		this.temporaryModifiers.forEach(modifier => this.mergeWithActive(this.activeStats, modifier.statBlock));
-	}
+	calculateActiveStats() { }
 
 	/**
 	 * Traverses the properties of stats and updates
 	 */
-	private mergeWithActive(target: Record<string, any>, source: Record<string, any>) {
+	mergeWithActive(target: Record<string, any>, source: Record<string, any>) {
 		for (const key in source) {
-			if (key == "projectile") {
-				console.error("Currently not overwriting Projectile due to class constructor loss");
-				continue;
-			}
-
 			const sourceValue = source[key];
 			const targetValue = target[key];
 
@@ -96,6 +73,39 @@ export class Stats {
 				target[key] = sourceValue;
 			}
 		}
+	}
+}
+
+/** ************************************************************
+ * CHARACTER STATS
+ */
+
+export class CharacterStats extends Stats {
+	activeStats: StatBlockCharacter; // Live statistics
+	baseStats: StatBlockCharacter; // The entity's base stats
+
+	constructor(baseStats: StatBlockCharacter) {
+		super(baseStats);
+	}
+
+	/**
+	 * Calculates active values of stats
+	 */
+	calculateActiveStats() {
+		this.activeStats = {
+			movement: this.baseStats.movement && { ...this.baseStats.movement },
+			interception: this.baseStats.interception && { ...this.baseStats.interception },
+			attack: this.baseStats.attack && { ...this.baseStats.attack },
+			projectile: this.baseStats.projectile && { ...this.baseStats.projectile },
+			life: this.baseStats.life && { ...this.baseStats.life },
+			defenses: this.baseStats.defenses && { ...this.baseStats.defenses },
+			kill_rewards: this.baseStats.kill_rewards && { ...this.baseStats.kill_rewards },
+			vp_loss: this.baseStats.vp_loss && { ...this.baseStats.vp_loss },
+		}
+
+		// Add upgrades and Modifiers
+		this.permanentUpgrades.forEach((upgrade: any) => this.mergeWithActive(this.activeStats, upgrade));
+		this.temporaryModifiers.forEach(modifier => this.mergeWithActive(this.activeStats, modifier.statBlock));
 	}
 
 	/**
@@ -124,39 +134,39 @@ export class Stats {
 }
 
 // Base Stat Block
-export interface StatBlock {
-	movement?: MovementStats;
-	interception?: InterceptionStats;
-	attack?: AttackStats;
+export interface StatBlockCharacter {
+	movement?: CharacterMovementStats;
+	interception?: CharacterInterceptionStats;
+	attack?: CharacterAttackStats;
 	projectile?: TowerProjectileDefinition;
-	life?: LifeStats;
+	life?: CharacterLifeStats;
 	defenses?: DamageTypeDefences;
-	kill_rewards?: KillRewardsStats;
-	vp_loss?: VPLossStats;
+	kill_rewards?: CharacterKillRewardsStats;
+	vp_loss?: CharacterVPLossStats;
 }
 
-interface StatBlockModification {
-	movement?: Partial<MovementStats>;
-	interception?: Partial<InterceptionStats>;
-	attack?: Partial<AttackStats>;
+export interface StatBlockCharacterModification {
+	movement?: Partial<CharacterMovementStats>;
+	interception?: Partial<CharacterInterceptionStats>;
+	attack?: Partial<CharacterAttackStats>;
 	projectile?: Partial<TowerProjectileDefinition>;
-	life?: Partial<LifeStats>;
+	life?: Partial<CharacterLifeStats>;
 	defenses?: Partial<DamageTypeDefences>;
-	kill_rewards?: Partial<KillRewardsStats>;
-	vp_loss?: Partial<VPLossStats>;
+	kill_rewards?: Partial<CharacterKillRewardsStats>;
+	vp_loss?: Partial<CharacterVPLossStats>;
 }
 
-interface MovementStats {
+interface CharacterMovementStats {
 	speed: number;
 	type: MovementTypes;
 }
 
-interface InterceptionStats {
+interface CharacterInterceptionStats {
 	distance: number;
 	interceptionCount: number;
 }
 
-export interface AttackStats {
+export interface CharacterAttackStats {
 	speed: number;
 	accuracy: number;
 	damage: number;
@@ -173,28 +183,69 @@ interface TowerProjectileDefinition {
 	splashRadius: number;
 }
 
-interface LifeStats {
+interface CharacterLifeStats {
 	total: number;
 	current: number;
 }
 
-interface KillRewardsStats {
+interface CharacterKillRewardsStats {
 	economic_property: string,
 	value: number
 }
 
-interface VPLossStats {
+interface CharacterVPLossStats {
 	value: number
 }
 
 interface StatBlockModificationDefinition {
 	name: string;
-	statBlock: StatBlockModification;
+	statBlock: StatBlockCharacterModification;
 }
 
 export enum AttackRangeTypes {
 	melee,
 	ranged
+}
+
+
+/** ************************************************************
+ * POWER STATS
+ */
+export class PowerStats extends Stats {
+	activeStats: StatBlockPower; // Live statistics
+	baseStats: StatBlockPower; // The entity's base stats
+
+	constructor(baseStats: StatBlockPower) {
+		super(baseStats);
+	}
+
+	/**
+	 * Calculates active values of stats
+	 */
+	calculateActiveStats() {
+		this.activeStats = { ...this.baseStats };
+
+		// Add upgrades and Modifiers
+		this.permanentUpgrades.forEach((upgrade: any) => this.mergeWithActive(this.activeStats, upgrade));
+		this.temporaryModifiers.forEach(modifier => this.mergeWithActive(this.activeStats, modifier.statBlock));
+	}
+}
+
+
+export interface StatBlockPower {
+	cost: number;
+	damage?: number;
+	radiusPrimary?: number;
+	radiusSecondary?: number;
+	duration?: number;
+}
+
+export interface StatBlockPowerModification {
+	cost?: number;
+	damage?: number;
+	radiusPrimary?: number;
+	radiusSecondary?: number;
+	duration?: number;
 }
 
 

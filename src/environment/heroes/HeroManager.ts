@@ -3,6 +3,7 @@ import { Main } from '../../core/Main';
 import { Hero } from './Hero';
 import { Level } from '../../levels/Level';
 import { AssetGenerator } from '../assets/AssetGenerator';
+import { StatBlockCharacterModification } from '../Stats';
 
 export class HeroManager {
 	/**
@@ -15,6 +16,7 @@ export class HeroManager {
 	 * Stats
 	 * */
 	heroes: Hero[] = [];
+	heroUpgrades: Record<string, StatBlockCharacterModification[]> = {};
 
 	/**
 	 * Construtor
@@ -27,12 +29,13 @@ export class HeroManager {
 	/**
 	 * Creates a hero
 	 */
-	async createDefaultHero(point: THREE.Vector3) {
-		const hero = await AssetGenerator.createSpriteAsset('Man0', this.level.main) as Hero;
+	async createHero(assetName: string, point: THREE.Vector3) {
+		const hero = await AssetGenerator.createSpriteAsset(assetName, this.level.main) as Hero;
 		hero.registerOnLoadCallback(() => {
 			hero.setPosition(point);
 		});
 		this.heroes.push(hero);
+		hero.stats.addUpgrades(this.heroUpgrades[assetName]);
 	}
 
 	/**

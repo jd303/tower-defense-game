@@ -24,25 +24,6 @@ export interface TowerProjectileDefinition {
 	speed: number;
 }
 
-export class TowerStatesLegacy {
-	attacking: TowerAttacking;
-	stunned: TowerStunned;
-
-	constructor() {
-		this.attacking = {
-			isAttacking: false,
-			attackStartTime: 0,
-			attackDuration: 750,
-		};
-		this.stunned = {
-			isStunned: false,
-			stunStartTime: 0,
-		};
-
-		return this;
-	}
-}
-
 export interface TowerAttacking {
 	isAttacking: boolean;
 	attackStartTime: number;

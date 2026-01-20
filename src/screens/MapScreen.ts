@@ -117,10 +117,10 @@ export class MapScreen extends Screen {
 	 */
 	createMapPoints() {
 		const sInteraction: InteractionService2 = this.main.s('Interaction2');
-		let levels = ['level0', 'level1'];
+		let levels = ['Sandbox', 'Level_1', 'Level_2'];
 
 		levels.forEach((levelCode: string, index) => {
-			const mapNode = new MapNode(levelCode, index);
+			const mapNode = new MapNode(levelCode);
 			mapNode.groupMain.position.set(-35 + (index * 10), 30, 0);
 			sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, mapNode));
 			sInteraction.registerInteractableListener('ui-component', 'loadLevel', this.requestLoadLevel);
@@ -135,7 +135,7 @@ export class MapScreen extends Screen {
 	requestLoadLevel(event: InteractionEvent) {
 		console.error("Need to add confirmation of loading a level");
 
-		window.location.hash = "game";
+		window.location.hash = `game/${(event.raycasterInteraction.object as MapNode).levelCode}`;
 
 		return {
 			handled: true,
@@ -147,7 +147,7 @@ export class MapScreen extends Screen {
 	 * When unloading this 
 	 */
 	dispose() {
-		this.disposeLevelCommons();
+		this.disposeScreenCommons();
 		this.mapNodes.forEach(node => node.dispose(this.main));
 		this.mapNodes = [];
 		this.geometries.forEach(geometry => geometry.dispose());
@@ -165,17 +165,19 @@ export class MapNode {
 	static MapNodeGeometry = () => new THREE.BoxGeometry(5, 5, 5);
 	static MapNodeMaterial = () => new THREE.MeshBasicMaterial({ color: 0x0000ff });
 
+	levelCode: string;
 	groupMain: THREE.Group;
 	geometry: THREE.BoxGeometry;
 	material: THREE.Material;
 	mesh: THREE.Mesh;
 
-	constructor(levelCode: string, index: number) {
+	constructor(levelCode: string) {
+		this.levelCode = levelCode;
 		this.groupMain = new THREE.Group();
+		this.groupMain.name = `mapnode-${levelCode}`;
 		this.geometry = MapNode.MapNodeGeometry();
 		this.material = MapNode.MapNodeMaterial();
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
-		this.mesh.name = `map-node-${index}--level-code-${levelCode}`;
 		this.groupMain.add(this.mesh);
 	}
 

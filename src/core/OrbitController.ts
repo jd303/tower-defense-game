@@ -140,7 +140,7 @@ export class OrbitController {
 		}
 
 		// Hook into the controls update loop
-		const originalUpdate = this.controls.update;
+		const originalUpdate = this.controls.update.bind(this.controls);
 		this.controls.update = () => {
 			originalUpdate();
 			clampTargetToBounds.bind(this)();

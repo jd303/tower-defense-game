@@ -165,7 +165,7 @@ export abstract class SpriteAsset extends Asset {
 		} catch (e) {
 			console.error(`ERROR TRIGGERED IN setInstancedMeshPosition for ${this.assetName} - ${e}`);
 		}
-	}
+	} //TypeError: Cannot read properties of undefined (reading 'iMesh')
 
 	/**
 	 * Sets the Instanced Mesh scale

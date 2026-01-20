@@ -63,7 +63,7 @@ export class SplineBuilder {
 
 		if (makeFromWindowJSON) {
 			if ((window as any).jsonPoints) this.points = (window as any).jsonPoints;
-			else console.log('%c Unable to load from window.jsonPoints', 'color: red');
+			else console.log('%c !! Unable to load from window.jsonPoints - no points configured !!', 'color: red');
 		}
 
 		this.path = this.createPath();
@@ -229,21 +229,30 @@ export class SplineBuilder {
 	/**
 	 * Exports points to the console
 	 */
-	exportPathPoints() {
-		console.log("Exporting as PathPoint array(s)");
-		if (this.bezierEnabled) {
-			const exportablePoints = this.bezierEnabled && this.points || this.points.map((point) => { return { point: point.point } });
-			console.log(exportablePoints);
-			console.log(JSON.stringify(exportablePoints));
-		} else {
-			console.log(`[ ${this.points.map((point: PathPoint) => `{ point: new Vector3(${point.point.x}, 0, ${point.point.z}) }`)} ]`);
-		}
-	}
-	exportVectorPoints() {
-		console.log("Exporting as Vector array(s)");
+	exportObject() {
+		console.log("%c >>>>>> Exporting as an object:", 'color:pink');
 		const exportablePoints = this.bezierEnabled && this.points || this.points.map((point) => { return { point: point.point } });
 		console.log(exportablePoints);
-		console.log(JSON.stringify(exportablePoints));
+	}
+	exportPathPoints() {
+		console.log("%c >>>>>> Exporting as a point array:", 'color:pink');
+		const points = this.bezierEnabled && this.points || this.points.map((point) => { return { point: point.point } });
+		console.log(JSON.stringify(points, null, 2));
+	}
+	exportVectorPoints() {
+		console.log("%c >>>>>> Exporting as a Vector3 array:", 'color:pink');
+		const exportableVectorPoints = this.points.map((pointGroup: any) => {
+			return this.bezierEnabled &&
+				`{
+				"incomingControlPoint": new Vector3(${pointGroup.incomingControlPoint.x}, ${pointGroup.incomingControlPoint.y}, ${pointGroup.incomingControlPoint.z}),
+				"point": new Vector3(${pointGroup.point.x}, ${pointGroup.point.y}, ${pointGroup.point.z}),
+				"outgoingControlPoint": new Vector3(${pointGroup.outgoingControlPoint.x}, ${pointGroup.outgoingControlPoint.y}, ${pointGroup.outgoingControlPoint.z})
+			}` ||
+				`{
+				"point": new Vector3(${pointGroup.point.x}, ${pointGroup.point.y}, ${pointGroup.point.z})
+		 	}`;
+		});
+		console.log(exportableVectorPoints.join(',\n'));
 	}
 
 	/**

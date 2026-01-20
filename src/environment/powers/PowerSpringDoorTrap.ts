@@ -4,7 +4,7 @@ import { Level } from '../../levels/Level';
 import { Power, PowerCommons } from './Power';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
 import { PathService } from '../../game/PathService';
-import { CreepStates, CreepTransitions } from '../creeps/CreepStates';
+import { PowerStats } from '../Stats';
 
 export class PowerSpringDoorTrap extends Power {
 	/**
@@ -12,7 +12,6 @@ export class PowerSpringDoorTrap extends Power {
 	 */
 	static assetName = 'PowerSpringDoorTrap';
 	static buttonIcon = 'assets/models/powers/Power.SpringDoorTrap.UI.icon.png';
-	static powerCost = 10;
 	static radiusOfEffect = 8;
 
 	/**
@@ -21,6 +20,14 @@ export class PowerSpringDoorTrap extends Power {
 	launchTime: number;
 	growingMesh: THREE.Mesh;
 	shrinkingMesh: THREE.Mesh;
+
+	/**
+	 * Stats
+	 */
+	static stats = new PowerStats({
+		cost: 10,
+		radiusPrimary: 8
+	})
 
 	/**
 	 * Constructor

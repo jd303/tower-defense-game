@@ -19,7 +19,8 @@ export class CreepManager {
 	/**
 	 * Objects
 	 */
-	creeps: Creep[] = [];
+	creepTypes: Creep[] = []; // Stores one reference to each creep, to dispose properly
+	creeps: Creep[] = []; // Stores active Creeps on the map
 	creepPaths: CreepPath[] = [];
 
 	/**
@@ -48,7 +49,13 @@ export class CreepManager {
 		const creep = await AssetGenerator.createSpriteAsset(creepName, this.level.main) as Creep;
 		creep.setCreepPath(creepPath);
 
+		// Add to active creeps
 		this.creeps.push(creep);
+
+		// Add to known creep types
+		if (!this.creepTypes.find(creepType => creepType.assetName == creep.assetName)) {
+			this.creepTypes.push(creep);
+		}
 	}
 
 	/**
@@ -81,10 +88,14 @@ export class CreepManager {
 	 */
 	disposeAll() {
 		this.creeps.forEach((creep) => {
-			this.main.scene.remove(creep.groupMain);
-			creep.dispose();
+			creep.deleteCreep();
 		});
 		this.creeps = [];
+
+		this.creepTypes.forEach(creepType => {
+			creepType.dispose();
+		});
+		this.creepTypes = [];
 
 		this.creepPaths.forEach((creepPath) => {
 			creepPath.dispose();

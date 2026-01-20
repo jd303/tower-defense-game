@@ -79,6 +79,7 @@ export class Main {
 		console.log("%c In environment tile, we need to send uTime not using a setInterval", 'color: red');
 		console.log("%c Projectile Splash effect doesn't seem to work?", 'color: red');
 		console.log("%c Feedback when a Projectile misses.", 'color: red');
+		console.log("%c I've preloaded the game with user upgrades.  Remove for a more realistic starting difficulty.", 'color: red');
 
 		return this;
 	}

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Main } from '../../core/Main';
 import { Level } from "../../levels/Level";
+import { PowerStats } from "../Stats";
 
 export class Power {
 	/**
@@ -16,6 +17,11 @@ export class Power {
 	static assetName: string;
 	static buttonIcon: string;
 	static powerCost: number;
+
+	/**
+	 * Stats
+	 */
+	static stats: PowerStats;
 
 	/**
 	 * Construtor

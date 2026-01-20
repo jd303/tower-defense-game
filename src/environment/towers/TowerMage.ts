@@ -4,7 +4,7 @@ import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
-import { AttackRangeTypes, StatBlock, Stats } from '../Stats';
+import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerMage extends Tower {
 	/**
@@ -47,7 +47,7 @@ export class TowerMage extends Tower {
 	/**
 	 * Stats
 	 * */
-	static stats: StatBlock = {
+	static stats: StatBlockCharacter = {
 		attack: {
 			speed: 1,
 			accuracy: 1.0,
@@ -71,7 +71,7 @@ export class TowerMage extends Tower {
 	constructor(main: Main) {
 		super(main, TowerMage.assetName, TowerMage.assetType, TowerMage.assetPositionY, TowerMage.spriteSheetRows, TowerMage.assetScale);
 
-		this.stats = new Stats(TowerMage.stats);
+		this.stats = new CharacterStats(TowerMage.stats);
 
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;

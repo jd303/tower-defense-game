@@ -2,10 +2,12 @@ import { Main } from '../core/Main';
 import { Power } from '../environment/powers/Power';
 import { AssetGenerator } from '../environment/assets/AssetGenerator';
 import { EconomyData } from '../game/EconomyService';
+import { StatBlockCharacterModification, StatBlockPowerModification } from "../environment/Stats";
 
 // TEMP
 import { tempUserLoadoutData } from './_userLoadoutData';
 import { Tower } from '../environment/towers/Tower';
+import { Hero } from '../environment/heroes/Hero';
 
 export class UserLoadoutManager {
 	/**
@@ -34,8 +36,12 @@ export class UserLoadoutManager {
 	 * Gets equipped powers
 	 */
 	async getEquippedHeroes() {
-		const heroes = this.userLoadout.heroes;
-		return heroes.map((heroName) => AssetGenerator.getAssetAsSpriteAsset(heroName));
+		const heroNames = this.userLoadout.heroes;
+		const heroes = [];
+		for (let x = 0; x < heroNames.length; x++) {
+			heroes.push(await AssetGenerator.getAssetAsSpriteAsset(heroNames[x]) as typeof Hero);
+		}
+		return heroes;
 	}
 
 	/**
@@ -74,8 +80,13 @@ export class UserLoadoutManager {
 
 export interface UserLoadoutData {
 	heroes: string[];
+	heroUpgrades: Record<string, StatBlockCharacterModification[]>;
+
 	towers: string[];
+	towerUpgrades: Record<string, StatBlockCharacterModification[]>;
+
 	powers: string[];
+	powerUpgrades: Record<string, StatBlockPowerModification[]>;
+
 	economyData: EconomyData;
-	//upgrades: UserLoadoutUpgrades; // To do later
 }

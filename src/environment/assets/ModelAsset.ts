@@ -7,6 +7,8 @@ export abstract class ModelAsset extends Asset {
 	/**
 	 * Model Asset Properties
 	 */
+	groupTransforms: THREE.Group; // Middle group - applies minor transformations
+	groupModel: THREE.Group; // Innermost group - applies status transforms
 	shadowsEnabled: boolean = false;
 	geometry: THREE.ShapeGeometry;
 	material: THREE.Material;
@@ -17,6 +19,14 @@ export abstract class ModelAsset extends Asset {
 	 * */
 	constructor(main: Main, assetName: string, assetType: string) {
 		super(main, assetName, assetType);
+
+		this.groupTransforms = new THREE.Group();
+		this.groupTransforms.name = `transforms-${assetName}`;
+		this.groupModel = new THREE.Group();
+		this.groupModel.name = `model-${assetName}`;
+
+		this.groupTransforms.add(this.groupModel);
+		this.groupMain.add(this.groupTransforms);
 	}
 
 	/**

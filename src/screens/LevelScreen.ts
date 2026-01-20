@@ -10,6 +10,7 @@ export class LevelScreen extends Screen {
 	/**
 	 * Core
 	 */
+	levelCode: string;
 	level: Level;
 
 	/**
@@ -17,7 +18,10 @@ export class LevelScreen extends Screen {
 	 * */
 	constructor(main: Main) {
 		super(main);
+	}
 
+	loadScreen(levelCode: string) {
+		this.levelCode = levelCode;
 		this.loadLevel();
 	}
 
@@ -26,7 +30,7 @@ export class LevelScreen extends Screen {
 	 */
 	loadLevel() {
 		const sLevel: LevelService = this.main.s('Level');
-		this.level = sLevel.loadLevel('Level_1');
+		this.level = sLevel.loadLevel(this.levelCode);
 		this.createUI();
 		this.startTick();
 	}
@@ -47,7 +51,7 @@ export class LevelScreen extends Screen {
 	 * Disposes of everything
 	 */
 	dispose() {
-		this.disposeLevelCommons();
+		this.disposeScreenCommons();
 		this.level.disposeLevel();
 
 	}

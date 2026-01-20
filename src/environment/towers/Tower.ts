@@ -1,7 +1,6 @@
 import THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { TowerStatesLegacy } from './TowerStats';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
@@ -32,7 +31,6 @@ export abstract class Tower extends CharacterAsset {
 	 * Status
 	 */
 	typeName: InteractableTypes = "tower";
-	states: TowerStatesLegacy = new TowerStatesLegacy();
 	attackStateLength: number = 750;
 
 	/**
@@ -145,15 +143,6 @@ export abstract class Tower extends CharacterAsset {
 			}
 		}
 
-		if (this.stateMachine.isInState(TowerStates.attacking)) {
-			if (this.states.attacking.attackStartTime + this.states.attacking.attackDuration < new Date().getTime()) {
-				this.states.attacking.isAttacking = false;
-				this.groupModel.position.z = 0;
-			} else {
-				this.groupModel.position.z = Math.sin(timeProperties.elapsedTime * 50) / 10;
-			}
-		}
-
 		// Animate Projectiles
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
 	}
@@ -179,8 +168,17 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Removes a Projectile
 	 * */
-	removeProjectile(removedProjectile: Projectile) {
+	disposeProjectile(removedProjectile: Projectile) {
 		this.projectiles = this.projectiles.filter(projectile => projectile != removedProjectile);
+		removedProjectile.dispose();
+	}
+
+	/**
+	 * Disposes all projectiles
+	 */
+	disposeAllProjectiles() {
+		this.projectiles.forEach(projectile => projectile.dispose());
+		this.projectiles = [];
 	}
 
 	/**
@@ -206,13 +204,5 @@ export abstract class Tower extends CharacterAsset {
 	deselect() {
 		this.selected = false;
 		this.removeSelectionVisibleMesh();
-	}
-
-	/**
-	 * Dispose
-	 */
-	dispose() {
-		(this.instancedMesh.iMesh.material as THREE.Material).dispose();
-		this.instancedMesh.iMesh.geometry.dispose();
 	}
 }

@@ -3,7 +3,7 @@ import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
-import { AttackRangeTypes, Stats } from '../Stats';
+import { AttackRangeTypes, CharacterStats } from '../Stats';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Lupine extends Creep {
@@ -42,7 +42,7 @@ export class Lupine extends Creep {
 	/**
 	 * Stats
 	 * */
-	stats = new Stats({
+	stats = new CharacterStats({
 		movement: {
 			speed: 4,
 			type: MovementTypes.walking,

@@ -154,6 +154,15 @@ export class InteractionService2 extends Service {
 
 		return false;
 	}
+
+	/**
+	 * Clear all interactables and event listeners
+	 */
+	clearAll() {
+		this.interactables = [];
+		this.interactableListeners = [];
+		this.currentInteractive = null;
+	}
 }
 
 export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile | MapNode;

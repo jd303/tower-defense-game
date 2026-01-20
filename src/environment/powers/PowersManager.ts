@@ -7,6 +7,7 @@ import { UIRegions } from '../../game/UIProperties';
 import { EconomyService } from '../../game/EconomyService';
 import { InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
 import { AssetGenerator } from '../assets/AssetGenerator';
+import { StatBlockPowerModification } from '../Stats';
 
 export class PowersManager {
 	/**
@@ -14,6 +15,7 @@ export class PowersManager {
 	 * */
 	main: Main;
 	level: Level;
+	powerUpgrades: Record<string, StatBlockPowerModification[]> = {};
 
 	/**
 	 * Construtor
@@ -28,6 +30,12 @@ export class PowersManager {
 	 */
 	setup(levelPowers: typeof Power[]) {
 		const sUI: UIService = this.main.s('UI');
+
+		levelPowers.forEach(power => {
+			const powerUpgrades = this.powerUpgrades[power.assetName] || [];
+			powerUpgrades.forEach(upgrade => power.stats.addUpgrade(upgrade));
+		});
+
 		levelPowers.forEach((power: typeof Power) => {
 			const button = sUI.createIconButton(power.buttonIcon, UIRegions.Power);
 			button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.powerCreationUIButton.bind(this, event, power, button)());
@@ -44,14 +52,14 @@ export class PowersManager {
 		// Can we afford it?
 		const sEconomy: EconomyService = this.main.s('Economy');
 		const currentPower = sEconomy.getEconomicProperty('power');
-		const affordable = currentPower && currentPower.current >= power.powerCost;
+		const affordable = currentPower && currentPower.current >= power.stats.activeStats.cost;
 
 		if (affordable) {
 			button.select();
 
 			// Notify the Interaction Service that we want to create a tower
 			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-			sInteraction2.registerInteractableListener('terrain', 'createPower', (event) => this.requestAddPower.bind(this, power, event, button)(), true);
+			sInteraction2.registerInteractableListener('terrain', 'createPower', (event) => this.requestAddPower.bind(this)(power, event, button), true);
 		}
 	}
 
@@ -61,7 +69,7 @@ export class PowersManager {
 	requestAddPower(power: typeof Power, event: InteractionEvent, button: UIButton) {
 		// Pay the cost
 		const sEconomy: EconomyService = this.main.s('Economy');
-		sEconomy.adjustEconomyValue('power', -1 * power.powerCost);
+		sEconomy.adjustEconomyValue('power', -1 * power.stats.activeStats.cost);
 
 		// Create the power
 		this.createPower(power, event.raycasterInteraction.point.point);
@@ -79,6 +87,6 @@ export class PowersManager {
 	 * Creates a power
 	 */
 	async createPower(power: typeof Power, position: THREE.Vector3) {
-		AssetGenerator.createPowerAsset(power.assetName, this.main, this.level, position);
+		return await AssetGenerator.createPowerAsset(power.assetName, this.main, this.level, position);
 	}
 }

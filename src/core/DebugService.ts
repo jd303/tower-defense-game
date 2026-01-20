@@ -13,6 +13,7 @@ export class DebugService extends Service {
 	 * Properties
 	 * */
 	main: Main;
+	debugMode: boolean;
 	lilGUI: lil.GUI;
 
 	/**
@@ -44,24 +45,26 @@ export class DebugService extends Service {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, debugMode: boolean, tickService: TickService) {
+	constructor(main: Main, debugMode: boolean) {
 		super();
 
 		this.main = main;
+		this.debugMode = debugMode;
 
-		if (debugMode) {
-			this.lilGUI = new lil.GUI();
-
-			this.lilGUI.add(tickService, 'pauseTick').name('Pause Tick');
-			this.lilGUI.add(tickService, 'unpauseTick').name('Unpause Tick');
-			this.lilGUI.add(this, 'cycleTickSpeed').name('Cycle Tick Speed');
-
-			this.watchDrawCalls();
-			this.addZoneCreatoreLilGUI();
-			this.addTerrainPositionWatcher();
-		}
+		this.createLilGUI();
 
 		return this;
+	}
+
+	/**
+	 * Creates the default LilGUI
+	 */
+	createLilGUI() {
+		if (this.lilGUI) {
+			this.lilGUI.destroy();
+		}
+
+		this.lilGUI = new lil.GUI();
 	}
 
 	/**
@@ -159,13 +162,17 @@ export class DebugService extends Service {
 	/**
 	 * Add a Sphere to the scene at 0,0,0
 	 * */
-	addDebugSphere() {
+	addDebugSphere(initialProperties: { position?: THREE.Vector3, scale?: THREE.Vector3 }) {
 		const geometry = new THREE.SphereGeometry(1, 10, 10);
 		const material = new THREE.MeshStandardMaterial({ color: '#ffffff' });
 		const mesh = new THREE.Mesh(geometry, material);
 		mesh.position.set(0, 1.25, 0);
+		mesh.scale.set(1, 1, 1);
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
+
+		if (initialProperties.position) mesh.position.set(initialProperties.position.x, initialProperties.position.y, initialProperties.position.z);
+		if (initialProperties.scale) mesh.scale.set(initialProperties.scale.x, initialProperties.scale.y, initialProperties.scale.z);
 
 		this.main.scene.add(mesh);
 	}
@@ -173,7 +180,7 @@ export class DebugService extends Service {
 	/**
 	 * Add a Plane to the scene at 0,0,0
 	 * */
-	addDebugPlane() {
+	addDebugPlane(initialProperties: { position?: THREE.Vector3, scale?: THREE.Vector3 }) {
 		const geometry = new THREE.PlaneGeometry(100, 100);
 		const material = new THREE.MeshStandardMaterial({ color: '#aaaaaa' });
 		const mesh = new THREE.Mesh(geometry, material);
@@ -181,6 +188,9 @@ export class DebugService extends Service {
 		mesh.rotation.x = Math.PI * -0.5;
 		mesh.receiveShadow = true;
 		material.needsUpdate = true;
+
+		if (initialProperties.position) mesh.position.set(initialProperties.position.x, initialProperties.position.y, initialProperties.position.z);
+		if (initialProperties.scale) mesh.scale.set(initialProperties.scale.x, initialProperties.scale.y, initialProperties.scale.z);
 
 		this.main.scene.add(mesh);
 	}
@@ -244,9 +254,11 @@ export class DebugService extends Service {
 	 * Exports a Spline to the console
 	 */
 	exportPoints() {
-		console.log("Export spline");
+		console.group("%c >>>>>>>>>>>>>>>>>>>>> Spline Export", 'color: pink');
+		this.splineBuilder?.exportObject();
 		this.splineBuilder?.exportPathPoints();
 		this.splineBuilder?.exportVectorPoints();
+		console.groupEnd();
 	}
 
 	/**
@@ -276,20 +288,10 @@ export class DebugService extends Service {
 	}
 
 	/**
-	 * Adds spline tools
-	 */
-	addZoneCreatoreLilGUI() {
-		const folder = this.lilGUI.addFolder('Zone Creator');
-		folder.open(false);
-		folder.add(this.zoneCreatorObject, 'startZoneCreator');
-		folder.add(this.zoneCreatorObject, 'endZoneCreator');
-	}
-
-	/**
 	 * Creates a level creator
 	 */
-	addLevelCreatorLilGUI(levelCreator: LevelCreator) {
-		const levelCreatorFolder = this.lilGUI.addFolder('Level Creator');
+	addLevelEditorLilGUI(levelCreator: LevelCreator) {
+		const levelCreatorFolder = this.lilGUI.addFolder('Level Editor');
 		levelCreatorFolder.open(false);
 		this.levelCreator = levelCreator;
 		this.levelCreator.getLevelCreatorFeatures().forEach((feature: string) => {
@@ -305,6 +307,11 @@ export class DebugService extends Service {
 		splineFolder.add(this.splineObject, 'addSplinePointToEnd');
 		splineFolder.add(this.splineObject, 'exportPoints');
 		splineFolder.add(this.splineObject, 'destroySpline');
+
+		const folder = levelCreatorFolder.addFolder('Zone Tools');
+		folder.open(false);
+		folder.add(this.zoneCreatorObject, 'startZoneCreator');
+		folder.add(this.zoneCreatorObject, 'endZoneCreator');
 	}
 
 	/**

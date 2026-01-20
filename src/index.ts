@@ -42,7 +42,7 @@ main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
 main.registerService('FogOfWar', new FogOfWarService(main));
 main.registerService('Particle', new ParticleService(main));
-main.registerService('Debug', new DebugService(main, debugMode, main.s('Tick')));
+main.registerService('Debug', new DebugService(main, debugMode));
 main.registerService('Screen', new ScreenService(main));
 
 // Setup Screens

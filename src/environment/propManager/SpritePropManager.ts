@@ -59,13 +59,18 @@ export class SpritePropManager {
 	 */
 	async registerProp(args: LevelPropDefinition, levelDetails?: LevelDefinition) {
 		const assetInstance = await AssetGenerator.createSpriteAsset(args.assetName, this.main) as SpriteAsset;
-		const colourisation = levelDetails?.propColourisation && levelDetails?.propColourisation[args.assetName];
-		this.spriteAssets.push(assetInstance);
-		assetInstance.registerOnLoadCallback(() => {
-			colourisation && assetInstance.setColourisation(colourisation);
-			assetInstance.setPosition(args.position);
-			if (args.scale) assetInstance.setScale(args.scale);
-		});
+		if (assetInstance) {
+			const colourisation = levelDetails?.propColourisation && levelDetails?.propColourisation[args.assetName];
+			this.spriteAssets.push(assetInstance);
+
+			assetInstance.registerOnLoadCallback(() => {
+				colourisation && assetInstance.setColourisation(colourisation);
+				assetInstance.setPosition(args.position);
+				if (args.scale) assetInstance.setScale(args.scale);
+			});
+		} else {
+			console.error(`Asset not configured - ${args.assetName}`);
+		}
 	}
 
 	/**

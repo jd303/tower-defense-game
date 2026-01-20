@@ -4,7 +4,7 @@ import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStates, CreepTransitions } from './CreepStates';
-import { AttackRangeTypes, Stats } from '../Stats';
+import { AttackRangeTypes, CharacterStats } from '../Stats';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Wisp extends Creep {
@@ -43,7 +43,7 @@ export class Wisp extends Creep {
 	/**
 	 * Stats
 	 * */
-	stats = new Stats({
+	stats = new CharacterStats({
 		movement: {
 			speed: 2.75,
 			type: MovementTypes.flying,

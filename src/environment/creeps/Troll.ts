@@ -3,7 +3,7 @@ import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 import { Creep } from './Creep';
-import { AttackRangeTypes, Stats } from '../Stats';
+import { AttackRangeTypes, CharacterStats } from '../Stats';
 
 export class Troll extends Creep {
 	/**
@@ -41,7 +41,7 @@ export class Troll extends Creep {
 	/**
 	 * Stats
 	 * */
-	stats = new Stats({
+	stats = new CharacterStats({
 		movement: {
 			speed: 1.9,
 			type: MovementTypes.walking,

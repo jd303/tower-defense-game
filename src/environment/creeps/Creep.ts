@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { StateMachine, StateMachineEvents } from '../../core/StateMachine';
 import { TickTimeProperties } from '../../core/TickService';
@@ -9,7 +8,7 @@ import { MovePathDefinition } from '../../data/PathInterfaces';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
-import { AttackStats, Stats } from '../Stats';
+import { CharacterAttackStats, CharacterStats } from '../Stats';
 
 export abstract class Creep extends CharacterAsset {
 	/**
@@ -22,16 +21,8 @@ export abstract class Creep extends CharacterAsset {
 	 * */
 	typeName: InteractableTypes = "creep";
 	interactiveOrder = InteractableOrders.creeps;
-	stats: Stats;
-	newStats: Stats;
-
-	/**
-	 * Three Assets
-	 * */
-	groupMain: THREE.Group; // Outermost group - transforms the whole model
-	groupTransforms: THREE.Group; // Inner group - applies minor transformations
-	groupModel: THREE.Group; // Innermost group - applies status transforms
-	mesh: THREE.Mesh;
+	stats: CharacterStats;
+	newStats: CharacterStats;
 
 	/**
 	 * System Properties
@@ -171,7 +162,7 @@ export abstract class Creep extends CharacterAsset {
 	/**
 	 * Resolves when a creep was attacked
 	 * */
-	resolveAttack(attack: AttackStats) {
+	resolveAttack(attack: CharacterAttackStats) {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
@@ -271,7 +262,7 @@ export abstract class Creep extends CharacterAsset {
 	 * */
 	deleteCreep() {
 		this.stateMachine.remove();
-		this.dispose();
+		this.hideInstancedMesh();
 		this.main.s('Level').currentLevel.creepManager.removeCreep(this);
 	}
 
