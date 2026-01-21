@@ -14,6 +14,7 @@ export abstract class SpriteAsset extends Asset {
 	static AnimationAttributes: ShaderMaterialAttributes;
 	static spriteSheetRows: SpriteSheetRow[] = [];
 	static instancedMeshInstanceCount: number;
+	static instancedMeshAnimates: boolean; // False doesn't fire needsUpdate on the instancedMesh in updateInstancedMeshes()
 
 	/**
 	 * Sprite Asset Properties
@@ -53,7 +54,7 @@ export abstract class SpriteAsset extends Asset {
 		this.setPositionerScale();
 
 		this.registerOnLoadCallback(() => {
-			this.setupSpriteSheetFrameManager(spriteSheetRows);
+			if (spriteSheetRows.length > 1) this.setupSpriteSheetFrameManager(spriteSheetRows);
 		});
 	}
 
@@ -90,7 +91,7 @@ export abstract class SpriteAsset extends Asset {
 		const sInstancedMesh: InstancedMeshService = this.main.s('InstancedMesh');
 		const assetClass = await AssetGenerator.getAssetAsSpriteAsset(assetName);
 
-		const instancedMesh = await sInstancedMesh.sourceInstancedMesh(assetName, assetClass, this.spriteSheet, assetClass.instancedMeshInstanceCount);
+		const instancedMesh = await sInstancedMesh.sourceInstancedMesh(assetName, assetClass, this.spriteSheet, assetClass.instancedMeshInstanceCount, assetClass.instancedMeshAnimates);
 		if (instancedMesh) {
 			this.instancedMesh = instancedMesh;
 			this.instancedMeshIndex = this.instancedMesh.assignInstancedMeshIndex();
@@ -137,7 +138,7 @@ export abstract class SpriteAsset extends Asset {
 		let row = 0;
 		let speed = 0;
 		let cellsInRow = 1;
-		let animationTimeOffset = Math.random() * 100;
+		let animationTimeOffset = Math.ceil((Math.random() * 100) * 100) / 100;
 
 		if (assetClass.spriteSheetRows && assetClass.spriteSheetRows.length) {
 			speed = assetClass.AnimationAttributes.animationSpeed;
@@ -148,6 +149,20 @@ export abstract class SpriteAsset extends Asset {
 		this.instancedMesh.geometry.attributes.animationSpeed.setX(this.instancedMeshIndex, speed);
 		this.instancedMesh.geometry.attributes.animationTimeOffset.setX(this.instancedMeshIndex, animationTimeOffset);
 		this.instancedMesh.geometry.attributes.cellsInRow.setX(this.instancedMeshIndex, cellsInRow);
+
+		// Then tell the instancedMesh that there is a new guy on the block (increments the initial count)
+		if (this.instancedMesh.iMesh.count + 1 > this.instancedMesh.iMeshMaximumIndexes) console.error("Critical - Sprite exceeds expected InstancedMesh Indexes!");
+		this.instancedMesh.iMesh.count += 1;
+
+		// Update everything
+		if (this.instancedMesh.iMesh.geometry.attributes.animationRow) {
+			this.instancedMesh.iMesh.geometry.attributes.animationRow.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.animationSpeed.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.cellsInRow.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.mirrorX.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.animationTimeOffset.needsUpdate = true;
+			this.instancedMesh.iMesh.instanceMatrix.needsUpdate = true;
+		}
 	}
 
 	/**
@@ -165,7 +180,7 @@ export abstract class SpriteAsset extends Asset {
 		} catch (e) {
 			console.error(`ERROR TRIGGERED IN setInstancedMeshPosition for ${this.assetName} - ${e}`);
 		}
-	} //TypeError: Cannot read properties of undefined (reading 'iMesh')
+	}
 
 	/**
 	 * Sets the Instanced Mesh scale
@@ -278,18 +293,6 @@ export class SpriteSheetFrameManager {
 			this.instancedMesh.geometry.attributes.mirrorX.setX(this.owner.instancedMeshIndex, isMirrored ? 1 : 0);
 			this.instancedMesh.geometry.attributes.mirrorX.needsUpdate = true;
 		}
-	}
-
-	/**
-	 * Chooses the next frame from the current row
-	 */
-	nextFrame(): number {
-		const step = this.mirrored ? -1 : 1;
-		this.currentRow.currentFrame = this.currentRow.currentFrame + step;
-		if (this.currentRow.currentFrame < 0) this.currentRow.currentFrame = this.currentRow.totalFrames - 1;
-		else if (this.currentRow.currentFrame > this.currentRow.totalFrames - 1) this.currentRow.currentFrame = 0;
-
-		return this.currentRow.currentFrame;
 	}
 }
 

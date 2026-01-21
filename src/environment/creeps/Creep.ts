@@ -10,11 +10,14 @@ import { CharacterAsset } from '../assets/CharacterAsset';
 import { SpriteSheetRow } from '../assets/SpriteAsset';
 import { CharacterAttackStats, CharacterStats } from '../Stats';
 
+
 export abstract class Creep extends CharacterAsset {
 	/**
 	 * Static values
 	 */
 	static instancedMeshInstanceCount: number = 100;
+	static instancedMeshAnimates: boolean = true;
+	static waveDifficulty: number;
 
 	/**
 	 * Stats

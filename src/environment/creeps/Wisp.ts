@@ -1,5 +1,4 @@
 import { Main } from '../../core/Main';
-import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
@@ -16,6 +15,7 @@ export class Wisp extends Creep {
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
 	static assetScale: number = 0.25;
 	static assetPositionY = 3;
+	static waveDifficulty = 1.5;
 
 	/**
 	 * Spritesheet & InstancedMesh properties
@@ -23,7 +23,7 @@ export class Wisp extends Creep {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 2 },
-			uFrameRows: { value: 1 },
+			uFrameRows: { value: 2 },
 			uSize: { value: 8 }
 		},
 		alphaTest: 0.5,
@@ -35,6 +35,11 @@ export class Wisp extends Creep {
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "walk",
+			totalFrames: 2,
+			currentFrame: 0,
+		},
+		{
+			name: "power",
 			totalFrames: 2,
 			currentFrame: 0,
 		}
@@ -85,7 +90,7 @@ export class Wisp extends Creep {
 		super(main, Wisp.assetName, Wisp.assetType, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.assetScale);
 
 		this.modifyStateMachine();
-		this.stateMachine.transition('moving');
+		this.stateMachine.transition(CreepStates.pathmoving);
 
 		return this;
 	}
@@ -99,15 +104,23 @@ export class Wisp extends Creep {
 			name: CreepStates.pathmoving,
 			autoTransition: CreepTransitions.activating_standing_power,
 			autoTransitionTimeMS: 5000,
+			onEnter: this.activatePathMoving.bind(this),
 		});
 
 		// Wisps then activate and move on
 		this.stateMachine.modifyState(CreepStates.activatingStandingPower, {
 			name: CreepStates.activatingStandingPower,
 			autoTransition: CreepTransitions.pathmoving,
-			autoTransitionTimeMS: 1750,
+			autoTransitionTimeMS: 2000,
 			onEnter: this.activateStandingPower.bind(this),
 		});
+	}
+
+	/**
+	 * WISP: Normal walking
+	 */
+	activatePathMoving() {
+		this.spriteSheetFrameManager?.changeAnimation('walk');
 	}
 
 	/**
@@ -115,6 +128,8 @@ export class Wisp extends Creep {
 	 * */
 	activateStandingPower(): void {
 		console.log('%c WISP: Life Scales', 'color: purple');
+
+		this.spriteSheetFrameManager.changeAnimation('power');
 
 		const creepsAroundMe = this.main.s('Position').getCreepsInRadiusFromPosition(this.groupMain.position, 15);
 		const creepsThatArentMe = creepsAroundMe.filter((creep: Creep) => creep !== this);
@@ -129,9 +144,4 @@ export class Wisp extends Creep {
 			creep.setHealthByPercentage(averageHealthPercentage);
 		});
 	}
-
-	/**
-	 * Animations
-	 * */
-	animate(timeProperties: TickTimeProperties) { }
 }

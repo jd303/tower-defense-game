@@ -3,7 +3,14 @@ import { Vector3 } from 'three';
 import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
+	difficulty: 1,
 	terrain: TerrainTypes.sand,
+	creepOptions: [
+		{ name: 'CreepTrollDink', chance: 0.4 },
+		{ name: 'CreepLupine', chance: 0.4 },
+		{ name: 'CreepTroll', chance: 0.1 },
+		{ name: 'CreepWisp', chance: 0.1 },
+	],
 	paths: [
 		{
 			id: 1,

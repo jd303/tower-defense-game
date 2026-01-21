@@ -1,5 +1,4 @@
 import { Main } from '../../core/Main';
-import { TickTimeProperties } from '../../core/TickService';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
@@ -15,6 +14,7 @@ export class Lupine extends Creep {
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
 	static assetScale: number = 0.25;
 	static assetPositionY: number = 0.5;
+	static waveDifficulty = 1;
 
 	/**
 	 * Spritesheet & InstancedMesh properties
@@ -85,9 +85,4 @@ export class Lupine extends Creep {
 
 		return this;
 	}
-
-	/**
-	 * Animations
-	 * */
-	animate(timeProperties: TickTimeProperties) { }
 }

@@ -56,7 +56,7 @@ export class Level {
 		this.propManager = new SpritePropManager(this.main);
 		this.towerManager = new TowerManager(this.main);
 		this.creepManager = new CreepManager(this.main, this);
-		this.waveManager = new WaveManager(this, this.main);
+		this.waveManager = new WaveManager(this.main, this);
 		this.heroManager = new HeroManager(this.main, this);
 		this.powersManager = new PowersManager(this.main, this);
 		this.userLoadoutManager = new UserLoadoutManager(this.main);
@@ -97,20 +97,28 @@ export class Level {
 		/**
 		 * New Instanced Mesh Generation
 		 */
-		const includedCreeps = [{
-			difficulty: 2,
-			name: 'CreepTroll',
-		}, {
-			difficulty: 1,
-			name: 'CreepWisp'
-		}, {
-			difficulty: 1,
-			name: 'CreepLupine'
-		}, {
-			difficulty: 0,
-			name: 'CreepTrollDink'
-		}];
-		this.waveManager.createLevelWaves(1, includedCreeps);
+		const includedCreeps = [
+			{
+				difficulty: 0,
+				chance: 0.4,
+				name: 'CreepTrollDink'
+			},
+			{
+				chance: 0.4,
+				difficulty: 1,
+				name: 'CreepLupine'
+			},
+			{
+				chance: 0.1,
+				difficulty: 2,
+				name: 'CreepTroll',
+			},
+			{
+				chance: 0.1,
+				difficulty: 1,
+				name: 'CreepWisp'
+			}];
+		await this.waveManager.createLevelWaves(1, includedCreeps);
 		this.waveManager.startWaveTimer();
 	}
 
@@ -263,7 +271,16 @@ export class Level {
 
 		sDebug.lilGUI.add(sTick, 'pauseTick').name('Pause Tick');
 		sDebug.lilGUI.add(sTick, 'unpauseTick').name('Unpause Tick');
-		sDebug.lilGUI.add(sDebug, 'cycleTickSpeed').name('Cycle Tick Speed');
+
+		sDebug.addDebugNumber({
+			folder: '',
+			objectParent: sTick,
+			property: 'masterSpeed',
+			min: 0,
+			max: 4,
+			step: 0.01,
+			name: `Tick Speed`,
+		});
 
 		sDebug.watchDrawCalls();
 		sDebug.addTerrainPositionWatcher();

@@ -14,6 +14,7 @@ export class Troll extends Creep {
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-troll.png';
 	static assetScale: number = 0.7;
 	static assetPositionY: number = 3;
+	static waveDifficulty = 3;
 
 	/**
 	 * Spritesheet & InstancedMesh properties

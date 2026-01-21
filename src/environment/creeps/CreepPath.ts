@@ -13,7 +13,7 @@ export class CreepPath {
 	/**
 	 * Setup Properties
 	 * */
-	pathWidth: number = 9;
+	static pathWidth: number = 9;
 	variantDistance: number = 5;
 
 	/**
@@ -59,10 +59,10 @@ export class CreepPath {
 	/**
 	 * Creates a variant path for uniqueness
 	 * */
-	createVariantPath(): MovePathDefinition {
+	createVariantPath(adjust?: { x: number, z: number }): MovePathDefinition {
 		const sPath = this.main.s('Path');
 
-		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.pathPoints, this.getRandomAdjustX(), this.getRandomAdjustZ());
+		const variantPath = sPath.createMovePath(this.corePath.id, this.corePath.pathPoints, adjust && adjust.x || this.getRandomAdjustX(), adjust && adjust.z || this.getRandomAdjustZ());
 		this.variantPaths.push(variantPath);
 		return variantPath;
 	}
@@ -73,7 +73,7 @@ export class CreepPath {
 	createPathGeometry(pathDefinition: PathDefinition) {
 		if (pathDefinition.pathGeometry == PathGeometryTypes.none) return;
 
-		const lineWidth = this.pathWidth;
+		const lineWidth = CreepPath.pathWidth;
 		const lineHeight = -0.1;
 
 		// Create the path shape

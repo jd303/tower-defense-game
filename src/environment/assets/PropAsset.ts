@@ -10,6 +10,7 @@ export abstract class PropAsset extends SpriteAsset {
 	static assetScale: number;
 	static instancedMeshAssetScale: number;
 	static instancedMeshInstanceCount: number;
+	static instancedMeshAnimates: boolean = false;
 
 	/**
 	 * Constructor

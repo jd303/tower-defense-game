@@ -74,7 +74,7 @@ export class SpriteService {
 		  attribute float animationRow;
 		  attribute float cellsInRow;
 		  attribute float animationSpeed;
-		  attribute float animationOffset;
+		  attribute float animationTimeOffset;
         attribute float mirrorX;
         
         varying vec2 vUv;
@@ -90,13 +90,13 @@ export class SpriteService {
             vInstanceColor = instanceColor;
             vMirrorX = mirrorX;
 
-				float staggeredTime = uTime + animationOffset;
+				float staggeredTime = uTime + animationTimeOffset;
             float timeScaled = staggeredTime * animationSpeed;
             
             float frameWidth = 1.0 / uFrameCols;
             float frameHeight = 1.0 / uFrameRows;
             float row = animationRow;
-				float col = floor(mod(uTime * animationSpeed, cellsInRow)) * step(1.1, cellsInRow);
+				float col = floor(mod(timeScaled, cellsInRow)) * step(1.1, cellsInRow);
 
 				if (mirrorX > 0.5) {
 					col = (uFrameCols - 1.0) - col;

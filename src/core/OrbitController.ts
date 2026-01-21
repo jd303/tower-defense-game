@@ -26,6 +26,10 @@ export class OrbitController {
 		this.controls.maxZoom = 0;
 		this.controls.minZoom = 0;
 		this.controls.panSpeed = 1;
+		this.controls.touches = {
+			ONE: THREE.TOUCH.PAN,
+			TWO: THREE.TOUCH.DOLLY_PAN
+		}
 		this.main = main;
 		this.panClampBounds = this.main.debugMode ? this.panClampBoundsDebug : this.panClampBoundsGame;
 

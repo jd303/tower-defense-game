@@ -79,7 +79,8 @@ export class Main {
 		console.log("%c In environment tile, we need to send uTime not using a setInterval", 'color: red');
 		console.log("%c Projectile Splash effect doesn't seem to work?", 'color: red');
 		console.log("%c Feedback when a Projectile misses.", 'color: red');
-		console.log("%c I've preloaded the game with user upgrades.  Remove for a more realistic starting difficulty.", 'color: red');
+		console.log("%c I've preloaded the game with user upgrades (_userLoadoutData.ts).  Remove for a more realistic starting difficulty.", 'color: red');
+		console.log("%c iPad and iPhone needs to be able to zoom out a little further than desktop, so maybe consider adjusting zoom for device, or using a letterbox effect?", 'color: red');
 
 		return this;
 	}

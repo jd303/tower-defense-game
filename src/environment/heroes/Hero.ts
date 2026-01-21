@@ -23,6 +23,7 @@ export abstract class Hero extends CharacterAsset {
 	 * Static values
 	 */
 	static instancedMeshInstanceCount: number = 1;
+	static instancedMeshAnimates: boolean = true;
 
 	/**
 	 * Stats
@@ -446,7 +447,7 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Selection Callbacks
 	 * */
-	select(event: InteractionEvent) {
+	select(/*event: InteractionEvent*/) {
 		if (this.selected) {
 			this.deselect();
 		} else {
@@ -454,7 +455,6 @@ export abstract class Hero extends CharacterAsset {
 			this.addSelectionVisibleMesh();
 
 			// Register a new listener to make the movement
-			console.log("SELECT HERO", this);
 			const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 			sInteraction2.registerInteractableListener('terrain', 'registerHeroMovement', this.registerMovement.bind(this));
 		}

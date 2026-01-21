@@ -2,6 +2,13 @@ import { PathGeometryTypes } from '../../data/PathInterfaces';
 import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
+	difficulty: 1,
+	creepOptions: [
+		{
+			name: 'CreepTrollDink',
+			chance: 1
+		}
+	],
 	terrain: TerrainTypes.sand,
 	paths: [
 		{

@@ -26,6 +26,8 @@ export class InteractionService2 extends Service {
 	 * */
 	main: Main;
 	sRaycaster: RaycasterService;
+	isTouchDevice: boolean = false;
+	interactionEvent: keyof WindowEventMap;
 
 	/**
 	 * Interactables and Handlers
@@ -43,6 +45,10 @@ export class InteractionService2 extends Service {
 
 		this.main = main;
 		this.sRaycaster = this.main.s('Raycaster');
+
+		const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+		this.isTouchDevice = isTouchDevice;
+		this.interactionEvent = isTouchDevice ? 'touchstart' : 'click';
 
 		// Setup Click Listener
 		this.setupClickListener();
@@ -102,16 +108,16 @@ export class InteractionService2 extends Service {
 	 * Listens for all clicks
 	 * */
 	setupClickListener() {
-		window.addEventListener('click', this.clickListener.bind(this));
+		window.addEventListener(this.interactionEvent, this.clickListener.bind(this));
 	}
 	removeClickListener() {
-		window.removeEventListener('click', this.clickListener.bind(this));
+		window.removeEventListener(this.interactionEvent, this.clickListener.bind(this));
 	}
 
 	/**
 	 * Click Listener
 	 * */
-	clickListener(event: MouseEvent | TouchEvent) {
+	clickListener(event: Event) {
 		const targets = this.interactables;
 		const cancelTargets: any[] = [];
 		let target;

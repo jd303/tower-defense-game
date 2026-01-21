@@ -24,7 +24,7 @@ export const orthographicCameraLevel: CameraSettings = {
 	maxPolarAngle: Math.PI * 0.23, // Was 0.4, the lower the less range
 	minAzimuthAngle: 0,
 	maxAzimuthAngle: 0,
-	minZoom: 0.7,
+	minZoom: 0.6,
 	maxZoom: 1.2,
 	clampingEnabled: true
 };

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as lil from 'lil-gui';
 import { Light } from './LightingService';
-import { TickCallback, TickService, TickSpeed } from './TickService';
+import { TickCallback } from './TickService';
 import { Main } from './Main';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
@@ -38,7 +38,6 @@ export class DebugService extends Service {
 	/**
 	 * References
 	 */
-	currentGameSpeed: TickSpeed;
 	debugDivRef: HTMLElement | null;
 	splineBuilder?: SplineBuilder;
 
@@ -65,17 +64,6 @@ export class DebugService extends Service {
 		}
 
 		this.lilGUI = new lil.GUI();
-	}
-
-	/**
-	 * Cycles through game speeds
-	 */
-	cycleTickSpeed() {
-		const sTick: TickService = this.main.s('Tick');
-
-		const gameSpeed = this.currentGameSpeed == TickSpeed.fast && TickSpeed.slow || this.currentGameSpeed == TickSpeed.slow && TickSpeed.default || TickSpeed.fast;
-		this.currentGameSpeed = gameSpeed;
-		sTick.setGameSpeed(gameSpeed);
 	}
 
 	/**
@@ -280,7 +268,7 @@ export class DebugService extends Service {
 	 * Prints the click point when the user clicks on the terrain
 	 */
 	debugTerrainPoint(event: InteractionEvent) {
-		console.group('Debug: Click Terrain');
+		console.groupCollapsed('Debug: Click Terrain');
 		console.log(`${event.raycasterInteraction.point.point.x.toFixed(5)},0,${event.raycasterInteraction.point.point.z.toFixed(5)}`);
 		console.log(event.raycasterInteraction.object);
 		console.groupEnd();

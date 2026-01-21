@@ -125,7 +125,7 @@ export abstract class Asset {
 		for (let x = 0; x < 4; x++) {
 			const thisCross = AssetCommons.healingCrossMesh();
 			thisCross.position.x += Math.random() - 0.5;
-			thisCross.position.y += Math.random();
+			thisCross.position.y += Math.random() + 2.5;
 			const scale = Math.random() * 0.9 + 0.1;
 			thisCross.scale.set(scale, scale, scale);
 

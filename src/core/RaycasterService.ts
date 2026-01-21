@@ -53,12 +53,12 @@ export class RaycasterService extends Service {
 	 * When a click occurs, handle it
 	 * Will accept targets, and cancel if it first hits a cancelTarget
 	 * */
-	fireRayToTargets(event: MouseEvent | TouchEvent, targets: Interactable2[], singleTarget = false, cancelTargets: Interactable2[] = []): RaycasterIntersection[] | RaycasterIntersection | null {
+	fireRayToTargets(event: Event, targets: Interactable2[], singleTarget = false, cancelTargets: Interactable2[] = []): RaycasterIntersection[] | RaycasterIntersection | null {
 		const position: THREE.Vector2 = new THREE.Vector2(0, 0);
 		if (event instanceof MouseEvent) {
 			position.x = (event.clientX / this.main.sizes.width) * 2 - 1;
 			position.y = -((event.clientY / this.main.sizes.height) * 2 - 1);
-		} else {
+		} else if (event instanceof TouchEvent) {
 			position.x = (event.touches[0].clientX / this.main.sizes.width) * 2 - 1;
 			position.y = -((event.touches[0].clientY / this.main.sizes.height) * 2 - 1);
 		}

@@ -25,13 +25,13 @@ export class InstancedMeshService {
 	/**
 	 * Sources an instanced mesh or creates one
 	 */
-	async sourceInstancedMesh(assetName: string, assetClass: typeof SpriteAsset, spriteSheet: SpriteSheet, instancedMeshInstanceCount: number) {
+	async sourceInstancedMesh(assetName: string, assetClass: typeof SpriteAsset, spriteSheet: SpriteSheet, instancedMeshInstanceCount: number, instancedMeshAnimates: boolean) {
 		if (this.instancedMeshes[assetName]) {
 			if (this.instancedMeshes[assetName] instanceof Promise) {
 				return await this.instancedMeshes[assetName];
 			} else return this.instancedMeshes[assetName];
 		} else {
-			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetName, spriteSheet, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount);
+			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetName, spriteSheet, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount, instancedMeshAnimates);
 
 			if (instancedMesh) {
 				const positioner = new THREE.Object3D();
@@ -70,7 +70,7 @@ export class InstancedMeshService {
 	/**
 	 * Creates an instanced mesh for sprites
 	 */
-	createSpriteSheetInstancedMesh(assetName: string, spriteSheet: SpriteSheet, materialProperties: ShaderMaterialProperties, assetCount: number = 100) {
+	createSpriteSheetInstancedMesh(assetName: string, spriteSheet: SpriteSheet, materialProperties: ShaderMaterialProperties, assetCount: number = 100, instancedMeshAnimates: boolean = false) {
 		if (this.instancedMeshes[assetName]) return console.error(`Cannot recreate ${assetName} Instanced Mesh`);
 
 		const vertexShader = spriteSheet.spriteService.vertexShader;
@@ -87,6 +87,7 @@ export class InstancedMeshService {
 		});
 
 		const iMesh = new SpriteSheetInstancedMesh(this.main, assetName, this, material, assetCount);
+		iMesh.instancedMeshAnimates = instancedMeshAnimates;
 		this.instancedMeshes[assetName] = iMesh;
 
 		return iMesh;
@@ -111,9 +112,9 @@ export class InstancedMeshService {
 	 */
 	updateInstancedMeshes() {
 		Object.keys(this.instancedMeshes).forEach((iMeshRecord: any) => {
-			this.instancedMeshes[iMeshRecord].iMesh.instanceMatrix.needsUpdate = true;
-			//this.instancedMeshes[iMeshRecord].geometry.attributes.animationRow.needsUpdate = true;
-			//this.instancedMeshes[iMeshRecord].geometry.attributes.animationSpeed.needsUpdate = true;
+			if (this.instancedMeshes[iMeshRecord].instancedMeshAnimates) {
+				this.instancedMeshes[iMeshRecord].iMesh.instanceMatrix.needsUpdate = true;
+			}
 		});
 	}
 }
@@ -125,9 +126,11 @@ export class InstancedMesh {
 	main: Main;
 	assetName: string;
 	iMesh: THREE.InstancedMesh;
+	iMeshMaximumIndexes: number = 0;
 	iMeshTotalIndexes: number = 0;
 	geometry: THREE.PlaneGeometry;
 	instancedMeshService: InstancedMeshService;
+	instancedMeshAnimates: boolean = false;
 
 	/**
 	 * Constructor
@@ -137,9 +140,11 @@ export class InstancedMesh {
 		this.assetName = assetName;
 		this.instancedMeshService = instancedMeshService;
 		this.geometry = geometry;
+		this.iMeshMaximumIndexes = assetCount;
 
 		const mesh = new THREE.InstancedMesh(geometry, material, assetCount);
 		this.iMesh = mesh;
+		mesh.count = 0; // Manually set the count to 0, which will be incremented as assets are added
 		mesh.frustumCulled = false;
 
 		const colour = new THREE.Color(1, 1, 1);
