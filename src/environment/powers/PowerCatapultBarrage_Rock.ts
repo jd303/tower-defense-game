@@ -19,6 +19,7 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	static assetScale = 1;
 	static instancedMeshAssetScale = 1;
 	static instancedMeshInstanceCount = 5;
+	static instancedMeshAnimates: boolean = true;
 
 	/**
 	 * Spritesheet & InstancedMesh properties

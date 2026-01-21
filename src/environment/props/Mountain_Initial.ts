@@ -11,7 +11,7 @@ export class MountainInitial extends PropAsset {
 	static assetPositionY: number = 1;
 	static assetScale: number = 1;
 	static instancedMeshAssetScale: number = 2;
-	static instancedMeshInstanceCount: number = 500;
+	static instancedMeshInstanceCount: number = 1000;
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },

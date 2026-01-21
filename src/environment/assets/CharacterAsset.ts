@@ -46,6 +46,7 @@ export abstract class CharacterAsset extends SpriteAsset {
 		material.visible = false
 		const mesh = new THREE.Mesh(geometry, material);
 		mesh.position.y = this.instancedMeshPosition.position.y;
+		mesh.name = `${this.assetName}-selector`;
 		this.groupMain.add(mesh);
 	}
 

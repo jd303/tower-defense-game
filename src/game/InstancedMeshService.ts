@@ -168,9 +168,15 @@ export class InstancedMesh {
 	 * Gets the size of an instance based on the instance index
 	 */
 	getSizeOfInstance(instancedMeshIndex: number) {
-		const box = new THREE.Box3().setFromObject(this.iMesh);
+		/*const box = new THREE.Box3().setFromObject(this.iMesh);
 		const baseSize = new THREE.Vector3();
-		box.getSize(baseSize);
+		box.getSize(baseSize);*/
+
+		//const box = new THREE.Box3().setFromObject(this.iMesh);
+		this.iMesh.geometry.computeBoundingBox();
+		const geoBox = this.iMesh.geometry.boundingBox!;
+		const baseSize = new THREE.Vector3();
+		geoBox.getSize(baseSize);
 
 		const matrix = new THREE.Matrix4();
 		const scale = new THREE.Vector3();
@@ -187,8 +193,11 @@ export class InstancedMesh {
 		);
 
 		const material = this.iMesh.material as THREE.ShaderMaterial;
-		const finalWidth = baseSize.x * scale.x * this.iMesh.scale.x * material.uniforms.uSize.value;
-		const finalHeight = baseSize.y * scale.y * this.iMesh.scale.y * material.uniforms.uSize.value;
+		console.error("Need to calculate instance size properly, for selector");
+		//const finalWidth = baseSize.x * scale.x * this.iMesh.scale.x * material.uniforms.uSize.value;
+		//const finalHeight = baseSize.y * scale.y * this.iMesh.scale.y * material.uniforms.uSize.value;
+		const finalWidth = 3;
+		const finalHeight = 3;
 
 		return new THREE.Vector3(finalWidth, finalHeight, 1)
 	}

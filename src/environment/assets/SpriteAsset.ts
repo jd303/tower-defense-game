@@ -71,6 +71,7 @@ export abstract class SpriteAsset extends Asset {
 	async setupInstancedMesh(assetName: string) {
 		await this.sourceSpriteSheet(assetName);
 		await this.sourceInstancedMesh(assetName);
+		this.hideInstancedMesh();
 		this.setInstancedMeshInitialSettings(assetName);
 		this.loadCallbacks.forEach(callback => callback());
 	}
@@ -151,7 +152,7 @@ export abstract class SpriteAsset extends Asset {
 		this.instancedMesh.geometry.attributes.cellsInRow.setX(this.instancedMeshIndex, cellsInRow);
 
 		// Then tell the instancedMesh that there is a new guy on the block (increments the initial count)
-		if (this.instancedMesh.iMesh.count + 1 > this.instancedMesh.iMeshMaximumIndexes) console.error("Critical - Sprite exceeds expected InstancedMesh Indexes!");
+		if (this.instancedMesh.iMesh.count + 1 > this.instancedMesh.iMeshMaximumIndexes) console.error(`Critical - Sprite ${assetName} exceeds expected InstancedMesh Indexes!`);
 		this.instancedMesh.iMesh.count += 1;
 
 		// Update everything
