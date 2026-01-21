@@ -26,6 +26,7 @@ export abstract class Tower extends CharacterAsset {
 	static costType: string;
 	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
 	static instancedMeshInstanceCount: number = 25;
+	static instancedMeshAnimates: boolean = true;
 
 	/**
 	 * Status
