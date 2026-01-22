@@ -70,13 +70,15 @@ export class WaveManager {
 		const spacing = CreepPath.pathWidth * 0.85 / cols
 		const waveGrid = this.createWaveGridPositions(cols, rows, spacing, 0);
 
+		// Apply randomness to the waveGrid
+		waveGrid.map(point => ({
+			x: point.x + Math.random() * spacing / 1.5,
+			z: point.z > 0 && point.z - Math.random() / 2 || point.z + Math.random() / 2
+		}));
+
 		// Create creeps
 		wave.creepNames.forEach((creepName: string, index: number) => {
-			const variantPathPosition = {
-				x: (waveGrid[index].x + Math.random() * spacing / 1.5),
-				z: waveGrid[index].z > 0 && waveGrid[index].z - Math.random() / 2 || waveGrid[index].z + Math.random() / 2
-			}
-			const creepPath = wave.corePath.createVariantPath(variantPathPosition);
+			const creepPath = wave.corePath.createVariantPath(waveGrid[index]);
 			this.level.creepManager.addCreep(creepName, creepPath);
 		});
 

@@ -2,7 +2,7 @@ import THREE from "three";
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { EventHandlingResult, InteractableOrders, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
-import { SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
+import { ShaderAnimationAttributes, SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
 import { CharacterStats } from '../Stats';
 import { MovePathManager } from "../MovePathManager";
 import { AssetCommons } from "./Asset";
@@ -26,8 +26,8 @@ export abstract class CharacterAsset extends SpriteAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
-		super(main, assetName, assetType, assetPositionY, spriteSheetRows, instancedMeshAssetScale, instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetName, assetType, assetScale, assetPositionY, spriteSheetRows, animationAttributes);
 
 		this.registerOnLoadCallback(() => {
 			this.createSelectionGeometry();
@@ -40,8 +40,9 @@ export abstract class CharacterAsset extends SpriteAsset {
 	 * Creates invisible geometry for selection
 	 */
 	createSelectionGeometry() {
-		const size = this.instancedMesh.getSizeOfInstance(this.instancedMeshIndex);
-		const geometry = new THREE.BoxGeometry(size.x * 0.9, size.y * 0.9, size.z);
+		//const size = this.instancedMesh.getSizeOfInstance(this.instancedMeshIndex);
+		//const geometry = new THREE.BoxGeometry(size.x * 0.9, size.y * 0.9, size.z);
+		const geometry = new THREE.BoxGeometry(this.assetScale * 0.9, this.assetScale * 0.9, this.assetScale * 0.1);
 		const material = new THREE.MeshBasicMaterial();
 		material.visible = false
 		const mesh = new THREE.Mesh(geometry, material);
@@ -66,9 +67,14 @@ export abstract class CharacterAsset extends SpriteAsset {
 		this.setPosition(point);
 
 		// Set the look at
-		const currentPoint = path.path.getPoint(path.pathProgress) as THREE.Vector3;
-		const pointAhead = path.path.getPoint(path.pathProgress + 0.05) as THREE.Vector3;
-		pointAhead && this.spriteSheetFrameManager && this.spriteSheetFrameManager.mirrorSpriteSheet(pointAhead.x < currentPoint.x);
+		if (path.pathProgress > path.mirrorFacingPercentages![0]?.perc) {
+			try {
+				this.spriteSheetFrameManager.mirrorSpriteSheet(path.mirrorFacingPercentages![0].mirror);
+				path.mirrorFacingPercentages!.splice(0, 1);
+			} catch (e) {
+				console.error(`SpriteSheetFrameManager doesn't exist in animationMove - race condition? ${this.assetName}`);
+			}
+		}
 
 		// If this asset has finished its path
 		if (path.pathProgress >= 0.99) {

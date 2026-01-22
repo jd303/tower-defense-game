@@ -8,7 +8,7 @@ import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
 
 
 // Maybe split CharacterAsset out into TowerAsset as well, for this?
@@ -31,7 +31,7 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Status
 	 */
-	typeName: InteractableTypes = "tower";
+	interactiveTypeName: InteractableTypes = "tower";
 	attackStateLength: number = 750;
 
 	/**
@@ -49,8 +49,8 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
-		super(main, assetName, 'tower', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Tower.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetName, 'tower', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(TowerStates.scanning);

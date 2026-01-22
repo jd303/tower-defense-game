@@ -14,8 +14,8 @@ export class Man0 extends Hero {
 	static assetType = 'hero';
 	static assetName: string = 'Man0';
 	static assetPath: string = 'assets/spritesheets/heroes/spritesheet-man0.png';
-	static assetScale: number = 0.8;
-	static assetPositionY: number = 1.2;
+	static assetScale: number = 6;
+	static assetPositionY: number = 1.8;
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "idle",
@@ -82,13 +82,11 @@ export class Man0 extends Hero {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 4 },
-			uFrameRows: { value: 4 },
-			uSize: { value: 10 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 4 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 4
 	}
 
@@ -96,7 +94,7 @@ export class Man0 extends Hero {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Man0.assetName, Man0.assetType, Man0.assetPositionY, Man0.spriteSheetRows, Man0.assetScale);
+		super(main, Man0.assetName, Man0.assetType, Man0.assetScale, Man0.assetPositionY, Man0.spriteSheetRows, Man0.AnimationAttributes);
 
 		this.interceptionHandler.setInterceptionSlotCount(this.stats.activeStats.interception!.interceptionCount);
 

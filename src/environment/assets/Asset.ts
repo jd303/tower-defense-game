@@ -27,7 +27,7 @@ export abstract class Asset {
 	/**
 	 * Setup Properties
 	 */
-	typeName: InteractableTypes;
+	interactiveTypeName: InteractableTypes;
 	interactiveOrder: InteractableOrders;
 	interactive: boolean;
 	createGroups: boolean = true;
@@ -76,7 +76,7 @@ export abstract class Asset {
 	 * */
 	public readonly setInteractive = () => {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
-		sInteraction2.registerInteractable(new Interactable2(this.typeName, this.interactiveOrder, this));
+		sInteraction2.registerInteractable(new Interactable2(this.interactiveTypeName, this.interactiveOrder, this));
 	}
 	public readonly unsetInteractive = () => {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');

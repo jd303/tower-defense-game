@@ -82,6 +82,12 @@ export class InstancedMeshService {
 				uTime: { value: 0 },
 				uMap: { value: spriteSheet.texture },
 			},
+			defines: {
+				USE_ANIMATION: 1
+			},
+			alphaTest: 0.5,
+			transparent: true,
+			//precision: 'lowp',
 			vertexShader,
 			fragmentShader
 		});
@@ -167,10 +173,10 @@ export class InstancedMesh {
 	/**
 	 * Gets the size of an instance based on the instance index
 	 */
-	getSizeOfInstance(instancedMeshIndex: number) {
-		/*const box = new THREE.Box3().setFromObject(this.iMesh);
-		const baseSize = new THREE.Vector3();
-		box.getSize(baseSize);*/
+	/*getSizeOfInstance(instancedMeshIndex: number) {
+		//const box = new THREE.Box3().setFromObject(this.iMesh);
+		//const baseSize = new THREE.Vector3();
+		//box.getSize(baseSize);
 
 		//const box = new THREE.Box3().setFromObject(this.iMesh);
 		this.iMesh.geometry.computeBoundingBox();
@@ -193,14 +199,11 @@ export class InstancedMesh {
 		);
 
 		const material = this.iMesh.material as THREE.ShaderMaterial;
-		console.error("Need to calculate instance size properly, for selector");
-		//const finalWidth = baseSize.x * scale.x * this.iMesh.scale.x * material.uniforms.uSize.value;
-		//const finalHeight = baseSize.y * scale.y * this.iMesh.scale.y * material.uniforms.uSize.value;
-		const finalWidth = 3;
-		const finalHeight = 3;
+		const finalWidth = baseSize.x * scale.x * this.iMesh.scale.x * material.uniforms.uSize.value;
+		const finalHeight = baseSize.y * scale.y * this.iMesh.scale.y * material.uniforms.uSize.value;
 
 		return new THREE.Vector3(finalWidth, finalHeight, 1)
-	}
+	}*/
 
 	/**
 	 * Resets the instanced mesh

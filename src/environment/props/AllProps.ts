@@ -1,4 +1,4 @@
-import { TreeProps } from "./TreeProps";
+import { TreeProps } from "./trees/TreeProps";
 import { MountainProps } from "./MountainProps";
 
 export default [

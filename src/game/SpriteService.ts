@@ -71,80 +71,156 @@ export class SpriteService {
 	 */
 	createVertexShader() {
 		this.vertexShader = `
+			attribute float animationRow;
+			attribute float cellsInRow;
+			attribute float animationSpeed;
+			attribute float animationTimeOffset;
+			attribute float mirrorX;
+			
+			varying vec2 vUv;
+			varying vec3 vInstanceColor;
+			varying float vMirrorX;
+			
+			uniform float uTime;
+			uniform float uFrameCols;
+			uniform float uFrameRows;
+
+			void main() {
+				vInstanceColor = instanceColor;
+				vMirrorX = mirrorX;
+
+				float col = 0.0;
+				float row = animationRow;
+
+				// Dead Code Elimination - only animate sprites that need it
+				#if USE_ANIMATION == 1
+					float staggeredTime = uTime + animationTimeOffset;
+					float timeScaled = staggeredTime * animationSpeed;
+					col = floor(mod(timeScaled, cellsInRow)) * step(1.1, cellsInRow);
+				#endif
+
+				if (mirrorX > 0.5) {
+					col = (uFrameCols - 1.0) - col;
+				}
+
+				float frameWidth = 1.0 / uFrameCols;
+				float frameHeight = 1.0 / uFrameRows;
+
+				vUv.x = (uv.x + col) * frameWidth;
+				vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
+
+				vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+				float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
+				
+				mvPosition.xy += position.xy * instanceScale;
+				
+				gl_Position = projectionMatrix * mvPosition;
+			}`;
+	}
+
+	createFragmentShader() {
+		this.fragmentShader = `
+			uniform sampler2D uMap;
+			varying vec2 vUv;
+			varying vec3 vInstanceColor;
+			varying float vMirrorX;
+
+			void main() {
+				vec2 uv = vUv;
+				
+				// Dead Code Elimination - only animate sprites that need it
+				#if USE_ANIMATION == 1
+						if (vMirrorX > 0.5) {
+							float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
+							float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
+							float localU = (vUv.x - frameStartX) / frameWidth;
+							uv.x = frameStartX + (1.0 - localU) * frameWidth;
+						}
+				#endif
+				
+				vec4 color = texture2D(uMap, uv);
+				color.rgb = pow(color.rgb, vec3(0.5));
+				color.rgb *= vInstanceColor;
+
+				if (color.a < 0.1) discard;
+				gl_FragColor = color;
+			}`;
+	}
+	/*createVertexShader() {
+		this.vertexShader = `
 		  attribute float animationRow;
 		  attribute float cellsInRow;
 		  attribute float animationSpeed;
 		  attribute float animationTimeOffset;
-        attribute float mirrorX;
-        
-        varying vec2 vUv;
-        varying vec3 vInstanceColor;
-        varying float vMirrorX;
-        
+		  attribute float mirrorX;
+		  
+		  varying vec2 vUv;
+		  varying vec3 vInstanceColor;
+		  varying float vMirrorX;
+		  
 		  uniform float uTime;
-        uniform float uFrameCols;
-        uniform float uFrameRows;
-        uniform float uSize;
+		  uniform float uFrameCols;
+		  uniform float uFrameRows;
 
-        void main() {
-            vInstanceColor = instanceColor;
-            vMirrorX = mirrorX;
+		  void main() {
+				vInstanceColor = instanceColor;
+				vMirrorX = mirrorX;
 
 				float staggeredTime = uTime + animationTimeOffset;
-            float timeScaled = staggeredTime * animationSpeed;
-            
-            float frameWidth = 1.0 / uFrameCols;
-            float frameHeight = 1.0 / uFrameRows;
-            float row = animationRow;
+				float timeScaled = staggeredTime * animationSpeed;
+			   
+				float frameWidth = 1.0 / uFrameCols;
+				float frameHeight = 1.0 / uFrameRows;
+				float row = animationRow;
 				float col = floor(mod(timeScaled, cellsInRow)) * step(1.1, cellsInRow);
 
 				if (mirrorX > 0.5) {
 					col = (uFrameCols - 1.0) - col;
 				}
 
-            vUv.x = (uv.x + col) * frameWidth;
-            vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
+				vUv.x = (uv.x + col) * frameWidth;
+				vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
 
-            vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-            float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
-            
-            mvPosition.xy += position.xy * instanceScale * uSize;
-            
-            gl_Position = projectionMatrix * mvPosition;
-        }
-    `;
+				vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+				float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
+			   
+				mvPosition.xy += position.xy * instanceScale;
+			   
+				gl_Position = projectionMatrix * mvPosition;
+		  }
+	 `;
 	}
 	createFragmentShader() {
 		this.fragmentShader = `
-        uniform sampler2D uMap;
-        varying vec2 vUv;
-        varying vec3 vInstanceColor;
-        varying float vMirrorX;
+		  uniform sampler2D uMap;
+		  varying vec2 vUv;
+		  varying vec3 vInstanceColor;
+		  varying float vMirrorX;
 
-        void main() {
-            vec2 uv = vUv;
-            
-            if (vMirrorX > 0.5) {
-                float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
-                float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
-                float frameEndX = frameStartX + frameWidth;
+		  void main() {
+				vec2 uv = vUv;
+			   
+				if (vMirrorX > 0.5) {
+					 float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
+					 float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
+					 float frameEndX = frameStartX + frameWidth;
 					 
-                float localU = (vUv.x - frameStartX) / frameWidth;
-                localU = 1.0 - localU;
-                uv.x = frameStartX + localU * frameWidth;
-            }
-            
-            vec4 color = texture2D(uMap, uv);
-            
-            // Apply gamma correction to the texture and colorise
-            color.rgb = pow(color.rgb, vec3(0.5));
-            color.rgb *= vInstanceColor;
+					 float localU = (vUv.x - frameStartX) / frameWidth;
+					 localU = 1.0 - localU;
+					 uv.x = frameStartX + localU * frameWidth;
+				}
+			   
+				vec4 color = texture2D(uMap, uv);
+			   
+				// Apply gamma correction to the texture and colorise
+				color.rgb = pow(color.rgb, vec3(0.5));
+				color.rgb *= vInstanceColor;
 
-            if (color.a < 0.1) discard;
-            gl_FragColor = color;
-        }
-    `;
-	}
+				if (color.a < 0.1) discard;
+				gl_FragColor = color;
+		  }
+	 `;
+	}*/
 
 	/**
 	 * Creates a text sprite

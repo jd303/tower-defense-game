@@ -7,7 +7,7 @@ import { InteractableOrders, InteractableTypes, InteractionService2 } from '../.
 import { MovePathDefinition } from '../../data/PathInterfaces';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
 import { CharacterAttackStats, CharacterStats } from '../Stats';
 
 
@@ -16,13 +16,12 @@ export abstract class Creep extends CharacterAsset {
 	 * Static values
 	 */
 	static instancedMeshInstanceCount: number = 100;
-	static instancedMeshAnimates: boolean = true;
 	static waveDifficulty: number;
 
 	/**
 	 * Stats
 	 * */
-	typeName: InteractableTypes = "creep";
+	interactiveTypeName: InteractableTypes = "creep";
 	interactiveOrder = InteractableOrders.creeps;
 	stats: CharacterStats;
 	newStats: CharacterStats;
@@ -51,13 +50,16 @@ export abstract class Creep extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
-		super(main, assetName, 'creep', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Creep.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetName, 'creep', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
 
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.transition(CreepStates.pathmoving);
 		this.setInteractive();
 		this.setInteractiveCreep();
+
+		this.registerOnLoadCallback(() => {
+			setTimeout(() => this.stateMachine.transition(CreepStates.pathmoving), 1250);
+		});
 	}
 
 	/**

@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
@@ -9,18 +8,11 @@ import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerArcher extends Tower {
 	/**
-	 * Tower Assets
-	 * */
-	assetPath: string = 'assets/models/towers/Tower.Slinger.glb';
-	assetScale = 1.75;
-	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshMatcapMaterial({ color: 'red' }));
-
-	/**
 	 * Static details
 	 */
 	static assetName = "TowerArcher";
 	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-archer.png';
-	static assetScale: number = 1;
+	static assetScale: number = 7;
 	static assetPositionY = 3;
 	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
 	static cost = 100;
@@ -29,14 +21,12 @@ export class TowerArcher extends Tower {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 8 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
-		animationSpeed: 0
+		animates: true,
+		animationSpeed: 2
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
@@ -71,7 +61,7 @@ export class TowerArcher extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerArcher.assetName, 'tower', TowerArcher.assetPositionY, TowerArcher.spriteSheetRows, TowerArcher.assetScale);
+		super(main, TowerArcher.assetName, 'tower', TowerArcher.assetScale, TowerArcher.assetPositionY, TowerArcher.spriteSheetRows, TowerArcher.AnimationAttributes);
 
 		this.stats = new CharacterStats({ ...TowerArcher.stats });
 

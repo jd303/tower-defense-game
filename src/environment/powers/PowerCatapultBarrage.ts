@@ -6,6 +6,7 @@ import { AssetGenerator } from '../assets/AssetGenerator';
 import { SpriteAsset } from '../assets/SpriteAsset';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
 import { PowerStats } from '../Stats';
+import { PowerCatapultBarrageRock } from './PowerCatapultBarrage_Rock';
 
 export class PowerCatapultBarrage extends Power {
 	/**
@@ -104,8 +105,8 @@ export class PowerCatapultBarrage extends Power {
 			const totalXDist = startData.end.x - startData.start.x;
 			rockPosition.position.x = startData.start.x + (totalXDist * easedTX);
 
-			const scaleAmount = Math.pow(elapsedTime, 2);
-			rockPosition.scale.x = Math.min(1, scaleAmount);
+			const scaleAmount = Math.pow(elapsedTime, PowerCatapultBarrageRock.assetScale);
+			rockPosition.scale.x = Math.min(PowerCatapultBarrageRock.assetScale, scaleAmount);
 
 			const dropAmount = Math.pow(elapsedTime, 5.5) * startData.fallSpeed;
 			rockPosition.position.y = Math.max(0, startData.start.y - dropAmount);

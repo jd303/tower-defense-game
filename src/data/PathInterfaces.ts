@@ -17,6 +17,7 @@ export interface MovePathDefinition {
 	pathProgress: number;
 	callbackOnComplete?: any[],
 	switchToOnComplete?: string;
+	mirrorFacingPercentages?: PathMirrorPoint[]
 }
 
 // A point that can have an optional control point
@@ -30,4 +31,9 @@ export enum PathGeometryTypes {
 	none = 'none',
 	dirt = 'dirt',
 	rock = 'rock',
+}
+
+export interface PathMirrorPoint {
+	perc: number;
+	mirror: boolean;
 }

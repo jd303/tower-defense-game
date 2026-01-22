@@ -1,6 +1,6 @@
 import THREE, { CatmullRomCurve3, CurvePath, Vector3 } from "three";
 import { Main } from "../core/Main";
-import { MovePathDefinition, PathPoint } from "../data/PathInterfaces";
+import { MovePathDefinition, PathMirrorPoint, PathPoint } from "../data/PathInterfaces";
 import { Service } from "../core/Service";
 
 export class PathService extends Service {
@@ -28,7 +28,8 @@ export class PathService extends Service {
 			pathLength: pathLength,
 			path: path,
 			pathProgress: 0,
-			pathTravelPercentagePerSec: 0
+			pathTravelPercentagePerSec: 0,
+			mirrorFacingPercentages: this.calculateMirrorFacingPointsInPath(path)
 		};
 
 		return pathDefinition;
@@ -414,6 +415,39 @@ export class PathService extends Service {
 		}
 
 		return shapePlacements;
+	}
+
+	/**
+	 * Finds where the path flips x direction significantly
+	 */
+	calculateMirrorFacingPointsInPath(path: THREE.CurvePath<THREE.Vector>) {
+		const checkPoints = 50;
+		const checkPointDistance = 1 / checkPoints;
+
+		const mirrorPoints: PathMirrorPoint[] = [];
+		let mirrored = false;
+		let currentMeasure = 0;
+		while (currentMeasure < 1) {
+			const currentPoint = path.getPointAt(currentMeasure) as THREE.Vector3;
+			const upcomingPoint = path.getPointAt(Math.min(1, currentMeasure + checkPointDistance)) as THREE.Vector3;
+
+			if (currentPoint.x < upcomingPoint.x) {
+				mirrored = false;
+			} else {
+				mirrored = true;
+			}
+
+			if (!mirrorPoints.length || mirrorPoints.at(-1)!.mirror != mirrored) {
+				mirrorPoints.push({
+					perc: currentMeasure,
+					mirror: mirrored
+				});
+			}
+
+			currentMeasure += checkPointDistance;
+		}
+
+		return mirrorPoints;
 	}
 
 	/**

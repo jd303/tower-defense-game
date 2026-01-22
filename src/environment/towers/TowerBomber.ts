@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
@@ -9,18 +8,12 @@ import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerBomber extends Tower {
 	/**
-	 * Tower Assets
-	 * */
-	assetScale = 1.25;
-	projectileBasis: THREE.Mesh = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), new THREE.MeshBasicMaterial({ color: 'red' }));
-
-	/**
 	 * Static details
 	 */
 	static assetType = 'tower';
 	static assetName = "TowerBomber";
 	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-bomber.png';
-	static assetScale: number = 0.8;
+	static assetScale: number = 7;
 	static assetPositionY = 3;
 	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
 	static cost = 175;
@@ -29,13 +22,11 @@ export class TowerBomber extends Tower {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 8 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 0
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
@@ -71,7 +62,7 @@ export class TowerBomber extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerBomber.assetName, TowerBomber.assetType, TowerBomber.assetPositionY, TowerBomber.spriteSheetRows, TowerBomber.assetScale);
+		super(main, TowerBomber.assetName, TowerBomber.assetType, TowerBomber.assetScale, TowerBomber.assetPositionY, TowerBomber.spriteSheetRows, TowerBomber.AnimationAttributes);
 
 		this.stats = new CharacterStats(TowerBomber.stats);
 

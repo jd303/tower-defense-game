@@ -1,6 +1,6 @@
 import { Vector3 } from "three";
-import { TerrainTypes } from "../../data/LevelInterfaces";
-import { SpritePropAssetDefinition } from "../propManager/SpritePropManager";
+import { TerrainTypes } from "../../../data/LevelInterfaces";
+import { SpritePropAssetDefinition } from "../../propManager/SpritePropManager";
 
 export const TreeProps: SpritePropAssetDefinition[] = [
 	{

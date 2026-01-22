@@ -410,7 +410,7 @@ export const levelDetails: LevelDefinition = {
 	propZones: [
 		// Northern Forest
 		{
-			propNames: [{ name: 'TreeFir', chance: 1 }],
+			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(-19.571, 0, -21.928) },
 				{ point: new Vector3(6.928, 0, -15.0000) },
@@ -430,10 +430,10 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-20.500, 0, -22.8571) },
 				{ point: new Vector3(-19.571, 0, -21.928) },
 			],
-			propSparseness: 4,
-			propScale: 3,
+			propSparseness: 8,
+			propScale: 2,
 			positionRandom: 1.5,
-			scaleRandom: { all: 0.25 },
+			scaleRandom: { all: 5 },
 			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
@@ -450,13 +450,13 @@ export const levelDetails: LevelDefinition = {
 					{ point: new Vector3(77.51429, 0, -21.43008) },
 					{ point: new Vector3(78.71429, 0, -1.88722) },
 				],
-				attentuationDistance: 20,
-				attenuatedScale: 0.75
+				attentuationDistance: 10,
+				attenuatedScale: 2
 			}
 		},
 		// Southern Forest
 		{
-			propNames: [{ name: 'TreeFir', chance: 1 }],
+			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(-35.4285, 0, 27.7857) },
 				{ point: new Vector3(-19.78571428571429, 0, 5.214285714285714) },
@@ -477,10 +477,10 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-36.8571, 0, 29.2857) },
 				{ point: new Vector3(-35.4285, 0, 27.7857) }
 			],
-			propSparseness: 3,
-			propScale: 4,
+			propSparseness: 7,
+			propScale: 3,
 			positionRandom: 3,
-			scaleRandom: { all: 0.25, y: 0.25 },
+			scaleRandom: { all: 1, y: 0.25 },
 			rotateRandom: 2.5,
 			environmentTile: {
 				type: "land",
@@ -500,7 +500,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Western Forest
 		{
-			propNames: [{ name: 'TreeFir', chance: 1 }],
+			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
 			zonePathPoints: [
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 				{ point: new Vector3(-75, 0, -60) },
@@ -533,10 +533,10 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-76.9067510915006, 0, -39.719276488087914) },
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 			],
-			propSparseness: 4,
+			propSparseness: 7,
 			propScale: 3,
 			positionRandom: 3,
-			scaleRandom: { all: 0.5 },
+			scaleRandom: { all: 0.25 },
 			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
@@ -555,7 +555,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Small Rock Pile
 		{
-			propNames: [{ name: 'MountainInitial', chance: 1 }],
+			propNames: [{ name: 'MesaBrown', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.734, 0, -2.850) },
 				{ point: new Vector3(-36.067, 0, -3.916) },
@@ -568,10 +568,10 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-35.967, 0, 2.984) },
 				{ point: new Vector3(-34.734, 0, -2.850) },
 			],
-			propSparseness: 1.5,
-			propScale: 3,
+			propSparseness: 2,
+			propScale: 5,
 			positionRandom: 1.5,
-			scaleRandom: { all: 1 },
+			scaleRandom: { all: 1, y: 3 },
 			rotateRandom: 0.75,
 			environmentTile: {
 				type: "land",
@@ -581,7 +581,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// North West Rubble
 		{
-			propNames: [{ name: 'MountainInitial', chance: 1 }],
+			propNames: [{ name: 'MesaBrown', chance: 1 }],
 			zonePathPoints: [
 				{ point: new Vector3(-34.010, 0, -37.243) },
 				{ point: new Vector3(-30.696, 0, -37.929) },
@@ -596,10 +596,10 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-44.696, 0, -42.043) },
 				{ point: new Vector3(-34.010, 0, -37.243) },
 			],
-			propSparseness: 1.5,
-			propScale: 3,
+			propSparseness: 3,
+			propScale: 7,
 			positionRandom: 5.5,
-			scaleRandom: { all: 0.5, y: 0.5 },
+			scaleRandom: { all: 0.5, y: 1 },
 			rotateRandom: 3,
 			environmentTile: {
 				type: "land",
@@ -677,7 +677,7 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(35, 0, -99) },
 			],
 			propSparseness: 6,
-			propScale: 0.6,
+			propScale: 10,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.1, y: 0.5 },
 			rotateRandom: 0.75,
@@ -699,7 +699,7 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(-93.89255, 0, -51.47957) },
 			],
 			propSparseness: 6,
-			propScale: 0.8,
+			propScale: 20,
 			positionRandom: 5.5,
 			scaleRandom: { y: 0.25 },
 			rotateRandom: 0.75,
@@ -718,7 +718,7 @@ export const levelDetails: LevelDefinition = {
 				{ point: new Vector3(28.870673076923076, 0, 93.5919078742053) },
 			],
 			propSparseness: 3,
-			propScale: 1,
+			propScale: 10,
 			positionRandom: 2,
 			scaleRandom: { all: 0.5, y: 0.5 },
 			rotateRandom: 1.5,
@@ -730,7 +730,8 @@ export const levelDetails: LevelDefinition = {
 		}
 	],
 	propColourisation: {
-		"TreeFir": { b: 1, g: 0.25 },
+		"TreeDead": { b: 0.5, l: 1 },
+		"TreeDead2": { b: 0.5, l: 0.25 },
 		"MountainInitial": { l: -0.5 },
 	},
 };

@@ -13,7 +13,7 @@ export class Wisp extends Creep {
 	static assetType = 'creep';
 	static assetName: string = 'CreepWisp';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
-	static assetScale: number = 0.25;
+	static assetScale: number = 2;
 	static assetPositionY = 3;
 	static waveDifficulty = 1.5;
 
@@ -23,13 +23,11 @@ export class Wisp extends Creep {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 2 },
-			uFrameRows: { value: 2 },
-			uSize: { value: 8 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 2 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 2
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
@@ -87,7 +85,7 @@ export class Wisp extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Wisp.assetName, Wisp.assetType, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.assetScale);
+		super(main, Wisp.assetName, Wisp.assetType, Wisp.assetScale, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.AnimationAttributes);
 
 		this.modifyStateMachine();
 		this.stateMachine.transition(CreepStates.pathmoving);

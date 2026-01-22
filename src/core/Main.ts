@@ -73,7 +73,6 @@ export class Main {
 		console.log("%c Projectile.ts > createPath() - this could be shifted to PathService.", 'color: red');
 		console.log("%c CharacterAsset > animationAttack() && animationHurtMe() still needed", 'color: red');
 		console.log("%c InstancedMeshService > updateInstancedMeshes() is a performance consideration", 'color: red');
-		console.log("%c Let's identify when a spriteasset has animations and not, so we can not set attributes and animate.  Change shader and setInstancedMeshInitialSettings.  Also disable uTime update in InstancedMeshService > SpriteSheetInstancedMesh()", 'color: red');
 		console.log("%c Clean up Asset.ts.  YOu can probably move MovePathManager out to something more reasonable.", 'color: red');
 		console.log("%c I need to stop animating creeps that have died.  Is that possible?  Is that going to give us much performance improvements?", 'color: red');
 		console.log("%c In environment tile, we need to send uTime not using a setInterval", 'color: red');
@@ -81,6 +80,7 @@ export class Main {
 		console.log("%c Feedback when a Projectile misses.", 'color: red');
 		console.log("%c I've preloaded the game with user upgrades (_userLoadoutData.ts).  Remove for a more realistic starting difficulty.", 'color: red');
 		console.log("%c iPad and iPhone needs to be able to zoom out a little further than desktop, so maybe consider adjusting zoom for device, or using a letterbox effect?", 'color: red');
+		console.log("%c Remove setInstancedMeshScale - merge it into setInstancedMeshPosition", 'color: red');
 
 		return this;
 	}

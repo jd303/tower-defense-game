@@ -16,7 +16,7 @@ import { SpriteService } from '../../game/SpriteService';
 import { Asset } from '../assets/Asset';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
 
 export abstract class Hero extends CharacterAsset {
 	/**
@@ -28,7 +28,7 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Stats
 	 * */
-	typeName: InteractableTypes = "hero";
+	interactiveTypeName: InteractableTypes = "hero";
 	interactiveOrder = InteractableOrders.heroes;
 	stats: CharacterStats;
 
@@ -74,8 +74,8 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Construtor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number) {
-		super(main, assetName, 'hero', assetPositionY, spriteSheetRows, instancedMeshAssetScale, Hero.instancedMeshInstanceCount);
+	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetName, 'hero', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
 
 		this.assetType = 'hero';
 		this.stateMachine = this.setDefaultStates();

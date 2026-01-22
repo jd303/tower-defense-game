@@ -277,7 +277,7 @@ export class Level {
 			objectParent: sTick,
 			property: 'masterSpeed',
 			min: 0,
-			max: 4,
+			max: 5,
 			step: 0.01,
 			name: `Tick Speed`,
 		});

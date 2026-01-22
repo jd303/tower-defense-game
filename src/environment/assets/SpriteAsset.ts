@@ -6,56 +6,50 @@ import { SpriteService, SpriteSheet } from "../../game/SpriteService";
 import { InstancedMesh, InstancedMeshService } from "../../game/InstancedMeshService";
 import { AssetGenerator } from "./AssetGenerator";
 
+
 export abstract class SpriteAsset extends Asset {
 	/**
 	 * Setup Properties
 	 * */
 	static ShaderMaterialProperties: ShaderMaterialProperties;
-	static AnimationAttributes: ShaderMaterialAttributes;
+	static AnimationAttributes: ShaderAnimationAttributes;
 	static spriteSheetRows: SpriteSheetRow[] = [];
 	static instancedMeshInstanceCount: number;
-	static instancedMeshAnimates: boolean; // False doesn't fire needsUpdate on the instancedMesh in updateInstancedMeshes()
 
 	/**
 	 * Sprite Asset Properties
 	 */
 	loadCallbacks: (() => void)[] = [];
-	assetName: string;
+	assetScale: number;
 	assetPositionY: number;
-	typeName: InteractableTypes;
+	interactiveTypeName: InteractableTypes;
 	interactiveOrder: InteractableOrders;
 
 	spriteSheet: SpriteSheet;
-	spriteSheetFrames: number = 1;
-	spriteSheetCurrentFrame: number = 0;
+	spriteSheetRows: SpriteSheetRow[];
 	spriteSheetFrameManager: SpriteSheetFrameManager;
 
 	instancedMesh: InstancedMesh;
 	instancedMeshIndex: number;
 	instancedMeshPosition: THREE.Object3D;
-	instancedMeshAssetScale: number;
-	instancedMeshInstanceCount: number;
+	instancedMeshAnimates: boolean;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], instancedMeshAssetScale: number, instancedMeshInstanceCount: number) {
+	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
 		super(main, assetName, assetType);
 
 		const positioner = new THREE.Object3D();
 		this.instancedMeshPosition = positioner;
+		this.assetScale = assetScale;
 		this.assetPositionY = assetPositionY;
+		this.spriteSheetRows = spriteSheetRows;
+		this.instancedMeshAnimates = animationAttributes.animates;
 		this.main.scene.add(this.groupMain);
 
-		this.instancedMeshInstanceCount = instancedMeshInstanceCount;
-		this.instancedMeshAssetScale = instancedMeshAssetScale;
-
 		this.setupInstancedMesh(assetName);
-		this.setPositionerScale();
-
-		this.registerOnLoadCallback(() => {
-			if (spriteSheetRows.length > 1) this.setupSpriteSheetFrameManager(spriteSheetRows);
-		});
+		this.setPositionerScale(assetScale);
 	}
 
 	/**
@@ -73,6 +67,7 @@ export abstract class SpriteAsset extends Asset {
 		await this.sourceInstancedMesh(assetName);
 		this.hideInstancedMesh();
 		this.setInstancedMeshInitialSettings(assetName);
+		this.setupSpriteSheetFrameManager();
 		this.loadCallbacks.forEach(callback => callback());
 	}
 
@@ -92,7 +87,7 @@ export abstract class SpriteAsset extends Asset {
 		const sInstancedMesh: InstancedMeshService = this.main.s('InstancedMesh');
 		const assetClass = await AssetGenerator.getAssetAsSpriteAsset(assetName);
 
-		const instancedMesh = await sInstancedMesh.sourceInstancedMesh(assetName, assetClass, this.spriteSheet, assetClass.instancedMeshInstanceCount, assetClass.instancedMeshAnimates);
+		const instancedMesh = await sInstancedMesh.sourceInstancedMesh(assetName, assetClass, this.spriteSheet, assetClass.instancedMeshInstanceCount, assetClass.AnimationAttributes.animates);
 		if (instancedMesh) {
 			this.instancedMesh = instancedMesh;
 			this.instancedMeshIndex = this.instancedMesh.assignInstancedMeshIndex();
@@ -102,15 +97,17 @@ export abstract class SpriteAsset extends Asset {
 	/**
 	 * Creates a spritesheet frame manager for this sprite asset
 	 */
-	setupSpriteSheetFrameManager(spriteSheetRows: SpriteSheetRow[]) {
-		this.spriteSheetFrameManager = new SpriteSheetFrameManager(this, this.instancedMesh, spriteSheetRows);
+	setupSpriteSheetFrameManager() {
+		if (this.instancedMeshAnimates) {
+			this.spriteSheetFrameManager = new SpriteSheetFrameManager(this, this.instancedMesh, this.spriteSheetRows);
+		}
 	}
 
 	/**
 	 * Sets the positioner scale to ensure constant scale size
 	 */
-	setPositionerScale() {
-		this.instancedMeshPosition.scale.set(this.instancedMeshAssetScale, this.instancedMeshAssetScale, this.instancedMeshAssetScale);
+	setPositionerScale(scale: number) {
+		this.instancedMeshPosition.scale.set(scale, scale, scale);
 	}
 
 	/**
@@ -136,34 +133,41 @@ export abstract class SpriteAsset extends Asset {
 		const assetClass = await AssetGenerator.getAssetAsSpriteAsset(assetName);
 		if (!assetClass) console.error("NO ASSET FOR:", assetName);
 
-		let row = 0;
-		let speed = 0;
-		let cellsInRow = 1;
-		let animationTimeOffset = Math.ceil((Math.random() * 100) * 100) / 100;
-
-		if (assetClass.spriteSheetRows && assetClass.spriteSheetRows.length) {
-			speed = assetClass.AnimationAttributes.animationSpeed;
-			cellsInRow = assetClass.spriteSheetRows[0].totalFrames;
-		}
-
-		this.instancedMesh.geometry.attributes.animationRow.setX(this.instancedMeshIndex, row);
-		this.instancedMesh.geometry.attributes.animationSpeed.setX(this.instancedMeshIndex, speed);
-		this.instancedMesh.geometry.attributes.animationTimeOffset.setX(this.instancedMeshIndex, animationTimeOffset);
-		this.instancedMesh.geometry.attributes.cellsInRow.setX(this.instancedMeshIndex, cellsInRow);
-
 		// Then tell the instancedMesh that there is a new guy on the block (increments the initial count)
 		if (this.instancedMesh.iMesh.count + 1 > this.instancedMesh.iMeshMaximumIndexes) console.error(`Critical - Sprite ${assetName} exceeds expected InstancedMesh Indexes!`);
 		this.instancedMesh.iMesh.count += 1;
 
-		// Update everything
+		let row = 0;
+
+		// Set default properties
+		this.instancedMesh.geometry.attributes.animationRow.setX(this.instancedMeshIndex, row);
+
+		// Update default properties
 		if (this.instancedMesh.iMesh.geometry.attributes.animationRow) {
 			this.instancedMesh.iMesh.geometry.attributes.animationRow.needsUpdate = true;
-			this.instancedMesh.iMesh.geometry.attributes.animationSpeed.needsUpdate = true;
-			this.instancedMesh.iMesh.geometry.attributes.cellsInRow.needsUpdate = true;
-			this.instancedMesh.iMesh.geometry.attributes.mirrorX.needsUpdate = true;
-			this.instancedMesh.iMesh.geometry.attributes.animationTimeOffset.needsUpdate = true;
-			this.instancedMesh.iMesh.instanceMatrix.needsUpdate = true;
+			//this.instancedMesh.iMesh.geometry.attributes.mirrorX.needsUpdate = true;
 		}
+
+		//assetClass.spriteSheetRows && assetClass.spriteSheetRows.length
+
+		// Add animation-based properties
+		if (!assetClass.AnimationAttributes) console.log("missing for ", this.assetName);
+		if (assetClass.AnimationAttributes.animates) {
+			let speed = assetClass.AnimationAttributes.animationSpeed!;
+			let cellsInRow = assetClass.spriteSheetRows[0].totalFrames;
+			let animationTimeOffset = Math.ceil((Math.random() * 100) * 100) / 100;
+			this.instancedMesh.geometry.attributes.cellsInRow.setX(this.instancedMeshIndex, cellsInRow);
+			this.instancedMesh.geometry.attributes.animationSpeed.setX(this.instancedMeshIndex, speed);
+			this.instancedMesh.geometry.attributes.animationTimeOffset.setX(this.instancedMeshIndex, animationTimeOffset);
+
+			// Update
+			this.instancedMesh.iMesh.geometry.attributes.cellsInRow.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.animationSpeed.needsUpdate = true;
+			this.instancedMesh.iMesh.geometry.attributes.animationTimeOffset.needsUpdate = true;
+		}
+
+		// Final overall update
+		this.instancedMesh.iMesh.instanceMatrix.needsUpdate = true;
 	}
 
 	/**
@@ -243,6 +247,10 @@ export abstract class SpriteAsset extends Asset {
 	}
 }
 
+export interface SpriteAssetProperties {
+
+}
+
 /**
  * Handles the best frame for the sprite asset
  */
@@ -307,13 +315,11 @@ export interface SpriteSheetRow {
 export interface ShaderMaterialProperties {
 	uniforms: {
 		uFrameCols: { value: number },
-		uFrameRows: { value: number },
-		uSize: { value: number }
-	},
-	alphaTest: number,
-	transparent: boolean
+		uFrameRows: { value: number }
+	}
 }
 
-export interface ShaderMaterialAttributes {
-	animationSpeed: number
+export interface ShaderAnimationAttributes {
+	animates: boolean;
+	animationSpeed: number | null;
 }

@@ -16,8 +16,7 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	static assetType = 'power';
 	static assetPath = 'assets/spritesheets/powers/spritesheet-power-catapultbarrage.png';
 	static assetPositionY = 0;
-	static assetScale = 1;
-	static instancedMeshAssetScale = 1;
+	static assetScale = 5;
 	static instancedMeshInstanceCount = 5;
 	static instancedMeshAnimates: boolean = true;
 
@@ -27,13 +26,11 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 2 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 4 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 5
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
@@ -48,6 +45,6 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	 * Construtor
 	 * */
 	constructor(main: Main) {
-		super(main, PowerCatapultBarrageRock.assetName, PowerCatapultBarrageRock.assetType, PowerCatapultBarrageRock.assetPositionY, PowerCatapultBarrageRock.spriteSheetRows, PowerCatapultBarrageRock.instancedMeshAssetScale, PowerCatapultBarrageRock.instancedMeshInstanceCount);
+		super(main, PowerCatapultBarrageRock.assetName, PowerCatapultBarrageRock.assetType, PowerCatapultBarrageRock.assetScale, PowerCatapultBarrageRock.assetPositionY, PowerCatapultBarrageRock.spriteSheetRows, PowerCatapultBarrageRock.AnimationAttributes);
 	}
 }

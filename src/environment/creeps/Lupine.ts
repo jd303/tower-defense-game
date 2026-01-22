@@ -12,8 +12,8 @@ export class Lupine extends Creep {
 	static assetType = 'creep';
 	static assetName: string = 'CreepLupine';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
-	static assetScale: number = 0.25;
-	static assetPositionY: number = 0.5;
+	static assetScale: number = 2;
+	static assetPositionY: number = 0.6;
 	static waveDifficulty = 1;
 
 	/**
@@ -22,13 +22,11 @@ export class Lupine extends Creep {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 2 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 8 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 2
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
@@ -81,7 +79,7 @@ export class Lupine extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Lupine.assetName, Lupine.assetType, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.assetScale);
+		super(main, Lupine.assetName, Lupine.assetType, Lupine.assetScale, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.AnimationAttributes);
 
 		return this;
 	}

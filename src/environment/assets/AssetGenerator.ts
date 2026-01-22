@@ -7,13 +7,13 @@ import { TrollDink } from '../creeps/TrollDink';
 import { Wisp } from '../creeps/Wisp';
 import { Man0 } from '../heroes/Man0';
 import { MountainInitial } from '../props/Mountain_Initial';
-import { TreeFir } from '../props/TreeFir';
-import { TreeBulbous } from '../props/TreeBulbous';
+import { TreeFir } from '../props/trees/TreeFir';
+import { TreeBulbous } from '../props/trees/TreeBulbous';
 import { TowerArcher } from '../towers/TowerArcher';
 import { TowerBomber } from '../towers/TowerBomber';
 import { TowerMage } from '../towers/TowerMage';
 import { SpriteAsset } from './SpriteAsset';
-import { TreeTall } from '../props/TreeTall';
+import { TreeTall } from '../props/trees/TreeTall';
 import { WaveSubtle } from '../props/WaveSubtle';
 import { LogSubmerged } from '../props/LogSubmerged';
 import { PowerCatapultBarrage } from '../powers/PowerCatapultBarrage';
@@ -24,6 +24,9 @@ import { PowerTimeNoodleDistortion } from '../powers/PowerTimeNoodleDistortion';
 import { PowerTowerMotivation } from '../powers/PowerTowerMotivation';
 import { PowerSpringDoorTrap } from '../powers/PowerSpringDoorTrap';
 import { PowerHeroMotivation } from '../powers/PowerHeroMotivation';
+import { MesaBrown } from '../props/MesaBrown';
+import { TreeDead } from '../props/trees/TreeDead';
+import { TreeDead2 } from '../props/trees/TreeDead2';
 
 export class AssetGenerator {
 	/**
@@ -71,12 +74,18 @@ export class AssetGenerator {
 				return instatiateClass ? await new TreeFir(main!) : TreeFir;
 			case 'TreeTall':
 				return instatiateClass ? await new TreeTall(main!) : TreeTall;
+			case 'TreeDead':
+				return instatiateClass ? await new TreeDead(main!) : TreeDead;
+			case 'TreeDead2':
+				return instatiateClass ? await new TreeDead2(main!) : TreeDead2;
 			case 'LogSubmerged':
 				return instatiateClass ? await new LogSubmerged(main!) : LogSubmerged;
 
 			// Environment - Mountains
 			case 'MountainInitial':
 				return instatiateClass ? await new MountainInitial(main!) : MountainInitial;
+			case 'MesaBrown':
+				return instatiateClass ? await new MesaBrown(main!) : MesaBrown;
 
 			// Environment - weather and effects
 			case 'WaveSubtle':

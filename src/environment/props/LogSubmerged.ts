@@ -10,23 +10,21 @@ export class LogSubmerged extends PropAsset {
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-log-submerged.png';
 	static assetPositionY: number = 1.75;
 	static assetScale: number = 1;
-	static instancedMeshAssetScale: number = 1;
 	static instancedMeshInstanceCount: number = 500;
+	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 1 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: false,
 		animationSpeed: 2
 	}
 
 	constructor(main: Main) {
-		super(main, LogSubmerged.assetName, LogSubmerged.assetType, LogSubmerged.spriteSheetRows, LogSubmerged.assetPositionY, LogSubmerged.instancedMeshAssetScale, LogSubmerged.instancedMeshInstanceCount);
+		super(main, LogSubmerged.assetName, LogSubmerged.assetType, LogSubmerged.spriteSheetRows, LogSubmerged.assetScale, LogSubmerged.assetPositionY, LogSubmerged.AnimationAttributes);
 	}
 
 }

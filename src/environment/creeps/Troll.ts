@@ -12,8 +12,8 @@ export class Troll extends Creep {
 	static assetType = 'creep';
 	static assetName: string = 'CreepTroll';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-troll.png';
-	static assetScale: number = 0.7;
-	static assetPositionY: number = 3;
+	static assetScale: number = 6.5;
+	static assetPositionY: number = 2.1;
 	static waveDifficulty = 3;
 
 	/**
@@ -22,13 +22,11 @@ export class Troll extends Creep {
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 2 },
-			uFrameRows: { value: 1 },
-			uSize: { value: 8 }
-		},
-		alphaTest: 0.5,
-		transparent: true
+			uFrameRows: { value: 1 }
+		}
 	}
 	static AnimationAttributes = {
+		animates: true,
 		animationSpeed: 1.5
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
@@ -81,7 +79,7 @@ export class Troll extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Troll.assetName, Troll.assetType, Troll.assetPositionY, Troll.spriteSheetRows, Troll.assetScale);
+		super(main, Troll.assetName, Troll.assetType, Troll.assetScale, Troll.assetPositionY, Troll.spriteSheetRows, Troll.AnimationAttributes);
 
 		return this;
 	}
