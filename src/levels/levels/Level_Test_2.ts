@@ -13,32 +13,52 @@ export const levelDetails: LevelDefinition = {
 	terrain: TerrainTypes.grass,
 	paths: [
 		{
-			id: 1,
+			id: "1",
 			pathGeometry: PathGeometryTypes.dirt,
-			pathPoints: [{ "incomingControlPoint": { "x": -90, "y": 0, "z": -63.57142857142858 }, "point": { "x": -90, "y": 0, "z": -59.64285714285714 }, "outgoingControlPoint": { "x": -66.5, "y": 0, "z": -60.57142857142857 } }, { "incomingControlPoint": { "x": 29.642857142857146, "y": 0, "z": -59.357142857142854 }, "point": { "x": 49.642857142857146, "y": 0, "z": -59.42857142857142 }, "outgoingControlPoint": { "x": 54.42857142857143, "y": 0, "z": -59.57142857142857 } }, { "incomingControlPoint": { "x": 59.642857142857146, "y": 0, "z": -55.42857142857142 }, "point": { "x": 59.28571428571429, "y": 0, "z": -49.57142857142857 }, "outgoingControlPoint": { "x": 59.21428571428572, "y": 0, "z": -39.71428571428571 } }, { "incomingControlPoint": { "x": 59.50000000000001, "y": 0, "z": -36.14285714285714 }, "point": { "x": 59.28571428571429, "y": 0, "z": -29.857142857142854 }, "outgoingControlPoint": { "x": 59.50000000000001, "y": 0, "z": -25.571428571428573 } }, { "incomingControlPoint": { "x": 55.92857142857143, "y": 0, "z": -19.64285714285714 }, "point": { "x": 49.50000000000001, "y": 0, "z": -19.857142857142854 }, "outgoingControlPoint": { "x": 21.000000000000007, "y": 0, "z": -19.57142857142857 } }, { "incomingControlPoint": { "x": -1.9285714285714235, "y": 0, "z": -19.785714285714285 }, "point": { "x": -49.49999999999999, "y": 0, "z": -19.928571428571427 }, "outgoingControlPoint": { "x": -54.928571428571416, "y": 0, "z": -19.857142857142854 } }, { "incomingControlPoint": { "x": -59.428571428571416, "y": 0, "z": -16.357142857142854 }, "point": { "x": -59.49999999999999, "y": 0, "z": -10.07142857142857 }, "outgoingControlPoint": { "x": -59.64285714285713, "y": 0, "z": -0.42857142857142616 } }, { "incomingControlPoint": { "x": -59.49999999999999, "y": 0, "z": 5.0000000000000036 }, "point": { "x": -59.49999999999999, "y": 0, "z": 29.42857142857143 }, "outgoingControlPoint": { "x": -59.428571428571416, "y": 0, "z": 35.42857142857143 } }, { "incomingControlPoint": { "x": -54.78571428571428, "y": 0, "z": 39.50000000000001 }, "point": { "x": -49.42857142857142, "y": 0, "z": 39.42857142857143 }, "outgoingControlPoint": { "x": -29.714285714285708, "y": 0, "z": 39.57142857142858 } }, { "incomingControlPoint": { "x": -3.9285714285714235, "y": 0, "z": 39.142857142857146 }, "point": { "x": 78, "y": 0, "z": 39.57142857142858 }, "outgoingControlPoint": { "x": 39.50000000000001, "y": 0, "z": 39.57142857142858 } }],
-		}
+			propCurve: {
+				//propNames: [{ name: "ShrubWide", chance: 0.9 }, { name: 'GrassNarrow', chance: 0.05 }, { name: 'GrassWide', chance: 0.05 }],
+				propNames: [{ name: "ShrubWide", chance: 1 }],
+				propSparseness: 15,
+				propScale: 3,
+				positionRandom: 0.5,
+				scaleRandom: { all: 2 },
+			},
+			pathPoints: [
+				{ incomingControlPoint: new Vector3(-90, 0, -63.57142857142858), point: new Vector3(-90, 0, -59.64285714285714), outgoingControlPoint: new Vector3(-66.5, 0, -60.57142857142857) },
+				{ incomingControlPoint: new Vector3(29.642857142857146, 0, -59.357142857142854), point: new Vector3(49.642857142857146, 0, -59.42857142857142), outgoingControlPoint: new Vector3(54.42857142857143, 0, -59.57142857142857) },
+				{ incomingControlPoint: new Vector3(59.642857142857146, 0, -55.42857142857142), point: new Vector3(59.28571428571429, 0, -49.57142857142857), outgoingControlPoint: new Vector3(59.21428571428572, 0, -39.71428571428571) },
+				{ incomingControlPoint: new Vector3(59.50000000000001, 0, -36.14285714285714), point: new Vector3(59.28571428571429, 0, -29.857142857142854), outgoingControlPoint: new Vector3(59.50000000000001, 0, -25.571428571428573) },
+				{ incomingControlPoint: new Vector3(55.92857142857143, 0, -19.64285714285714), point: new Vector3(49.50000000000001, 0, -19.857142857142854), outgoingControlPoint: new Vector3(21.000000000000007, 0, -19.57142857142857) },
+				{ incomingControlPoint: new Vector3(-1.9285714285714235, 0, -19.785714285714285), point: new Vector3(-49.49999999999999, 0, -19.928571428571427), outgoingControlPoint: new Vector3(-54.928571428571416, 0, -19.857142857142854) },
+				{ incomingControlPoint: new Vector3(-59.428571428571416, 0, -16.357142857142854), point: new Vector3(-59.49999999999999, 0, -10.07142857142857), outgoingControlPoint: new Vector3(-59.64285714285713, 0, -0.42857142857142616) },
+				{ incomingControlPoint: new Vector3(-59.49999999999999, 0, 5.0000000000000036), point: new Vector3(-59.49999999999999, 0, 29.42857142857143), outgoingControlPoint: new Vector3(-59.428571428571416, 0, 35.42857142857143) },
+				{ incomingControlPoint: new Vector3(-54.78571428571428, 0, 39.50000000000001), point: new Vector3(-49.42857142857142, 0, 39.42857142857143), outgoingControlPoint: new Vector3(-29.714285714285708, 0, 39.57142857142858) },
+				{ incomingControlPoint: new Vector3(-3.9285714285714235, 0, 39.142857142857146), point: new Vector3(78, 0, 39.57142857142858), outgoingControlPoint: new Vector3(39.50000000000001, 0, 39.57142857142858) },
+			],
+		},
 	],
 	towerPlacementZones: [
 		// First bend inner
 		{
 			points: [
-				{ point: new Vector3(37.611, 0, -54.319) },
-				{ point: new Vector3(52.297, 0, -52.797) },
-				{ point: new Vector3(54.354, 0, -38.775) },
-				{ point: new Vector3(50.697, 0, -25.464) },
-				{ point: new Vector3(38.125, 0, -25.997) },
-				{ point: new Vector3(32.354, 0, -38.386) },
-				{ point: new Vector3(37.611, 0, -54.319) },
+				{ point: new Vector3(37, 0, -52.5) },
+				{ point: new Vector3(37.5, 0, -53) },
+				{ point: new Vector3(52.5, 0, -53) },
+				{ point: new Vector3(53, 0, -38.775) },
+				{ point: new Vector3(52.5, 0, -26.5) },
+				{ point: new Vector3(36.5, 0, -26.5) },
+				{ point: new Vector3(37, 0, -52.5) },
 			]
 		},
 		{
 			points: [
-				{ point: new Vector3(-34.946, 0, -65) },
-				{ point: new Vector3(-32.603, 0, -73) },
-				{ point: new Vector3(-28.031, 0, -73) },
-				{ point: new Vector3(-23.117, 0, -73) },
-				{ point: new Vector3(-21.346, 0, -65.634) },
-				{ point: new Vector3(-34.946, 0, -65) },
+				{ point: new Vector3(-36.5, 0, -66.5) },
+				{ point: new Vector3(-32.5, 0, -72.5) },
+				{ point: new Vector3(-30, 0, -72.5) },
+				{ point: new Vector3(-23.5, 0, -72.5) },
+				{ point: new Vector3(-20, 0, -65.5) },
+				{ point: new Vector3(-36, 0, -65.5) },
+				{ point: new Vector3(-36.5, 0, -66.5) },
 			]
 		},
 		{
@@ -74,13 +94,13 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			points: [
-				{ "point": new Vector3(12.357142857142858, 4, 34) },
-				{ "point": new Vector3(11.714285714285715, 4, 32) },
-				{ "point": new Vector3(15.928571428571432, 4, 27) },
-				{ "point": new Vector3(25.571428571428573, 4, 27) },
-				{ "point": new Vector3(30.071428571428573, 4, 32) },
-				{ "point": new Vector3(29.071428571428573, 4, 34) },
-				{ "point": new Vector3(12.357142857142858, 4, 34) },
+				{ point: new Vector3(12.357142857142858, 4, 34) },
+				{ point: new Vector3(11.714285714285715, 4, 32) },
+				{ point: new Vector3(15.928571428571432, 4, 27) },
+				{ point: new Vector3(25.571428571428573, 4, 27) },
+				{ point: new Vector3(30.071428571428573, 4, 32) },
+				{ point: new Vector3(29.071428571428573, 4, 34) },
+				{ point: new Vector3(12.357142857142858, 4, 34) },
 			]
 		},
 	],
@@ -107,11 +127,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 4,
 			positionRandom: 1.5,
 			scaleRandom: { all: 2 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 1.25,
 				colour: 0x547621,
+				bevelColour: 0x547621
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -154,11 +174,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 4,
 			positionRandom: 1.5,
 			scaleRandom: { all: 2 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 1.25,
 				colour: 0x547621,
+				bevelColour: 0x547621
 			},
 		},
 		{
@@ -184,55 +204,54 @@ export const levelDetails: LevelDefinition = {
 			propScale: 4,
 			positionRandom: 1.5,
 			scaleRandom: { all: 2 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 1,
 				colour: 0x547621,
+				bevelColour: 0x547621
 			},
 		},
 		{
 			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
 			zonePathPoints: [
-				{ "point": new Vector3(-46.5, 4, 50.92857142857143) },
-				{ "point": new Vector3(84.85714285714286, 4, 49.857142857142854) },
-				{ "point": new Vector3(87.14285714285715, 4, 108.71428571428571) },
-				{ "point": new Vector3(-80.28571428571426, 4, 107.42857142857142) },
-				{ "point": new Vector3(-82.4285714285714, 4, 71.57142857142856) },
-				{ "point": new Vector3(-54.99999999999997, 4, 68.28571428571426) },
-				{ "point": new Vector3(-46.357142857142826, 4, 58.142857142857125) },
-				{ "point": new Vector3(-46.5, 4, 50.92857142857143) },
+				{ point: new Vector3(-46.5, 0, 48) },
+				{ point: new Vector3(84.85714285714286, 0, 47) },
+				{ point: new Vector3(87.14285714285715, 0, 106) },
+				{ point: new Vector3(-80.28571428571426, 0, 105) },
+				{ point: new Vector3(-82.4285714285710, 0, 69) },
+				{ point: new Vector3(-54.99999999999997, 0, 66) },
+				{ point: new Vector3(-46.357142857142826, 0, 56) },
+				{ point: new Vector3(-46.5, 0, 48) },
 			],
 			propSparseness: 3,
 			propScale: 4,
 			positionRandom: 1.5,
 			scaleRandom: { all: 2 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 1,
 				colour: 0x547621,
+				bevelColour: 0x547621
 			},
 		},
 
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
 			zonePathPoints: [
-				{ point: new Vector3(72.358, 0, -70) },
-				{ point: new Vector3(62.130, 0, -62) },
+				{ point: new Vector3(74, 0, -70) },
+				{ point: new Vector3(63, 0, -62) },
 				{ point: new Vector3(65.273, 0, -49) },
 				{ point: new Vector3(65.330, 0, -31) },
 				{ point: new Vector3(64.130, 0, -24) },
 				{ point: new Vector3(74.130, 0, -15) },
 				{ point: new Vector3(94.764, 0, -14) },
 				{ point: new Vector3(94.730, 0, -69) },
-				{ point: new Vector3(72.358, 0, -70) },
+				{ point: new Vector3(74, 0, -70) },
 			],
-			propSparseness: 5,
-			propScale: 1,
+			propSparseness: 3,
+			propScale: 0.1,
 			positionRandom: 2,
-			scaleRandom: { all: 5 },
-			rotateRandom: 0.5,
+			scaleRandom: { all: 3 },
 			environmentTile: false,
 			dynamicScaling: {
 				scalePoints: [
@@ -275,11 +294,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 2,
 			positionRandom: 3,
 			scaleRandom: { all: 1 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "sea",
 				distance: -1.3,
 				colour: 0x82aeff,
+				bevelColour: 0x00291A
 			},
 		}
 	],
@@ -288,5 +307,8 @@ export const levelDetails: LevelDefinition = {
 		"TreeFir": { r: 0.75, b: 0.33, l: -0.5 },
 		"TreeTall": { r: 0.75, b: 0.33, l: -0.5 },
 		"MountainInitial": { r: 0.1, l: -0.25 },
+		"GrassNarrow": { r: 0.5, l: -0.5 },
+		"GrassWide": { r: 1, l: -0.5 },
+		"ShrubWide": { r: 0.25, l: -0.25 },
 	},
 };

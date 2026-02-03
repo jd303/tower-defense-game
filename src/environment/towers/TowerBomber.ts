@@ -14,7 +14,7 @@ export class TowerBomber extends Tower {
 	static assetName = "TowerBomber";
 	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-bomber.png';
 	static assetScale: number = 7;
-	static assetPositionY = 3;
+	static assetPositionY = 0;
 	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
 	static cost = 175;
 	static costType = 'money';

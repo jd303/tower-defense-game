@@ -8,7 +8,7 @@ export class TreeTall extends PropAsset {
 	static assetName: string = "TreeTall";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-tall.png';
-	static assetPositionY: number = 3;
+	static assetPositionY: number = 0;
 	static assetScale: number = 2;
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;

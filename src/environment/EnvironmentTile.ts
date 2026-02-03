@@ -61,40 +61,51 @@ export class EnvironmentTile {
 	 */
 	createBeveledMeshFromShape(shape: THREE.Shape, options = {}) {
 		const extrudeSettings = {
-			depth: 0.2,
 			bevelEnabled: true,
-			bevelThickness: 0.05,
-			bevelSize: 0.2,
+			depth: 0.2,
+			bevelThickness: 0.5, //0.075
+			bevelSize: 0.75, // 0.2
+			bevelOffset: -0.33,
 			bevelSegments: 2,
 			steps: 1,
-			curveSegments: 100,
+			curveSegments: 2,
 			...options
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 		geometry.rotateX(Math.PI / 2); // So it stands up on XZ
-		const material = this.createEnvironmentTileMaterial();
+		const materials = this.createEnvironmentTileMaterials();
 
-		const mesh = new THREE.Mesh(geometry, material);
+		const mesh = new THREE.Mesh(geometry, materials);
 		mesh.receiveShadow = true;
-		mesh.material.needsUpdate = true;
-		mesh.position.y = 0.1;
+		mesh.material[0].needsUpdate = true;
+		mesh.position.y = -0.22; // Not necessarily right, but shows under the debug lines for now
 		return mesh;
 	}
 
 	/**
 	 * Creates a material based on the environment tile type
 	 */
-	createEnvironmentTileMaterial() {
-		if (this.properties.type == "land") {
-			const material = new THREE.MeshStandardMaterial({ color: this.properties.colour || 0xeeaa88 });
-			material.polygonOffset = true;
-			material.polygonOffsetFactor = 1;
-			material.polygonOffsetUnits = 1;
+	createEnvironmentTileMaterials() {
+		//const materialBevel = new THREE.MeshStandardMaterial({ color: this.properties.bevelColour });
+		const materialBevel = new THREE.ShaderMaterial({
+			uniforms: {
+				uColor: { value: new THREE.Color(this.properties.bevelColour) },
+				uRoughness: { value: 0.075 },
+			},
+			vertexShader: bevelVertexShader,
+			fragmentShader: bevelFragmentShader
+		});
 
-			return material;
+		if (this.properties.type == "land") {
+			const materialMain = new THREE.MeshStandardMaterial({ color: this.properties.colour });
+			materialMain.polygonOffset = true;
+			materialMain.polygonOffsetFactor = 1;
+			materialMain.polygonOffsetUnits = 1;
+
+			return [materialMain, materialBevel];
 		} else {
-			const waterMaterial = new THREE.ShaderMaterial({
+			const materialWater = new THREE.ShaderMaterial({
 				uniforms: {
 					uTime: { value: 0 },
 					waterColor: { value: new THREE.Color(0x0077be) },
@@ -107,10 +118,10 @@ export class EnvironmentTile {
 			});
 
 			setInterval(() => {
-				waterMaterial.uniforms.uTime.value += 0.1;
+				materialWater.uniforms.uTime.value += 0.1;
 			}, 50);
 
-			return waterMaterial;
+			return [materialWater, materialBevel];
 		}
 	}
 
@@ -125,7 +136,8 @@ export class EnvironmentTile {
 export interface EnvironmentTileProperties {
 	type: "land" | "sea",
 	distance: number,
-	colour: number
+	colour: number,
+	bevelColour: number
 }
 
 const waterFragmentShader = `
@@ -222,5 +234,51 @@ const waterVertexShader = `
 		pos.y += noise;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+	}
+`;
+
+const bevelVertexShader = `
+	// Standard Three.js uniforms and attributes
+	varying vec2 vUv;
+	uniform float uRoughness; // Control the intensity (e.g., 0.05)
+
+	// Simple hash function to generate "random" noise from a coordinate
+	float hash(vec2 p) {
+		p = fract(p * vec2(123.34, 456.21));
+		p += dot(p, p + 45.32);
+		return fract(p.x * p.y);
+	}
+
+	void main() {
+		vUv = uv;
+		
+		// Copy the original position
+		vec3 newPosition = position;
+
+		// Generate noise based on the original X and Z
+		// We use the original coordinates as a "seed"
+		float noiseX = hash(position.xz + 1.0) - 0.5;
+		float noiseZ = hash(position.zx + 2.0) - 0.5;
+
+		// Apply the displacement
+		newPosition.x += noiseX * uRoughness;
+		newPosition.z += noiseZ * uRoughness;
+
+		// Standard projection
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+	}
+`;
+
+const bevelFragmentShader = `
+	precision highp float;
+	uniform vec3 uColor;
+	varying vec2 vUv;
+	varying vec3 vNormal;
+
+	void main() {
+		vec3 color = uColor;
+		color = pow(color.rgb, vec3(1.0 / 2.2));
+
+		gl_FragColor = vec4(color, 1.0);
 	}
 `;

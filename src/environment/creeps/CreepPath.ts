@@ -3,12 +3,15 @@ import { Interactable2, InteractableOrders, InteractionService2 } from '../../ga
 import { Main } from '../../core/Main';
 import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../../data/PathInterfaces';
 import { PathService } from '../../game/PathService';
+import { Level } from '../../levels/Level';
+import { CreepPathPropCurveArguments } from '../propManager/PropCurve';
 
 export class CreepPath {
 	/**
 	 * Core
 	 * */
 	main: Main;
+	level: Level;
 
 	/**
 	 * Setup Properties
@@ -29,17 +32,21 @@ export class CreepPath {
 		pathProgress: 0,
 		pathTravelPercentagePerSec: 0,
 	};
+	topEdgePathPoints: PathPoint[];
+	bottomEdgePathPoints: PathPoint[];
 	variantPaths: MovePathDefinition[] = [];
 	groupMain: THREE.Group; // Contains a pathMesh's groupmain, if created
 
 	/**
 	 * Constructor
 	 * */
-	constructor(pathDefinition: PathDefinition, main: Main) {
+	constructor(pathDefinition: CreepPathDefinition, level: Level, main: Main) {
 		this.id = pathDefinition.id;
+		this.level = level;
 		this.main = main;
 		this.setCorePath(pathDefinition.pathPoints);
 		this.createPathGeometry(pathDefinition);
+		this.createEdgePaths();
 
 		this.setInteractive();
 
@@ -125,6 +132,42 @@ export class CreepPath {
 	}
 
 	/**
+	 * Creates paths at the edges
+	 */
+	createEdgePaths() {
+		const samplingRate = 125;
+		const sPath: PathService = this.main.s('Path');
+		const corePathPoints = this.corePath.path.getSpacedPoints(samplingRate);
+		const corePathFrenetFrames = this.corePath.path.computeFrenetFrames(samplingRate, false);
+		const distance = CreepPath.pathWidth * 1.1 / 2;
+
+		// Top path
+		this.topEdgePathPoints = corePathPoints.map((point: THREE.Vector, index: number) => {
+			const x = (point as THREE.Vector3).x + corePathFrenetFrames.binormals[index].x * distance;
+			const y = (point as THREE.Vector3).y + corePathFrenetFrames.binormals[index].y * distance;
+			const z = (point as THREE.Vector3).z + corePathFrenetFrames.binormals[index].z * distance;
+			return { point: new THREE.Vector3(x, y, z) };
+		});
+
+		// Bottom path
+		this.bottomEdgePathPoints = corePathPoints.map((point: THREE.Vector, index: number) => {
+			const x = (point as THREE.Vector3).x + corePathFrenetFrames.binormals[index].x * -distance;
+			const y = (point as THREE.Vector3).y + corePathFrenetFrames.binormals[index].y * -distance;
+			const z = (point as THREE.Vector3).z + corePathFrenetFrames.binormals[index].z * -distance;
+			return { point: new THREE.Vector3(x, y, z) };
+		});
+
+		if (this.main.debugMode) {
+			const topEdgePath = sPath.createCurveFromPathPoints(this.topEdgePathPoints, 0, 0, false);
+			const bottomEdgePath = sPath.createCurveFromPathPoints(this.bottomEdgePathPoints, 0, 0, false);
+			const topPathDebugLine = sPath.debugCreateOutlines(topEdgePath, 0xff0000);
+			const bottomPathDebugLine = sPath.debugCreateOutlines(bottomEdgePath, 0xff0000);
+			this.main.scene.add(topPathDebugLine);
+			this.main.scene.add(bottomPathDebugLine);
+		}
+	}
+
+	/**
 	 * Sets whether this model can be interactive 
 	 * */
 	setInteractive() {
@@ -146,6 +189,13 @@ export class CreepPath {
 	dispose() {
 		this.main.scene.remove(this.groupMain);
 	}
+}
+
+export interface CreepPathDefinition {
+	id: string;
+	pathGeometry: PathGeometryTypes;
+	pathPoints: PathPoint[],
+	propCurve?: CreepPathPropCurveArguments;
 }
 
 const creepPathVertexShader = `

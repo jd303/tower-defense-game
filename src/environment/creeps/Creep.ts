@@ -10,7 +10,6 @@ import { CharacterAsset } from '../assets/CharacterAsset';
 import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
 import { CharacterAttackStats, CharacterStats } from '../Stats';
 
-
 export abstract class Creep extends CharacterAsset {
 	/**
 	 * Static values
@@ -58,7 +57,7 @@ export abstract class Creep extends CharacterAsset {
 		this.setInteractiveCreep();
 
 		this.registerOnLoadCallback(() => {
-			setTimeout(() => this.stateMachine.transition(CreepStates.pathmoving), 1250);
+			this.stateMachine.transition(CreepStates.pathmoving);
 		});
 	}
 

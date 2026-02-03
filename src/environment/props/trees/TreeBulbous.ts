@@ -8,7 +8,7 @@ export class TreeBulbous extends PropAsset {
 	static assetName: string = "TreeBulbous";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-bulbous.png';
-	static assetPositionY: number = 3;
+	static assetPositionY: number = 0;
 	static assetScale: number = 0.5;
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;

@@ -1,11 +1,12 @@
 import { Vector3 } from 'three';
 import { PropZoneArguments } from '../environment/propManager/PropZone';
 import { TowerPlacementZoneDefinition } from '../environment/towers/TowerPlacementZone';
+import { CreepPathDefinition } from '../environment/creeps/CreepPath';
 
 export interface LevelDefinition {
 	difficulty: number;
 	terrain: TerrainTypes;
-	paths: any[];
+	paths: CreepPathDefinition[];
 	creepOptions: LevelCreepOption[];
 	towerPlacementZones: TowerPlacementZoneDefinition[];
 	props?: LevelPropDefinition[];
@@ -27,5 +28,5 @@ export interface LevelPropDefinition {
 	assetName: string,
 	position: Vector3,
 	scale?: Vector3,
-	rotate?: Vector3,
+	rotation?: Vector3,
 }

@@ -8,7 +8,7 @@ export class MesaBrown extends PropAsset {
 	static assetName: string = "MesaBrown";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-mesa-brown.png';
-	static assetPositionY: number = 3;
+	static assetPositionY: number = 0;
 	static assetScale: number = 1;
 	static instancedMeshInstanceCount: number = 1000;
 	static ShaderMaterialProperties = {

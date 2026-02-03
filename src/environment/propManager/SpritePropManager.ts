@@ -6,6 +6,8 @@ import { PropZone, PropZoneArguments } from "./PropZone";
 import { EnvironmentTile } from "../EnvironmentTile";
 import { AssetGenerator } from "../assets/AssetGenerator";
 import { SpriteAsset } from "../assets/SpriteAsset";
+import { PropCurve, PropCurveArguments } from "./PropCurve";
+import { Level } from "../../levels/Level";
 
 /**
  * A framework for adding props and propzones to the board
@@ -16,9 +18,11 @@ export class SpritePropManager {
 	 * Core Properties
 	 * */
 	main: Main;
+	level: Level;
 	tileset: TerrainTypes = TerrainTypes.grass;
 	spriteAssets: SpriteAsset[] = [];
 	propZones: PropZone[] = [];
+	propCurves: PropCurve[] = [];
 	propGroups: PropGroup[] = [];
 	environmentTiles: EnvironmentTile[] = [];
 
@@ -27,14 +31,13 @@ export class SpritePropManager {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main) {
+	constructor(main: Main, level: Level) {
 		this.main = main;
+		this.level = level;
 	}
 
 	/**
 	 * Sets up all props, propzones, and towerPlacementZones
-	 * @param props 
-	 * @param propZones 
 	 */
 	async setup(levelDetails: LevelDefinition) {
 		this.tileset = levelDetails.terrain;
@@ -49,7 +52,22 @@ export class SpritePropManager {
 		// Register Prop Zones
 		if (levelDetails.propZones) {
 			for (let x = 0; x < levelDetails.propZones.length; x++) {
-				this.registerPropZone(levelDetails.propZones[x], levelDetails)
+				this.registerPropZone(levelDetails.propZones[x], levelDetails);
+			}
+		}
+
+		// Register Creep Prop Curves
+		if (levelDetails.paths) {
+			for (let x = 0; x < levelDetails.paths.length; x++) {
+				if (levelDetails.paths[x].propCurve) {
+
+					// If there is a matchjing creep path, let's create props for it
+					const creepPath = this.level.creepManager.creepPaths.find(path => path.id == levelDetails.paths[x].id);
+					if (creepPath) {
+						this.registerPropCurve({ ...levelDetails.paths[x].propCurve!, curvePathPoints: creepPath.topEdgePathPoints }, levelDetails);
+						this.registerPropCurve({ ...levelDetails.paths[x].propCurve!, curvePathPoints: creepPath.bottomEdgePathPoints }, levelDetails);
+					}
+				}
 			}
 		}
 	}
@@ -67,6 +85,7 @@ export class SpritePropManager {
 				colourisation && assetInstance.setColourisation(colourisation);
 				assetInstance.setPosition(args.position);
 				if (args.scale) assetInstance.setScale(args.scale);
+				//if (args.rotation) assetInstance.setRotate(args.rotation); // Never used, as our sprite shader always looks at the camera
 			});
 		} else {
 			console.error(`Asset not configured - ${args.assetName}`);
@@ -96,6 +115,30 @@ export class SpritePropManager {
 			if (!pickedItem) throw new Error("Cannot choose a propName");
 
 			this.registerProp({ assetName: pickedItem.name, position: new THREE.Vector3(position.position.x, propZonePropsY, position.position.z), scale: new THREE.Vector3(position.scale.x, position.scale.y, position.scale.z) }, levelDetails);
+		});
+	}
+
+	/**
+	 * Registers a curve on which to plant props
+	 */
+	registerPropCurve(args: PropCurveArguments, levelDetails: LevelDefinition) {
+		const propCurve = new PropCurve(args, this.main);
+		this.propCurves.push(propCurve);
+		const propPositions: THREE.Vector3[] = propCurve.createPositions();
+
+		// Place the props
+		propPositions.forEach((position: any) => {
+			const random = Math.random();
+			let sum = 0;
+			const pickedItem = args.propNames.find(item => (sum += item.chance) >= random);
+			if (!pickedItem) throw new Error("Cannot choose a propName");
+
+			this.registerProp({
+				assetName: pickedItem.name,
+				position: new THREE.Vector3(position.position.x, position.position.y, position.position.z),
+				scale: new THREE.Vector3(position.scale.x, position.scale.y, position.scale.z),
+				rotation: new THREE.Vector3(Math.PI, Math.PI, Math.PI)
+			}, levelDetails);
 		});
 	}
 

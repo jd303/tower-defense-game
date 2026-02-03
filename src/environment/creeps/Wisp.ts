@@ -14,7 +14,7 @@ export class Wisp extends Creep {
 	static assetName: string = 'CreepWisp';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
 	static assetScale: number = 2;
-	static assetPositionY = 3;
+	static assetPositionY = 0;
 	static waveDifficulty = 1.5;
 
 	/**
@@ -139,7 +139,7 @@ export class Wisp extends Creep {
 		creepsThatArentMe.forEach((creep: Creep) => {
 			creep.stateMachine.transition(CreepTransitions.healed);
 			//creep.adjustHealthByNumber(20);
-			creep.setHealthByPercentage(averageHealthPercentage);
+			creep.setHealthByPercentage(Math.ceil(averageHealthPercentage + 0.5));
 		});
 	}
 }

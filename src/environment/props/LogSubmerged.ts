@@ -8,7 +8,7 @@ export class LogSubmerged extends PropAsset {
 	static assetName: string = "LogSubmerged";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-log-submerged.png';
-	static assetPositionY: number = 1.75;
+	static assetPositionY: number = 0;
 	static assetScale: number = 1;
 	static instancedMeshInstanceCount: number = 500;
 	static instancedMeshAnimates: boolean = false;

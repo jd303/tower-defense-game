@@ -15,7 +15,7 @@ export class Man0 extends Hero {
 	static assetName: string = 'Man0';
 	static assetPath: string = 'assets/spritesheets/heroes/spritesheet-man0.png';
 	static assetScale: number = 6;
-	static assetPositionY: number = 1.8;
+	static assetPositionY: number = 0;
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "idle",

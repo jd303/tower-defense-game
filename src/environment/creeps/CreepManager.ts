@@ -36,7 +36,7 @@ export class CreepManager {
 	 */
 	setupCreepPaths(levelDetails: LevelDefinition) {
 		levelDetails.paths.forEach((path) => {
-			const creepPath = new CreepPath(path, this.main);
+			const creepPath = new CreepPath(path, this.level, this.main);
 			this.creepPaths.push(creepPath);
 			this.main.scene.add(creepPath.groupMain);
 		});

@@ -27,6 +27,9 @@ import { PowerHeroMotivation } from '../powers/PowerHeroMotivation';
 import { MesaBrown } from '../props/MesaBrown';
 import { TreeDead } from '../props/trees/TreeDead';
 import { TreeDead2 } from '../props/trees/TreeDead2';
+import { GrassNarrow } from '../props/grasses/GrassNarrow';
+import { GrassWide } from '../props/grasses/GrassWide';
+import { ShrubWide } from '../props/grasses/ShrubWide';
 
 export class AssetGenerator {
 	/**
@@ -80,6 +83,14 @@ export class AssetGenerator {
 				return instatiateClass ? await new TreeDead2(main!) : TreeDead2;
 			case 'LogSubmerged':
 				return instatiateClass ? await new LogSubmerged(main!) : LogSubmerged;
+
+			// Environment - Grasses and edges
+			case 'GrassNarrow':
+				return instatiateClass ? await new GrassNarrow(main!) : GrassNarrow;
+			case 'GrassWide':
+				return instatiateClass ? await new GrassWide(main!) : GrassWide;
+			case 'ShrubWide':
+				return instatiateClass ? await new ShrubWide(main!) : ShrubWide;
 
 			// Environment - Mountains
 			case 'MountainInitial':

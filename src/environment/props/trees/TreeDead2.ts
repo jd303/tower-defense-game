@@ -8,7 +8,7 @@ export class TreeDead2 extends PropAsset {
 	static assetName: string = "TreeDead2";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-dead-2.png';
-	static assetPositionY: number = 3;
+	static assetPositionY: number = 0;
 	static assetScale: number = 2;
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;

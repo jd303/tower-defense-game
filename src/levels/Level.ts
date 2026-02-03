@@ -53,7 +53,7 @@ export class Level {
 		this.main = main;
 		this.main.s('Level').currentLevel = this;
 		this.levelCameraManager = new LevelCameraManager(this.main);
-		this.propManager = new SpritePropManager(this.main);
+		this.propManager = new SpritePropManager(this.main, this);
 		this.towerManager = new TowerManager(this.main);
 		this.creepManager = new CreepManager(this.main, this);
 		this.waveManager = new WaveManager(this.main, this);

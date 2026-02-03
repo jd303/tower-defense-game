@@ -80,7 +80,10 @@ export class Main {
 		console.log("%c Feedback when a Projectile misses.", 'color: red');
 		console.log("%c I've preloaded the game with user upgrades (_userLoadoutData.ts).  Remove for a more realistic starting difficulty.", 'color: red');
 		console.log("%c iPad and iPhone needs to be able to zoom out a little further than desktop, so maybe consider adjusting zoom for device, or using a letterbox effect?", 'color: red');
+		console.log("%c In createEnvironmentTileMaterials (materialBevel as a shader material), I am trialling a roughness shader.  Could consdider removing this and trying something else.", 'color: red');
 		console.log("%c Remove setInstancedMeshScale - merge it into setInstancedMeshPosition", 'color: red');
+		console.log("%c I feel like createEdgePaths is inefficient.  Do I create then get points then create then get points, etc?  Choose one, or do it once", 'color: red');
+		console.log("%c Edge Rubbles are rubbish.", 'color: red');
 
 		return this;
 	}

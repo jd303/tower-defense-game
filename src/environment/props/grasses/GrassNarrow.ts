@@ -1,16 +1,16 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
 
-export class TreeFir extends PropAsset {
+export class GrassNarrow extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "TreeFir";
+	static assetName: string = "GrassNarrow";
 	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-fir.png';
+	static assetPath: string = 'assets/spritesheets/environment/spritesheet-grass-narrow.png';
 	static assetPositionY: number = 0;
-	static assetScale: number = 0.2;
-	static instancedMeshInstanceCount: number = 2000;
+	static assetScale: number = 0.5;
+	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
 		uniforms: {
@@ -24,7 +24,7 @@ export class TreeFir extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, TreeFir.assetName, TreeFir.assetType, TreeFir.spriteSheetRows, TreeFir.assetScale, TreeFir.assetPositionY, TreeFir.AnimationAttributes);
+		super(main, GrassNarrow.assetName, GrassNarrow.assetType, GrassNarrow.spriteSheetRows, GrassNarrow.assetScale, GrassNarrow.assetPositionY, GrassNarrow.AnimationAttributes);
 	}
 
 }

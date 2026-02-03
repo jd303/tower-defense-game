@@ -67,7 +67,7 @@ export abstract class SpriteAsset extends Asset {
 		await this.sourceInstancedMesh(assetName);
 		this.hideInstancedMesh();
 		this.setInstancedMeshInitialSettings(assetName);
-		this.setupSpriteSheetFrameManager();
+		await this.setupSpriteSheetFrameManager();
 		this.loadCallbacks.forEach(callback => callback());
 	}
 
@@ -97,9 +97,9 @@ export abstract class SpriteAsset extends Asset {
 	/**
 	 * Creates a spritesheet frame manager for this sprite asset
 	 */
-	setupSpriteSheetFrameManager() {
+	async setupSpriteSheetFrameManager() {
 		if (this.instancedMeshAnimates) {
-			this.spriteSheetFrameManager = new SpriteSheetFrameManager(this, this.instancedMesh, this.spriteSheetRows);
+			this.spriteSheetFrameManager = await new SpriteSheetFrameManager(this, this.instancedMesh, this.spriteSheetRows);
 		}
 	}
 
@@ -124,6 +124,14 @@ export abstract class SpriteAsset extends Asset {
 	setScale(point: THREE.Vector3) {
 		this.setInstancedMeshScale(point);
 		this.groupMain.scale.set(point.x, point.y, point.z);
+	}
+
+	/**
+	 * Sets the position of the asset
+	 */
+	setRotate(rotation: THREE.Vector3) {
+		this.setInstancedMeshRotation(rotation);
+		this.groupMain.rotation.set(rotation.x, rotation.y, rotation.z);
 	}
 
 	/**
@@ -203,6 +211,26 @@ export abstract class SpriteAsset extends Asset {
 			}
 		} catch (e) {
 			console.error(`ERROR TRIGGERED IN setInstancedMeshScale for ${this.assetName} - ${e}`);
+		}
+	}
+
+
+	/**
+	 * Sets the Instanced Mesh rotate
+	 */
+	setInstancedMeshRotation(rotation: THREE.Vector3, needsUpdate: boolean = true) {
+		try {
+			this.instancedMeshPosition.rotation.x = rotation.x;
+			this.instancedMeshPosition.rotation.y = rotation.y;
+			this.instancedMeshPosition.rotation.z = rotation.z;
+			this.instancedMeshPosition.updateMatrix();
+			this.instancedMesh.iMesh.setMatrixAt(this.instancedMeshIndex, this.instancedMeshPosition.matrix);
+
+			if (needsUpdate) {
+				this.instancedMesh.iMesh.instanceMatrix.needsUpdate = true;
+			}
+		} catch (e) {
+			console.error(`ERROR TRIGGERED IN setInstancedMeshRotation for ${this.assetName} - ${e}`);
 		}
 	}
 

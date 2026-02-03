@@ -229,6 +229,7 @@ export class InstancedMesh {
 class SpriteSheetInstancedMesh extends InstancedMesh {
 	constructor(main: Main, assetName: string, instancedMeshService: InstancedMeshService, material: THREE.Material, assetCount: number = 100) {
 		const geometry = new THREE.PlaneGeometry(1, 1);
+		geometry.translate(0, 0.5, 0); // Shift the geometry by 0.5, to normalise a y=0 point
 		super(main, assetName, instancedMeshService, geometry, material, assetCount);
 
 		// Add animationRow attribute

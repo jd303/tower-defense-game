@@ -13,252 +13,240 @@ export const levelDetails: LevelDefinition = {
 	],
 	paths: [
 		{
-			id: 1,
+			id: "1",
 			pathGeometry: PathGeometryTypes.dirt,
 			pathPoints: [
 				{
-					"incomingControlPoint": {
-						"x": -2.1428571428571317,
-						"y": 0,
-						"z": 30.42857142857143
-					},
-					"point": {
-						"x": 1.000000000000011,
-						"y": 0,
-						"z": 94.42857142857143
-					},
-					"outgoingControlPoint": {
-						"x": 1.5714285714285827,
-						"y": 0,
-						"z": 47
-					}
+					incomingControlPoint: new Vector3(-2.1428571428571317, 0, 30.42857142857143),
+					point: new Vector3(1.000000000000011, 0, 94.42857142857143),
+					outgoingControlPoint: new Vector3(1.5714285714285827, 0, 47)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 4.571428571428583,
-						"y": 0,
-						"z": 37.92857142857142
-					},
-					"point": {
-						"x": 7.857142857142868,
-						"y": 0,
-						"z": 35.42857142857143
-					},
-					"outgoingControlPoint": {
-						"x": 14.142857142857155,
-						"y": 0,
-						"z": 29.78571428571429
-					}
+					incomingControlPoint: new Vector3(
+						4.571428571428583,
+						0,
+						37.92857142857142
+					),
+					point: new Vector3(
+						7.857142857142868,
+						0,
+						35.42857142857143
+					),
+					outgoingControlPoint: new Vector3(
+						14.142857142857155,
+						0,
+						29.78571428571429
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 28.642857142857153,
-						"y": 0,
-						"z": 19.857142857142858
-					},
-					"point": {
-						"x": 27.85714285714287,
-						"y": 0,
-						"z": 12.142857142857142
-					},
-					"outgoingControlPoint": {
-						"x": 28,
-						"y": 0,
-						"z": 9.071428571428571
-					}
+					incomingControlPoint: new Vector3(
+						28.642857142857153,
+						0,
+						19.857142857142858
+					),
+					point: new Vector3(
+						27.85714285714287,
+						0,
+						12.142857142857142
+					),
+					outgoingControlPoint: new Vector3(
+						28,
+						0,
+						9.071428571428571
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 28.928571428571423,
-						"y": 0,
-						"z": 3.642857142857146
-					},
-					"point": {
-						"x": 13.714285714285715,
-						"y": 0,
-						"z": -2.6428571428571423
-					},
-					"outgoingControlPoint": {
-						"x": -13.071428571428571,
-						"y": 0,
-						"z": -16.57142857142857
-					}
+					incomingControlPoint: new Vector3(
+						28.928571428571423,
+						0,
+						3.642857142857146
+					),
+					point: new Vector3(
+						13.714285714285715,
+						0,
+						-2.6428571428571423
+					),
+					outgoingControlPoint: new Vector3(
+						-13.071428571428571,
+						0,
+						-16.57142857142857
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": -29.285714285714285,
-						"y": 0,
-						"z": -10.5
-					},
-					"point": {
-						"x": -28.642857142857142,
-						"y": 0,
-						"z": -25.642857142857142
-					},
-					"outgoingControlPoint": {
-						"x": -28.142857142857146,
-						"y": 0,
-						"z": -30.07142857142857
-					}
+					incomingControlPoint: new Vector3(
+						-29.285714285714285,
+						0,
+						-10.5
+					),
+					point: new Vector3(
+						-28.642857142857142,
+						0,
+						-25.642857142857142
+					),
+					outgoingControlPoint: new Vector3(
+						-28.142857142857146,
+						0,
+						-30.07142857142857
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": -28.928571428571427,
-						"y": 0,
-						"z": -38
-					},
-					"point": {
-						"x": -18.928571428571434,
-						"y": 0,
-						"z": -42.14285714285714
-					},
-					"outgoingControlPoint": {
-						"x": -5.857142857142857,
-						"y": 0,
-						"z": -48.14285714285714
-					}
+					incomingControlPoint: new Vector3(
+						-28.928571428571427,
+						0,
+						-38
+					),
+					point: new Vector3(
+						-18.928571428571434,
+						0,
+						-42.14285714285714
+					),
+					outgoingControlPoint: new Vector3(
+						-5.857142857142857,
+						0,
+						-48.14285714285714
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 5.21428571428571,
-						"y": 0,
-						"z": -41.92857142857142
-					},
-					"point": {
-						"x": 14.142857142857139,
-						"y": 0,
-						"z": -49.99999999999999
-					},
-					"outgoingControlPoint": {
-						"x": 22.28571428571428,
-						"y": 0,
-						"z": -57.71428571428571
-					}
+					incomingControlPoint: new Vector3(
+						5.21428571428571,
+						0,
+						-41.92857142857142
+					),
+					point: new Vector3(
+						14.142857142857139,
+						0,
+						-49.99999999999999
+					),
+					outgoingControlPoint: new Vector3(
+						22.28571428571428,
+						0,
+						-57.71428571428571
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 24.71428571428571,
-						"y": 0,
-						"z": -74.92857142857142
-					},
-					"point": {
-						"x": 24.14285714285714,
-						"y": 0,
-						"z": -99.28571428571428
-					},
-					"outgoingControlPoint": {
-						"x": 28.14285714285714,
-						"y": 0,
-						"z": -88.21428571428571
-					}
+					incomingControlPoint: new Vector3(
+						24.71428571428571,
+						0,
+						-74.92857142857142
+					),
+					point: new Vector3(
+						24.14285714285714,
+						0,
+						-99.28571428571428
+					),
+					outgoingControlPoint: new Vector3(
+						28.14285714285714,
+						0,
+						-88.21428571428571
+					)
 				}
 			],
 		},
 		{
-			id: 2,
+			id: "2",
 			pathGeometry: PathGeometryTypes.dirt,
 			pathPoints: [
 				{
-					"incomingControlPoint": {
-						"x": -64.28571428571428,
-						"y": 0,
-						"z": 21.5
-					},
-					"point": {
-						"x": -59.42857142857142,
-						"y": 0,
-						"z": 23.642857142857142
-					},
-					"outgoingControlPoint": {
-						"x": -51.57142857142857,
-						"y": 0,
-						"z": 24.642857142857142
-					}
+					incomingControlPoint: new Vector3(
+						-64.28571428571428,
+						0,
+						21.5
+					),
+					point: new Vector3(
+						-59.42857142857142,
+						0,
+						23.642857142857142
+					),
+					outgoingControlPoint: new Vector3(
+						-51.57142857142857,
+						0,
+						24.642857142857142
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": -45.714285714285715,
-						"y": 0,
-						"z": 24.42857142857143
-					},
-					"point": {
-						"x": -39.714285714285715,
-						"y": 0,
-						"z": 20.071428571428573
-					},
-					"outgoingControlPoint": {
-						"x": -30.642857142857142,
-						"y": 0,
-						"z": 14.571428571428571
-					}
+					incomingControlPoint: new Vector3(
+						-45.714285714285715,
+						0,
+						24.42857142857143
+					),
+					point: new Vector3(
+						-39.714285714285715,
+						0,
+						20.071428571428573
+					),
+					outgoingControlPoint: new Vector3(
+						-30.642857142857142,
+						0,
+						14.571428571428571
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": -29.57142857142857,
-						"y": 0,
-						"z": -6.7857142857142865
-					},
-					"point": {
-						"x": -28.928571428571427,
-						"y": 0,
-						"z": -15.714285714285714
-					},
-					"outgoingControlPoint": {
-						"x": -27.642857142857146,
-						"y": 0,
-						"z": -26.07142857142857
-					}
+					incomingControlPoint: new Vector3(
+						-29.57142857142857,
+						0,
+						-6.7857142857142865
+					),
+					point: new Vector3(
+						-28.928571428571427,
+						0,
+						-15.714285714285714
+					),
+					outgoingControlPoint: new Vector3(
+						-27.642857142857146,
+						0,
+						-26.07142857142857
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": -30.928571428571427,
-						"y": 0,
-						"z": -35.714285714285715
-					},
-					"point": {
-						"x": -18.71428571428572,
-						"y": 0,
-						"z": -42.07142857142857
-					},
-					"outgoingControlPoint": {
-						"x": -5.857142857142857,
-						"y": 0,
-						"z": -48.14285714285714
-					}
+					incomingControlPoint: new Vector3(
+						-30.928571428571427,
+						0,
+						-35.714285714285715
+					),
+					point: new Vector3(
+						-18.71428571428572,
+						0,
+						-42.07142857142857
+					),
+					outgoingControlPoint: new Vector3(
+						-5.857142857142857,
+						0,
+						-48.14285714285714
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 5.21428571428571,
-						"y": 0,
-						"z": -41.92857142857142
-					},
-					"point": {
-						"x": 14.142857142857139,
-						"y": 0,
-						"z": -49.99999999999999
-					},
-					"outgoingControlPoint": {
-						"x": 22.28571428571428,
-						"y": 0,
-						"z": -57.71428571428571
-					}
+					incomingControlPoint: new Vector3(
+						5.21428571428571,
+						0,
+						-41.92857142857142
+					),
+					point: new Vector3(
+						14.142857142857139,
+						0,
+						-49.99999999999999
+					),
+					outgoingControlPoint: new Vector3(
+						22.28571428571428,
+						0,
+						-57.71428571428571
+					)
 				},
 				{
-					"incomingControlPoint": {
-						"x": 24.71428571428571,
-						"y": 0,
-						"z": -74.92857142857142
-					},
-					"point": {
-						"x": 24.14285714285714,
-						"y": 0,
-						"z": -99.28571428571428
-					},
-					"outgoingControlPoint": {
-						"x": 28.14285714285714,
-						"y": 0,
-						"z": -88.21428571428571
-					}
+					incomingControlPoint: new Vector3(
+						24.71428571428571,
+						0,
+						-74.92857142857142
+					),
+					point: new Vector3(
+						24.14285714285714,
+						0,
+						-99.28571428571428
+					),
+					outgoingControlPoint: new Vector3(
+						28.14285714285714,
+						0,
+						-88.21428571428571
+					)
 				}
 			],
 		},
@@ -398,13 +386,13 @@ export const levelDetails: LevelDefinition = {
 			assetName: 'MountainInitial',
 			position: new Vector3(65, 0, 72),
 			scale: new Vector3(1.25, 0.75, 1.25),
-			rotate: new Vector3(0, -1, 0)
+			rotation: new Vector3(0, -1, 0)
 		},
 		{
 			assetName: 'MountainInitial',
 			position: new Vector3(50, 0, 85),
 			scale: new Vector3(1, 1, 1),
-			rotate: new Vector3(0, 1.5, 0)
+			rotation: new Vector3(0, 1.5, 0)
 		},
 	],
 	propZones: [
@@ -434,11 +422,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 2,
 			positionRandom: 1.5,
 			scaleRandom: { all: 5 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 1.25,
 				colour: 0x878B42,
+				bevelColour: 0x525328
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -481,11 +469,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 3,
 			positionRandom: 3,
 			scaleRandom: { all: 1, y: 0.25 },
-			rotateRandom: 2.5,
 			environmentTile: {
 				type: "land",
 				distance: 2,
 				colour: 0x878B42,
+				bevelColour: 0x525328
 			},
 			dynamicScaling:
 			{
@@ -537,11 +525,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 3,
 			positionRandom: 3,
 			scaleRandom: { all: 0.25 },
-			rotateRandom: 0.5,
 			environmentTile: {
 				type: "land",
 				distance: 2,
 				colour: 0x878B42,
+				bevelColour: 0x525328
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -572,11 +560,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 5,
 			positionRandom: 1.5,
 			scaleRandom: { all: 1, y: 3 },
-			rotateRandom: 0.75,
 			environmentTile: {
 				type: "land",
 				distance: 0,
-				colour: 0x9E8D51
+				colour: 0x9E8D51,
+				bevelColour: 0x70643A
 			}
 		},
 		// North West Rubble
@@ -600,11 +588,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 7,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.5, y: 1 },
-			rotateRandom: 3,
 			environmentTile: {
 				type: "land",
 				distance: 0,
 				colour: 0x9E8D51,
+				bevelColour: 0x70643A
 			}
 		},
 		// South East Rubble
@@ -630,11 +618,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 6,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.5, y: 0.5 },
-			rotateRandom: 3,
 			environmentTile: {
 				type: "land",
 				distance: 2,
 				colour: 0x9E8D51,
+				bevelColour: 0x70643A
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -662,7 +650,6 @@ export const levelDetails: LevelDefinition = {
 			propScale: 20,
 			positionRandom: 3.5,
 			scaleRandom: { all: 0.1, y: 0.25 },
-			rotateRandom: 0.75,
 			environmentTile: false
 		},
 		// North East Mountains
@@ -680,7 +667,6 @@ export const levelDetails: LevelDefinition = {
 			propScale: 10,
 			positionRandom: 5.5,
 			scaleRandom: { all: 0.1, y: 0.5 },
-			rotateRandom: 0.75,
 			environmentTile: false
 		},
 		// West Mountains
@@ -702,7 +688,6 @@ export const levelDetails: LevelDefinition = {
 			propScale: 20,
 			positionRandom: 5.5,
 			scaleRandom: { y: 0.25 },
-			rotateRandom: 0.75,
 			environmentTile: false
 		},
 		// Southern Mesas
@@ -721,11 +706,11 @@ export const levelDetails: LevelDefinition = {
 			propScale: 10,
 			positionRandom: 2,
 			scaleRandom: { all: 0.5, y: 0.5 },
-			rotateRandom: 1.5,
 			environmentTile: {
 				type: "land",
 				distance: 2,
 				colour: 0x9E8D51,
+				bevelColour: 0x70643A
 			}
 		}
 	],

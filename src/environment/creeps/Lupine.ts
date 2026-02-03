@@ -13,7 +13,7 @@ export class Lupine extends Creep {
 	static assetName: string = 'CreepLupine';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
 	static assetScale: number = 2;
-	static assetPositionY: number = 0.6;
+	static assetPositionY: number = 0;
 	static waveDifficulty = 1;
 
 	/**

@@ -20,6 +20,7 @@ export class WaveManager {
 	/**
 	 * Wave Properties
 	 * */
+	static waveSeparationTime: number = 10000;
 	waveTimer: Timer | null;
 	waves: Wave[] = [];
 
@@ -68,10 +69,10 @@ export class WaveManager {
 		const cols = Math.min(5, Math.sqrt(wave.creepNames.length));
 		const rows = Math.ceil(wave.creepNames.length / cols);
 		const spacing = CreepPath.pathWidth * 0.85 / cols
-		const waveGrid = this.createWaveGridPositions(cols, rows, spacing, 0);
+		let waveGrid = this.createWaveGridPositions(cols, rows, spacing, 0);
 
 		// Apply randomness to the waveGrid
-		waveGrid.map(point => ({
+		waveGrid = waveGrid.map(point => ({
 			x: point.x + Math.random() * spacing / 1.5,
 			z: point.z > 0 && point.z - Math.random() / 2 || point.z + Math.random() / 2
 		}));
@@ -97,7 +98,7 @@ export class WaveManager {
 		/*const minWaveTime = 2000 - (difficulty * 100);
 		const maxWaveTime = Math.max(5000 - (difficulty * 1000), minWaveTime);*/
 		//const waveTime = 20000 / difficulty;
-		const waveTime = 6500 / difficulty;
+		const waveTime = WaveManager.waveSeparationTime / (difficulty / 2);
 
 		const waves: Wave[] = [];
 		for (let x = 0; x < numberOfWaves; x++) {
@@ -128,7 +129,7 @@ export class WaveManager {
 
 			const wave = new Wave({
 				id: x,
-				waveStartTime: waveTime,
+				waveStartTime: x == 0 && waveTime / 2 || waveTime,
 				pathID: creepPathID,
 				difficulty: 1,
 				creepNames: creeps.map(creep => creep.name)

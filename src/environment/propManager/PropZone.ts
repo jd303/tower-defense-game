@@ -149,7 +149,6 @@ export interface PropZoneArguments {
 	dynamicScaling?: PropZoneScaling,
 	positionRandom: number,
 	scaleRandom: { all?: number, x?: number, y?: number, z?: number },
-	rotateRandom: number,
 	environmentTile: EnvironmentTileProperties | false
 }
 

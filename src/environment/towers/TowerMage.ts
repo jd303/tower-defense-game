@@ -14,7 +14,7 @@ export class TowerMage extends Tower {
 	static assetName = "TowerMage";
 	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-mage.png';
 	static assetScale: number = 7;
-	static assetPositionY = 3;
+	static assetPositionY = 0;
 	static buttonIcon = 'assets/models/towers/Tower.Mage.UI.icon.png';
 	static cost = 150;
 	static costType = 'money';

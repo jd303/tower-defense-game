@@ -13,7 +13,7 @@ export class TowerArcher extends Tower {
 	static assetName = "TowerArcher";
 	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-archer.png';
 	static assetScale: number = 7;
-	static assetPositionY = 3;
+	static assetPositionY = 0;
 	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
 	static cost = 100;
 	static costType = 'money';

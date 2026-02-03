@@ -13,7 +13,7 @@ export class TrollDink extends Creep {
 	static assetName: string = 'CreepTrollDink';
 	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-troll.png';
 	static assetScale: number = 3.25;
-	static assetPositionY: number = 1.1;
+	static assetPositionY: number = 0;
 	static waveDifficulty = 1;
 
 	/**

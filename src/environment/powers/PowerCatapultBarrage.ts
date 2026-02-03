@@ -173,7 +173,7 @@ export class PowerCatapultBarrage extends Power {
 		const creepsInShortRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusPrimary!);
 		let creepsInMidRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusSecondary!);
 		creepsInMidRange = creepsInMidRange.filter(midRangeCreep => !creepsInShortRange.find(shortRangeCreep => midRangeCreep == shortRangeCreep));
-		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * PowerCatapultBarrage.stats.activeStats.damage!));
+		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage!)));
 		creepsInMidRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage! / 3)));
 
 		// The dispose

@@ -23,6 +23,7 @@ export class TowerPlacementZone {
 	static environmentTileProperties: EnvironmentTileProperties = {
 		type: "land",
 		colour: 0xC4B271,
+		bevelColour: 0x71622F,
 		distance: 1
 	}
 

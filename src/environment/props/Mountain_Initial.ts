@@ -8,7 +8,7 @@ export class MountainInitial extends PropAsset {
 	static assetName: string = "MountainInitial";
 	static assetType = 'prop';
 	static assetPath: string = 'assets/spritesheets/environment/spritesheet-mountain-0.png';
-	static assetPositionY: number = 1;
+	static assetPositionY: number = 0;
 	static assetScale: number = 1;
 	static instancedMeshInstanceCount: number = 1000;
 	static instancedMeshAnimates: boolean = false;

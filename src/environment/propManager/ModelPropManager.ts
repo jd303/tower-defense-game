@@ -91,7 +91,7 @@ export class ModelPropManager {
 			const pickedItem = args.propNames.find(item => (sum += item.chance) >= random);
 			if (!pickedItem) throw new Error("Cannot choose a propName");
 
-			this.registerProp({ assetName: pickedItem.name, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, Maths.addBipolarRandom(0, args.rotateRandom || 0), 0) }, levelDetails);
+			this.registerProp({ assetName: pickedItem.name, position: new Vector3(position.position.x, propZonePropsY, position.position.z), scale: new Vector3(position.scale.x, position.scale.y, position.scale.z), rotate: new Vector3(0, 0, 0) }, levelDetails);
 		});
 	}
 
