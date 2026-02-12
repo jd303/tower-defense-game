@@ -1,15 +1,18 @@
 import { Main } from "../../core/Main";
 import { PropAsset } from "../assets/PropAsset";
+import { SpriteAssetProperties } from "../assets/SpriteAsset";
 
 export class LogSubmerged extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "LogSubmerged";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-log-submerged.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 1;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'LogSubmerged',
+		assetPath: 'assets/spritesheets/environment/spritesheet-log-submerged.png',
+		assetScale: 1,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 500;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class LogSubmerged extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, LogSubmerged.assetName, LogSubmerged.assetType, LogSubmerged.spriteSheetRows, LogSubmerged.assetScale, LogSubmerged.assetPositionY, LogSubmerged.AnimationAttributes);
+		super(main, LogSubmerged.assetProperties, LogSubmerged.spriteSheetRows, LogSubmerged.AnimationAttributes);
 	}
 
 }

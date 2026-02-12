@@ -6,6 +6,7 @@ import { EnvironmentTile } from '../environment/EnvironmentTile';
 import { CreepPath } from '../environment/creeps/CreepPath';
 import { Asset } from '../environment/assets/Asset';
 import { MapNode } from '../screens/MapScreen';
+import { ThreeDeeButton } from '../screens/_ThreeDeeButton';
 
 /**
  * Allows us to manage interaction based on clicks and taps.
@@ -128,6 +129,8 @@ export class InteractionService2 extends Service {
 			if (matchedTargets) {
 				let handled = false;
 
+				console.log("MATCHED TARGETS", matchedTargets);
+
 				for (let i = 0; i < (matchedTargets as RaycasterIntersection[]).length; i++) {
 					if (handled) break;
 					target = (matchedTargets as RaycasterIntersection[])[i];
@@ -145,15 +148,16 @@ export class InteractionService2 extends Service {
 	offerTargetToListeners(target: RaycasterIntersection) {
 		if (this.modalInteractableListener) {
 			if (this.modalInteractableListener.targetName == target.name) {
-				const { handled, cancelListeners } = this.modalInteractableListener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
-				if (handled && cancelListeners) return true;
+				const { handled, stopPropagation } = this.modalInteractableListener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
+				if (handled && stopPropagation) return true;
 			}
 		} else {
 			for (let i = 0; i < this.interactableListeners.length; i++) {
 				const listener = this.interactableListeners[i];
+				console.log("Should I give you this?", listener, target);
 				if (listener.targetName == target.name) {
-					const { handled, cancelListeners } = listener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
-					if (handled && cancelListeners) return true;
+					const { handled, stopPropagation } = listener.callback.bind(target.object)({ raycasterInteraction: target, main: this.main });
+					if (handled && stopPropagation) return true;
 				}
 			}
 		}
@@ -171,7 +175,7 @@ export class InteractionService2 extends Service {
 	}
 }
 
-export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile | MapNode;
+export type InteractableObject = Asset | Terrain | CreepPath | EnvironmentTile | MapNode | ThreeDeeButton;
 export type InteractableTypes = 'creep' | 'creepPath' | 'hero' | 'tower' | 'environmentTile' | 'towerPlacementZone' | 'levelpath' | 'terrain' | 'ui-component';
 
 export class Interactable2 {
@@ -195,7 +199,7 @@ export interface InteractableListener {
 
 export interface EventHandlingResult {
 	handled: boolean;
-	cancelListeners: boolean;
+	stopPropagation: boolean;
 }
 
 export interface InteractionEvent {

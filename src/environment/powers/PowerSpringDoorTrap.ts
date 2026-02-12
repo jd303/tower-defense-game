@@ -10,8 +10,11 @@ export class PowerSpringDoorTrap extends Power {
 	/**
 	 * Static properties
 	 */
-	static assetName = 'PowerSpringDoorTrap';
-	static buttonIcon = 'assets/models/powers/Power.SpringDoorTrap.UI.icon.png';
+	static powerProperties = {
+		assetName: 'PowerSpringDoorTrap',
+		icon: 'assets/powers/springDoorTrap/Power.SpringDoorTrap.UI.icon.png',
+		art: ''
+	}
 	static radiusOfEffect = 8;
 
 	/**

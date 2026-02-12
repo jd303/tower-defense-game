@@ -3,19 +3,24 @@ import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MagicBolt } from '../effects/MagicBolt';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerMage extends Tower {
 	/**
 	 * Static details
 	 */
-	static assetType = 'tower';
-	static assetName = "TowerMage";
-	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-mage.png';
-	static assetScale: number = 7;
-	static assetPositionY = 0;
-	static buttonIcon = 'assets/models/towers/Tower.Mage.UI.icon.png';
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'tower',
+		assetName: 'TowerMage',
+		assetPath: 'assets/towers/mage/spritesheet-tower-mage.png',
+		assetScale: 7,
+		assetPositionY: 0
+	}
+	static towerProperties = {
+		icon: 'assets/models/towers/Tower.Mage.UI.icon.png',
+		art: ''
+	}
 	static cost = 150;
 	static costType = 'money';
 	static towerZoneWidth = 1;
@@ -62,7 +67,7 @@ export class TowerMage extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerMage.assetName, TowerMage.assetType, TowerMage.assetScale, TowerMage.assetPositionY, TowerMage.spriteSheetRows, TowerMage.AnimationAttributes);
+		super(main, TowerMage.assetProperties, TowerMage.spriteSheetRows, TowerMage.AnimationAttributes);
 
 		this.stats = new CharacterStats(TowerMage.stats);
 

@@ -3,17 +3,19 @@ import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { AttackRangeTypes, CharacterStats } from '../Stats';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Lupine extends Creep {
 	/**
 	 * Main
 	 * */
-	static assetType = 'creep';
-	static assetName: string = 'CreepLupine';
-	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-lupine.png';
-	static assetScale: number = 2;
-	static assetPositionY: number = 0;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'creep',
+		assetName: 'CreepLupine',
+		assetPath: 'assets/spritesheets/creeps/spritesheet-lupine.png',
+		assetScale: 2,
+		assetPositionY: 0
+	}
 	static waveDifficulty = 1;
 
 	/**
@@ -79,7 +81,7 @@ export class Lupine extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Lupine.assetName, Lupine.assetType, Lupine.assetScale, Lupine.assetPositionY, Lupine.spriteSheetRows, Lupine.AnimationAttributes);
+		super(main, Lupine.assetProperties, Lupine.spriteSheetRows, Lupine.AnimationAttributes);
 
 		return this;
 	}

@@ -14,12 +14,16 @@ export class InstancedMeshService {
 	 * Main properties
 	 */
 	instancedMeshes: Record<string, InstancedMesh> = {};
+	environmentColour: THREE.Vector3;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
 		this.main = main;
+		this.environmentColour = new THREE.Vector3(1, 1, 1);
+		// vec3(1.1, 1.05, 0.9); // warm sunlight example
+		// vec3(0.4, 0.45, 0.7); // moonlight
 	}
 
 	/**
@@ -31,7 +35,7 @@ export class InstancedMeshService {
 				return await this.instancedMeshes[assetName];
 			} else return this.instancedMeshes[assetName];
 		} else {
-			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetName, spriteSheet, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount, instancedMeshAnimates);
+			const instancedMesh = await this.createSpriteSheetInstancedMesh(assetClass.assetProperties.assetName, spriteSheet, assetClass.billboarded, assetClass.ShaderMaterialProperties, instancedMeshInstanceCount, instancedMeshAnimates);
 
 			if (instancedMesh) {
 				const positioner = new THREE.Object3D();
@@ -70,7 +74,7 @@ export class InstancedMeshService {
 	/**
 	 * Creates an instanced mesh for sprites
 	 */
-	createSpriteSheetInstancedMesh(assetName: string, spriteSheet: SpriteSheet, materialProperties: ShaderMaterialProperties, assetCount: number = 100, instancedMeshAnimates: boolean = false) {
+	createSpriteSheetInstancedMesh(assetName: string, spriteSheet: SpriteSheet, billboarded: boolean, materialProperties: ShaderMaterialProperties, assetCount: number = 100, instancedMeshAnimates: boolean = false) {
 		if (this.instancedMeshes[assetName]) return console.error(`Cannot recreate ${assetName} Instanced Mesh`);
 
 		const vertexShader = spriteSheet.spriteService.vertexShader;
@@ -80,10 +84,12 @@ export class InstancedMeshService {
 			uniforms: {
 				...materialProperties.uniforms,
 				uTime: { value: 0 },
+				uEnvironmentColour: { value: new THREE.Vector3(1, 1, 1) },
 				uMap: { value: spriteSheet.texture },
 			},
 			defines: {
-				USE_ANIMATION: 1
+				USE_ANIMATION: spriteSheet.sheetRows + spriteSheet.sheetCols > 2 && 1 || 0,
+				BILLBOARD: billboarded && 1 || 0
 			},
 			alphaTest: 0.5,
 			transparent: true,
@@ -123,6 +129,18 @@ export class InstancedMeshService {
 			}
 		});
 	}
+
+	/**
+	 * Sets a universal enviroment colour to provide to all instanced meshes
+	 */
+	setEnvironmentColour(environmentColour: THREE.Vector3) {
+		this.environmentColour = environmentColour;
+
+		// And update any existing items
+		Object.keys(this.instancedMeshes).forEach(iMeshKey => {
+			this.instancedMeshes[iMeshKey].updateEnvironmentColour(environmentColour);
+		});
+	}
 }
 
 /**
@@ -157,6 +175,8 @@ export class InstancedMesh {
 		for (let x = 0; x < assetCount; x++) {
 			this.iMesh.setColorAt(x, colour);
 		}
+
+		this.updateEnvironmentColour(this.instancedMeshService.environmentColour);
 
 		return this;
 	}
@@ -204,6 +224,13 @@ export class InstancedMesh {
 
 		return new THREE.Vector3(finalWidth, finalHeight, 1)
 	}*/
+
+	/**
+	 * Updates the environment colour
+	 */
+	updateEnvironmentColour(environmentColour: THREE.Vector3) {
+		(this.iMesh.material as THREE.ShaderMaterial).uniforms.uEnvironmentColour.value = environmentColour;
+	}
 
 	/**
 	 * Resets the instanced mesh

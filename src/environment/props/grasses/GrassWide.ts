@@ -1,15 +1,18 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
+import { SpriteAssetProperties } from "../../assets/SpriteAsset";
 
 export class GrassWide extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "GrassWide";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-grass-wide.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 0.5;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'GrassWide',
+		assetPath: 'assets/spritesheets/environment/spritesheet-grass-wide.png',
+		assetScale: 0.5,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class GrassWide extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, GrassWide.assetName, GrassWide.assetType, GrassWide.spriteSheetRows, GrassWide.assetScale, GrassWide.assetPositionY, GrassWide.AnimationAttributes);
+		super(main, GrassWide.assetProperties, GrassWide.spriteSheetRows, GrassWide.AnimationAttributes);
 	}
 
 }

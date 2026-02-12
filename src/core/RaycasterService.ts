@@ -77,11 +77,13 @@ export class RaycasterService extends Service {
 	 * Finds the first ray target, or null
 	 */
 	getSingleRayTarget(targets: Interactable2[], cancelTargets: Interactable2[]) {
+		console.log("GET SINGLE", targets);
 		let intersected: RaycasterIntersection | null = null;
 		for (let i = 0; i < targets.length; i++) {
 			let subject = targets[i];
 
 			let intersectsTarget = this.raycaster?.intersectObjects([subject.object['groupMain']]);
+			console.log("ITARGET", intersectsTarget);
 			if (intersectsTarget?.length) {
 
 				// Check that we don't also intersect with a cancelTarget
@@ -98,7 +100,8 @@ export class RaycasterService extends Service {
 			}
 		}
 
-		return intersected;
+		if (intersected) return [intersected]; // Return single result as array
+		else return null;
 	}
 
 	/**
@@ -114,15 +117,19 @@ export class RaycasterService extends Service {
 			let intersectsTarget = this.raycaster?.intersectObjects([subject.object['groupMain']]);
 			if (intersectsTarget?.length) {
 				intersectsTarget.forEach((target) => {
-					intersected.push({
-						name: targets[i].name || 'no name just yet', // TODO: This is for the migration to new Interaction, fix up please.
-						point: target,
-						object: subject.object
-					});
+					// Ensure we haven't multiple-matched
+					if (!intersected.find(intersected => intersected.object.groupMain == target.object.parent)) {
+						intersected.push({
+							name: targets[i].name,
+							point: target,
+							object: subject.object
+						});
+					}
 				});
 			}
 		}
 
+		console.log("IT INTERSECTED", intersected);
 		return intersected;
 	}
 }

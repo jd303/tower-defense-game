@@ -95,32 +95,16 @@ export class LightingService extends Service {
 	}
 
 	/**
-	 * Makes a light cast shadows
-	 * */
-	addShadowsToLight(light: Light) {
-		light.threeLight.castShadow = true;
-
-		if (light.threeLight.shadow) {
-			light.threeLight.shadow.mapSize.width = 4096;
-			light.threeLight.shadow.mapSize.height = 4096;
-			(light.threeLight.shadow.camera as any).left = 250;
-			(light.threeLight.shadow.camera as any).right = -250;
-			(light.threeLight.shadow.camera as any).bottom = -250;
-			(light.threeLight.shadow.camera as any).top = 250;
-			(light.threeLight.shadow.camera as any).near = 0.5;
-			(light.threeLight.shadow.camera as any).far = 250;
-			//light.threeLight.shadow.radius = 10; // Adds 'blur' to shadows
-			//(light.threeLight.shadow as any).type = THREE.PCFSoftShadowMap;
-			light.threeLight.shadow.normalBias = 0.4; // 0.03
-
+	 * Enabled or disables Renderer Shadows
+	 * Note that disabling will no automatically disable shadows.  Instead, new materials will neither cast or receive
+	 */
+	setRendererShadows(enabled: boolean) {
+		if (enabled) {
+			this.main.renderer.shadowMap.enabled = true;
+			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		} else {
+			this.main.renderer.shadowMap.enabled = false;
 		}
-	}
-
-	/**
-	 * Stops a light casting shadows
-	 * */
-	removeShadowsFromLight(light: Light) {
-		light.threeLight.castShadow = false;
 	}
 
 	/**
@@ -144,6 +128,24 @@ export class LightingService extends Service {
 		}
 
 		if (light) this.main.scene.add(light.threeLight);
+	}
+
+	/**
+	 * Gets an environmentColour based on intensity
+	 */
+	getEnvironmentColourByIntensity(colourName: keyof typeof EnvironmentColours, intensity: number) {
+		const t = Math.max(0, Math.min(1, intensity));
+		const colour = EnvironmentColours[colourName];
+
+		if (colour) {
+			return new THREE.Vector3(
+				colour.dark.x * (1 - t) + colour.light.x * t,
+				colour.dark.y * (1 - t) + colour.light.y * t,
+				colour.dark.z * (1 - t) + colour.light.z * t
+			);
+		} else {
+			console.error("Cannot find environment colour");
+		}
 	}
 
 	/**
@@ -173,10 +175,34 @@ export class LightingService extends Service {
 			light.threeLight.dispose();
 		});
 		this.lights = [];
+		this.setRendererShadows(false);
 	}
 }
 
 export class Light {
 	name: string;
 	threeLight: THREE.Light;
+
+	enableShadows() {
+		this.threeLight.castShadow = true;
+
+		if (this.threeLight.shadow) {
+			this.threeLight.shadow.mapSize.width = 4096;
+			this.threeLight.shadow.mapSize.height = 4096;
+			(this.threeLight.shadow.camera as any).left = 250;
+			(this.threeLight.shadow.camera as any).right = -250;
+			(this.threeLight.shadow.camera as any).bottom = -250;
+			(this.threeLight.shadow.camera as any).top = 250;
+			(this.threeLight.shadow.camera as any).near = 0.5;
+			(this.threeLight.shadow.camera as any).far = 250;
+			//light.threeLight.shadow.radius = 10; // Adds 'blur' to shadows
+			//(light.threeLight.shadow as any).type = THREE.PCFSoftShadowMap;
+			this.threeLight.shadow.normalBias = 0.4; // 0.03
+		}
+	}
 }
+
+export const EnvironmentColours = {
+	outdoors: { dark: new THREE.Vector3(0.4, 0.45, 0.7), light: new THREE.Vector3(1.1, 1.05, 0.9) },
+	cavern_flame: { dark: new THREE.Vector3(0.8, 0.45, 0.6), light: new THREE.Vector3(1.4, 1.05, 0.9) },
+} as const;

@@ -12,8 +12,11 @@ export class PowerCatapultBarrage extends Power {
 	/**
 	 * Static properties
 	 */
-	static assetName = 'PowerCatapultBarrage';
-	static buttonIcon = 'assets/models/powers/Power.CatapultBarrage.UI.icon.png';
+	static powerProperties = {
+		assetName: 'PowerCatapultBarrage',
+		icon: 'assets/powers/catapultBarrage/Power.CatapultBarrage.UI.icon.png',
+		art: ''
+	}
 
 	/**
 	 * Unique properties for this Power

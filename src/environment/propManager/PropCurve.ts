@@ -80,8 +80,8 @@ export class PropCurve {
 	 * Removes all elements of a PropZone
 	 */
 	dispose() {
-		this.debugOutline && this.main.scene.remove(this.debugOutline);
-		this.debugZoneOutline && this.main.scene.remove(this.debugZoneOutline);
+		if (this.debugOutline) this.main.scene.remove(this.debugOutline);
+		if (this.debugZoneOutline) this.main.scene.remove(this.debugZoneOutline);
 	}
 }
 

@@ -85,17 +85,17 @@ export class UIService extends Service {
 		// Switch depending on the type
 		switch (button.region) {
 			// Towers
-			case UIRegions.Tower:
+			case UIRegions.BottomCenter:
 				this.towersUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
 			// Towers
-			case UIRegions.Power:
+			case UIRegions.BottomLeft:
 				this.powersUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
 			// Menu
-			case UIRegions.Menu:
+			case UIRegions.TopLeft:
 				this.menuUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;

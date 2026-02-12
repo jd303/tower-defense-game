@@ -17,9 +17,9 @@ import { HeroManager } from '../environment/heroes/HeroManager';
 import { LevelCreator } from './LevelCreator';
 import { InstancedMeshService } from '../game/InstancedMeshService';
 import { PowersManager } from '../environment/powers/PowersManager';
-import { UserLoadoutManager } from '../userData/UserLoadoutManager';
 import { LightingService } from '../core/LightingService';
 import { DebugService } from '../core/DebugService';
+import { UserDataService } from '../userData/UserDataService';
 
 export class Level {
 	/**
@@ -31,7 +31,6 @@ export class Level {
 	 * Path
 	 * */
 	levelDetails: LevelDefinition;
-	userLoadoutManager: UserLoadoutManager;
 
 	/**
 	 * Level Assets
@@ -59,7 +58,6 @@ export class Level {
 		this.waveManager = new WaveManager(this.main, this);
 		this.heroManager = new HeroManager(this.main, this);
 		this.powersManager = new PowersManager(this.main, this);
-		this.userLoadoutManager = new UserLoadoutManager(this.main);
 
 		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
@@ -87,6 +85,9 @@ export class Level {
 		this.creepManager.setupCreepPaths(this.levelDetails);
 		this.propManager.setup(this.levelDetails);
 		this.setupLights();
+
+		await this.main.s('UserData').awaitDev();
+
 		this.setupUI();
 		this.setupEconomy();
 		this.setupHero();
@@ -134,14 +135,16 @@ export class Level {
 		sLighting.enableLight(directionalLight);
 		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
 
+		// Set instanced Mesh colours
+		const sInstancedMesh: InstancedMeshService = this.main.s('InstancedMesh');
+		const environmentColour = sLighting.getEnvironmentColourByIntensity(this.levelDetails.environmentColour.colour, this.levelDetails.environmentColour.intensity);
+		if (environmentColour) sInstancedMesh.setEnvironmentColour(environmentColour);
+
 		// Enable shadows
 		setTimeout(() => {
-			//this.main.renderer.physicallyCorrectLights = true;
-			//this.main.renderer.outputEncoding = THREE.sRGBEncoding;
-			this.main.renderer.shadowMap.enabled = true;
-			this.main.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			sLighting.setRendererShadows(true);
 			this.terrain?.enableShadows();
-			this.main.s('Lighting').addShadowsToLight(directionalLight);
+			directionalLight.enableShadows();
 		}, 100);
 	}
 
@@ -158,11 +161,12 @@ export class Level {
 	/**
 	 * Sets up the economy for the level
 	 */
-	setupEconomy() {
+	async setupEconomy() {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		const sEvent: EventService = this.main.s('Event');
+		const sUserData: UserDataService = this.main.s('UserData');
 
-		const userEconomyData = this.userLoadoutManager.getEconomyData();
+		const userEconomyData = await sUserData.getEconomyData();
 		sEconomy.setEconomyValue("money", userEconomyData.money.current);
 		sEvent.fire('commerce_money_changed', userEconomyData.money.current);
 		sEconomy.setEconomyValue("hearts", userEconomyData.hearts.current);
@@ -175,21 +179,24 @@ export class Level {
 	 * Sets up the hero for the level
 	 */
 	async setupHero() {
-		const heroUpgrades = await this.userLoadoutManager.userLoadout.heroUpgrades;
+		const sUserData: UserDataService = this.main.s('UserData');
+		const heroUpgrades = sUserData.userLoadout.heroUpgrades;
 		this.heroManager.heroUpgrades = heroUpgrades;
 
-		const heroes = await this.userLoadoutManager.getEquippedHeroes();
-		heroes.forEach(hero => this.heroManager.createHero(hero.assetName, new THREE.Vector3(-28, 0, -20)));
+		const heroes = await sUserData.getEquippedHeroes();
+		heroes.forEach(hero => this.heroManager.createHero(hero.assetProperties.assetName, new THREE.Vector3(-28, 0, -20)));
 	}
 
 	/**
 	 * Sets up towers for the level
 	 */
 	async setupTowers() {
-		const towers = await this.userLoadoutManager.getEquippedTowers();
+		const sUserData: UserDataService = this.main.s('UserData');
+
+		const towers = await sUserData.getEquippedTowers();
 		await this.towerManager.setup(this.levelDetails, towers);
 
-		const towerUpgrades = await this.userLoadoutManager.userLoadout.towerUpgrades;
+		const towerUpgrades = await sUserData.userLoadout.towerUpgrades;
 		this.towerManager.towerUpgrades = towerUpgrades;
 	}
 
@@ -197,8 +204,10 @@ export class Level {
 	 * Sets up powers for the level
 	 */
 	async setupPowers() {
-		const powers = await this.userLoadoutManager.getEquippedPowers();
-		const powerUpgrades = await this.userLoadoutManager.userLoadout.powerUpgrades;
+		const sUserData: UserDataService = this.main.s('UserData');
+
+		const powers = await sUserData.getEquippedPowers();
+		const powerUpgrades = await sUserData.userLoadout.powerUpgrades;
 		this.powersManager.powerUpgrades = powerUpgrades;
 		this.powersManager.setup(powers);
 	}

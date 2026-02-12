@@ -3,8 +3,6 @@ import { Main } from "../../core/Main";
 import { LevelDefinition, TerrainTypes } from "../../data/LevelInterfaces";
 import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
-import { Maths } from "../../core/Maths";
-import { EnvironmentTile } from "../EnvironmentTile";
 
 // RETIRED WHEN I SHIFTED TO SPRITES 01-2026.  Would still work, but is outdated.
 
@@ -21,7 +19,6 @@ export class ModelPropManager {
 	tileset: TerrainTypes = TerrainTypes.grass;
 	propZones: PropZone[] = [];
 	propGroups: PropGroup[] = [];
-	environmentTiles: EnvironmentTile[] = [];
 
 	tempTreeTexture: any;
 
@@ -77,12 +74,6 @@ export class ModelPropManager {
 		const propZone = new PropZone(args, this.main);
 		this.propZones.push(propZone);
 		const propPositions: Vector3[] = propZone.createPositions();
-
-		if (args.environmentTile) {
-			const environmentTile = propZone.createEnvironmentTile();
-			this.environmentTiles.push(environmentTile);
-			this.main.scene.add(environmentTile.groupMain);
-		}
 
 		// Place the props
 		propPositions.forEach((position: any) => {
@@ -258,11 +249,6 @@ export class ModelPropManager {
 			propZone.dispose();
 		});
 		this.propZones = [];
-
-		this.environmentTiles.forEach((environmentTile) => {
-			environmentTile.dispose();
-		});
-		this.environmentTiles = [];
 	}
 }
 

@@ -1,15 +1,18 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
+import { SpriteAssetProperties } from "../../assets/SpriteAsset";
 
 export class ShrubWide extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "ShrubWide";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-shrub-wide.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 0.5;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'ShrubWide',
+		assetPath: 'assets/spritesheets/environment/spritesheet-shrub-wide.png',
+		assetScale: 0.5,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class ShrubWide extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, ShrubWide.assetName, ShrubWide.assetType, ShrubWide.spriteSheetRows, ShrubWide.assetScale, ShrubWide.assetPositionY, ShrubWide.AnimationAttributes);
+		super(main, ShrubWide.assetProperties, ShrubWide.spriteSheetRows, ShrubWide.AnimationAttributes);
 	}
 
 }

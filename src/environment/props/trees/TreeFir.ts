@@ -1,15 +1,18 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
+import { SpriteAssetProperties } from "../../assets/SpriteAsset";
 
 export class TreeFir extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "TreeFir";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-fir.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 0.2;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'TreeFir',
+		assetPath: 'assets/spritesheets/environment/spritesheet-tree-fir.png',
+		assetScale: 0.2,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class TreeFir extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, TreeFir.assetName, TreeFir.assetType, TreeFir.spriteSheetRows, TreeFir.assetScale, TreeFir.assetPositionY, TreeFir.AnimationAttributes);
+		super(main, TreeFir.assetProperties, TreeFir.spriteSheetRows, TreeFir.AnimationAttributes);
 	}
 
 }

@@ -1,15 +1,18 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
+import { SpriteAssetProperties } from "../../assets/SpriteAsset";
 
 export class TreeDead extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "TreeDead";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-dead.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 2;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'TreeDead',
+		assetPath: 'assets/spritesheets/environment/spritesheet-tree-dead.png',
+		assetScale: 2,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class TreeDead extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, TreeDead.assetName, TreeDead.assetType, TreeDead.spriteSheetRows, TreeDead.assetScale, TreeDead.assetPositionY, TreeDead.AnimationAttributes);
+		super(main, TreeDead.assetProperties, TreeDead.spriteSheetRows, TreeDead.AnimationAttributes);
 	}
 
 }

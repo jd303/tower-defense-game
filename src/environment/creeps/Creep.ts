@@ -7,7 +7,7 @@ import { InteractableOrders, InteractableTypes, InteractionService2 } from '../.
 import { MovePathDefinition } from '../../data/PathInterfaces';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { CharacterAttackStats, CharacterStats } from '../Stats';
 
 export abstract class Creep extends CharacterAsset {
@@ -49,8 +49,8 @@ export abstract class Creep extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
-		super(main, assetName, 'creep', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
+	constructor(main: Main, assetDetails: SpriteAssetProperties, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetDetails, spriteSheetRows, animationAttributes);
 
 		this.stateMachine = this.setDefaultStates();
 		this.setInteractive();
@@ -330,7 +330,7 @@ export abstract class Creep extends CharacterAsset {
 		console.log('Stats:', this.stats);
 		console.groupEnd();
 
-		return { handled: true, cancelListeners: true };
+		return { handled: true, stopPropagation: true };
 	}
 	deselect() {
 	}

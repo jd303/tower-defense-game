@@ -1,7 +1,7 @@
 import { Main } from '../../core/Main';
 import { DamageTypes } from '../../data/DamageTypes';
 import { MovementTypes } from '../../data/MovementTypes';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { Creep } from './Creep';
 import { AttackRangeTypes, CharacterStats } from '../Stats';
 
@@ -9,11 +9,13 @@ export class Troll extends Creep {
 	/**
 	 * Main
 	 * */
-	static assetType = 'creep';
-	static assetName: string = 'CreepTroll';
-	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-troll.png';
-	static assetScale: number = 6.5;
-	static assetPositionY: number = 0;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'creep',
+		assetName: 'CreepTroll',
+		assetPath: 'assets/spritesheets/creeps/spritesheet-troll.png',
+		assetScale: 3,
+		assetPositionY: 0
+	}
 	static waveDifficulty = 3;
 
 	/**
@@ -79,7 +81,7 @@ export class Troll extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Troll.assetName, Troll.assetType, Troll.assetScale, Troll.assetPositionY, Troll.spriteSheetRows, Troll.AnimationAttributes);
+		super(main, Troll.assetProperties, Troll.spriteSheetRows, Troll.AnimationAttributes);
 
 		return this;
 	}

@@ -1,6 +1,6 @@
 import { Main } from '../../core/Main';
 import { Level } from '../../levels/Level';
-import { SpriteAsset, SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAsset, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class PowerCatapultBarrageRock extends SpriteAsset {
 	/**
@@ -12,11 +12,13 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	/**
 	 * Static properties
 	 */
-	static assetName = 'PowerCatapultBarrageRock';
-	static assetType = 'power';
-	static assetPath = 'assets/spritesheets/powers/spritesheet-power-catapultbarrage.png';
-	static assetPositionY = 0;
-	static assetScale = 5;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'power',
+		assetName: 'PowerCatapultBarrageRock',
+		assetPath: 'assets/spritesheets/powers/spritesheet-power-catapultbarrage.png',
+		assetScale: 5,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount = 5;
 	static instancedMeshAnimates: boolean = true;
 
@@ -45,6 +47,6 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 	 * Construtor
 	 * */
 	constructor(main: Main) {
-		super(main, PowerCatapultBarrageRock.assetName, PowerCatapultBarrageRock.assetType, PowerCatapultBarrageRock.assetScale, PowerCatapultBarrageRock.assetPositionY, PowerCatapultBarrageRock.spriteSheetRows, PowerCatapultBarrageRock.AnimationAttributes);
+		super(main, PowerCatapultBarrageRock.assetProperties, PowerCatapultBarrageRock.spriteSheetRows, PowerCatapultBarrageRock.AnimationAttributes);
 	}
 }

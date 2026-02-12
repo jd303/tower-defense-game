@@ -11,10 +11,12 @@ export abstract class SpriteAsset extends Asset {
 	/**
 	 * Setup Properties
 	 * */
+	static assetProperties: SpriteAssetProperties;
 	static ShaderMaterialProperties: ShaderMaterialProperties;
 	static AnimationAttributes: ShaderAnimationAttributes;
 	static spriteSheetRows: SpriteSheetRow[] = [];
 	static instancedMeshInstanceCount: number;
+	static billboarded: boolean = true; // If true, will always face the camera
 
 	/**
 	 * Sprite Asset Properties
@@ -37,19 +39,20 @@ export abstract class SpriteAsset extends Asset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
-		super(main, assetName, assetType);
+	constructor(main: Main, assetProperties: SpriteAssetProperties, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetProperties.assetName, assetProperties.assetType);
 
 		const positioner = new THREE.Object3D();
 		this.instancedMeshPosition = positioner;
-		this.assetScale = assetScale;
-		this.assetPositionY = assetPositionY;
+		this.assetName = assetProperties.assetName;
+		this.assetScale = assetProperties.assetScale;
+		this.assetPositionY = assetProperties.assetPositionY;
 		this.spriteSheetRows = spriteSheetRows;
 		this.instancedMeshAnimates = animationAttributes.animates;
 		this.main.scene.add(this.groupMain);
 
-		this.setupInstancedMesh(assetName);
-		this.setPositionerScale(assetScale);
+		this.setupInstancedMesh(assetProperties.assetName);
+		this.setPositionerScale(assetProperties.assetScale);
 	}
 
 	/**
@@ -258,7 +261,7 @@ export abstract class SpriteAsset extends Asset {
 	 * Actions to take when we delete the instanced mesh
 	 */
 	hideInstancedMesh() {
-		this.setInstancedMeshPosition(new THREE.Vector3(-100, 0, -100), true);
+		this.setInstancedMeshPosition(new THREE.Vector3(-100 + (Math.random() * 3), 0, -100 + (Math.random() * 3)), true);
 	}
 
 	/**
@@ -276,7 +279,11 @@ export abstract class SpriteAsset extends Asset {
 }
 
 export interface SpriteAssetProperties {
-
+	assetType: string;
+	assetName: string;
+	assetPath: string;
+	assetScale: number;
+	assetPositionY: number;
 }
 
 /**

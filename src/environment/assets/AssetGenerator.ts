@@ -5,7 +5,7 @@ import { Lupine } from '../creeps/Lupine';
 import { Troll } from '../creeps/Troll';
 import { TrollDink } from '../creeps/TrollDink';
 import { Wisp } from '../creeps/Wisp';
-import { Man0 } from '../heroes/Man0';
+import { AldricEthersteel } from '../heroes/list/HeroAldricEthersteel';
 import { MountainInitial } from '../props/Mountain_Initial';
 import { TreeFir } from '../props/trees/TreeFir';
 import { TreeBulbous } from '../props/trees/TreeBulbous';
@@ -30,6 +30,7 @@ import { TreeDead2 } from '../props/trees/TreeDead2';
 import { GrassNarrow } from '../props/grasses/GrassNarrow';
 import { GrassWide } from '../props/grasses/GrassWide';
 import { ShrubWide } from '../props/grasses/ShrubWide';
+import { Nether } from '../heroes/list/HeroNether';
 
 export class AssetGenerator {
 	/**
@@ -67,8 +68,10 @@ export class AssetGenerator {
 				return instatiateClass ? await new TowerMage(main!) : TowerMage;
 
 			// Heroes
-			case 'Man0':
-				return instatiateClass ? await new Man0(main!) : Man0;
+			case 'AldricEthersteel':
+				return instatiateClass ? await new AldricEthersteel(main!) : AldricEthersteel;
+			case 'Nether':
+				return instatiateClass ? await new Nether(main!) : Nether;
 
 			// Environment - Trees
 			case 'TreeBulbous':

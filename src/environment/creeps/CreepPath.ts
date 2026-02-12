@@ -5,6 +5,8 @@ import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from
 import { PathService } from '../../game/PathService';
 import { Level } from '../../levels/Level';
 import { CreepPathPropCurveArguments } from '../propManager/PropCurve';
+import { VertexDisplacementFragmentShader, VertexDisplacementVertexShader } from '../../shaders/shader.vertex-displacement';
+import { BasicFragmentShader } from '../../shaders/shader.basic';
 
 export class CreepPath {
 	/**
@@ -17,6 +19,9 @@ export class CreepPath {
 	 * Setup Properties
 	 * */
 	static pathWidth: number = 9;
+	static pathHeight: number = 0.1;
+	static pathEdgeHeight: number = 1;
+	static edgePathMultiplier: number = 1.1;
 	variantDistance: number = 5;
 
 	/**
@@ -38,6 +43,11 @@ export class CreepPath {
 	groupMain: THREE.Group; // Contains a pathMesh's groupmain, if created
 
 	/**
+	 * Debugs
+	 */
+	debugLines: THREE.Line[] = [];
+
+	/**
 	 * Constructor
 	 * */
 	constructor(pathDefinition: CreepPathDefinition, level: Level, main: Main) {
@@ -46,7 +56,9 @@ export class CreepPath {
 		this.main = main;
 		this.setCorePath(pathDefinition.pathPoints);
 		this.createPathGeometry(pathDefinition);
+		this.createPathGeometryEdges(pathDefinition);
 		this.createEdgePaths();
+		this.testOnlyCreateEdgings();
 
 		this.setInteractive();
 
@@ -81,30 +93,42 @@ export class CreepPath {
 		if (pathDefinition.pathGeometry == PathGeometryTypes.none) return;
 
 		const lineWidth = CreepPath.pathWidth;
-		const lineHeight = -0.1;
+		const lineHeight = CreepPath.pathHeight;
 
 		// Create the path shape
 		const shape = new THREE.Shape();
-		shape.moveTo(0, -lineWidth / 2);
-		shape.lineTo(0, lineWidth / 2);
+		shape.moveTo(lineHeight, -lineWidth / 2);
 		shape.lineTo(lineHeight, lineWidth / 2);
-		shape.lineTo(lineHeight, -lineWidth / 2);
+		shape.lineTo(0, lineWidth / 2);
 		shape.lineTo(0, -lineWidth / 2);
+		shape.lineTo(lineHeight, -lineWidth / 2);
 
 		// Extrude Settings
 		const extrudeSettings = {
-			steps: 750,
-			depth: 1,
-			bevelEnabled: false,
+			steps: 1000,
 			extrudePath: this.corePath.path,
+			bevelEnabled: false,
+
+			//depth: 1,
+			//bevelThickness: 1,
+			//bevelSize: 0.75, // 0.2
+			//bevelOffset: -0.33,
+			//bevelSegments: 2,
+			//curveSegments: 2,
 		};
 
 		// Create the material
 		let pathMaterial;
 		switch (pathDefinition.pathGeometry) {
 			case PathGeometryTypes.dirt:
-				//pathMaterial = new THREE.MeshStandardMaterial({ color: 0xbfa340 });
-				pathMaterial = new THREE.ShaderMaterial({ vertexShader: creepPathVertexShader, fragmentShader: creepPathFragmentShader/*, flatShading: true*/ });
+				pathMaterial = new THREE.ShaderMaterial({
+					vertexShader: VertexDisplacementVertexShader,
+					fragmentShader: VertexDisplacementFragmentShader,
+					uniforms: {
+						uTopColour: { value: new THREE.Vector3(0.76, 0.70, 0.50) },
+						uEdgeColour: { value: new THREE.Vector3(0.5, 0.45, 0.25) },
+					}
+				});
 				break;
 			case PathGeometryTypes.rock:
 				pathMaterial = new THREE.MeshStandardMaterial({ color: 0x666666 });
@@ -114,11 +138,84 @@ export class CreepPath {
 		// Create the geometry and mesh and attach
 		const pathGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings as any);
 		const pathMesh = new THREE.Mesh(pathGeometry, pathMaterial);
+		pathMesh.position.y = 0.1;
 		pathMesh.name = 'creepPath';
 
 		// Create group
 		this.groupMain = new THREE.Group();
 		this.groupMain.name = 'CreepPath';
+		this.groupMain.add(pathMesh);
+
+		// Add shadows
+		this.groupMain.children.forEach((child: any) => {
+			if (child.isMesh) {
+				child.castShadow = false;
+				child.receiveShadow = true;
+				child.material.needsUpdate = true;
+			}
+		});
+	}
+
+
+	/**
+	 * Creates an extruded edging along the paths
+	 * */
+	createPathGeometryEdges(pathDefinition: PathDefinition) {
+		const lineWidth = CreepPath.pathWidth + 0.5;
+		const lineHeight = CreepPath.pathEdgeHeight;
+		const rimWidth = 0.3;
+		const ditchHeight = 0.5;
+
+		// Create the path shape
+		const shape = new THREE.Shape();
+		shape.moveTo(-lineHeight, -lineWidth / 2);
+		shape.lineTo(-lineHeight, -lineWidth / 2 + rimWidth);
+		shape.lineTo(-lineHeight + ditchHeight, -lineWidth / 2 + rimWidth);
+		shape.lineTo(-lineHeight + ditchHeight, lineWidth / 2 - rimWidth);
+		shape.lineTo(-lineHeight, lineWidth / 2 - rimWidth);
+		shape.lineTo(-lineHeight, lineWidth / 2);
+		shape.lineTo(0, lineWidth / 2);
+		shape.lineTo(0, -lineWidth / 2);
+		shape.lineTo(-lineHeight, -lineWidth / 2);
+
+		// Extrude Settings
+		const extrudeSettings = {
+			steps: 250,
+			extrudePath: this.corePath.path,
+			bevelEnabled: false,
+
+			//depth: 1,
+			//bevelThickness: 1,
+			//bevelSize: 0.75, // 0.2
+			//bevelOffset: -0.33,
+			//bevelSegments: 2,
+			//curveSegments: 2,
+		};
+
+		// Create the material
+		let pathMaterial;
+		switch (pathDefinition!.pathGeometry) {
+			case PathGeometryTypes.dirt:
+				pathMaterial = new THREE.ShaderMaterial({
+					vertexShader: VertexDisplacementVertexShader,
+					fragmentShader: BasicFragmentShader,
+					uniforms: {
+						uColour: { value: new THREE.Vector3(0.5, 0.45, 0.25) }
+					}
+				});
+				break;
+			case PathGeometryTypes.rock:
+				pathMaterial = new THREE.MeshStandardMaterial({ color: 0x684520 });
+				break;
+		}
+
+		// Create the geometry and mesh and attach
+		const pathGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings as any);
+		const pathMesh = new THREE.Mesh(pathGeometry, pathMaterial);
+		pathMesh.position.y = -ditchHeight;
+		pathMesh.name = 'creepPath';
+
+		// Create group
 		this.groupMain.add(pathMesh);
 
 		// Add shadows
@@ -139,7 +236,7 @@ export class CreepPath {
 		const sPath: PathService = this.main.s('Path');
 		const corePathPoints = this.corePath.path.getSpacedPoints(samplingRate);
 		const corePathFrenetFrames = this.corePath.path.computeFrenetFrames(samplingRate, false);
-		const distance = CreepPath.pathWidth * 1.1 / 2;
+		const distance = CreepPath.pathWidth * CreepPath.edgePathMultiplier / 2;
 
 		// Top path
 		this.topEdgePathPoints = corePathPoints.map((point: THREE.Vector, index: number) => {
@@ -162,9 +259,20 @@ export class CreepPath {
 			const bottomEdgePath = sPath.createCurveFromPathPoints(this.bottomEdgePathPoints, 0, 0, false);
 			const topPathDebugLine = sPath.debugCreateOutlines(topEdgePath, 0xff0000);
 			const bottomPathDebugLine = sPath.debugCreateOutlines(bottomEdgePath, 0xff0000);
+			this.debugLines.push(topPathDebugLine);
+			this.debugLines.push(bottomPathDebugLine);
 			this.main.scene.add(topPathDebugLine);
 			this.main.scene.add(bottomPathDebugLine);
 		}
+	}
+
+	testOnlyCreateEdgings() {
+		/*const spriteManager = this.level.propManager;
+		spriteManager.registerProp({
+			assetName: "DirtEdge",
+			position: new THREE.Vector3(-80, 0, 0),
+			scale: new THREE.Vector3(1, 1, 1),
+		}, this.level.levelDetails);*/
 	}
 
 	/**
@@ -188,6 +296,7 @@ export class CreepPath {
 	 */
 	dispose() {
 		this.main.scene.remove(this.groupMain);
+		this.debugLines.forEach(line => this.main.scene.remove(line));
 	}
 }
 
@@ -197,73 +306,3 @@ export interface CreepPathDefinition {
 	pathPoints: PathPoint[],
 	propCurve?: CreepPathPropCurveArguments;
 }
-
-const creepPathVertexShader = `
-	varying vec2 vUv;
-	varying float vHeight;
-	varying float vDisplacement; // New: Pass the "bumpiness" value
-
-	float hash(vec2 p) {
-		return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-	}
-
-	float noise(vec2 p) {
-		vec2 i = floor(p);
-		vec2 f = fract(p);
-		float a = hash(i);
-		float b = hash(i + vec2(0.0, 0.0));
-		vec2 u = f * f * (3.0 - 2.0 * f);
-		return mix(a, b, u.x);
-	}
-
-	void main() {
-		vUv = uv;
-		vHeight = position.y;
-
-		// 1. Calculate Noise
-		float d = noise(position.xz * 3.0);  // was 3.0
-		vDisplacement = d; // Save this for the fragment shader
-
-		vec3 newPosition = position;
-		
-		// 2. Displace ONLY the sides
-		// If we are at the "bottom" or "sides" of the rectangle extrusion
-		if(position.y < 0.1) {
-			newPosition.xz += normal.xz * d * 0.3; // Move outward based on noise
-		}
-
-		gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
-	}
-`;
-
-const creepPathFragmentShader = `
-	varying vec2 vUv;
-	varying float vHeight;
-	varying float vDisplacement;
-
-	void main() {
-		// 1. Base Colors
-		vec3 sandColor = vec3(0.76, 0.70, 0.50);
-		vec3 dirtColor = vec3(0.5, 0.45, 0.25);
-
-		// 2. The Top vs Side Logic (from height)
-		float topMask = smoothstep(0.3, 0.45, vHeight);
-
-		// 3. Fake Lighting (Ambient Occlusion)
-		// We darken the color where the displacement noise is low.
-		// This makes the "bumpy" parts pop.
-		float shadow = mix(1.8, 1.9, vDisplacement); 
-
-		// 4. Edge Blend (Creeping dirt on the top edges)
-		float edgeCreep = abs(vUv.y - 0.5) * 2.0;
-		float dirtOnTop = smoothstep(0.6, 0.95, edgeCreep);
-
-		// 5. Final Mix
-		vec3 topFinal = mix(sandColor, dirtColor, dirtOnTop);
-		vec3 finalColor = mix(dirtColor, topFinal, topMask);
-
-		// 6. APPLY THE SHADOWS
-		// This multiplies the color by our noise-based light map
-		gl_FragColor = vec4(finalColor * shadow, 1.0);
-	}
-`;

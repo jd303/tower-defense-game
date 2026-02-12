@@ -3,18 +3,24 @@ import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
 import { DamageTypes } from '../../data/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerArcher extends Tower {
 	/**
 	 * Static details
 	 */
-	static assetName = "TowerArcher";
-	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-archer.png';
-	static assetScale: number = 7;
-	static assetPositionY = 0;
-	static buttonIcon = 'assets/models/towers/Tower.Archer.UI.icon.png';
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'tower',
+		assetName: 'TowerArcher',
+		assetPath: 'assets/towers/archer/spritesheet-tower-archer.png',
+		assetScale: 7,
+		assetPositionY: 0
+	}
+	static towerProperties = {
+		icon: 'assets/models/towers/Tower.Archer.UI.icon.png',
+		art: ''
+	}
 	static cost = 100;
 	static costType = 'money';
 	static towerZoneWidth = 0;
@@ -61,7 +67,7 @@ export class TowerArcher extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerArcher.assetName, 'tower', TowerArcher.assetScale, TowerArcher.assetPositionY, TowerArcher.spriteSheetRows, TowerArcher.AnimationAttributes);
+		super(main, TowerArcher.assetProperties, TowerArcher.spriteSheetRows, TowerArcher.AnimationAttributes);
 
 		this.stats = new CharacterStats({ ...TowerArcher.stats });
 

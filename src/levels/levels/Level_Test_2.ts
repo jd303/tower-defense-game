@@ -11,16 +11,21 @@ export const levelDetails: LevelDefinition = {
 		{ name: 'CreepWisp', chance: 0.1 },
 	],
 	terrain: TerrainTypes.grass,
+	environmentColour: {
+		colour: "outdoors",
+		intensity: 0.75
+	},
 	paths: [
 		{
 			id: "1",
 			pathGeometry: PathGeometryTypes.dirt,
 			propCurve: {
 				//propNames: [{ name: "ShrubWide", chance: 0.9 }, { name: 'GrassNarrow', chance: 0.05 }, { name: 'GrassWide', chance: 0.05 }],
+				//propNames: [{ name: "DirtEdging_REMOVED", chance: 1 }], // Doesn't look great, but it does not billboard
 				propNames: [{ name: "ShrubWide", chance: 1 }],
-				propSparseness: 15,
-				propScale: 3,
-				positionRandom: 0.5,
+				propSparseness: 25,
+				propScale: 2,
+				positionRandom: 0.15,
 				scaleRandom: { all: 2 },
 			},
 			pathPoints: [
@@ -131,7 +136,8 @@ export const levelDetails: LevelDefinition = {
 				type: "land",
 				distance: 1.25,
 				colour: 0x547621,
-				bevelColour: 0x547621
+				bevelColour: 0x547621,
+				smooth: true
 			},
 			dynamicScaling: {
 				scalePoints: [
@@ -178,7 +184,8 @@ export const levelDetails: LevelDefinition = {
 				type: "land",
 				distance: 1.25,
 				colour: 0x547621,
-				bevelColour: 0x547621
+				bevelColour: 0x547621,
+				smooth: true
 			},
 		},
 		{
@@ -208,7 +215,8 @@ export const levelDetails: LevelDefinition = {
 				type: "land",
 				distance: 1,
 				colour: 0x547621,
-				bevelColour: 0x547621
+				bevelColour: 0x547621,
+				smooth: true
 			},
 		},
 		{
@@ -231,7 +239,8 @@ export const levelDetails: LevelDefinition = {
 				type: "land",
 				distance: 1,
 				colour: 0x547621,
-				bevelColour: 0x547621
+				bevelColour: 0x547621,
+				smooth: true
 			},
 		},
 
@@ -298,7 +307,8 @@ export const levelDetails: LevelDefinition = {
 				type: "sea",
 				distance: -1.3,
 				colour: 0x82aeff,
-				bevelColour: 0x00291A
+				bevelColour: 0x00291A,
+				smooth: true
 			},
 		}
 	],

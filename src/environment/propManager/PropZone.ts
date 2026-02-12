@@ -12,10 +12,9 @@ export class PropZone {
 	main: Main;
 	arguments: PropZoneArguments;
 	curvePath: THREE.CurvePath<THREE.Vector>;
-	zoneOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3;
+	environmentTileComponents: PropZoneEnvironmentTileDefinition;
 	boundingBox: BoundingBoxPlane;
 	debugOutline?: THREE.Line;
-	debugZoneOutline?: THREE.Line;
 
 	/**
 	 * Constructor
@@ -28,18 +27,13 @@ export class PropZone {
 		this.boundingBox = sPath.getBoundingBoxOfCurvePath(this.curvePath);
 
 		if (args.environmentTile) {
-			this.zoneOutlinePath = sPath.offsetPathFromPointsXZ(args.zonePathPoints, args.environmentTile!.distance!, true);
-			this.zoneOutlinePath = sPath.smoothPathByPoints(this.zoneOutlinePath, 0.2, 4);
+			this.createEnvironmentTile();
 		}
 
 		if (this.main.debugMode) {
 			const sPath: PathService = this.main.s('Path');
 			this.debugOutline = sPath.debugCreateOutlines(this.curvePath);
 			this.main.scene.add(this.debugOutline);
-			if (args.environmentTile) {
-				this.debugZoneOutline = sPath.debugCreateOutlines(this.zoneOutlinePath, 0xff0000);
-				this.main.scene.add(this.debugZoneOutline);
-			}
 		}
 
 		return this;
@@ -104,9 +98,16 @@ export class PropZone {
 	 * @returns 
 	 */
 	createEnvironmentTile() {
-		console.log("TODO: I feel that environment tiles should be centralised, otherwise anything could create them. Consider moving them.");
-		const environmentTile = new EnvironmentTile(this.zoneOutlinePath, this.main, this.arguments.environmentTile as EnvironmentTileProperties);
-		return environmentTile;
+		const sPath: PathService = this.main.s('Path');
+
+		const zoneOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3 = sPath.offsetPathFromPointsXZ(this.arguments.zonePathPoints, (this.arguments.environmentTile as EnvironmentTileProperties)!.distance!, true);
+		const environmentTile = new EnvironmentTile(zoneOutlinePath, this.main, this.arguments.environmentTile as EnvironmentTileProperties);
+		this.main.scene.add(environmentTile.groupMain);
+
+		this.environmentTileComponents = {
+			environmentTile: environmentTile,
+			tileOutlinePath: zoneOutlinePath
+		}
 	}
 
 	/**
@@ -137,8 +138,14 @@ export class PropZone {
 	 */
 	dispose() {
 		this.debugOutline && this.main.scene.remove(this.debugOutline);
-		this.debugZoneOutline && this.main.scene.remove(this.debugZoneOutline);
+		this.environmentTileComponents?.environmentTile.dispose();
 	}
+}
+
+type PropZoneEnvironmentTileDefinition = {
+	environmentTile: EnvironmentTile;
+	tileOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3;
+
 }
 
 export interface PropZoneArguments {

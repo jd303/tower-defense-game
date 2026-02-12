@@ -24,7 +24,8 @@ export class TowerPlacementZone {
 		type: "land",
 		colour: 0xC4B271,
 		bevelColour: 0x71622F,
-		distance: 1
+		distance: 1,
+		smooth: true
 	}
 
 	/**
@@ -122,7 +123,7 @@ export class TowerPlacementZone {
 export class TowerPlacementCommons {
 	main: Main;
 	placementTileSize: number = 4;
-	placementTileCurve: THREE.Curve<any>;
+	placementTileCurve: THREE.CurvePath<any>;
 
 	constructor(main: Main) {
 		this.main = main;

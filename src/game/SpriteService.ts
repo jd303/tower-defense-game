@@ -33,7 +33,7 @@ export class SpriteService {
 				return await this.spriteSheets[assetName];
 			} else return this.spriteSheets[assetName];
 		} else {
-			this.spriteSheets[assetName] = this.createSpriteSheet(assetName, assetClass.assetPath, cols, rows, frames);
+			this.spriteSheets[assetName] = this.createSpriteSheet(assetName, assetClass.assetProperties.assetPath, cols, rows, frames);
 			return await this.spriteSheets[assetName];
 		}
 	}
@@ -78,7 +78,7 @@ export class SpriteService {
 			attribute float mirrorX;
 			
 			varying vec2 vUv;
-			varying vec3 vInstanceColor;
+			varying vec3 vInstanceColour;
 			varying float vMirrorX;
 			
 			uniform float uTime;
@@ -86,7 +86,7 @@ export class SpriteService {
 			uniform float uFrameRows;
 
 			void main() {
-				vInstanceColor = instanceColor;
+				vInstanceColour = instanceColor;
 				vMirrorX = mirrorX;
 
 				float col = 0.0;
@@ -109,20 +109,30 @@ export class SpriteService {
 				vUv.x = (uv.x + col) * frameWidth;
 				vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
 
-				vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-				float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
-				
-				mvPosition.xy += position.xy * instanceScale;
-				
-				gl_Position = projectionMatrix * mvPosition;
+				#if BILLBOARD == 1
+               // BILLBOARDING LOGIC: Faces camera
+               vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+               float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
+               
+               // Reconstruct the quad in view space (always facing front)
+               mvPosition.xy += position.xy * instanceScale;
+               gl_Position = projectionMatrix * mvPosition;
+            #else
+               // STANDARD LOGIC: Follows object/instance rotation
+               vec4 worldPosition = instanceMatrix * vec4(position, 1.0);
+					float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
+               gl_Position = projectionMatrix * modelViewMatrix * worldPosition;
+            #endif
 			}`;
 	}
 
 	createFragmentShader() {
 		this.fragmentShader = `
 			uniform sampler2D uMap;
+			uniform vec3 uEnvironmentColour;
+
 			varying vec2 vUv;
-			varying vec3 vInstanceColor;
+			varying vec3 vInstanceColour;
 			varying float vMirrorX;
 
 			void main() {
@@ -138,89 +148,22 @@ export class SpriteService {
 						}
 				#endif
 				
+				// Setup base colour
 				vec4 color = texture2D(uMap, uv);
 				color.rgb = pow(color.rgb, vec3(0.5));
-				color.rgb *= vInstanceColor;
+
+				// Multiply the colour with any provided vInstanceColour
+				color.rgb *= vInstanceColour;
+
+				// Add lighting
+				//vec3 envColor = vec3(1.1, 1.05, 0.9); // warm sunlight example
+				//vec3 envColor = vec3(0.4, 0.45, 0.7); // moonlight
+				color.rgb *= uEnvironmentColour;
 
 				if (color.a < 0.1) discard;
 				gl_FragColor = color;
 			}`;
 	}
-	/*createVertexShader() {
-		this.vertexShader = `
-		  attribute float animationRow;
-		  attribute float cellsInRow;
-		  attribute float animationSpeed;
-		  attribute float animationTimeOffset;
-		  attribute float mirrorX;
-		  
-		  varying vec2 vUv;
-		  varying vec3 vInstanceColor;
-		  varying float vMirrorX;
-		  
-		  uniform float uTime;
-		  uniform float uFrameCols;
-		  uniform float uFrameRows;
-
-		  void main() {
-				vInstanceColor = instanceColor;
-				vMirrorX = mirrorX;
-
-				float staggeredTime = uTime + animationTimeOffset;
-				float timeScaled = staggeredTime * animationSpeed;
-			   
-				float frameWidth = 1.0 / uFrameCols;
-				float frameHeight = 1.0 / uFrameRows;
-				float row = animationRow;
-				float col = floor(mod(timeScaled, cellsInRow)) * step(1.1, cellsInRow);
-
-				if (mirrorX > 0.5) {
-					col = (uFrameCols - 1.0) - col;
-				}
-
-				vUv.x = (uv.x + col) * frameWidth;
-				vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
-
-				vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-				float instanceScale = length(vec3(instanceMatrix[0].x, instanceMatrix[0].y, instanceMatrix[0].z));
-			   
-				mvPosition.xy += position.xy * instanceScale;
-			   
-				gl_Position = projectionMatrix * mvPosition;
-		  }
-	 `;
-	}
-	createFragmentShader() {
-		this.fragmentShader = `
-		  uniform sampler2D uMap;
-		  varying vec2 vUv;
-		  varying vec3 vInstanceColor;
-		  varying float vMirrorX;
-
-		  void main() {
-				vec2 uv = vUv;
-			   
-				if (vMirrorX > 0.5) {
-					 float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
-					 float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
-					 float frameEndX = frameStartX + frameWidth;
-					 
-					 float localU = (vUv.x - frameStartX) / frameWidth;
-					 localU = 1.0 - localU;
-					 uv.x = frameStartX + localU * frameWidth;
-				}
-			   
-				vec4 color = texture2D(uMap, uv);
-			   
-				// Apply gamma correction to the texture and colorise
-				color.rgb = pow(color.rgb, vec3(0.5));
-				color.rgb *= vInstanceColor;
-
-				if (color.a < 0.1) discard;
-				gl_FragColor = color;
-		  }
-	 `;
-	}*/
 
 	/**
 	 * Creates a text sprite

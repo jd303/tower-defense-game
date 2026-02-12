@@ -1,4 +1,5 @@
 import './style.css';
+import './stylePopups.css';
 import { Main } from './core/Main';
 import { LevelService } from './levels/LevelService';
 import { PositionService } from './environment/PositionService';
@@ -15,6 +16,10 @@ import { ScreenService } from './core/ScreenService';
 import { SplashScreen } from './screens/SplashScreen';
 import { LevelScreen } from './screens/LevelScreen';
 import { MapScreen } from './screens/MapScreen';
+import { HeroesScreen } from './screens/HeroesScreen';
+import { PowersScreen } from './screens/PowersScreen';
+import { TowersScreen } from './screens/TowersScreen';
+import { UpgradesScreen } from './screens/UpgradesScreen';
 
 /**
  * Configuration
@@ -57,5 +62,21 @@ main.s('Screen').registerScreen({
 main.s('Screen').registerScreen({
 	hash: 'map',
 	screenType: MapScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'heroes',
+	screenType: HeroesScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'powers',
+	screenType: PowersScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'towers',
+	screenType: TowersScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'upgrades',
+	screenType: UpgradesScreen
 });
 main.s('Screen').loaded();

@@ -32,12 +32,12 @@ export class PowersManager {
 		const sUI: UIService = this.main.s('UI');
 
 		levelPowers.forEach(power => {
-			const powerUpgrades = this.powerUpgrades[power.assetName] || [];
+			const powerUpgrades = this.powerUpgrades[power.powerProperties.assetName] || [];
 			powerUpgrades.forEach(upgrade => power.stats.addUpgrade(upgrade));
 		});
 
 		levelPowers.forEach((power: typeof Power) => {
-			const button = sUI.createIconButton(power.buttonIcon, UIRegions.Power);
+			const button = sUI.createIconButton(power.powerProperties.icon, UIRegions.BottomLeft);
 			button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.powerCreationUIButton.bind(this, event, power, button)());
 			sUI.addButtonToUI(button);
 		});
@@ -80,13 +80,13 @@ export class PowersManager {
 
 		button.deselect();
 
-		return { handled: true, cancelListeners: true };
+		return { handled: true, stopPropagation: true };
 	}
 
 	/**
 	 * Creates a power
 	 */
 	async createPower(power: typeof Power, position: THREE.Vector3) {
-		return await AssetGenerator.createPowerAsset(power.assetName, this.main, this.level, position);
+		return await AssetGenerator.createPowerAsset(power.powerProperties.assetName, this.main, this.level, position);
 	}
 }

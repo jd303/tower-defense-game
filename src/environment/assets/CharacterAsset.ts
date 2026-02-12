@@ -2,7 +2,7 @@ import THREE from "three";
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { EventHandlingResult, InteractableOrders, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
-import { ShaderAnimationAttributes, SpriteAsset, SpriteSheetRow } from "./SpriteAsset";
+import { ShaderAnimationAttributes, SpriteAsset, SpriteAssetProperties, SpriteSheetRow } from "./SpriteAsset";
 import { CharacterStats } from '../Stats';
 import { MovePathManager } from "../MovePathManager";
 import { AssetCommons } from "./Asset";
@@ -26,8 +26,8 @@ export abstract class CharacterAsset extends SpriteAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
-		super(main, assetName, assetType, assetScale, assetPositionY, spriteSheetRows, animationAttributes);
+	constructor(main: Main, assetProperties: SpriteAssetProperties, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetProperties, spriteSheetRows, animationAttributes);
 
 		this.registerOnLoadCallback(() => {
 			this.createSelectionGeometry();

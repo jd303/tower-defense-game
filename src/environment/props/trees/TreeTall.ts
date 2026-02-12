@@ -1,15 +1,18 @@
 import { Main } from "../../../core/Main";
 import { PropAsset } from "../../assets/PropAsset";
+import { SpriteAssetProperties } from "../../assets/SpriteAsset";
 
 export class TreeTall extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "TreeTall";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-tree-tall.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 2;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'TreeTall',
+		assetPath: 'assets/spritesheets/environment/spritesheet-tree-tall.png',
+		assetScale: 2,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class TreeTall extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, TreeTall.assetName, TreeTall.assetType, TreeTall.spriteSheetRows, TreeTall.assetScale, TreeTall.assetPositionY, TreeTall.AnimationAttributes);
+		super(main, TreeTall.assetProperties, TreeTall.spriteSheetRows, TreeTall.AnimationAttributes);
 	}
 
 }

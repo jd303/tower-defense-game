@@ -14,8 +14,7 @@ export class Power {
 	/**
 	 * Static properties
 	 */
-	static assetName: string;
-	static buttonIcon: string;
+	static powerProperties: PowerAssetProperties;
 	static powerCost: number;
 
 	/**
@@ -48,4 +47,10 @@ export abstract class PowerCommons {
 		mesh.rotation.x = -Math.PI / 2;
 		return mesh;
 	}
+}
+
+export interface PowerAssetProperties {
+	assetName: string;
+	icon: string; // In level
+	art: string; // In power picker popup
 }

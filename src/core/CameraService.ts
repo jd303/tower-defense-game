@@ -127,6 +127,10 @@ export class CameraService extends Service {
 			const newMainCam = this.cameras.find((cam) => cam !== this.mainCamera);
 			console.log(newMainCam);
 			this.setMainCamera(newMainCam as Camera);
+
+			if (this.orbitController) {
+				this.updateOrbitControls();
+			}
 		}
 	}
 
@@ -147,17 +151,26 @@ export class CameraService extends Service {
 			this.orbitController.controls.update();
 		}), false);
 
+		this.updateOrbitControls();
+	}
+
+	/**
+	 * Sets orbit controls settings for the current camera
+	 */
+	updateOrbitControls() {
 		// Set a max pan
 		/*var minPan = new THREE.Vector3(-1, -1, -1);
 		var maxPan = new THREE.Vector3(1, 1, 1);
 		this.orbitController.controls.target = new Vector3(0, 0, 0);
 		this.orbitController.controls.target.clamp(minPan, maxPan);*/
 
+		function isNonNumericallyFalsey(value: unknown) { return value !== null && value !== undefined; }
+
 		// Set a max rotate
-		this.orbitController.controls.minPolarAngle = this.mainCamera.settings.minPolarAngle || -Infinity;
-		this.orbitController.controls.maxPolarAngle = this.mainCamera.settings.maxPolarAngle || Infinity;
+		this.orbitController.controls.minPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.minPolarAngle) ? this.mainCamera.settings.minPolarAngle : -Infinity;
+		this.orbitController.controls.maxPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.maxPolarAngle) ? this.mainCamera.settings.maxPolarAngle : Infinity;
 		this.orbitController.controls.minAzimuthAngle = Number.isFinite(this.mainCamera.settings.minAzimuthAngle) ? this.mainCamera.settings.minAzimuthAngle : -Infinity;
-		this.orbitController.controls.maxAzimuthAngle = Number.isFinite(this.mainCamera.settings.maxAzimuthAngle) ? this.mainCamera.settings.maxAzimuthAngle : -Infinity;
+		this.orbitController.controls.maxAzimuthAngle = Number.isFinite(this.mainCamera.settings.maxAzimuthAngle) ? this.mainCamera.settings.maxAzimuthAngle : Infinity;
 		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom || 0.1;
 		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom || 5;
 

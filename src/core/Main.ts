@@ -10,6 +10,7 @@ import { RaycasterService } from './RaycasterService';
 import { Service } from './Service';
 import { SpriteService } from '../game/SpriteService';
 import { InstancedMeshService } from '../game/InstancedMeshService';
+import { UserDataService } from '../userData/UserDataService';
 
 export class Main {
 	/**
@@ -56,6 +57,7 @@ export class Main {
 		this.registerService('Sprite', new SpriteService(this));
 		this.registerService('InstancedMesh', new InstancedMeshService(this));
 		this.registerService('Tick', new TickService(this));
+		this.registerService('UserData', new UserDataService(this));
 
 		// Watch the screen
 		this.windowSizer = new WindowService(this);
@@ -83,7 +85,8 @@ export class Main {
 		console.log("%c In createEnvironmentTileMaterials (materialBevel as a shader material), I am trialling a roughness shader.  Could consdider removing this and trying something else.", 'color: red');
 		console.log("%c Remove setInstancedMeshScale - merge it into setInstancedMeshPosition", 'color: red');
 		console.log("%c I feel like createEdgePaths is inefficient.  Do I create then get points then create then get points, etc?  Choose one, or do it once", 'color: red');
-		console.log("%c Edge Rubbles are rubbish.", 'color: red');
+		console.log("%c The new creep path is raised.  Let's address creeps y pos.", 'color: red');
+		console.log("%c Given sprite usage, we can probably get rid of shadow in level (setupLights()).", 'color: red');
 
 		return this;
 	}

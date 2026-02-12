@@ -9,8 +9,11 @@ export class PowerTimeNoodleDistortion extends Power {
 	/**
 	 * Static properties
 	 */
-	static assetName = 'PowerTimeNoodleDistortion';
-	static buttonIcon = 'assets/models/powers/Power.TimeNoodleDistortion.UI.icon.png';
+	static powerProperties = {
+		assetName: 'PowerTimeNoodleDistortion',
+		icon: 'assets/powers/timeNoodleDistortion/Power.TimeNoodleDistortion.UI.icon.png',
+		art: '',
+	}
 
 	/**
 	 * Unique properties for this Power

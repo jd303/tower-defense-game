@@ -1,15 +1,18 @@
 import { Main } from "../../core/Main";
 import { PropAsset } from "../assets/PropAsset";
+import { SpriteAssetProperties } from "../assets/SpriteAsset";
 
 export class MountainInitial extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "MountainInitial";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-mountain-0.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 1;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'MountainInitial',
+		assetPath: 'assets/spritesheets/environment/spritesheet-mountain-0.png',
+		assetScale: 1,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 1000;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class MountainInitial extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, MountainInitial.assetName, MountainInitial.assetType, MountainInitial.spriteSheetRows, MountainInitial.assetScale, MountainInitial.assetPositionY, MountainInitial.AnimationAttributes);
+		super(main, MountainInitial.assetProperties, MountainInitial.spriteSheetRows, MountainInitial.AnimationAttributes);
 	}
 
 }

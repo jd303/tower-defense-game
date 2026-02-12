@@ -8,7 +8,7 @@ import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 
 
 // Maybe split CharacterAsset out into TowerAsset as well, for this?
@@ -21,7 +21,7 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Static values
 	 */
-	static buttonIcon: string;
+	static towerProperties: TowerAssetProperties;
 	static cost: number;
 	static costType: string;
 	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
@@ -49,8 +49,8 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
-		super(main, assetName, 'tower', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
+	constructor(main: Main, assetProperties: SpriteAssetProperties, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetProperties, spriteSheetRows, animationAttributes);
 
 		this.stateMachine = this.setDefaultStates();
 		this.stateMachine.transition(TowerStates.scanning);
@@ -200,10 +200,15 @@ export abstract class Tower extends CharacterAsset {
 			console.groupEnd();
 		}
 
-		return { handled: true, cancelListeners: true };
+		return { handled: true, stopPropagation: true };
 	}
 	deselect() {
 		this.selected = false;
 		this.removeSelectionVisibleMesh();
 	}
+}
+
+export interface TowerAssetProperties {
+	icon: string; // In level
+	art: string; // In power picker popup
 }

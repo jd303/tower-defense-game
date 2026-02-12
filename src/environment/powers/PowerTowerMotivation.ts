@@ -9,8 +9,11 @@ export class PowerTowerMotivation extends Power {
 	/**
 	 * Static properties
 	 */
-	static assetName = 'PowerTowerMotivation';
-	static buttonIcon = 'assets/models/powers/Power.TowerMotivation.UI.icon.png';
+	static powerProperties = {
+		assetName: 'PowerTowerMotivation',
+		icon: 'assets/powers/towerMotivation/Power.TowerMotivation.UI.icon.png',
+		art: ''
+	}
 	static radiusOfEffect = 10;
 	static powerDuration = 7500;
 	static towerMotivationBuff = {

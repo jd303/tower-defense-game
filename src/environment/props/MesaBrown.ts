@@ -1,15 +1,18 @@
 import { Main } from "../../core/Main";
 import { PropAsset } from "../assets/PropAsset";
+import { SpriteAssetProperties } from "../assets/SpriteAsset";
 
 export class MesaBrown extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "MesaBrown";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-mesa-brown.png';
-	static assetPositionY: number = 0;
-	static assetScale: number = 1;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'MesaBrown',
+		assetPath: 'assets/spritesheets/environment/spritesheet-mesa-brown.png',
+		assetScale: 1,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 1000;
 	static ShaderMaterialProperties = {
 		uniforms: {
@@ -23,7 +26,7 @@ export class MesaBrown extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, MesaBrown.assetName, MesaBrown.assetType, MesaBrown.spriteSheetRows, MesaBrown.assetScale, MesaBrown.assetPositionY, MesaBrown.AnimationAttributes);
+		super(main, MesaBrown.assetProperties, MesaBrown.spriteSheetRows, MesaBrown.AnimationAttributes);
 	}
 
 }

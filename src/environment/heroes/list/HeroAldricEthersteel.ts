@@ -1,21 +1,29 @@
-import { Main } from '../../core/Main';
-import { TickTimeProperties } from '../../core/TickService';
-import { DamageTypes } from '../../data/DamageTypes';
-import { MovementTypes } from '../../data/MovementTypes';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { Main } from '../../../core/Main';
+import { TickTimeProperties } from '../../../core/TickService';
+import { DamageTypes } from '../../../data/DamageTypes';
+import { MovementTypes } from '../../../data/MovementTypes';
+import { SpriteAssetProperties, SpriteSheetRow } from '../../assets/SpriteAsset';
 //import { DamageTypes } from '../../data/DamageTypes';
-import { Hero } from './Hero';
-import { AttackRangeTypes, CharacterStats } from '../Stats';
+import { Hero, HeroAssetProperties } from '../Hero';
+import { AttackRangeTypes, CharacterStats } from '../../Stats';
 
-export class Man0 extends Hero {
+export class AldricEthersteel extends Hero {
 	/**
 	 * Main
 	 * */
-	static assetType = 'hero';
-	static assetName: string = 'Man0';
-	static assetPath: string = 'assets/spritesheets/heroes/spritesheet-man0.png';
-	static assetScale: number = 6;
-	static assetPositionY: number = 0;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'hero',
+		assetName: 'AldricEthersteel',
+		assetPath: 'assets/heroes/aldricEthersteel/spritesheet-aldricethersteel.png',
+		assetScale: 6,
+		assetPositionY: 0
+	}
+	static heroProperties: HeroAssetProperties = {
+		iconUI: 'assets/heroes/aldricEthersteel/icon.ui.aldricethersteel.png',
+		iconGallery: 'assets/heroes/aldricEthersteel/gallery-aldricethersteel.png',
+		heroArt: 'assets/heroes/aldricEthersteel/hero-art-aldricethersteel.png',
+	}
+	static assetPositionY: number = 0; // Matches the path
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "idle",
@@ -94,7 +102,7 @@ export class Man0 extends Hero {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Man0.assetName, Man0.assetType, Man0.assetScale, Man0.assetPositionY, Man0.spriteSheetRows, Man0.AnimationAttributes);
+		super(main, AldricEthersteel.assetProperties, AldricEthersteel.spriteSheetRows, AldricEthersteel.AnimationAttributes);
 
 		this.interceptionHandler.setInterceptionSlotCount(this.stats.activeStats.interception!.interceptionCount);
 

@@ -4,17 +4,20 @@ import { MovementTypes } from '../../data/MovementTypes';
 import { Creep } from './Creep';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { AttackRangeTypes, CharacterStats } from '../Stats';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 
 export class Wisp extends Creep {
 	/**
 	 * Main
 	 * */
-	static assetType = 'creep';
-	static assetName: string = 'CreepWisp';
-	static assetPath: string = 'assets/spritesheets/creeps/spritesheet-wisp.png';
-	static assetScale: number = 2;
-	static assetPositionY = 0;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'creep',
+		assetName: 'CreepWisp',
+		assetPath: 'assets/spritesheets/creeps/spritesheet-wisp.png',
+		assetScale: 2,
+		assetPositionY: 0
+	}
+
 	static waveDifficulty = 1.5;
 
 	/**
@@ -85,7 +88,7 @@ export class Wisp extends Creep {
 	 * Constructor
 	 * */
 	constructor(main: Main) {
-		super(main, Wisp.assetName, Wisp.assetType, Wisp.assetScale, Wisp.assetPositionY, Wisp.spriteSheetRows, Wisp.AnimationAttributes);
+		super(main, Wisp.assetProperties, Wisp.spriteSheetRows, Wisp.AnimationAttributes);
 
 		this.modifyStateMachine();
 		this.stateMachine.transition(CreepStates.pathmoving);

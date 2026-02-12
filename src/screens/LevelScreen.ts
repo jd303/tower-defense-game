@@ -40,7 +40,7 @@ export class LevelScreen extends Screen {
 	 */
 	createUI() {
 		const sUI: UIService = this.main.s('UI');
-		const button = sUI.createIconButton('assets/common/ico.home.png', UIRegions.Menu);
+		const button = sUI.createIconButton('assets/common/ico.home.png', UIRegions.TopLeft);
 		button.addClickBehaviour(() => {
 			window.location.hash = 'map';
 		});

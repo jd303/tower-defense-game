@@ -1,0 +1,15 @@
+.popup {
+	position: fixed;
+	z-index: 1000;
+	top: 10px;
+	left: 10px;
+	place-self: anchor-center;
+	align-self: anchor-center;
+	padding: var(--padding-standard);
+	background-color: #fff;
+}
+
+.popup-close {
+	padding: calc(var(--padding-standard));
+	background-color: #000;
+}

@@ -2,7 +2,7 @@
 	--z-index-game: 1;
 	--z-index-UI: 10;
 	--button-height: 50px;
-	--standard-padding: 20px;
+	--padding-standard: 20px;
 	--ui-distance-from-edge: 10px;
 }
 
@@ -13,6 +13,7 @@
 
 html,
 body {
+	display: flex;
 	overflow: hidden;
 }
 
@@ -114,7 +115,7 @@ UI ELEMENTS
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	padding: var(--standard-padding);
+	padding: var(--padding-standard);
 	background-color: #fff;
 	border-radius: 8px;
 	box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.15);

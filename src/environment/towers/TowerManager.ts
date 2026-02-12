@@ -46,7 +46,7 @@ export class TowerManager {
 
 		const sUI: UIService = this.main.s('UI');
 		levelTowers.forEach(async (towerType: typeof Tower) => {
-			const button = sUI.createIconButton(towerType.buttonIcon, UIRegions.Tower);
+			const button = sUI.createIconButton(towerType.towerProperties.icon, UIRegions.BottomCenter);
 			button.addClickBehaviour((event: MouseEvent | TouchEvent) => this.towerCreationUIButton.bind(this, event, towerType, button)());
 			sUI.addButtonToUI(button);
 		});
@@ -97,7 +97,7 @@ export class TowerManager {
 	requestAddTower(tower: typeof Tower, event: InteractionEvent, button: UIButton) {
 		const sEconomy: EconomyService = this.main.s('Economy');
 		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
-			this.addTower(tower.assetName, event.raycasterInteraction.object.groupMain.position);
+			this.addTower(tower.assetProperties.assetName, event.raycasterInteraction.object.groupMain.position);
 			sEconomy.adjustEconomyValue(tower.costType, -1 * tower.cost);
 			(event.raycasterInteraction.object as any).towerZoneShapePlacement.addTowerToTowerZoneShapePlacement(tower);
 		}
@@ -107,7 +107,7 @@ export class TowerManager {
 
 		this.endTowerCreation(button);
 
-		return { handled: true, cancelListeners: true };
+		return { handled: true, stopPropagation: true };
 	}
 
 	/**

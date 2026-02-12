@@ -272,7 +272,7 @@ export class DebugService extends Service {
 		console.log(`${event.raycasterInteraction.point.point.x.toFixed(5)},0,${event.raycasterInteraction.point.point.z.toFixed(5)}`);
 		console.log(event.raycasterInteraction.object);
 		console.groupEnd();
-		return { handled: true, cancelListeners: false };
+		return { handled: true, stopPropagation: false };
 	}
 
 	/**
@@ -327,6 +327,6 @@ export class DebugService extends Service {
 		const newPoint = new THREE.Vector3(event.raycasterInteraction.point.point.x.toFixed(3), 0, event.raycasterInteraction.point.point.z.toFixed(3));
 		(this.zoneCreatorObject.zoneCreation as THREE.Vector3[]).push(newPoint);
 
-		return { handled: true, cancelListeners: true }
+		return { handled: true, stopPropagation: true }
 	}
 }

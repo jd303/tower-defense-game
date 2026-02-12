@@ -2,10 +2,12 @@ import { Vector3 } from 'three';
 import { PropZoneArguments } from '../environment/propManager/PropZone';
 import { TowerPlacementZoneDefinition } from '../environment/towers/TowerPlacementZone';
 import { CreepPathDefinition } from '../environment/creeps/CreepPath';
+import { EnvironmentColours } from '../core/LightingService';
 
 export interface LevelDefinition {
 	difficulty: number;
 	terrain: TerrainTypes;
+	environmentColour: { colour: keyof typeof EnvironmentColours, intensity: number },
 	paths: CreepPathDefinition[];
 	creepOptions: LevelCreepOption[];
 	towerPlacementZones: TowerPlacementZoneDefinition[];

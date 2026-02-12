@@ -16,12 +16,13 @@ import { SpriteService } from '../../game/SpriteService';
 import { Asset } from '../assets/Asset';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
-import { ShaderAnimationAttributes, SpriteSheetRow } from '../assets/SpriteAsset';
+import { ShaderAnimationAttributes, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 
 export abstract class Hero extends CharacterAsset {
 	/**
 	 * Static values
 	 */
+	static heroProperties: HeroAssetProperties;
 	static instancedMeshInstanceCount: number = 1;
 	static instancedMeshAnimates: boolean = true;
 
@@ -74,8 +75,8 @@ export abstract class Hero extends CharacterAsset {
 	/**
 	 * Construtor
 	 * */
-	constructor(main: Main, assetName: string, assetType: string, assetScale: number, assetPositionY: number, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
-		super(main, assetName, 'hero', assetScale, assetPositionY, spriteSheetRows, animationAttributes);
+	constructor(main: Main, assetProperties: SpriteAssetProperties, spriteSheetRows: SpriteSheetRow[], animationAttributes: ShaderAnimationAttributes) {
+		super(main, assetProperties, spriteSheetRows, animationAttributes);
 
 		this.assetType = 'hero';
 		this.stateMachine = this.setDefaultStates();
@@ -282,7 +283,7 @@ export abstract class Hero extends CharacterAsset {
 
 		this.deselect();
 
-		return { handled: true, cancelListeners: true }
+		return { handled: true, stopPropagation: true }
 	}
 
 	/**
@@ -459,7 +460,7 @@ export abstract class Hero extends CharacterAsset {
 			sInteraction2.registerInteractableListener('terrain', 'registerHeroMovement', this.registerMovement.bind(this));
 		}
 
-		return { handled: true, cancelListeners: true }
+		return { handled: true, stopPropagation: true }
 	}
 	deselect() {
 		this.selected = false;
@@ -469,4 +470,10 @@ export abstract class Hero extends CharacterAsset {
 		const sInteraction2: InteractionService2 = this.main.s('Interaction2');
 		sInteraction2.deregisterInteractableListener('terrain', 'registerHeroMovement');
 	}
+}
+
+export interface HeroAssetProperties {
+	iconUI: string; // In level
+	iconGallery: string; // In hero picker screen
+	heroArt: string; // In hero picker popup
 }

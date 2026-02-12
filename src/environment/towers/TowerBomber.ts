@@ -3,19 +3,24 @@ import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
 import { DamageTypes } from '../../data/DamageTypes';
 import { BombShot } from '../effects/BombShot';
-import { SpriteSheetRow } from '../assets/SpriteAsset';
+import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 
 export class TowerBomber extends Tower {
 	/**
 	 * Static details
 	 */
-	static assetType = 'tower';
-	static assetName = "TowerBomber";
-	static assetPath = 'assets/spritesheets/towers/spritesheet-tower-bomber.png';
-	static assetScale: number = 7;
-	static assetPositionY = 0;
-	static buttonIcon = 'assets/models/towers/Tower.Bomber.UI.icon.png';
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'tower',
+		assetName: 'TowerBomber',
+		assetPath: 'assets/towers/bomber/spritesheet-tower-bomber.png',
+		assetScale: 7,
+		assetPositionY: 0
+	}
+	static towerProperties = {
+		icon: 'assets/models/towers/Tower.Bomber.UI.icon.png',
+		art: ''
+	}
 	static cost = 175;
 	static costType = 'money';
 	static towerZoneWidth = 3;
@@ -62,7 +67,7 @@ export class TowerBomber extends Tower {
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerBomber.assetName, TowerBomber.assetType, TowerBomber.assetScale, TowerBomber.assetPositionY, TowerBomber.spriteSheetRows, TowerBomber.AnimationAttributes);
+		super(main, TowerBomber.assetProperties, TowerBomber.spriteSheetRows, TowerBomber.AnimationAttributes);
 
 		this.stats = new CharacterStats(TowerBomber.stats);
 

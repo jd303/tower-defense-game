@@ -70,11 +70,16 @@ export class MapScreen extends Screen {
 	createLighting() {
 		const sLighting: LightingService = this.main.s('Lighting');
 		const ambientLight = sLighting.createAmbientLight("WorldAmbient");
+		ambientLight.threeLight.intensity = 0.25;
 		sLighting.enableLight(ambientLight);
 		const directionalLight = sLighting.createDirectionalLight("Directional");
+		directionalLight.threeLight.intensity = 2;
+		directionalLight.enableShadows();
 		sLighting.enableLight(directionalLight);
 		this.main.s('Debug').debugLight(directionalLight, 'Directional Light');
 		this.main.s('Debug').debugLight(ambientLight, 'Ambient Light');
+
+		sLighting.setRendererShadows(true);
 	}
 
 	/**
@@ -82,11 +87,41 @@ export class MapScreen extends Screen {
 	 */
 	createUI() {
 		const sUI: UIService = this.main.s('UI');
-		const button = sUI.createIconButton('assets/common/ico.home.png', UIRegions.Menu);
-		button.addClickBehaviour(() => {
+
+		// Home button
+		const btHome = sUI.createIconButton('assets/common/ico.home.png', UIRegions.TopLeft);
+		btHome.addClickBehaviour(() => {
 			window.location.hash = '';
 		});
-		sUI.addButtonToUI(button);
+		sUI.addButtonToUI(btHome);
+
+		// Heroes button
+		const btHeroes = sUI.createIconButton('assets/common/buttons/bt.heroes.webp', UIRegions.BottomCenter);
+		btHeroes.addClickBehaviour(() => {
+			window.location.hash = 'heroes';
+		});
+		sUI.addButtonToUI(btHeroes);
+
+		// Powers button
+		const btPowers = sUI.createIconButton('assets/common/buttons/bt.powers.webp', UIRegions.BottomCenter);
+		btPowers.addClickBehaviour(() => {
+			window.location.hash = 'powers';
+		});
+		sUI.addButtonToUI(btPowers);
+
+		// Towers button
+		const btTowers = sUI.createIconButton('assets/common/buttons/bt.towers.webp', UIRegions.BottomCenter);
+		btTowers.addClickBehaviour(() => {
+			window.location.hash = 'towers';
+		});
+		sUI.addButtonToUI(btTowers);
+
+		// Upgrades button
+		const btUpgrades = sUI.createIconButton('assets/common/buttons/bt.upgrades.webp', UIRegions.BottomCenter);
+		btUpgrades.addClickBehaviour(() => {
+			window.location.hash = 'upgrades';
+		});
+		sUI.addButtonToUI(btUpgrades);
 	}
 
 	/**
@@ -94,20 +129,24 @@ export class MapScreen extends Screen {
 	 */
 	createCaravanScene() {
 		const caravanBoundsGeometry = new THREE.BoxGeometry(200, 150, 100);
-		const caravanBoundsMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, side: THREE.BackSide });
+		const caravanBoundsMaterial = new THREE.MeshStandardMaterial({ color: 0x967C48, side: THREE.BackSide });
 		const caravanMesh = new THREE.Mesh(caravanBoundsGeometry, caravanBoundsMaterial);
 		caravanMesh.position.set(0, 75, 30);
+		caravanMesh.castShadow = true;
+		caravanMesh.receiveShadow = true;
 		this.geometries.push(caravanBoundsGeometry);
 		this.materials.push(caravanBoundsMaterial);
 		this.meshes.push(caravanMesh);
 		this.main.scene.add(caravanMesh);
 
-		const mapGeometry = new THREE.BoxGeometry(100, 30, 50);
-		const mapMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
-		const mapTableMesh = new THREE.Mesh(mapGeometry, mapMaterial);
+		const mapTableGeometry = new THREE.BoxGeometry(100, 30, 50);
+		const mapTableMaterial = new THREE.MeshStandardMaterial({ color: 0x6A4F17 });
+		const mapTableMesh = new THREE.Mesh(mapTableGeometry, mapTableMaterial);
 		mapTableMesh.position.set(0, 15, 0);
-		this.geometries.push(mapGeometry);
-		this.materials.push(mapMaterial);
+		mapTableMesh.castShadow = true;
+		mapTableMesh.receiveShadow = true;
+		this.geometries.push(mapTableGeometry);
+		this.materials.push(mapTableMaterial);
 		this.meshes.push(mapTableMesh);
 		this.main.scene.add(mapTableMesh);
 	}
@@ -139,7 +178,7 @@ export class MapScreen extends Screen {
 
 		return {
 			handled: true,
-			cancelListeners: true
+			stopPropagation: true
 		}
 	}
 
@@ -163,7 +202,7 @@ export class MapScreen extends Screen {
 
 export class MapNode {
 	static MapNodeGeometry = () => new THREE.BoxGeometry(5, 5, 5);
-	static MapNodeMaterial = () => new THREE.MeshBasicMaterial({ color: 0x0000ff });
+	static MapNodeMaterial = () => new THREE.MeshStandardMaterial({ color: 0x0000ff });
 
 	levelCode: string;
 	groupMain: THREE.Group;
@@ -179,6 +218,9 @@ export class MapNode {
 		this.material = MapNode.MapNodeMaterial();
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
 		this.groupMain.add(this.mesh);
+
+		this.mesh.castShadow = true;
+		this.mesh.receiveShadow = true;
 	}
 
 	/**

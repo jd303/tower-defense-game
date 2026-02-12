@@ -11,6 +11,10 @@ export const levelDetails: LevelDefinition = {
 		}
 	],
 	terrain: TerrainTypes.sand,
+	environmentColour: {
+		colour: "outdoors",
+		intensity: 1.0
+	},
 	paths: [
 		{
 			id: "1",

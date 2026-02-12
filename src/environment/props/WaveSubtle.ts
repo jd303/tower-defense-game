@@ -1,15 +1,18 @@
 import { Main } from "../../core/Main";
 import { PropAsset } from "../assets/PropAsset";
+import { SpriteAssetProperties } from "../assets/SpriteAsset";
 
 export class WaveSubtle extends PropAsset {
 	/**
 	 * Setup Properties
 	 * */
-	static assetName: string = "WaveSubtle";
-	static assetType = 'prop';
-	static assetPath: string = 'assets/spritesheets/environment/spritesheet-wave-subtle.png';
-	static assetPositionY: number = 0.25;
-	static assetScale: number = 2;
+	static assetProperties: SpriteAssetProperties = {
+		assetType: 'prop',
+		assetName: 'WaveSubtle',
+		assetPath: 'assets/spritesheets/environment/spritesheet-wave-subtle.png',
+		assetScale: 2,
+		assetPositionY: 0
+	}
 	static instancedMeshInstanceCount: number = 500;
 	static instancedMeshAnimates: boolean = false;
 	static ShaderMaterialProperties = {
@@ -24,7 +27,7 @@ export class WaveSubtle extends PropAsset {
 	}
 
 	constructor(main: Main) {
-		super(main, WaveSubtle.assetName, WaveSubtle.assetType, WaveSubtle.spriteSheetRows, WaveSubtle.assetScale, WaveSubtle.assetPositionY, WaveSubtle.AnimationAttributes);
+		super(main, WaveSubtle.assetProperties, WaveSubtle.spriteSheetRows, WaveSubtle.AnimationAttributes);
 	}
 
 }
