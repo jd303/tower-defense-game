@@ -9,7 +9,7 @@ export class TreeDead extends PropAsset {
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'prop',
 		assetName: 'TreeDead',
-		assetPath: 'assets/spritesheets/environment/spritesheet-tree-dead.png',
+		assetPath: 'assets/trees/spritesheet-tree-dead.png',
 		assetScale: 2,
 		assetPositionY: 0
 	}

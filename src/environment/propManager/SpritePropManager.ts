@@ -1,6 +1,6 @@
 import THREE from "three";
 import { Main } from "../../core/Main";
-import { LevelDefinition, LevelPropDefinition, TerrainTypes } from "../../data/LevelInterfaces";
+import { LevelDefinition, LevelPropDefinition, TerrainTypes } from "../../dataTypes/LevelInterfaces";
 import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
 import { AssetGenerator } from "../assets/AssetGenerator";

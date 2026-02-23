@@ -2,22 +2,22 @@ import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
 import { EnvironmentTile, EnvironmentTileProperties } from '../EnvironmentTile';
-import { PathPoint } from '../../data/PathInterfaces';
+import { PathPoint } from '../../dataTypes/PathInterfaces';
 import { PathService } from '../../game/PathService';
 import { Tower } from './Tower';
+import { DebugService } from '../../core/DebugService';
+import { PointsLogger } from '../../core/PointsLogger';
 
 export class TowerPlacementZone {
 	/**
 	 * Definitions
 	 * */
 	main: Main;
+	arguments: TowerPlacementArguments;
 	towerPlacementCommons: TowerPlacementCommons;
-	pathPoints: PathPoint[];
 	environmentTile: EnvironmentTile;
 	placementTilePositions: TowerZoneShapePlacement[] = [];
 	placementTiles: EnvironmentTile[] = [];
-	castShadows: boolean = false;
-	receiveShaodws: boolean = true;
 	curvePath: THREE.CurvePath<any>;
 
 	static environmentTileProperties: EnvironmentTileProperties = {
@@ -31,25 +31,35 @@ export class TowerPlacementZone {
 	/**
 	 * Constructor
 	 * */
-	constructor(points: PathPoint[], towerPlacementCommons: TowerPlacementCommons, main: Main) {
+	constructor(args: TowerPlacementArguments, towerPlacementCommons: TowerPlacementCommons, main: Main) {
 		this.main = main;
 		this.towerPlacementCommons = towerPlacementCommons;
-		this.pathPoints = points;
-		const sPath: PathService = main.s('Path');
-		const curvePath = sPath.createCurveFromPathPoints(points, 0, 0, true);
+		this.arguments = args;
+
+		this.build();
+
+		if (this.main.debugMode) {
+			const sPath: PathService = this.main.s('Path');
+			sPath.debugCreateOutlines(this.curvePath);
+			this.registerEditor();
+		}
+
+		return this;
+	}
+
+	/**
+	 * Builds the objects
+	 */
+	build() {
+		const sPath: PathService = this.main.s('Path');
+		const curvePath = sPath.createCurveFromPathPoints(this.arguments.zonePoints, 0, 0, true);
 		const smoothPath = sPath.smoothPathByPoints(curvePath);
 		this.curvePath = sPath.convertFromCatmullRomCurve3(smoothPath, 100);
-		this.environmentTile = new EnvironmentTile(this.curvePath, main, TowerPlacementZone.environmentTileProperties);
+		this.environmentTile = new EnvironmentTile(this.curvePath, this.main, TowerPlacementZone.environmentTileProperties);
 		this.main.scene.add(this.environmentTile.groupMain);
 
 		const shapePlacements = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
 		this.placementTilePositions = shapePlacements.map((placement) => { return new TowerZoneShapePlacement(placement.xIndex, placement.zIndex, placement.point); });
-
-		if (this.main.debugMode) {
-			sPath.debugCreateOutlines(this.curvePath);
-		}
-
-		return this;
 	}
 
 	/**
@@ -113,11 +123,30 @@ export class TowerPlacementZone {
 	}
 
 	/**
+	 * Creates controls for editing propZones
+	 */
+	registerEditor() {
+		const sDebug: DebugService = this.main.s('Debug');
+		sDebug.levelEditor?.registerExistingZone(this);
+	}
+	debugZoneEditorUpdated(pathPoints: PathPoint[]) {
+		this.arguments.zonePoints = pathPoints;
+		this.dispose();
+		this.build();
+
+		PointsLogger.log(this.arguments.zonePoints, true, "TPZ Path");
+	}
+
+	/**
 	 * Disposes this Tower Placement Zone
 	 */
 	dispose() {
 		this.environmentTile.dispose();
 	}
+}
+
+export interface TowerPlacementArguments {
+	zonePoints: PathPoint[]
 }
 
 export class TowerPlacementCommons {
@@ -171,5 +200,5 @@ export class TowerZoneShapePlacement {
 }
 
 export interface TowerPlacementZoneDefinition {
-	points: PathPoint[];
+	zonePoints: PathPoint[];
 }

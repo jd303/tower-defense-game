@@ -1,5 +1,5 @@
 import THREE, { Vector3 } from "three";
-import { PathPoint } from "../../data/PathInterfaces";
+import { PathPoint } from "../../dataTypes/PathInterfaces";
 import { BoundingBoxPlane, PathService } from "../../game/PathService";
 import { Main } from "../../core/Main";
 import { Maths } from "../../core/Maths";

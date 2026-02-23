@@ -16,7 +16,7 @@ export class HeroManager {
 	 * Stats
 	 * */
 	heroes: Hero[] = [];
-	heroUpgrades: Record<string, StatBlockCharacterModification[]> = {};
+	heroUpgrades: StatBlockCharacterModification = {};
 
 	/**
 	 * Construtor
@@ -35,7 +35,8 @@ export class HeroManager {
 			hero.setPosition(point);
 		});
 		this.heroes.push(hero);
-		hero.stats.addUpgrades(this.heroUpgrades[assetName]);
+
+		hero.stats.addUpgrades(this.heroUpgrades);
 	}
 
 	/**

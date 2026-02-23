@@ -1,6 +1,6 @@
 import { Main } from '../../core/Main';
-import { DamageTypes } from '../../data/DamageTypes';
-import { MovementTypes } from '../../data/MovementTypes';
+import { DamageTypes } from '../../dataTypes/DamageTypes';
+import { MovementTypes } from '../../dataTypes/MovementTypes';
 import { Creep } from './Creep';
 import { AttackRangeTypes, CharacterStats } from '../Stats';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';

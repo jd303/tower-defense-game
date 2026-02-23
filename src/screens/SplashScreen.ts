@@ -6,6 +6,7 @@ import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { LightingService } from '../core/LightingService';
 import { ModelPropManager } from '../environment/propManager/ModelPropManager';
+import { SplashMenuPopup } from './SplashMenuPopup';
 
 export class SplashScreen extends Screen {
 	/**
@@ -13,9 +14,6 @@ export class SplashScreen extends Screen {
 	 * */
 	main: Main;
 	propManager: ModelPropManager;
-	meshes: THREE.Mesh[] = [];
-	materials: THREE.Material[] = [];
-	geometries: THREE.PlaneGeometry[] = [];
 
 	/**
 	 * Properties
@@ -112,10 +110,7 @@ export class SplashScreen extends Screen {
 	 */
 	createUI() {
 		const sUI: UIService = this.main.s('UI');
-		sUI.createPopup("Menu", `
-			<h1>Tower Defense</h1>
-			<a href="/#map" onClick="window.location.hash = 'map';">Map</a>
-		`);
+		sUI.openPopup(SplashMenuPopup, "SplashMenu");
 	}
 
 	/**
@@ -125,12 +120,6 @@ export class SplashScreen extends Screen {
 		this.disposeScreenCommons();
 		this.stopTick();
 		this.propManager.disposeAll();
-		this.meshes.forEach(mesh => this.main.scene.remove(mesh));
-		this.meshes = [];
-		this.geometries.forEach(geometry => geometry.dispose());
-		this.geometries = [];
-		this.materials.forEach(material => material.dispose());
-		this.materials = [];
 
 		const sUI: UIService = this.main.s('UI');
 		sUI.deletePopup("Menu")

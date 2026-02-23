@@ -1,14 +1,24 @@
-export class Popup {
+import { Main } from "../core/Main";
+import { PopupManager } from "./PopupManager";
+
+export abstract class Popup {
 
 	/**
 	 * Core
 	 */
+	main: Main;
+	name: string;
+	popupManager: PopupManager;
 	private parentElement: HTMLElement;
+	onCloseCallback: () => void;
 
 	/**
 	 * Constructor
 	 */
-	constructor() {
+	constructor(main: Main, name: string) {
+		this.name = name;
+		this.main = main;
+
 		this.parentElement = document.createElement('div');
 		this.parentElement.classList.add('popup');
 		this.parentElement.setAttribute('data-open', 'false');
@@ -18,6 +28,14 @@ export class Popup {
 		this.parentElement.appendChild(closeButton);
 		closeButton.addEventListener('click', this.close);
 
+		this.parentElement.addEventListener('pointerdown', e => {
+			e.stopPropagation();
+		});
+
+		this.parentElement.addEventListener('click', e => {
+			e.stopPropagation();
+		});
+
 		document.body.appendChild(this.parentElement);
 	}
 
@@ -26,6 +44,7 @@ export class Popup {
 	 */
 	readonly open = () => {
 		this.parentElement.setAttribute('data-open', 'true');
+		this.openChild();
 	}
 
 	/**
@@ -33,6 +52,18 @@ export class Popup {
 	 */
 	readonly close = () => {
 		this.parentElement.setAttribute('data-open', 'false');
+		this.closeChild();
+
+		if (this.onCloseCallback) {
+			this.onCloseCallback();
+		}
+	}
+
+	/**
+	 * Stores a callback to call on close
+	 */
+	setOnCloseCallback(callback: () => void) {
+		this.onCloseCallback = callback;
 	}
 
 	/**
@@ -48,4 +79,25 @@ export class Popup {
 	readonly remove = () => {
 		document.body.removeChild(this.parentElement);
 	}
+
+	/**
+	 * Returns a reference to the parent Element
+	 */
+	readonly getParent = (): HTMLElement => {
+		return this.parentElement as HTMLElement;
+	}
+
+	/**
+	 * Deletes the popup
+	 */
+	readonly dispose = () => {
+		this.disposeChild();
+		document.body.removeChild(this.parentElement);
+	}
+
+	protected abstract openChild(): void;
+	protected abstract closeChild(): void;
+	protected abstract disposeChild(): void;
 }
+
+export type PopupConstructor<T extends Popup = Popup> = new (...args: any[]) => T;

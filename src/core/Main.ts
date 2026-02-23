@@ -10,7 +10,10 @@ import { RaycasterService } from './RaycasterService';
 import { Service } from './Service';
 import { SpriteService } from '../game/SpriteService';
 import { InstancedMeshService } from '../game/InstancedMeshService';
-import { UserDataService } from '../userData/UserDataService';
+import { UserDataService } from '../data/UserData/UserDataService';
+import { MapService } from '../map/MapService';
+import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
+import { StorageService } from './StorageService';
 
 export class Main {
 	/**
@@ -50,6 +53,7 @@ export class Main {
 
 		// Register core services
 		this.registerService('Loader', new LoaderService());
+		this.registerService('Storage', new StorageService(this));
 		this.registerService('Lighting', new LightingService(this));
 		this.registerService('Camera', new CameraService(this));
 		this.registerService('Audio', new AudioService(this));
@@ -58,6 +62,8 @@ export class Main {
 		this.registerService('InstancedMesh', new InstancedMeshService(this));
 		this.registerService('Tick', new TickService(this));
 		this.registerService('UserData', new UserDataService(this));
+		this.registerService('ProgressData', new ProgressDataService(this));
+		this.registerService('Map', new MapService(this));
 
 		// Watch the screen
 		this.windowSizer = new WindowService(this);

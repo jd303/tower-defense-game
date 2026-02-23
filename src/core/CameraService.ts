@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Main } from './Main';
-import { OrbitController } from './OrbitController';
+import { ClampBounds, OrbitController } from './OrbitController';
 import { FPSController, FPSControlsType } from './FPSController';
 import { TickCallback } from './TickService';
 import { Service } from './Service';
@@ -28,7 +28,6 @@ export class CameraService extends Service {
 		x: 0,
 		y: 0,
 		z: 0,
-		clampingEnabled: false
 	};
 
 	/**
@@ -146,7 +145,8 @@ export class CameraService extends Service {
 	 * Sets up orbit handling
 	 * */
 	setupOrbitControls() {
-		this.orbitController = new OrbitController(this.main.s('Camera').mainCamera.threeCamera, this.main.canvas, this.main.s('Camera').mainCamera.settings.clampingEnabled, this.main);
+		const sCamera: CameraService = this.main.s('Camera');
+		this.orbitController = new OrbitController(sCamera.mainCamera.threeCamera, sCamera.mainCamera.settings, this.main.canvas, this.main);
 		this.main.s('Tick').registerCallback(new TickCallback('OrbitController', () => {
 			this.orbitController.controls.update();
 		}), false);
@@ -167,10 +167,10 @@ export class CameraService extends Service {
 		function isNonNumericallyFalsey(value: unknown) { return value !== null && value !== undefined; }
 
 		// Set a max rotate
-		this.orbitController.controls.minPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.minPolarAngle) ? this.mainCamera.settings.minPolarAngle : -Infinity;
-		this.orbitController.controls.maxPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.maxPolarAngle) ? this.mainCamera.settings.maxPolarAngle : Infinity;
-		this.orbitController.controls.minAzimuthAngle = Number.isFinite(this.mainCamera.settings.minAzimuthAngle) ? this.mainCamera.settings.minAzimuthAngle : -Infinity;
-		this.orbitController.controls.maxAzimuthAngle = Number.isFinite(this.mainCamera.settings.maxAzimuthAngle) ? this.mainCamera.settings.maxAzimuthAngle : Infinity;
+		this.orbitController.controls.minPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.minPolarAngle) ? this.mainCamera.settings.minPolarAngle! : -Infinity;
+		this.orbitController.controls.maxPolarAngle = isNonNumericallyFalsey(this.mainCamera.settings.maxPolarAngle) ? this.mainCamera.settings.maxPolarAngle! : Infinity;
+		this.orbitController.controls.minAzimuthAngle = isNonNumericallyFalsey(this.mainCamera.settings.minAzimuthAngle) ? this.mainCamera.settings.minAzimuthAngle! : -Infinity;
+		this.orbitController.controls.maxAzimuthAngle = isNonNumericallyFalsey(this.mainCamera.settings.maxAzimuthAngle) ? this.mainCamera.settings.maxAzimuthAngle! : -Infinity;
 		this.orbitController.controls.minZoom = this.mainCamera.settings.minZoom || 0.1;
 		this.orbitController.controls.maxZoom = this.mainCamera.settings.maxZoom || 5;
 
@@ -238,7 +238,7 @@ export class CameraService extends Service {
 
 export class Camera {
 	isMain: boolean;
-	settings: any;
+	settings: CameraSettings;
 	groupPan: THREE.Group;
 	groupTilt: THREE.Group;
 	threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
@@ -259,7 +259,7 @@ export interface CameraSettings {
 	maxAzimuthAngle?: number;
 	minZoom?: number;
 	maxZoom?: number;
-	clampingEnabled: boolean;
+	panClampBounds?: ClampBounds;
 }
 
 export interface CameraPositionProperties {

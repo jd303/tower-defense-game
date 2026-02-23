@@ -78,6 +78,7 @@ export class WaveManager {
 		}));
 
 		// Create creeps
+		this.level.updateLevelResults('creepsSeen', wave.creepNames.length);
 		wave.creepNames.forEach((creepName: string, index: number) => {
 			const creepPath = wave.corePath.createVariantPath(waveGrid[index]);
 			this.level.creepManager.addCreep(creepName, creepPath);
@@ -91,9 +92,8 @@ export class WaveManager {
 	 * Creates waves for a particular difficulty
 	 */
 	async createLevelWaves(difficulty: number, includedCreeps: IncludedCreepDefinitions[]) {
-		difficulty = 1;
 		const numberOfWaves = 3 * difficulty;
-		const creepDifficulty = difficulty * 56;
+		const creepDifficulty = difficulty * 10;
 		const creepWaveDifficulty = Math.ceil(creepDifficulty / numberOfWaves);
 		/*const minWaveTime = 2000 - (difficulty * 100);
 		const maxWaveTime = Math.max(5000 - (difficulty * 1000), minWaveTime);*/
@@ -139,6 +139,10 @@ export class WaveManager {
 			waves.push(wave);
 		}
 
+		// Let the level know how many creeps we got
+		this.level.updateLevelResults('creepsInLevel', waves.reduce((sum, wave) => sum + wave.creepNames.length, 0));
+
+		// Finalise and return
 		this.waves = waves;
 		return waves;
 	}

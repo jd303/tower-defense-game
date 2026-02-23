@@ -1,9 +1,12 @@
 import THREE, { Vector3 } from "three";
-import { PathPoint } from "../../data/PathInterfaces";
+import { PathPoint } from "../../dataTypes/PathInterfaces";
 import { BoundingBoxPlane, PathService } from "../../game/PathService";
 import { Main } from "../../core/Main";
 import { Maths } from "../../core/Maths";
 import { EnvironmentTile, EnvironmentTileProperties } from "../EnvironmentTile";
+import { SplineBuilder } from "../../core/SplineBuilder";
+import { DebugService } from "../../core/DebugService";
+import { PointsLogger } from "../../core/PointsLogger";
 
 export class PropZone {
 	/**
@@ -15,28 +18,39 @@ export class PropZone {
 	environmentTileComponents: PropZoneEnvironmentTileDefinition;
 	boundingBox: BoundingBoxPlane;
 	debugOutline?: THREE.Line;
+	debugSplineBuilder: SplineBuilder;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(args: PropZoneArguments, main: Main) {
-		const sPath: PathService = main.s('Path');
 		this.main = main;
 		this.arguments = args;
-		this.curvePath = sPath.createCurveFromPathPoints(args.zonePathPoints, 0, 0, true);
-		this.boundingBox = sPath.getBoundingBoxOfCurvePath(this.curvePath);
 
-		if (args.environmentTile) {
-			this.createEnvironmentTile();
-		}
+		this.build();
 
 		if (this.main.debugMode) {
 			const sPath: PathService = this.main.s('Path');
 			this.debugOutline = sPath.debugCreateOutlines(this.curvePath);
 			this.main.scene.add(this.debugOutline);
+			this.registerEditor();
 		}
 
 		return this;
+	}
+
+	/**
+	 * Builds the components
+	 */
+	build() {
+		const sPath: PathService = this.main.s('Path');
+
+		this.curvePath = sPath.createCurveFromPathPoints(this.arguments.zonePoints, 0, 0, true);
+		this.boundingBox = sPath.getBoundingBoxOfCurvePath(this.curvePath);
+
+		if (this.arguments.environmentTile) {
+			this.createEnvironmentTile();
+		}
 	}
 
 	/**
@@ -100,7 +114,7 @@ export class PropZone {
 	createEnvironmentTile() {
 		const sPath: PathService = this.main.s('Path');
 
-		const zoneOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3 = sPath.offsetPathFromPointsXZ(this.arguments.zonePathPoints, (this.arguments.environmentTile as EnvironmentTileProperties)!.distance!, true);
+		const zoneOutlinePath: THREE.CurvePath<THREE.Vector> | THREE.CatmullRomCurve3 = sPath.offsetPathFromPointsXZ(this.arguments.zonePoints, (this.arguments.environmentTile as EnvironmentTileProperties)!.distance!, true);
 		const environmentTile = new EnvironmentTile(zoneOutlinePath, this.main, this.arguments.environmentTile as EnvironmentTileProperties);
 		this.main.scene.add(environmentTile.groupMain);
 
@@ -134,6 +148,21 @@ export class PropZone {
 	}*/
 
 	/**
+	 * Creates controls for editing propZones
+	 */
+	registerEditor() {
+		const sDebug: DebugService = this.main.s('Debug');
+		sDebug.levelEditor?.registerExistingZone(this);
+	}
+	debugZoneEditorUpdated(pathPoints: PathPoint[]) {
+		this.arguments.zonePoints = pathPoints;
+		this.dispose();
+		this.build();
+
+		PointsLogger.log(this.arguments.zonePoints, true, "PropZone Path");
+	}
+
+	/**
 	 * Removes all elements of a PropZone
 	 */
 	dispose() {
@@ -150,7 +179,7 @@ type PropZoneEnvironmentTileDefinition = {
 
 export interface PropZoneArguments {
 	propNames: Record<string, any>[],
-	zonePathPoints: PathPoint[],
+	zonePoints: PathPoint[],
 	propSparseness: number,
 	propScale: number;
 	dynamicScaling?: PropZoneScaling,

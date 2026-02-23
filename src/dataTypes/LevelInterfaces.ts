@@ -5,6 +5,7 @@ import { CreepPathDefinition } from '../environment/creeps/CreepPath';
 import { EnvironmentColours } from '../core/LightingService';
 
 export interface LevelDefinition {
+	levelId: string;
 	difficulty: number;
 	terrain: TerrainTypes;
 	environmentColour: { colour: keyof typeof EnvironmentColours, intensity: number },
@@ -31,4 +32,11 @@ export interface LevelPropDefinition {
 	position: Vector3,
 	scale?: Vector3,
 	rotation?: Vector3,
+}
+
+export interface LevelResults {
+	creepsInLevel: number;
+	creepsSeen: number;
+	creepsKilled: number;
+	creepsEscaped: number;
 }

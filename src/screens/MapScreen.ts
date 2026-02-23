@@ -6,6 +6,8 @@ import { LightingService } from '../core/LightingService';
 import { UIService } from '../game/UIService';
 import { UIRegions } from '../game/UIProperties';
 import { Interactable2, InteractableOrders, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
+import { MapNode, MapService } from '../map/MapService';
+import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
 
 export class MapScreen extends Screen {
 	/**
@@ -25,17 +27,20 @@ export class MapScreen extends Screen {
 		minAzimuthAngle: -0.5,
 		maxAzimuthAngle: 0.5,
 		minZoom: 0.7,
-		maxZoom: 1.2,
-		clampingEnabled: false
+		maxZoom: 1.2
 	}
+
+	/**
+	 * Static setups
+	 */
+	static mapTableWidth: number = 100;
+	static mapTableDepth: number = 50;
+	static mapTableHeight: number = 30;
 
 	/**
 	 * Assets
 	 */
-	geometries: THREE.BufferGeometry[] = [];
-	materials: THREE.Material[] = [];
-	meshes: THREE.Mesh[] = [];
-	mapNodes: MapNode[] = [];
+	mapMarkers: MapMarker[] = [];
 
 	/**
 	 * Constructor
@@ -131,7 +136,7 @@ export class MapScreen extends Screen {
 		const caravanBoundsGeometry = new THREE.BoxGeometry(200, 150, 100);
 		const caravanBoundsMaterial = new THREE.MeshStandardMaterial({ color: 0x967C48, side: THREE.BackSide });
 		const caravanMesh = new THREE.Mesh(caravanBoundsGeometry, caravanBoundsMaterial);
-		caravanMesh.position.set(0, 75, 30);
+		caravanMesh.position.set(0, 75, 25);
 		caravanMesh.castShadow = true;
 		caravanMesh.receiveShadow = true;
 		this.geometries.push(caravanBoundsGeometry);
@@ -139,7 +144,7 @@ export class MapScreen extends Screen {
 		this.meshes.push(caravanMesh);
 		this.main.scene.add(caravanMesh);
 
-		const mapTableGeometry = new THREE.BoxGeometry(100, 30, 50);
+		const mapTableGeometry = new THREE.BoxGeometry(MapScreen.mapTableWidth, MapScreen.mapTableHeight, MapScreen.mapTableDepth);
 		const mapTableMaterial = new THREE.MeshStandardMaterial({ color: 0x6A4F17 });
 		const mapTableMesh = new THREE.Mesh(mapTableGeometry, mapTableMaterial);
 		mapTableMesh.position.set(0, 15, 0);
@@ -154,17 +159,30 @@ export class MapScreen extends Screen {
 	/**
 	 * Creates map points based on the user's progression
 	 */
-	createMapPoints() {
+	async createMapPoints() {
 		const sInteraction: InteractionService2 = this.main.s('Interaction2');
-		let levels = ['Sandbox', 'Level_1', 'Level_2'];
 
-		levels.forEach((levelCode: string, index) => {
-			const mapNode = new MapNode(levelCode);
-			mapNode.groupMain.position.set(-35 + (index * 10), 30, 0);
-			sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, mapNode));
-			sInteraction.registerInteractableListener('ui-component', 'loadLevel', this.requestLoadLevel);
-			this.main.scene.add(mapNode.groupMain);
-			this.mapNodes.push(mapNode);
+		const sProgressData: ProgressDataService = this.main.s('ProgressData');
+		await sProgressData.awaitDev();
+		const userProgress = await sProgressData.getProgressData();
+
+		const sMap: MapService = this.main.s('Map');
+		sMap.mapNodes.forEach((mapNode: MapNode) => {
+			const completed = userProgress.levelsCompleted.has(mapNode.levelID);
+			const unlocked = completed || !mapNode.ancestorConnections.length || mapNode.ancestorConnections.some(ancestor => (userProgress.levelsCompleted.has(ancestor)));
+			const mapMarker = new MapMarker(mapNode, { completed: completed, unlocked: unlocked });
+			//mapMarker.groupMain.position.set(-35 + (index * 10), 30, 0);
+			const mapNodeX = -MapScreen.mapTableWidth / 2.3 + (mapNode.x * (MapScreen.mapTableWidth * 0.8));
+			const mapNodeZ = -MapScreen.mapTableDepth / 2.3 + (mapNode.z * (MapScreen.mapTableDepth * 0.8));
+			mapMarker.groupMain.position.set(mapNodeX, 30, mapNodeZ);
+
+			this.main.scene.add(mapMarker.groupMain);
+			this.mapMarkers.push(mapMarker);
+
+			if (completed || unlocked) {
+				sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, mapMarker));
+				sInteraction.registerInteractableListener('ui-component', 'loadLevel', this.requestLoadLevel);
+			}
 		});
 	}
 
@@ -174,7 +192,7 @@ export class MapScreen extends Screen {
 	requestLoadLevel(event: InteractionEvent) {
 		console.error("Need to add confirmation of loading a level");
 
-		window.location.hash = `game/${(event.raycasterInteraction.object as MapNode).levelCode}`;
+		window.location.hash = `game/${(event.raycasterInteraction.object as MapMarker).levelCode}`;
 
 		return {
 			handled: true,
@@ -187,22 +205,14 @@ export class MapScreen extends Screen {
 	 */
 	dispose() {
 		this.disposeScreenCommons();
-		this.mapNodes.forEach(node => node.dispose(this.main));
-		this.mapNodes = [];
-		this.geometries.forEach(geometry => geometry.dispose());
-		this.geometries = [];
-		this.materials.forEach(material => material.dispose());
-		this.materials = [];
-		this.meshes.forEach(mesh => {
-			this.main.scene.remove(mesh);
-		});
-		this.meshes = [];
+		this.mapMarkers.forEach(mesh => mesh.dispose(this.main));
+		this.mapMarkers = [];
 	}
 }
 
-export class MapNode {
+export class MapMarker {
 	static MapNodeGeometry = () => new THREE.BoxGeometry(5, 5, 5);
-	static MapNodeMaterial = () => new THREE.MeshStandardMaterial({ color: 0x0000ff });
+	static MapNodeMaterial = (colour: number) => new THREE.MeshStandardMaterial({ color: colour });
 
 	levelCode: string;
 	groupMain: THREE.Group;
@@ -210,17 +220,31 @@ export class MapNode {
 	material: THREE.Material;
 	mesh: THREE.Mesh;
 
-	constructor(levelCode: string) {
-		this.levelCode = levelCode;
+	constructor(mapNode: MapNode, accessStates: MapNodeAccess) {
+		this.levelCode = mapNode.levelID;
 		this.groupMain = new THREE.Group();
-		this.groupMain.name = `mapnode-${levelCode}`;
-		this.geometry = MapNode.MapNodeGeometry();
-		this.material = MapNode.MapNodeMaterial();
+		this.groupMain.name = `mapnode-${mapNode.levelID}`;
+		this.geometry = MapMarker.MapNodeGeometry();
+		this.material = MapMarker.MapNodeMaterial(this.getMapMarkerColour(accessStates));
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
 		this.groupMain.add(this.mesh);
 
 		this.mesh.castShadow = true;
 		this.mesh.receiveShadow = true;
+	}
+
+	/**
+	 * Determines marker colour
+	 */
+	getMapMarkerColour(accessStates: MapNodeAccess): number {
+		switch (true) {
+			case accessStates.completed:
+				return 0xE9DD90;
+			case accessStates.unlocked:
+				return 0x0000ff;
+			default:
+				return 0x666666;
+		}
 	}
 
 	/**
@@ -231,4 +255,9 @@ export class MapNode {
 		this.geometry.dispose();
 		this.material.dispose();
 	}
+}
+
+interface MapNodeAccess {
+	completed: boolean,
+	unlocked: boolean
 }

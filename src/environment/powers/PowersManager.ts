@@ -51,8 +51,8 @@ export class PowersManager {
 
 		// Can we afford it?
 		const sEconomy: EconomyService = this.main.s('Economy');
-		const currentPower = sEconomy.getEconomicProperty('power');
-		const affordable = currentPower && currentPower.current >= power.stats.activeStats.cost;
+		const currentPower = sEconomy.getEconomicValue('power');
+		const affordable = currentPower && currentPower >= power.stats.activeStats.cost;
 
 		if (affordable) {
 			button.select();

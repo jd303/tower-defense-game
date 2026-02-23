@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Main } from './Main';
 import { PathService } from '../game/PathService';
+import { CameraSettings } from './CameraService';
 
 export class OrbitController {
 	/**
@@ -9,16 +10,17 @@ export class OrbitController {
 	 * */
 	main: Main;
 	camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
+	cameraSettings: CameraSettings;
 	controls: OrbitControls;
 	panClampBounds: ClampBounds;
-	panClampBoundsGame: ClampBounds = { minX: -75, maxX: 75, minZ: -95, maxZ: 95 };
-	panClampBoundsDebug: ClampBounds = { minX: -110, maxX: 110, minZ: -120, maxZ: 120 };
+	panClampBoundsDebug: ClampBounds = { minX: -125, maxX: 125, minZ: -125, maxZ: 125 };
 
 	/**
 	 * Constructor
 	 * */
-	constructor(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, canvas: HTMLCanvasElement, clampingEnabled: boolean, main: Main) {
+	constructor(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, cameraSettings: CameraSettings, canvas: HTMLCanvasElement, main: Main) {
 		this.camera = camera;
+		this.cameraSettings = cameraSettings;
 		this.controls = new OrbitControls(camera, canvas);
 		this.controls.enablePan = true;
 		this.controls.enableRotate = true;
@@ -31,9 +33,12 @@ export class OrbitController {
 			TWO: THREE.TOUCH.DOLLY_PAN
 		}
 		this.main = main;
-		this.panClampBounds = this.main.debugMode ? this.panClampBoundsDebug : this.panClampBoundsGame;
 
-		if (clampingEnabled) this.setupPanClamp();
+		if (cameraSettings.panClampBounds) {
+			this.panClampBounds = main.debugMode ? this.panClampBoundsDebug : cameraSettings.panClampBounds;
+			this.setupPanClamp();
+		}
+
 		if (this.main.debugMode) this.drawDebugBounds();
 
 		return this;
@@ -156,16 +161,19 @@ export class OrbitController {
 	 * Creates a debug line to show camera bounds
 	 */
 	drawDebugBounds() {
-		const sPath: PathService = this.main.s('Path');
-		const curvePath = sPath.createCurveFromPathPoints([
-			{ point: new THREE.Vector3(75, 0.5, -95) },
-			{ point: new THREE.Vector3(-75, 0.5, -95) },
-			{ point: new THREE.Vector3(-75, 0.5, 95) },
-			{ point: new THREE.Vector3(75, 0.5, 95) },
-			{ point: new THREE.Vector3(75, 0.5, -95) },
-		], 0, 0, true);
-		const outline = sPath.debugCreateOutlines(curvePath, 0x0000ff);
-		this.main.scene.add(outline);
+		if (this.cameraSettings.panClampBounds) {
+			const sPath: PathService = this.main.s('Path');
+			const curvePath = sPath.createCurveFromPathPoints([
+				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.minX, 0.5, this.cameraSettings.panClampBounds!.minZ) },
+				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.minX, 0.5, this.cameraSettings.panClampBounds!.maxZ) },
+				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.maxX, 0.5, this.cameraSettings.panClampBounds!.maxZ) },
+				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.maxX, 0.5, this.cameraSettings.panClampBounds!.minZ) },
+				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.minX, 0.5, this.cameraSettings.panClampBounds!.minZ) },
+			], 0, 0, true);
+			console.log(curvePath);
+			const outline = sPath.debugCreateOutlines(curvePath, 0x0000ff);
+			this.main.scene.add(outline);
+		}
 	}
 
 	/*setupPanClamp(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera, terrainBounds: any) {
@@ -229,7 +237,7 @@ export class OrbitController {
 	}*/
 }
 
-interface ClampBounds {
+export interface ClampBounds {
 	minX: number,
 	maxX: number,
 	minZ: number,

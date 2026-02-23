@@ -1,4 +1,4 @@
-import { DamageTypes } from "../../data/DamageTypes";
+import { DamageTypes } from "../../dataTypes/DamageTypes";
 import { ProjectileHitTypes, ProjectileTravelTypes } from "../attacks/Projectile";
 import { EffectConstructor } from "../Effect";
 

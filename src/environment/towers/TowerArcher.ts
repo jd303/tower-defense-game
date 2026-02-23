@@ -1,7 +1,7 @@
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
-import { DamageTypes } from '../../data/DamageTypes';
+import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { ArrowShot } from '../effects/ArrowShot';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
@@ -22,7 +22,6 @@ export class TowerArcher extends Tower {
 		art: ''
 	}
 	static cost = 100;
-	static costType = 'money';
 	static towerZoneWidth = 0;
 	static ShaderMaterialProperties = {
 		uniforms: {
@@ -58,7 +57,7 @@ export class TowerArcher extends Tower {
 			effect: ArrowShot,
 			travelType: ProjectileTravelTypes.arc,
 			hitType: ProjectileHitTypes.direct,
-			speed: 20,
+			speed: 40,
 			splashRadius: 0
 		},
 	};

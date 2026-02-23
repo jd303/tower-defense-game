@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Interactable2, InteractableOrders, InteractionService2 } from '../../game/InteractionService2';
 import { Main } from '../../core/Main';
-import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../../data/PathInterfaces';
+import { MovePathDefinition, PathDefinition, PathGeometryTypes, PathPoint } from '../../dataTypes/PathInterfaces';
 import { PathService } from '../../game/PathService';
 import { Level } from '../../levels/Level';
 import { CreepPathPropCurveArguments } from '../propManager/PropCurve';

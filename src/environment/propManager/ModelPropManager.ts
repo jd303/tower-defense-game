@@ -1,6 +1,6 @@
 import THREE, { InstancedMesh, Texture, Vector3 } from "three";
 import { Main } from "../../core/Main";
-import { LevelDefinition, TerrainTypes } from "../../data/LevelInterfaces";
+import { LevelDefinition, TerrainTypes } from "../../dataTypes/LevelInterfaces";
 import AllProps from "../props/AllProps";
 import { PropZone, PropZoneArguments } from "./PropZone";
 

@@ -1,4 +1,4 @@
-import { MovePathDefinition } from '../data/PathInterfaces';
+import { MovePathDefinition } from '../dataTypes/PathInterfaces';
 import { TowerStats } from './towers/TowerStats';
 import { Vector3 } from 'three';
 import { PathService } from '../game/PathService';

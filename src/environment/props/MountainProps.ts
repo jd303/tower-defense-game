@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { TerrainTypes } from "../../data/LevelInterfaces";
+import { TerrainTypes } from "../../dataTypes/LevelInterfaces";
 import { SpritePropAssetDefinition } from "../propManager/SpritePropManager";
 
 export const MountainProps: SpritePropAssetDefinition[] = [

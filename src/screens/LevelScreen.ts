@@ -4,6 +4,7 @@ import { UIService } from '../game/UIService';
 import { Level } from '../levels/Level';
 import { LevelService } from '../levels/LevelService';
 import { Screen } from '../screens/Screen';
+import { LevelPausePopup } from './LevelPausePopup';
 
 export class LevelScreen extends Screen {
 
@@ -20,6 +21,9 @@ export class LevelScreen extends Screen {
 		super(main);
 	}
 
+	/**
+	 * Loads the screen
+	 */
 	loadScreen(levelCode: string) {
 		this.levelCode = levelCode;
 		this.loadLevel();
@@ -41,10 +45,20 @@ export class LevelScreen extends Screen {
 	createUI() {
 		const sUI: UIService = this.main.s('UI');
 		const button = sUI.createIconButton('assets/common/ico.home.png', UIRegions.TopLeft);
-		button.addClickBehaviour(() => {
-			window.location.hash = 'map';
-		});
+		button.addClickBehaviour(this.confirmExitLevel.bind(this));
 		sUI.addButtonToUI(button);
+	}
+
+	/**
+	 * Confirms that the user wants to leave the level
+	 */
+	confirmExitLevel() {
+		const sUI: UIService = this.main.s('UI');
+		const popup: LevelPausePopup = sUI.openPopup(LevelPausePopup, 'pause') as LevelPausePopup;
+		//const popup: LevelPausePopup = this.popupManager.openPopup(LevelPausePopup, 'pause') as LevelPausePopup;
+		popup.setLevel(this.level);
+		popup.setOnCloseCallback(() => this.level.setPaused(false));
+		this.level.setPaused(true);
 	}
 
 	/**
@@ -53,6 +67,5 @@ export class LevelScreen extends Screen {
 	dispose() {
 		this.disposeScreenCommons();
 		this.level.disposeLevel();
-
 	}
 }

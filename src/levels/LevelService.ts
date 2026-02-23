@@ -1,8 +1,9 @@
 import { Level } from './Level';
 import { Main } from '../core/Main';
 import { levelDetails as sandboxLevel } from './levels/Level_Sandbox';
-import { levelDetails as level1 } from './levels/Level_Test_1';
-import { levelDetails as level2 } from './levels/Level_Test_2';
+import { levelDetails as level_0 } from './levels/Level_0';
+import { levelDetails as level_1_1 } from './levels/Level_1_1';
+import { levelDetails as level_1_2 } from './levels/Level_1_2';
 
 export class LevelService {
 	currentLevel: Level;
@@ -22,11 +23,14 @@ export class LevelService {
 		console.log('Load Level', levelName);
 
 		switch (levelName) {
-			case 'Level_1':
-				this.currentLevel = new Level(level1, this.main);
+			case '0_0':
+				this.currentLevel = new Level(level_0, this.main);
 				break;
-			case 'Level_2':
-				this.currentLevel = new Level(level2, this.main);
+			case '1_1':
+				this.currentLevel = new Level(level_1_1, this.main);
+				break;
+			case '1_2':
+				this.currentLevel = new Level(level_1_2, this.main);
 				break;
 			default:
 				this.currentLevel = new Level(sandboxLevel, this.main);

@@ -1,8 +1,9 @@
-import { PathGeometryTypes } from '../../data/PathInterfaces';
+import { PathGeometryTypes } from '../../dataTypes/PathInterfaces';
 import { Vector3 } from 'three';
-import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
+import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
+	levelId: "1_1",
 	difficulty: 1,
 	terrain: TerrainTypes.sand,
 	environmentColour: {
@@ -174,7 +175,7 @@ export const levelDetails: LevelDefinition = {
 	towerPlacementZones: [
 		// West
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-44.350, 0, 7.333) },
 				{ point: new Vector3(-42.950, 0, 7.000) },
 				{ point: new Vector3(-40.283, 0, 9.066) },
@@ -190,7 +191,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Crossroads
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-24.186, 0, -10.042) },
 				{ point: new Vector3(-25.380, 0, -0.138) },
 				{ point: new Vector3(-26.309, 0, 4.726) },
@@ -205,7 +206,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// AfterCrossroads
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-16.068, 0, -37.316) },
 				{ point: new Vector3(-14.101, 0, -36.083) },
 				{ point: new Vector3(-14.368, 0, -33.383) },
@@ -220,7 +221,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Northern Forest
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(20.282, 0, -15.464) },
 				{ point: new Vector3(10.054, 0, -12.264) },
 				{ point: new Vector3(10.339, 0, -9.921) },
@@ -235,7 +236,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Long Path Forest Crook
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-2.090, 0, 44.182) },
 				{ point: new Vector3(-0.998, 0, 44.686) },
 				{ point: new Vector3(-1.670, 0, 52.121) },
@@ -249,7 +250,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// Long Path Forest Crook 2
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(20.643, 0, 8.248) },
 				{ point: new Vector3(21.909, 0, 9.848) },
 				{ point: new Vector3(22.776, 0, 12.615) },
@@ -262,7 +263,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// South East Wing
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(6.538, 0, 68.418) },
 				{ point: new Vector3(9.681, 0, 70.076) },
 				{ point: new Vector3(15.795, 0, 67.676) },
@@ -281,7 +282,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		// End Path
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-17.722, 0, -47.914) },
 				{ point: new Vector3(-19.436, 0, -48.829) },
 				{ point: new Vector3(-20.293, 0, -52.016) },
@@ -319,7 +320,7 @@ export const levelDetails: LevelDefinition = {
 		// Northern Forest
 		{
 			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-19.571, 0, -21.928) },
 				{ point: new Vector3(6.928, 0, -15.0000) },
 				{ point: new Vector3(20.928, 0, -18.0000) },
@@ -366,7 +367,7 @@ export const levelDetails: LevelDefinition = {
 		// Southern Forest
 		{
 			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-35.4285, 0, 27.7857) },
 				{ point: new Vector3(-19.78571428571429, 0, 5.214285714285714) },
 				{ point: new Vector3(-10, 0, -1.5) },
@@ -411,7 +412,7 @@ export const levelDetails: LevelDefinition = {
 		// Western Forest
 		{
 			propNames: [{ name: 'TreeDead', chance: 0.5 }, { name: 'TreeDead2', chance: 0.5 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-95.40783942269796, 0, -56.880699061193134) },
 				{ point: new Vector3(-75, 0, -60) },
 				{ point: new Vector3(-65.60518129642527, 0, -56) },
@@ -467,7 +468,7 @@ export const levelDetails: LevelDefinition = {
 		// Small Rock Pile
 		{
 			propNames: [{ name: 'MesaBrown', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-34.734, 0, -2.850) },
 				{ point: new Vector3(-36.067, 0, -3.916) },
 				{ point: new Vector3(-40.134, 0, -1.850) },
@@ -494,7 +495,7 @@ export const levelDetails: LevelDefinition = {
 		// North West Rubble
 		{
 			propNames: [{ name: 'MesaBrown', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-34.010, 0, -37.243) },
 				{ point: new Vector3(-30.696, 0, -37.929) },
 				{ point: new Vector3(-27.668, 0, -42.843) },
@@ -523,7 +524,7 @@ export const levelDetails: LevelDefinition = {
 		// South East Rubble
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(95.3855, 0, 46.3055) },
 				{ point: new Vector3(48.7394, 0, 36.58245) },
 				{ point: new Vector3(34.1548, 0, 36.70552) },
@@ -563,7 +564,7 @@ export const levelDetails: LevelDefinition = {
 		// North west Mountains
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(12, 0, -104) },
 				{ point: new Vector3(-80, 0, -104) },
 				{ point: new Vector3(-70, 0, -75) },
@@ -581,7 +582,7 @@ export const levelDetails: LevelDefinition = {
 		// North East Mountains
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(35, 0, -99) },
 				{ point: new Vector3(35, 0, -71) },
 				{ point: new Vector3(38, 0, -55) },
@@ -598,7 +599,7 @@ export const levelDetails: LevelDefinition = {
 		// West Mountains
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-93.89255, 0, -51.47957) },
 				{ point: new Vector3(-100.16947, 0, -1.01802) },
 				{ point: new Vector3(-83.43101, 0, -11.60264) },
@@ -619,7 +620,7 @@ export const levelDetails: LevelDefinition = {
 		// Southern Mesas
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(28.870673076923076, 0, 93.5919078742053) },
 				{ point: new Vector3(27.70144230769231, 0, 73.71498479727228) },
 				{ point: new Vector3(20.316826923076924, 0, 70.3919078741937) },

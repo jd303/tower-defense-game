@@ -1,6 +1,6 @@
 import THREE, { CatmullRomCurve3, CurvePath, Vector3 } from "three";
 import { Main } from "../core/Main";
-import { MovePathDefinition, PathMirrorPoint, PathPoint } from "../data/PathInterfaces";
+import { MovePathDefinition, PathMirrorPoint, PathPoint } from "../dataTypes/PathInterfaces";
 import { Service } from "../core/Service";
 
 export class PathService extends Service {
@@ -81,7 +81,7 @@ export class PathService extends Service {
 		if (closePath) {
 			const lastPoint = points[points.length - 1].point;
 			const firstPoint = points[0].point;
-			if (lastPoint.x !== firstPoint.x || lastPoint.y !== firstPoint.y || lastPoint.z !== firstPoint.z) {
+			if (lastPoint.distanceTo(firstPoint) > 0) {
 				console.error(`Closing path with different end position ${firstPoint.x}, ${firstPoint.y}, ${firstPoint.z}`);
 			}
 			curvePath.closePath();
@@ -448,6 +448,19 @@ export class PathService extends Service {
 		}
 
 		return mirrorPoints;
+	}
+
+	/**
+	 * Returns a point, which is x% between 2 points
+	 * @param point1 
+	 * @param point2 
+	 * @param percentage 
+	 */
+	static getPercentagePositionBetweenPoints(point1: THREE.Vector3, point2: THREE.Vector3, percentage: number) {
+		const xLerp = point1.x + (point2.x - point1.x) * percentage;
+		const yLerp = point1.y + (point2.y - point1.y) * percentage;
+		const zLerp = point1.z + (point2.z - point1.z) * percentage;
+		return new THREE.Vector3(xLerp, yLerp, zLerp);
 	}
 
 	/**

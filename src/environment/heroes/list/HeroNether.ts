@@ -1,9 +1,9 @@
 import { Main } from '../../../core/Main';
 import { TickTimeProperties } from '../../../core/TickService';
-import { DamageTypes } from '../../../data/DamageTypes';
-import { MovementTypes } from '../../../data/MovementTypes';
+import { DamageTypes } from '../../../dataTypes/DamageTypes';
+import { MovementTypes } from '../../../dataTypes/MovementTypes';
 import { SpriteAssetProperties, SpriteSheetRow } from '../../assets/SpriteAsset';
-//import { DamageTypes } from '../../data/DamageTypes';
+//import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { Hero, HeroAssetProperties } from '../Hero';
 import { AttackRangeTypes, CharacterStats } from '../../Stats';
 

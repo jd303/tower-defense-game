@@ -6,7 +6,8 @@ import { Main } from './Main';
 import { SplineBuilder } from './SplineBuilder';
 import { Service } from './Service';
 import { InteractionService2, InteractionEvent } from '../game/InteractionService2';
-import { LevelCreator } from '../levels/LevelCreator';
+import { LevelEditor } from '../levels/LevelEditor';
+import { Level } from '../levels/Level';
 
 export class DebugService extends Service {
 	/**
@@ -28,12 +29,7 @@ export class DebugService extends Service {
 		exportPoints: this.exportPoints.bind(this),
 		destroySpline: this.destroySpline.bind(this),
 	}
-	zoneCreatorObject = {
-		startZoneCreator: this.startZoneCreator.bind(this),
-		endZoneCreator: this.endZoneCreator.bind(this),
-		zoneCreation: []
-	}
-	levelCreator: LevelCreator;
+	levelEditor: LevelEditor;
 
 	/**
 	 * References
@@ -44,11 +40,11 @@ export class DebugService extends Service {
 	/**
 	 * Constructor
 	 * */
-	constructor(main: Main, debugMode: boolean) {
+	constructor(main: Main) {
 		super();
 
 		this.main = main;
-		this.debugMode = debugMode;
+		this.debugMode = main.debugMode;
 
 		this.createLilGUI();
 
@@ -64,6 +60,30 @@ export class DebugService extends Service {
 		}
 
 		this.lilGUI = new lil.GUI();
+		this.lilGUI.domElement.addEventListener('click', (event: MouseEvent) => event.stopPropagation());
+	}
+
+	/**
+	 * Creates a level editor
+	 */
+	createLevelEditor(level: Level) {
+		const levelCreator = new LevelEditor(this.main, level);
+		const levelCreatorFolder = this.lilGUI.addFolder('Level Editor');
+		levelCreatorFolder.open(false);
+		this.levelEditor = levelCreator;
+		this.levelEditor.getLevelEditorFeatures().forEach((feature: Record<string, string>) => {
+			levelCreatorFolder.add(this.levelEditor, feature.functionName).name(feature.name);
+		});
+
+		const splineFolder = levelCreatorFolder.addFolder('Spline Tools');
+		splineFolder.open(false);
+		splineFolder.add(this.splineObject, 'bezierEnabledOnLoad', [false, true]);
+		splineFolder.add(this.splineObject, 'makeSpline');
+		splineFolder.add(this.splineObject, 'makeLineFromWindowJSON');
+		splineFolder.add(this.splineObject, 'addSplinePointToStart');
+		splineFolder.add(this.splineObject, 'addSplinePointToEnd');
+		splineFolder.add(this.splineObject, 'exportPoints');
+		splineFolder.add(this.splineObject, 'destroySpline');
 	}
 
 	/**
@@ -217,7 +237,7 @@ export class DebugService extends Service {
 	 */
 	makeSpline() {
 		if (this.splineBuilder) this.splineBuilder.destroy();
-		this.splineBuilder = new SplineBuilder(this.main, false, this.splineObject.bezierEnabledOnLoad);
+		this.splineBuilder = new SplineBuilder(this.main, { makeFromWindowJSON: false, bezierEnabled: this.splineObject.bezierEnabledOnLoad, onUpdate: (points) => console.log("POINTS", points) });
 	}
 
 	/**
@@ -225,7 +245,7 @@ export class DebugService extends Service {
 	 */
 	makeLineFromWindowJSON() {
 		if (this.splineBuilder) this.splineBuilder.destroy();
-		this.splineBuilder = new SplineBuilder(this.main, true, this.splineObject.bezierEnabledOnLoad);
+		this.splineBuilder = new SplineBuilder(this.main, { makeFromWindowJSON: true, bezierEnabled: this.splineObject.bezierEnabledOnLoad });
 	}
 
 	/**
@@ -273,60 +293,5 @@ export class DebugService extends Service {
 		console.log(event.raycasterInteraction.object);
 		console.groupEnd();
 		return { handled: true, stopPropagation: false };
-	}
-
-	/**
-	 * Creates a level creator
-	 */
-	addLevelEditorLilGUI(levelCreator: LevelCreator) {
-		const levelCreatorFolder = this.lilGUI.addFolder('Level Editor');
-		levelCreatorFolder.open(false);
-		this.levelCreator = levelCreator;
-		this.levelCreator.getLevelCreatorFeatures().forEach((feature: string) => {
-			levelCreatorFolder.add(this.levelCreator, feature);
-		});
-
-		const splineFolder = levelCreatorFolder.addFolder('Spline Tools');
-		splineFolder.open(false);
-		splineFolder.add(this.splineObject, 'bezierEnabledOnLoad', [false, true]);
-		splineFolder.add(this.splineObject, 'makeSpline');
-		splineFolder.add(this.splineObject, 'makeLineFromWindowJSON');
-		splineFolder.add(this.splineObject, 'addSplinePointToStart');
-		splineFolder.add(this.splineObject, 'addSplinePointToEnd');
-		splineFolder.add(this.splineObject, 'exportPoints');
-		splineFolder.add(this.splineObject, 'destroySpline');
-
-		const folder = levelCreatorFolder.addFolder('Zone Tools');
-		folder.open(false);
-		folder.add(this.zoneCreatorObject, 'startZoneCreator');
-		folder.add(this.zoneCreatorObject, 'endZoneCreator');
-	}
-
-	/**
-	 * Enables zone creator mode
-	 */
-	startZoneCreator() {
-		this.zoneCreatorObject.zoneCreation = [];
-
-		setTimeout(() => {
-			const sInteraction: InteractionService2 = this.main.s('Interaction2');
-			sInteraction.registerInteractableListener('terrain', 'zoneCreator', this.registerZoneCreatorPoint.bind(this));
-		}, 500);
-	}
-
-	endZoneCreator() {
-		const sInteraction: InteractionService2 = this.main.s('Interaction2');
-		sInteraction.deregisterInteractableListener('terrain', 'zoneCreator');
-
-		this.zoneCreatorObject.zoneCreation.push(this.zoneCreatorObject.zoneCreation[0]);
-		console.log("Zone:", this.zoneCreatorObject.zoneCreation.map((point: THREE.Vector3) => `{ point: new Vector3(${point.x}, ${point.y}, ${point.z}) },`).join('\n'));
-		console.log("END ZONE",);
-	}
-
-	registerZoneCreatorPoint(event: InteractionEvent) {
-		const newPoint = new THREE.Vector3(event.raycasterInteraction.point.point.x.toFixed(3), 0, event.raycasterInteraction.point.point.z.toFixed(3));
-		(this.zoneCreatorObject.zoneCreation as THREE.Vector3[]).push(newPoint);
-
-		return { handled: true, stopPropagation: true }
 	}
 }

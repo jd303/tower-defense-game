@@ -1,7 +1,7 @@
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
 import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
-import { DamageTypes } from '../../data/DamageTypes';
+import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { BombShot } from '../effects/BombShot';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
@@ -22,7 +22,6 @@ export class TowerBomber extends Tower {
 		art: ''
 	}
 	static cost = 175;
-	static costType = 'money';
 	static towerZoneWidth = 3;
 	static ShaderMaterialProperties = {
 		uniforms: {

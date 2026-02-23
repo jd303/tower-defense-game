@@ -20,6 +20,7 @@ import { HeroesScreen } from './screens/HeroesScreen';
 import { PowersScreen } from './screens/PowersScreen';
 import { TowersScreen } from './screens/TowersScreen';
 import { UpgradesScreen } from './screens/UpgradesScreen';
+import { RunEndScreen } from './screens/RunEndScreen';
 
 /**
  * Configuration
@@ -47,7 +48,7 @@ main.registerService('UI', new UIService(main));
 main.registerService('Event', new EventService());
 main.registerService('FogOfWar', new FogOfWarService(main));
 main.registerService('Particle', new ParticleService(main));
-main.registerService('Debug', new DebugService(main, debugMode));
+main.registerService('Debug', new DebugService(main));
 main.registerService('Screen', new ScreenService(main));
 
 // Setup Screens
@@ -78,5 +79,9 @@ main.s('Screen').registerScreen({
 main.s('Screen').registerScreen({
 	hash: 'upgrades',
 	screenType: UpgradesScreen
+});
+main.s('Screen').registerScreen({
+	hash: 'endRun',
+	screenType: RunEndScreen
 });
 main.s('Screen').loaded();

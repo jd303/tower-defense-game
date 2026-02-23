@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { Creep } from '../environment/creeps/Creep';
 import { Terrain } from '../environment/Terrain';
 import { Main } from '../core/Main';
-import { LevelDefinition, TerrainTypes } from '../data/LevelInterfaces';
-import { TickCallback, TickService, TickTimeProperties } from '../core/TickService';
+import { LevelDefinition, LevelResults, TerrainTypes } from '../dataTypes/LevelInterfaces';
+import { TickCallback, TickService, TickSpeed, TickTimeProperties } from '../core/TickService';
 import { UIService } from '../game/UIService';
 import { CameraService } from '../core/CameraService';
 import { SpritePropManager } from '../environment/propManager/SpritePropManager';
@@ -14,12 +14,14 @@ import { LevelCameraManager } from './LevelCameraManager';
 import { EconomyService } from '../game/EconomyService';
 import { EventService } from '../core/EventService';
 import { HeroManager } from '../environment/heroes/HeroManager';
-import { LevelCreator } from './LevelCreator';
 import { InstancedMeshService } from '../game/InstancedMeshService';
 import { PowersManager } from '../environment/powers/PowersManager';
 import { LightingService } from '../core/LightingService';
 import { DebugService } from '../core/DebugService';
-import { UserDataService } from '../userData/UserDataService';
+import { UserDataService } from '../data/UserData/UserDataService';
+import { LevelCompletePopup } from '../screens/LevelCompletePopup';
+import { RunEndLevelPopup } from '../screens/RunEndLevelPopup';
+import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
 
 export class Level {
 	/**
@@ -28,9 +30,21 @@ export class Level {
 	main: Main;
 
 	/**
-	 * Path
+	 * Statics
+	 */
+	static levelWidth: number = 140; // Width of all levels
+	static levelHeight: number = 120; // Height of all levels
+
+	/**
+	 * Core
 	 * */
 	levelDetails: LevelDefinition;
+	levelResults: LevelResults = {
+		creepsInLevel: 0,
+		creepsSeen: 0,
+		creepsKilled: 0,
+		creepsEscaped: 0,
+	}
 
 	/**
 	 * Level Assets
@@ -51,7 +65,7 @@ export class Level {
 		this.levelDetails = levelDetails;
 		this.main = main;
 		this.main.s('Level').currentLevel = this;
-		this.levelCameraManager = new LevelCameraManager(this.main);
+		this.levelCameraManager = new LevelCameraManager(this.main, this);
 		this.propManager = new SpritePropManager(this.main, this);
 		this.towerManager = new TowerManager(this.main);
 		this.creepManager = new CreepManager(this.main, this);
@@ -59,9 +73,10 @@ export class Level {
 		this.heroManager = new HeroManager(this.main, this);
 		this.powersManager = new PowersManager(this.main, this);
 
+		if (this.main.debugMode) this.setupDebugs(levelDetails);
+
 		this.setTerrain(levelDetails.terrain);
 		this.setupLevel();
-		if (this.main.debugMode) this.setupDebugs(levelDetails);
 	}
 
 	/**
@@ -95,31 +110,7 @@ export class Level {
 		this.setupPowers();
 		this.setupMainTick();
 
-		/**
-		 * New Instanced Mesh Generation
-		 */
-		const includedCreeps = [
-			{
-				difficulty: 0,
-				chance: 0.4,
-				name: 'CreepTrollDink'
-			},
-			{
-				chance: 0.4,
-				difficulty: 1,
-				name: 'CreepLupine'
-			},
-			{
-				chance: 0.1,
-				difficulty: 2,
-				name: 'CreepTroll',
-			},
-			{
-				chance: 0.1,
-				difficulty: 1,
-				name: 'CreepWisp'
-			}];
-		await this.waveManager.createLevelWaves(1, includedCreeps);
+		await this.waveManager.createLevelWaves(this.levelDetails.difficulty, this.levelDetails.creepOptions);
 		this.waveManager.startWaveTimer();
 	}
 
@@ -154,8 +145,8 @@ export class Level {
 	setupUI() {
 		const sUI: UIService = this.main.s('UI');
 		sUI.addEconomyLabel('money', 'commerce_money_changed');
-		sUI.addEconomyLabel('power', 'power_changed');
-		sUI.addEconomyLabel('hearts', 'hearts_changed');
+		sUI.addEconomyLabel('power', 'commerce_power_changed');
+		sUI.addEconomyLabel('hearts', 'commerce_hearts_changed');
 	}
 
 	/**
@@ -170,9 +161,9 @@ export class Level {
 		sEconomy.setEconomyValue("money", userEconomyData.money.current);
 		sEvent.fire('commerce_money_changed', userEconomyData.money.current);
 		sEconomy.setEconomyValue("hearts", userEconomyData.hearts.current);
-		sEvent.fire("hearts_changed", userEconomyData.hearts.current);
+		sEvent.fire("commerce_hearts_changed", userEconomyData.hearts.current);
 		sEconomy.setEconomyValue("power", userEconomyData.power.current);
-		sEvent.fire("power_changed", userEconomyData.power.current);
+		sEvent.fire("commerce_power_changed", userEconomyData.power.current);
 	}
 
 	/**
@@ -180,7 +171,7 @@ export class Level {
 	 */
 	async setupHero() {
 		const sUserData: UserDataService = this.main.s('UserData');
-		const heroUpgrades = sUserData.userLoadout.heroUpgrades;
+		const heroUpgrades = sUserData.getHeroUpgrades();
 		this.heroManager.heroUpgrades = heroUpgrades;
 
 		const heroes = await sUserData.getEquippedHeroes();
@@ -196,7 +187,7 @@ export class Level {
 		const towers = await sUserData.getEquippedTowers();
 		await this.towerManager.setup(this.levelDetails, towers);
 
-		const towerUpgrades = await sUserData.userLoadout.towerUpgrades;
+		const towerUpgrades = await sUserData.getTowerUpgrades();
 		this.towerManager.towerUpgrades = towerUpgrades;
 	}
 
@@ -207,7 +198,7 @@ export class Level {
 		const sUserData: UserDataService = this.main.s('UserData');
 
 		const powers = await sUserData.getEquippedPowers();
-		const powerUpgrades = await sUserData.userLoadout.powerUpgrades;
+		const powerUpgrades = await sUserData.getPowerUpgrades();
 		this.powersManager.powerUpgrades = powerUpgrades;
 		this.powersManager.setup(powers);
 	}
@@ -234,27 +225,60 @@ export class Level {
 	}
 
 	/**
-	 * If the player wins the level!
-	 * */
-	winLevel() {
-		console.log("You win the level!");
-	}
-
-	/**
-	 * If the player loses the level!
-	 * */
-	loseLevel() {
-		console.log("You lose the level!");
-		const sTick: TickService = this.main.s('Tick');
-		const sUI: UIService = this.main.s('UI');
+	 * The level ends, and the caravan continues
+	 */
+	levelComplete() {
 		const sCamera: CameraService = this.main.s('Camera');
+		sCamera.removeOrbitControls();
+
+		const sTick: TickService = this.main.s('Tick');
 		sTick.end();
 
+		const sUI: UIService = this.main.s('UI');
 		sUI.removeEconomyUI();
 		sUI.removeTowersUI();
 		sUI.removePowersUI();
-		sUI.createPopup("lose-level", "Sorry, you lost the level.  Sad face", ['bubble-in']);
+
+		// Write that we completed the stage
+		const sProgressData: ProgressDataService = this.main.s('ProgressData');
+		sProgressData.updateLevelCompletion(this.levelDetails.levelId, true);
+
+		// Create a results popup
+		const popup: LevelCompletePopup = sUI.openPopup(LevelCompletePopup, "LevelLost") as LevelCompletePopup;
+		popup.setResults(this.levelResults);
+	}
+
+	/**
+	 * The caravan's last lives were cut short on this level
+	 */
+	levelFailed() {
+		const sCamera: CameraService = this.main.s('Camera');
 		sCamera.removeOrbitControls();
+
+		const sTick: TickService = this.main.s('Tick');
+		sTick.end();
+
+		const sUI: UIService = this.main.s('UI');
+		sUI.removeEconomyUI();
+		sUI.removeTowersUI();
+		sUI.removePowersUI();
+
+		// Create a results popup
+		sUI.openPopup(RunEndLevelPopup, "LevelLost") as RunEndLevelPopup;
+	}
+
+	/**
+	 * Updates a level result
+	 */
+	updateLevelResults(key: keyof LevelResults, valueChange: number) {
+		this.levelResults[key] += valueChange;
+
+		if (this.levelResults.creepsInLevel > 0) {
+			console.log(this.levelResults.creepsEscaped, this.levelResults.creepsKilled, this.levelResults.creepsInLevel)
+			if (this.levelResults.creepsEscaped + this.levelResults.creepsKilled >= this.levelResults.creepsInLevel) {
+				this.levelComplete();
+			}
+		}
 	}
 
 	/**
@@ -263,11 +287,13 @@ export class Level {
 	creepEscaped(creep: Creep) {
 		console.log("A creep passed the line:", creep);
 
-		const sEconomy = this.main.s('Economy');
-		const vpValue = sEconomy.adjustEconomyValue('vp', -1 * creep.stats.activeStats.vp_loss!.value);
+		const sEconomy: EconomyService = this.main.s('Economy');
+		const vpValue = sEconomy.adjustEconomyValue('hearts', -1 * creep.stats.activeStats.vp_loss!.value);
+
+		this.updateLevelResults('creepsEscaped', 1);
 
 		if (vpValue <= 0) {
-			this.loseLevel();
+			this.levelFailed();
 		}
 	}
 
@@ -286,7 +312,7 @@ export class Level {
 			objectParent: sTick,
 			property: 'masterSpeed',
 			min: 0,
-			max: 5,
+			max: 10,
 			step: 0.01,
 			name: `Tick Speed`,
 		});
@@ -299,13 +325,21 @@ export class Level {
 		this.propManager.registerProp({ assetName: 'TreeBulbous', position: new THREE.Vector3(-90, 0, -55) }, levelDetails);
 
 		// Setup a Debug to initiate level creation
-		const levelCreator = new LevelCreator(this.main, this);
-		this.main.s('Debug').addLevelEditorLilGUI(levelCreator);
+		this.main.s('Debug').createLevelEditor(this);
 
 		/**
 		 * DEBUG Objects
 		 * */
 		//sDebug.addDebugSphere({ position: new THREE.Vector3(0, 5, 30), scale: new THREE.Vector3(5, 5, 5) });
+	}
+
+	/**
+	 * Pauses the level
+	 */
+	setPaused(isPaused: boolean) {
+		const sTick: TickService = this.main.s('Tick');
+		console.log("Set game speed", isPaused ? TickSpeed.paused : TickSpeed.default);
+		sTick.setGameSpeed(isPaused ? TickSpeed.paused : TickSpeed.default);
 	}
 
 	/**

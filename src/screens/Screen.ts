@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { DebugService } from '../core/DebugService';
 import { LightingService } from '../core/LightingService';
 import { Main } from '../core/Main';
@@ -11,6 +12,13 @@ export class Screen {
 	 * */
 	main: Main;
 
+	/**
+	 * Assets
+	 */
+	geometries: THREE.BufferGeometry[] = [];
+	textures: THREE.Texture[] = [];
+	materials: THREE.Material[] = [];
+	meshes: THREE.Mesh[] = [];
 
 	/**
 	 * Properties
@@ -39,6 +47,15 @@ export class Screen {
 	 * Disposes and removes all common screen items
 	 */
 	disposeScreenCommons() {
+		this.geometries.forEach(geometry => geometry.dispose());
+		this.geometries = [];
+		this.materials.forEach(material => material.dispose());
+		this.materials = [];
+		this.meshes.forEach(mesh => {
+			this.main.scene.remove(mesh);
+		});
+		this.meshes = [];
+
 		const sLighting: LightingService = this.main.s('Lighting');
 		const sUI: UIService = this.main.s('UI');
 		const sTick: TickService = this.main.s('Tick');

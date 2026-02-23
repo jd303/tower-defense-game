@@ -1,5 +1,5 @@
-import { DamageTypeDefences, DamageTypes } from "../data/DamageTypes";
-import { MovementTypes } from "../data/MovementTypes";
+import { DamageTypeDefences, DamageTypes } from "../dataTypes/DamageTypes";
+import { MovementTypes } from "../dataTypes/MovementTypes";
 import { ProjectileHitTypes, ProjectileTravelTypes } from "./attacks/Projectile";
 import { EffectConstructor } from "./Effect";
 
@@ -24,7 +24,7 @@ export class Stats {
 		this.permanentUpgrades.push(upgrade);
 		this.calculateActiveStats();
 	}
-	addUpgrades(upgrades: StatBlockCharacterModification[] | StatBlockPowerModification[]) {
+	addUpgrades(upgrades: StatBlockCharacterModification) {
 		this.permanentUpgrades = this.permanentUpgrades.concat(upgrades);
 		this.calculateActiveStats();
 	}

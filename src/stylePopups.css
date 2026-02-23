@@ -7,9 +7,50 @@
 	align-self: anchor-center;
 	padding: var(--padding-standard);
 	background-color: #fff;
+
+	pointer-events: auto;
+
+	&[data-open="false"] {
+		display: none;
+	}
+
+	&[data-open="true"] {
+		display: block;
+	}
+}
+
+/* 
+* Popup styles
+*/
+.popup-style-header-footer {
+	display: grid;
+	grid-template-rows: 50px auto 50px;
+	gap: var(--padding-standard);
 }
 
 .popup-close {
-	padding: calc(var(--padding-standard));
+	position:absolute;
+	top: -15px;
+	left: -15px;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	border-radius: 5px;
 	background-color: #000;
+
+	&:before {
+		content: "X";
+		color: #fff;
+	}
+}
+
+.popup-flex-col {
+	display: flex;
+	flex-direction: column;
+	gap: calc(0.5 * var(--padding-standard));
+}
+
+.popup-flex-row {
+	display: flex;
+	gap: calc(0.5 * var(--padding-standard));
 }

@@ -1,8 +1,9 @@
-import { PathGeometryTypes } from '../../data/PathInterfaces';
+import { PathGeometryTypes } from '../../dataTypes/PathInterfaces';
 import { Vector3 } from 'three';
-import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
+import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
+	levelId: "1_2",
 	difficulty: 2,
 	creepOptions: [
 		{ name: 'CreepTrollDink', chance: 0.4 },
@@ -45,7 +46,7 @@ export const levelDetails: LevelDefinition = {
 	towerPlacementZones: [
 		// First bend inner
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(37, 0, -52.5) },
 				{ point: new Vector3(37.5, 0, -53) },
 				{ point: new Vector3(52.5, 0, -53) },
@@ -56,7 +57,7 @@ export const levelDetails: LevelDefinition = {
 			]
 		},
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-36.5, 0, -66.5) },
 				{ point: new Vector3(-32.5, 0, -72.5) },
 				{ point: new Vector3(-30, 0, -72.5) },
@@ -67,7 +68,7 @@ export const levelDetails: LevelDefinition = {
 			]
 		},
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-11.482, 0, -54.169) },
 				{ point: new Vector3(-7.539, 0, -47.589) },
 				{ point: new Vector3(-2.282, 0, -46.789) },
@@ -77,7 +78,7 @@ export const levelDetails: LevelDefinition = {
 			]
 		},
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-23.221, 0, -25.042) },
 				{ point: new Vector3(-24.250, 0, -25.830) },
 				{ point: new Vector3(-19.793, 0, -30.928) },
@@ -89,7 +90,7 @@ export const levelDetails: LevelDefinition = {
 			]
 		},
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(-32.891, 0, -14.414) },
 				{ point: new Vector3(-33.005, 0, 0.103) },
 				{ point: new Vector3(-11.348, 0, 1.318) },
@@ -98,7 +99,7 @@ export const levelDetails: LevelDefinition = {
 			]
 		},
 		{
-			points: [
+			zonePoints: [
 				{ point: new Vector3(12.357142857142858, 4, 34) },
 				{ point: new Vector3(11.714285714285715, 4, 32) },
 				{ point: new Vector3(15.928571428571432, 4, 27) },
@@ -113,7 +114,7 @@ export const levelDetails: LevelDefinition = {
 	propZones: [
 		{
 			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-76.578, 0, -97.405) },
 				{ point: new Vector3(-77.492, 0, -66) },
 				{ point: new Vector3(-39.606, 0, -66) },
@@ -135,8 +136,10 @@ export const levelDetails: LevelDefinition = {
 			environmentTile: {
 				type: "land",
 				distance: 1.25,
-				colour: 0x547621,
-				bevelColour: 0x547621,
+				//colour: 0x547621,
+				colour: 0x508100,
+				//bevelColour: 0x547621,
+				bevelColour: 0x508100,
 				smooth: true
 			},
 			dynamicScaling: {
@@ -152,7 +155,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			propNames: [{ name: 'TreeBulbous', chance: 0.65 }, { name: 'TreeTall', chance: 0.3 }, { name: 'LogSubmerged', chance: 0.05 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-36.461, 0, -13.132) },
 				{ point: new Vector3(-51.146, 0, -12.828) },
 				{ point: new Vector3(-53.946, 0, -10.162) },
@@ -190,7 +193,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-72.226, 0, -53.610) },
 				{ point: new Vector3(-16.626, 0, -53.667) },
 				{ point: new Vector3(-9.197, 0, -45) },
@@ -221,7 +224,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			propNames: [{ name: 'TreeBulbous', chance: 0.75 }, { name: 'TreeTall', chance: 0.25 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-46.5, 0, 48) },
 				{ point: new Vector3(84.85714285714286, 0, 47) },
 				{ point: new Vector3(87.14285714285715, 0, 106) },
@@ -246,7 +249,7 @@ export const levelDetails: LevelDefinition = {
 
 		{
 			propNames: [{ name: 'MountainInitial', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(74, 0, -70) },
 				{ point: new Vector3(63, 0, -62) },
 				{ point: new Vector3(65.273, 0, -49) },
@@ -279,7 +282,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			propNames: [{ name: 'WaveSubtle', chance: 1 }],
-			zonePathPoints: [
+			zonePoints: [
 				{ point: new Vector3(-67.143, 0, -23.425) },
 				{ point: new Vector3(-63.600, 0, -21.825) },
 				{ point: new Vector3(-64.743, 0, -18.549) },

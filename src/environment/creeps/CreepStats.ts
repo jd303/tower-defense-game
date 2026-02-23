@@ -1,5 +1,5 @@
-import { DamageTypeDefences, DamageTypes } from '../../data/DamageTypes';
-import { MovementTypes } from '../../data/MovementTypes';
+import { DamageTypeDefences, DamageTypes } from '../../dataTypes/DamageTypes';
+import { MovementTypes } from '../../dataTypes/MovementTypes';
 
 export class CreepStats {
 	/**

@@ -24,8 +24,8 @@ export class TickService extends Service {
 	/**
 	 * Debugs
 	 * */
-	masterSpeed: TickSpeed = TickSpeed.default;
-	previousMasterSpeed: TickSpeed = TickSpeed.default;
+	private masterSpeed: TickSpeed = TickSpeed.default;
+	private previousMasterSpeed: TickSpeed = TickSpeed.default;
 
 	/**
 	 * Constructor
@@ -156,7 +156,7 @@ export class TickService extends Service {
 	 * Unpauses game objects
 	 * */
 	setGameSpeed(gameSpeed?: TickSpeed) {
-		if (gameSpeed) {
+		if (gameSpeed || gameSpeed === 0) {
 			this.previousMasterSpeed = this.masterSpeed;
 			this.masterSpeed = gameSpeed;
 		} else {
@@ -233,6 +233,7 @@ export interface TickTimeProperties {
 }
 
 export enum TickSpeed {
+	paused = 0,
 	slowest = 0.1,
 	slower = 0.33,
 	slow = 0.5,

@@ -1,7 +1,7 @@
 import { Service } from "./Service";
 
 export class EventService extends Service {
-	eventListeners: EventInterface[] = [];
+	eventListeners: EventListenerDefinition[] = [];
 
 	/**
 	 * Constructor
@@ -13,28 +13,31 @@ export class EventService extends Service {
 	/**
 	 * Adds an event to the window, bound with a callback to affect the correct item
 	 * */
-	addEvent(name: string, callback: any) {
-		window.addEventListener(name, callback);
-		this.eventListeners.push({ name: name, callback: callback });
+	addListener(eventName: EventName, listenerName: string, callback: any) {
+		window.addEventListener(eventName, callback);
+		this.eventListeners.push({ listenerName: listenerName, eventName: eventName, callback: callback });
 	}
 
 	/**
 	 * Adds an event to the window, bound with a callback to affect the correct item
 	 * */
-	removeEvent(name: string) {
+	removeListener(eventName: EventName, listenerName: string) {
 		this.eventListeners.forEach(listener => {
-			if (listener.name == name) {
-				window.removeEventListener(listener.name, listener.callback);
+			if (listener.eventName == eventName && listener.listenerName == listenerName) {
+				window.removeEventListener(listener.eventName, listener.callback);
 			}
 		});
 
-		this.eventListeners = this.eventListeners.filter(listener => listener.name !== name);
+		this.eventListeners = this.eventListeners.filter(listener => {
+			if (listener.eventName == eventName && listener.listenerName == listenerName) return false;
+			return true;
+		});
 	}
 
 	/**
 	 * Fires an event into the event system
 	 * */
-	fire(name: string, value: any) {
+	fire(name: EventName, value: any) {
 		console.log("Fire!", name, value);
 
 		let event = new CustomEvent(name, { detail: value });
@@ -42,7 +45,18 @@ export class EventService extends Service {
 	}
 }
 
-interface EventInterface {
-	name: string;
+interface EventListenerDefinition {
+	listenerName: string;
+	eventName: EventName;
 	callback: any;
 }
+
+export const EventNames = [
+	"commerce_money_changed",
+	"commerce_hearts_changed",
+	"commerce_power_changed",
+	"chronos_changed",
+	"user_loadout_changed",
+	"user_progress_changed"
+] as const;
+export type EventName = typeof EventNames[number];

@@ -129,7 +129,6 @@ export class RaycasterService extends Service {
 			}
 		}
 
-		console.log("IT INTERSECTED", intersected);
 		return intersected;
 	}
 }

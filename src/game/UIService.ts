@@ -1,7 +1,9 @@
-import { EventService } from '../core/EventService';
+import { EventName, EventService } from '../core/EventService';
 import { Main } from '../core/Main';
 import { Service } from '../core/Service';
 import { Tower } from '../environment/towers/Tower';
+import { PopupConstructor } from '../popups/Popup';
+import { PopupManager } from '../popups/PopupManager';
 import { UIRegions } from './UIProperties';
 
 export class UIService extends Service {
@@ -9,6 +11,7 @@ export class UIService extends Service {
 	 * System Properties
 	 * */
 	main: Main;
+	popupManager: PopupManager;
 
 	/**
 	 * DOM Elements
@@ -42,6 +45,7 @@ export class UIService extends Service {
 		super();
 
 		this.main = main;
+		this.popupManager = new PopupManager(main);
 
 		this.rootUIElement = document.createElement('div');
 		this.rootUIElement.classList.add('ui');
@@ -107,7 +111,7 @@ export class UIService extends Service {
 	 * @param { name } string Name of the label; also it's class in CSS
 	 * @param { string | null } event Name of an event that this will listen to to update contents
 	 * */
-	addEconomyLabel(name: string, event: string) {
+	addEconomyLabel(name: string, event: EventName) {
 		const label = this.createLabel(name, event);
 		this.economyUIElement.appendChild(label);
 	}
@@ -117,7 +121,7 @@ export class UIService extends Service {
 	 * @param { name } string Name of the label; also it's class in CSS
 	 * @param { string | null } eventName Name of an event that this will listen to to update contents
 	 * */
-	createLabel(name: string, eventName: string) {
+	createLabel(name: string, eventName: EventName) {
 		const div = document.createElement('div');
 		div.classList.add(name);
 		div.classList.add('label');
@@ -125,7 +129,7 @@ export class UIService extends Service {
 		const callback: any = this.updateLabelWithText.bind({ scope: this, target: div });
 
 		const sEvent: EventService = this.main.s('Event');
-		sEvent.addEvent(eventName, callback);
+		sEvent.addListener(eventName, name, callback);
 
 		return div;
 	}
@@ -133,12 +137,12 @@ export class UIService extends Service {
 	/**
 	 * Removes a label and disconnects it's listener
 	 * */
-	removeLabel(name: string, eventName: string) {
+	removeLabel(name: string, eventName: EventName) {
 		const label = document.querySelector(`.${name}`);
 		label?.parentElement?.removeChild(label);
 
 		const sEvent: EventService = this.main.s('Event');
-		sEvent.removeEvent(eventName);
+		sEvent.removeListener(eventName, name);
 	}
 
 	/**
@@ -152,13 +156,14 @@ export class UIService extends Service {
 	/**
 	 * Creates a popup
 	 * */
-	createPopup(name: string, html: string, classList: string[] = []) {
-		const div = document.createElement('div');
+	openPopup(popupType: PopupConstructor, name: string) {
+		return this.popupManager.openPopup(popupType, name);
+		/*const div = document.createElement('div');
 		div.classList.add(name);
 		div.classList.add('popup');
 		classList.forEach(className => div.classList.add(className));
 		div.innerHTML = html;
-		this.rootUIElement.appendChild(div);
+		this.rootUIElement.appendChild(div);*/
 	}
 
 	/**

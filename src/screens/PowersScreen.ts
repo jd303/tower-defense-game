@@ -7,7 +7,7 @@ import { UIService } from '../game/UIService';
 import { UIRegions } from '../game/UIProperties';
 import { Interactable2, InteractableOrders, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
 import { LoaderService } from '../core/LoaderService';
-import { UserDataService } from '../userData/UserDataService';
+import { UserDataService } from '../data/UserData/UserDataService';
 import { ThreeDeeButton } from './_ThreeDeeButton';
 import { Power } from '../environment/powers/Power';
 import { AssetGenerator } from '../environment/assets/AssetGenerator';
@@ -30,17 +30,12 @@ export class PowersScreen extends Screen {
 		minAzimuthAngle: -0.5,
 		maxAzimuthAngle: 0.5,
 		minZoom: 0.7,
-		maxZoom: 1.2,
-		clampingEnabled: false
+		maxZoom: 1.2
 	}
 
 	/**
 	 * Assets
 	 */
-	geometries: THREE.BufferGeometry[] = [];
-	textures: THREE.Texture[] = [];
-	materials: THREE.Material[] = [];
-	meshes: THREE.Mesh[] = [];
 	toggleButtons: ThreeDeeButton[] = [];
 
 	/**
@@ -100,11 +95,13 @@ export class PowersScreen extends Screen {
 	async createWallOfPowers() {
 		await this.main.s('UserData').awaitDev();
 
-		const powers = ['PowerTimeNoodleDistortion', 'PowerTowerMotivation', 'PowerHeroMotivation', 'PowerSpringDoorTrap', 'PowerCatapultBarrage'];
-
 		const sLoader: LoaderService = this.main.s('Loader');
 		const sInteraction: InteractionService2 = this.main.s('Interaction2');
 		const sLoadout: UserDataService = this.main.s('UserData');
+		const sUserData: UserDataService = this.main.s('UserData');
+
+		await sUserData.awaitDev();
+		const powers = sUserData.userLoadout.runDiscoveries.powers;
 
 		const equippedPowers = await sLoadout.getEquippedPowers();
 		const equippedpowerNames = equippedPowers.map(power => power.powerProperties.assetName);
@@ -175,14 +172,6 @@ export class PowersScreen extends Screen {
 	 */
 	dispose() {
 		this.disposeScreenCommons();
-		this.geometries.forEach(geometry => geometry.dispose());
-		this.geometries = [];
-		this.materials.forEach(material => material.dispose());
-		this.materials = [];
-		this.meshes.forEach(mesh => {
-			this.main.scene.remove(mesh);
-		});
-		this.meshes = [];
 		this.toggleButtons.forEach(toggleButton => toggleButton.dispose());
 		this.toggleButtons = []
 	}

@@ -7,9 +7,9 @@ import { UIService } from '../game/UIService';
 import { UIRegions } from '../game/UIProperties';
 import { LoaderService } from '../core/LoaderService';
 import { Interactable2, InteractableOrders, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
-import { UserDataService } from '../userData/UserDataService';
 import { ThreeDeeButton } from './_ThreeDeeButton';
-import { TowerUpgradePopup } from '../popups/TowerUpgradePopup';
+import { UpgradePopup } from '../popups/UpgradePopup';
+import { PopupManager } from '../popups/PopupManager';
 
 export class UpgradesScreen extends Screen {
 	/**
@@ -29,8 +29,7 @@ export class UpgradesScreen extends Screen {
 		minAzimuthAngle: -0.5,
 		maxAzimuthAngle: 0.5,
 		minZoom: 0.7,
-		maxZoom: 1.2,
-		clampingEnabled: false
+		maxZoom: 1.2
 	}
 
 	/**
@@ -40,12 +39,15 @@ export class UpgradesScreen extends Screen {
 	materials: THREE.Material[] = [];
 	meshes: THREE.Mesh[] = [];
 	popupButtons: ThreeDeeButton[] = [];
+	popupManager: PopupManager;
 
 	/**
 	 * Constructor
 	 * */
 	constructor(main: Main) {
 		super(main);
+
+		this.popupManager = new PopupManager(main);
 
 		this.createCamera();
 		this.createLighting();
@@ -128,17 +130,7 @@ export class UpgradesScreen extends Screen {
 		this.main.scene.add(popupButton.groupMain);
 
 		sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, popupButton));
-		sInteraction.registerInteractableListener('ui-component', `popup-tower`, this.popupTowers.bind(this), false);
-	}
-	popupTowers(event: InteractionEvent) {
-		const towerUpgradePopup = new TowerUpgradePopup();
-		towerUpgradePopup.open();
-		console.log("POP!", "Towers", event);
-
-		return {
-			handled: true,
-			stopPropagation: false,
-		}
+		sInteraction.registerInteractableListener('ui-component', `popup-tower`, this.launchPopup.bind(this), false);
 	}
 
 	/**
@@ -151,15 +143,7 @@ export class UpgradesScreen extends Screen {
 		this.main.scene.add(popupButton.groupMain);
 
 		sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, popupButton));
-		sInteraction.registerInteractableListener('ui-component', `popup-hero`, this.popupHero.bind(this), false);
-	}
-	popupHero(event: InteractionEvent) {
-		console.log("POP!", "Hero", event);
-
-		return {
-			handled: true,
-			stopPropagation: false,
-		}
+		sInteraction.registerInteractableListener('ui-component', `popup-hero`, this.launchPopup.bind(this), false);
 	}
 
 	/**
@@ -173,14 +157,41 @@ export class UpgradesScreen extends Screen {
 		this.main.scene.add(popupButton.groupMain);
 
 		sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, popupButton));
-		sInteraction.registerInteractableListener('ui-component', `popup-powers`, this.popupPowers.bind(this), false);
+		sInteraction.registerInteractableListener('ui-component', `popup-powers`, this.launchPopup.bind(this), false);
 	}
-	popupPowers(event: InteractionEvent) {
-		console.log("POP!", "Powers", event);
+
+	/**
+	 * Accept a click and lanunch
+	 */
+	launchPopup(event: InteractionEvent) {
+		const launchingButtonName = event.raycasterInteraction.object.groupMain.name;
+		let handled = false;
+		let popup;
+
+		switch (launchingButtonName) {
+			case "threeDeeButton-towers":
+				popup = this.popupManager.openPopup(UpgradePopup, 'towerUpgrades') as UpgradePopup;
+				popup.setProperties("Towers", ["accuracy", "power", "range", "attackrate"], "towerUpgradePurchases");
+				popup.buildHTML();
+				handled = true;
+				break;
+			case "threeDeeButton-powers":
+				popup = this.popupManager.openPopup(UpgradePopup, 'powerUpgrades') as UpgradePopup;
+				popup.setProperties("Powers", ["cooldown", "power", "size"], "powerUpgradePurchases");
+				popup.buildHTML();
+				handled = true;
+				break;
+			case "threeDeeButton-heroes":
+				popup = this.popupManager.openPopup(UpgradePopup, 'heroUpgrades') as UpgradePopup;
+				popup.setProperties("Heroes", ["movement", "power", "life"], "heroUpgradePurchases");
+				popup.buildHTML();
+				handled = true;
+				break;
+		}
 
 		return {
-			handled: true,
-			stopPropagation: false,
+			handled: handled,
+			stopPropagation: handled,
 		}
 	}
 
@@ -197,5 +208,8 @@ export class UpgradesScreen extends Screen {
 			this.main.scene.remove(mesh);
 		});
 		this.meshes = [];
+		this.popupButtons.forEach(pButton => pButton.dispose());
+		this.popupButtons = [];
+		this.popupManager.disposeAll();
 	}
 }

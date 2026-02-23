@@ -4,11 +4,12 @@ import { TickTimeProperties } from '../../core/TickService';
 import { CreepStates, CreepTransitions } from './CreepStates';
 import { Hero } from '../heroes/Hero';
 import { InteractableOrders, InteractableTypes, InteractionService2 } from '../../game/InteractionService2';
-import { MovePathDefinition } from '../../data/PathInterfaces';
+import { MovePathDefinition } from '../../dataTypes/PathInterfaces';
 import { MovePathManager } from '../MovePathManager';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { ShaderAnimationAttributes, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { CharacterAttackStats, CharacterStats } from '../Stats';
+import { EventService } from '../../core/EventService';
 
 export abstract class Creep extends CharacterAsset {
 	/**
@@ -249,7 +250,7 @@ export abstract class Creep extends CharacterAsset {
 		const rewards = this.stats.activeStats.kill_rewards;
 		this.main.s('Economy').adjustEconomyValue(rewards!.economic_property, rewards!.value);
 		if (this.intercepter) this.intercepter.removeInterceptee(this);
-		this.deleteCreep();
+		this.deleteCreep(true);
 	}
 
 	/**
@@ -258,16 +259,16 @@ export abstract class Creep extends CharacterAsset {
 	creepEscaped() {
 		const sLevel = this.main.s('Level');
 		sLevel.currentLevel.creepEscaped(this);
-		this.deleteCreep();
+		this.deleteCreep(false);
 	}
 
 	/**
 	 * Final deletions of Creeps
 	 * */
-	deleteCreep() {
+	deleteCreep(wasKilled: boolean) {
 		this.stateMachine.remove();
 		this.hideInstancedMesh();
-		this.main.s('Level').currentLevel.creepManager.removeCreep(this);
+		this.main.s('Level').currentLevel.creepManager.removeCreep(this, wasKilled);
 	}
 
 	/**

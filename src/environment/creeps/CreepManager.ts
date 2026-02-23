@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
-import { LevelDefinition } from '../../data/LevelInterfaces';
+import { LevelDefinition } from '../../dataTypes/LevelInterfaces';
 import { Level } from '../../levels/Level';
 import { Creep } from './Creep';
 import { CreepPath } from './CreepPath';
-import { MovePathDefinition } from '../../data/PathInterfaces';
+import { MovePathDefinition } from '../../dataTypes/PathInterfaces';
 import { AssetGenerator } from '../assets/AssetGenerator';
 
 export class CreepManager {
@@ -61,9 +61,11 @@ export class CreepManager {
 	/**
 	 * Removes a creep from the level
 	 * */
-	removeCreep(removedCreep: Creep) {
+	removeCreep(removedCreep: Creep, killed: boolean) {
 		this.creeps = this.creeps.filter((creep) => creep !== removedCreep);
 		this.main.scene.remove(removedCreep.groupMain);
+
+		if (killed) this.level.updateLevelResults('creepsKilled', 1);
 	}
 
 	/**
@@ -88,7 +90,7 @@ export class CreepManager {
 	 */
 	disposeAll() {
 		this.creeps.forEach((creep) => {
-			creep.deleteCreep();
+			creep.deleteCreep(false);
 		});
 		this.creeps = [];
 

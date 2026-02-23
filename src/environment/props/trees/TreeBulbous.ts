@@ -9,7 +9,7 @@ export class TreeBulbous extends PropAsset {
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'prop',
 		assetName: 'TreeBulbous',
-		assetPath: 'assets/spritesheets/environment/spritesheet-tree-bulbous.png',
+		assetPath: 'assets/trees/spritesheet-tree-bulbous.png',
 		assetScale: 0.5,
 		assetPositionY: 0
 	}

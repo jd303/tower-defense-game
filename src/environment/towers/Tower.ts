@@ -23,7 +23,6 @@ export abstract class Tower extends CharacterAsset {
 	 */
 	static towerProperties: TowerAssetProperties;
 	static cost: number;
-	static costType: string;
 	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
 	static instancedMeshInstanceCount: number = 25;
 	static instancedMeshAnimates: boolean = true;
@@ -74,7 +73,7 @@ export abstract class Tower extends CharacterAsset {
 			{
 				name: TowerStates.attacking,
 				autoTransition: TowerTransitions.scanning,
-				autoTransitionTimeMS: 1750,
+				autoTransitionTimeMS: 2750,
 				//onEnter: this.activateStandingPower.bind(this),
 			},
 			{
@@ -178,7 +177,7 @@ export abstract class Tower extends CharacterAsset {
 	 * Disposes all projectiles
 	 */
 	disposeAllProjectiles() {
-		this.projectiles.forEach(projectile => projectile.dispose());
+		this.projectiles.forEach(projectile => projectile.dispose(true));
 		this.projectiles = [];
 	}
 

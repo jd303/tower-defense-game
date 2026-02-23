@@ -108,8 +108,8 @@ export class PowerCatapultBarrage extends Power {
 			const totalXDist = startData.end.x - startData.start.x;
 			rockPosition.position.x = startData.start.x + (totalXDist * easedTX);
 
-			const scaleAmount = Math.pow(elapsedTime, PowerCatapultBarrageRock.assetScale);
-			rockPosition.scale.x = Math.min(PowerCatapultBarrageRock.assetScale, scaleAmount);
+			const scaleAmount = Math.pow(elapsedTime, PowerCatapultBarrageRock.assetProperties.assetScale);
+			rockPosition.scale.x = Math.min(PowerCatapultBarrageRock.assetProperties.assetScale, scaleAmount);
 
 			const dropAmount = Math.pow(elapsedTime, 5.5) * startData.fallSpeed;
 			rockPosition.position.y = Math.max(0, startData.start.y - dropAmount);
@@ -159,28 +159,31 @@ export class PowerCatapultBarrage extends Power {
 	 * When a rock falls to Y: 0
 	 */
 	resolveRockFall(rockIndex: number) {
-		this.rockStartPositions.splice(rockIndex, 1);
-
-		// IF this will be the last one, let's reset the sprite
-		if (this.rocks.length == 1) {
-			this.rocks[0].instancedMesh.resetIndexes();
-
-			const sTick: TickService = this.main.s('Tick');
-			sTick.deregisterCallback('animateCatapultBarrage');
-		}
-
 		// Instantiate
 		const rock = this.rocks[rockIndex];
 
-		// Then apply damage
+		// Apply damage
 		const creepsInShortRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusPrimary!);
 		let creepsInMidRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusSecondary!);
 		creepsInMidRange = creepsInMidRange.filter(midRangeCreep => !creepsInShortRange.find(shortRangeCreep => midRangeCreep == shortRangeCreep));
 		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage!)));
 		creepsInMidRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage! / 3)));
 
-		// The dispose
-		this.rocks.splice(rockIndex, 1);
-		if (!this.rocks.length) rock.dispose();
+		// Then let them sit for a bit, then remove
+		setTimeout(() => {
+			this.rockStartPositions.splice(rockIndex, 1);
+
+			// IF this will be the last one, let's reset the sprite
+			if (this.rocks.length == 1) {
+				this.rocks[0].instancedMesh.resetIndexes();
+
+				const sTick: TickService = this.main.s('Tick');
+				sTick.deregisterCallback('animateCatapultBarrage');
+			}
+
+			// Then dispose
+			this.rocks.splice(rockIndex, 1);
+			if (!this.rocks.length) rock.dispose();
+		}, 500);
 	}
 }

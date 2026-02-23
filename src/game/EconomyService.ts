@@ -1,3 +1,4 @@
+import { EventService } from '../core/EventService';
 import { Main } from '../core/Main';
 
 export class EconomyService {
@@ -31,50 +32,43 @@ export class EconomyService {
 	/**
 	 * Gets the object of an economic metric
 	 * */
-	getEconomicProperty(property: string) {
+	getEconomicValue(property: EconomyProperty) {
 		switch (property) {
 			case "money":
-				return this.economy.money;
+				return this.economy.money.current;
 			case "power":
-				return this.economy.power;
+				return this.economy.power.current;
 			case "hearts":
-				return this.economy.hearts;
+				return this.economy.hearts.current;
 		}
 	}
 
 	/**
-	 * Gets the value of an economic metric
+	 * Sets money
 	 * */
-	getEconomyValue(property: string) {
-		const propertyObject = this.getEconomicProperty(property);
-		return propertyObject?.current;
+	setEconomyValue(property: EconomyProperty, value: number) {
+		return this.setValue(property, value);
 	}
 
 	/**
 	 * Sets money
 	 * */
-	setEconomyValue(property: string, value: number) {
-		const propertyObject = this.getEconomicProperty(property);
-		return this.setValue(propertyObject, value);
-	}
+	adjustEconomyValue(property: EconomyProperty, value: number) {
+		const sEvent: EventService = this.main.s('Event');
 
-	/**
-	 * Sets money
-	 * */
-	adjustEconomyValue(property: string, value: number) {
 		let newValue = 0;
 		switch (property) {
 			case "money":
 				newValue = this.adjustValue(this.economy.money, value);
-				this.main.s('Event').fire('commerce_money_changed', newValue);
+				sEvent.fire('commerce_money_changed', newValue);
 				return newValue;
 			case "hearts":
 				newValue = this.adjustValue(this.economy.hearts, value);
-				this.main.s('Event').fire('hearts_changed', newValue);
+				sEvent.fire('commerce_hearts_changed', newValue);
 				return newValue;
 			case "power":
 				newValue = this.adjustValue(this.economy.power, value);
-				this.main.s('Event').fire('power_changed', newValue);
+				sEvent.fire('commerce_power_changed', newValue);
 				return newValue;
 		}
 	}
@@ -82,8 +76,8 @@ export class EconomyService {
 	/**
 	 * Sets a value for a resource
 	 * */
-	setValue(property: any, value: number) {
-		property.current = value;
+	private setValue(property: EconomyProperty, value: number) {
+		this.economy[property].current = value;
 		return value;
 	}
 
@@ -99,6 +93,13 @@ export class EconomyService {
 	}
 }
 
+export const EconomyProperties = [
+	"money",
+	"hearts",
+	"power",
+] as const;
+export type EconomyProperty = typeof EconomyProperties[number];
+
 export interface EconomyData {
 	money: {
 		current: number
@@ -109,4 +110,10 @@ export interface EconomyData {
 	power: {
 		current: number
 	}
+}
+
+export interface ChronosData {
+	chronoblips: number;
+	chronobloops: number;
+	chronoblobs: number;
 }

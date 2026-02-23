@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TerrainTypes } from '../data/LevelInterfaces';
+import { TerrainTypes } from '../dataTypes/LevelInterfaces';
 import { Main } from '../core/Main';
 import { Interactable2, InteractableOrders } from '../game/InteractionService2';
 
@@ -10,6 +10,7 @@ export class Terrain {
 	main: Main;
 	cast: boolean = false;
 	receive: boolean = true;
+	terrainType: TerrainTypes;
 
 	/**
 	 * Three Objects
@@ -21,6 +22,7 @@ export class Terrain {
 	 * */
 	constructor(terrainType: TerrainTypes, main: Main) {
 		this.main = main;
+		this.terrainType = terrainType;
 		this.groupMain = new THREE.Group();
 		this.groupMain.name = "Terrain";
 

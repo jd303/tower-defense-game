@@ -91,7 +91,7 @@ export class InstancedMeshService {
 				USE_ANIMATION: spriteSheet.sheetRows + spriteSheet.sheetCols > 2 && 1 || 0,
 				BILLBOARD: billboarded && 1 || 0
 			},
-			alphaTest: 0.5,
+			alphaTest: 0.05,
 			transparent: true,
 			//precision: 'lowp',
 			vertexShader,

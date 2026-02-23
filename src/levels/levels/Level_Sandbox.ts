@@ -1,8 +1,9 @@
-import { PathGeometryTypes } from '../../data/PathInterfaces';
-import { LevelDefinition, TerrainTypes } from '../../data/LevelInterfaces';
+import { PathGeometryTypes } from '../../dataTypes/PathInterfaces';
+import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 import { Vector3 } from 'three';
 
 export const levelDetails: LevelDefinition = {
+	levelId: "Sandbox",
 	difficulty: 1,
 	creepOptions: [
 		{

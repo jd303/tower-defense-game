@@ -4,7 +4,7 @@ import { UIRegions } from '../../game/UIProperties';
 import { UIButton, UIService } from '../../game/UIService';
 import { TowerPlacementCommons, TowerPlacementZone } from './TowerPlacementZone';
 import { TickTimeProperties } from '../../core/TickService';
-import { LevelDefinition } from '../../data/LevelInterfaces';
+import { LevelDefinition } from '../../dataTypes/LevelInterfaces';
 import { InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
 import { EconomyService } from '../../game/EconomyService';
 import { AssetGenerator } from '../assets/AssetGenerator';
@@ -24,7 +24,7 @@ export class TowerManager {
 	towerPlacementCommons: TowerPlacementCommons;
 	towerPlacementZones: TowerPlacementZone[] = [];
 	towers: Tower[] = [];
-	towerUpgrades: Record<string, StatBlockCharacterModification[]> = {};
+	towerUpgrades: StatBlockCharacterModification = {};
 
 	/**
 	 * Constructor
@@ -40,7 +40,7 @@ export class TowerManager {
 		this.towerPlacementCommons = new TowerPlacementCommons(this.main);
 
 		levelDetails.towerPlacementZones.forEach((placement) => {
-			const towerPlacementZone = new TowerPlacementZone(placement.points, this.towerPlacementCommons, this.main);
+			const towerPlacementZone = new TowerPlacementZone(placement, this.towerPlacementCommons, this.main);
 			this.towerPlacementZones.push(towerPlacementZone);
 		});
 
@@ -65,7 +65,7 @@ export class TowerManager {
 		}
 
 		// See if we can create a tower
-		if (tower.cost > sEconomy.getEconomicProperty('money')!.current) {
+		if (tower.cost > sEconomy.getEconomicValue('money')) {
 			console.log("Not enough gold to create tower");
 			return;
 		} else {
@@ -96,9 +96,9 @@ export class TowerManager {
 	 */
 	requestAddTower(tower: typeof Tower, event: InteractionEvent, button: UIButton) {
 		const sEconomy: EconomyService = this.main.s('Economy');
-		if (tower.cost < sEconomy.getEconomicProperty('money')!.current) {
+		if (tower.cost < sEconomy.getEconomicValue('money')) {
 			this.addTower(tower.assetProperties.assetName, event.raycasterInteraction.object.groupMain.position);
-			sEconomy.adjustEconomyValue(tower.costType, -1 * tower.cost);
+			sEconomy.adjustEconomyValue('money', -1 * tower.cost);
 			(event.raycasterInteraction.object as any).towerZoneShapePlacement.addTowerToTowerZoneShapePlacement(tower);
 		}
 
@@ -117,7 +117,8 @@ export class TowerManager {
 		const newTower = await AssetGenerator.createSpriteAsset(assetName, this.main) as Tower;
 		this.towers.push(newTower);
 
-		newTower.stats.addUpgrades(this.towerUpgrades[assetName]);
+		console.log("ADDING UPGRADES", this.towerUpgrades);
+		newTower.stats.addUpgrades(this.towerUpgrades);
 
 		setTimeout(() => {
 			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");

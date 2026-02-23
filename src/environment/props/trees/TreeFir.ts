@@ -9,7 +9,7 @@ export class TreeFir extends PropAsset {
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'prop',
 		assetName: 'TreeFir',
-		assetPath: 'assets/spritesheets/environment/spritesheet-tree-fir.png',
+		assetPath: 'assets/trees/spritesheet-tree-fir.png',
 		assetScale: 0.2,
 		assetPositionY: 0
 	}

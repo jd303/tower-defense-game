@@ -9,7 +9,7 @@ export class TreeTall extends PropAsset {
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'prop',
 		assetName: 'TreeTall',
-		assetPath: 'assets/spritesheets/environment/spritesheet-tree-tall.png',
+		assetPath: 'assets/trees/spritesheet-tree-tall.png',
 		assetScale: 2,
 		assetPositionY: 0
 	}
