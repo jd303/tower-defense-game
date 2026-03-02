@@ -13,8 +13,7 @@ export class TrollDink extends Creep {
 		assetType: 'creep',
 		assetName: 'CreepTrollDink',
 		assetPath: 'assets/spritesheets/creeps/spritesheet-troll.png',
-		assetScale: 3.25,
-		assetPositionY: 0
+		assetScale: 3.25
 	}
 	static waveDifficulty = 1;
 
@@ -54,7 +53,7 @@ export class TrollDink extends Creep {
 		defenses: {
 			piercing: 0,
 			crushing: 0,
-			arcane: 10,
+			arcane: 0,
 			poison: 0,
 			lightning: 0,
 			fire: -10,
@@ -67,9 +66,9 @@ export class TrollDink extends Creep {
 			value: 3
 		},
 		attack: {
-			speed: 10,
+			duration: 1000,
 			accuracy: 1.0,
-			damage: 10,
+			damage: 5,
 			damageType: DamageTypes.piercing,
 			rangeType: AttackRangeTypes.melee,
 			range: 0

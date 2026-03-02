@@ -6,11 +6,11 @@ import { HeroUpgradeProperty, PowerUpgradeProperty, TowerUpgradeProperty, UserLo
 import { Tower } from '../../environment/towers/Tower';
 import { Hero } from '../../environment/heroes/Hero';
 import { EventService } from '../../core/EventService';
-
-// Data Source
-import { tempUserLoadoutData } from './_userLoadoutData';
 import { StorageService } from '../../core/StorageService';
 import { StorageKey } from '../../config/storageKeys';
+
+// Data Source
+import { newUserData } from './_userLoadoutData';
 
 export class UserDataService {
 	/**
@@ -48,7 +48,7 @@ export class UserDataService {
 			this.userLoadout = new UserLoadout(JSON.parse(userLoadout));
 		} else {
 			console.log("%c Loading User Loadout from tempUserLoadoutData", "color: pink");
-			this.userLoadout = new UserLoadout(tempUserLoadoutData);
+			this.userLoadout = new UserLoadout(newUserData);
 		}
 	}
 	async saveUserData() {

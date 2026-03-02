@@ -8,6 +8,7 @@
     "lint": "eslint \"**/*.ts\""
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^25.0.0",
     "gsap": "^3.11.5",
     "lil-gui": "^0.18.1",
     "three": "^0.182.0",

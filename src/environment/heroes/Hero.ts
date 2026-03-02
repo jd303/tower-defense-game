@@ -107,7 +107,7 @@ export abstract class Hero extends CharacterAsset {
 			},
 			{
 				name: HeroStates.hurting,
-				autoTransition: StateMachineEvents.Stop,
+				autoTransition: StateMachineEvents.ReleaseState,
 				autoTransitionTimeMS: 1000,
 			},
 			{
@@ -115,7 +115,7 @@ export abstract class Hero extends CharacterAsset {
 			},
 			{
 				name: HeroStates.healing,
-				autoTransition: StateMachineEvents.Stop,
+				autoTransition: StateMachineEvents.ReleaseState,
 				autoTransitionTimeMS: 1500,
 				onEnter: this.stateEnterHealing.bind(this),
 				onExit: this.stateExitHealing.bind(this)
@@ -320,7 +320,6 @@ export abstract class Hero extends CharacterAsset {
 	 * When Idling
 	 * */
 	stateEnterIdle() {
-		console.log("IDLING");
 		// Listen for interceptions
 		const callback = new TickCallback(`${this.assetName}_intercept`, this.findInterceptees.bind(this));
 		const sTick: TickService = this.main.s('Tick');
@@ -329,7 +328,6 @@ export abstract class Hero extends CharacterAsset {
 		this.spriteSheetFrameManager.changeAnimation("idle");
 	}
 	stateExitIdle() {
-		console.log("EXIT IDLE");
 		const sTick: TickService = this.main.s('Tick');
 		sTick.deregisterCallback(`${this.assetName}_intercept`);
 		this.disengageAsIntercepter();

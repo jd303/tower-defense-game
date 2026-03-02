@@ -122,7 +122,7 @@ export class TowerManager {
 
 		setTimeout(() => {
 			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");
-			newTower.setPosition(point);
+			newTower.setPosition(new THREE.Vector3(point.x, point.y, point.z + 2));
 			console.log(newTower);
 		}, 500);
 

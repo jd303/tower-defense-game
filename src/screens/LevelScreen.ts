@@ -24,17 +24,17 @@ export class LevelScreen extends Screen {
 	/**
 	 * Loads the screen
 	 */
-	loadScreen(levelCode: string) {
+	async loadScreen(levelCode: string) {
 		this.levelCode = levelCode;
-		this.loadLevel();
+		await this.loadLevel();
 	}
 
 	/**
 	 * Loads the level
 	 */
-	loadLevel() {
+	async loadLevel() {
 		const sLevel: LevelService = this.main.s('Level');
-		this.level = sLevel.loadLevel(this.levelCode);
+		this.level = await sLevel.loadLevel(this.levelCode);
 		this.createUI();
 		this.startTick();
 	}

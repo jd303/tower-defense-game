@@ -13,8 +13,7 @@ export class Lupine extends Creep {
 		assetType: 'creep',
 		assetName: 'CreepLupine',
 		assetPath: 'assets/spritesheets/creeps/spritesheet-lupine.png',
-		assetScale: 2,
-		assetPositionY: 0
+		assetScale: 2
 	}
 	static waveDifficulty = 1;
 
@@ -67,9 +66,9 @@ export class Lupine extends Creep {
 			value: 1
 		},
 		attack: {
-			speed: 15,
+			duration: 250,
 			accuracy: 1.0,
-			damage: 10,
+			damage: 5,
 			damageType: DamageTypes.piercing,
 			rangeType: AttackRangeTypes.melee,
 			range: 0

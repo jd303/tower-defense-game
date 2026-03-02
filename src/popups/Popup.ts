@@ -44,7 +44,7 @@ export abstract class Popup {
 	 */
 	readonly open = () => {
 		this.parentElement.setAttribute('data-open', 'true');
-		this.openChild();
+		this.onOpen();
 	}
 
 	/**
@@ -52,11 +52,29 @@ export abstract class Popup {
 	 */
 	readonly close = () => {
 		this.parentElement.setAttribute('data-open', 'false');
-		this.closeChild();
+		this.onClose();
 
 		if (this.onCloseCallback) {
 			this.onCloseCallback();
 		}
+	}
+
+	/**
+	 * Populate an element in the popup with html
+	 */
+	populateByID(id: string, content: string) {
+		const element = this.parentElement.querySelector(`#${id}`);
+		if (element) {
+			element.innerHTML = content;
+		}
+	}
+
+	/**
+	 * Helper to add an event listener to an id
+	 */
+	addEventListenerById(id: string, eventCallback: () => void) {
+		const element = this.parentElement.querySelector(`#${id}`);
+		element?.addEventListener('click', eventCallback);
 	}
 
 	/**
@@ -92,11 +110,12 @@ export abstract class Popup {
 	 */
 	readonly dispose = () => {
 		this.disposeChild();
+		this.popupManager.disposePopupByName(this.name);
 		document.body.removeChild(this.parentElement);
 	}
 
-	protected abstract openChild(): void;
-	protected abstract closeChild(): void;
+	protected abstract onOpen(): void;
+	protected abstract onClose(): void;
 	protected abstract disposeChild(): void;
 }
 

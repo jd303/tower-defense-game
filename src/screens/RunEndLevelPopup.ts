@@ -45,12 +45,7 @@ export class RunEndLevelPopup extends Popup {
 	 * Adds click events
 	 */
 	addEventListeners() {
-		const parent = this.getParent();
-		const confirm = parent.querySelector("#btConfirm");
-
-		if (confirm) {
-			confirm.addEventListener('click', this.confirmRestart.bind(this));
-		}
+		this.addEventListenerById("btConfirm", this.confirmRestart.bind(this));
 	}
 
 	/**
@@ -61,11 +56,8 @@ export class RunEndLevelPopup extends Popup {
 		window.location.hash = 'endRun';
 	}
 
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
-
-	openChild() { }
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 	disposeChild() { }
 }

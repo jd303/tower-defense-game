@@ -1,28 +1,28 @@
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
-import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
+import { ProjectileHitTypes } from '../projectiles/Projectile';
 import { DamageTypes } from '../../dataTypes/DamageTypes';
-import { BombShot } from '../effects/BombShot';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
+import { RicochetProjectile } from '../projectiles/Ricochet.Projectile';
+import { ShardProjectileEffect } from '../projectiles/effects/Shard.Projectile.Effect';
 
-export class TowerBomber extends Tower {
+export class TowerRicochet extends Tower {
 	/**
 	 * Static details
 	 */
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'tower',
-		assetName: 'TowerBomber',
-		assetPath: 'assets/towers/bomber/spritesheet-tower-bomber.png',
-		assetScale: 7,
-		assetPositionY: 0
+		assetName: 'TowerRicochet',
+		assetPath: 'assets/towers/ricochet/spritesheet-tower-ricochet.png',
+		assetScale: 5
 	}
 	static towerProperties = {
-		icon: 'assets/models/towers/Tower.Bomber.UI.icon.png',
+		icon: 'assets/towers/ricochet/ui.icon.tower.ricochet.png',
 		art: ''
 	}
-	static cost = 175;
-	static towerZoneWidth = 3;
+	static cost = 85;
+	static towerZoneWidth = 0;
 	static ShaderMaterialProperties = {
 		uniforms: {
 			uFrameCols: { value: 1 },
@@ -31,7 +31,7 @@ export class TowerBomber extends Tower {
 	}
 	static AnimationAttributes = {
 		animates: true,
-		animationSpeed: 0
+		animationSpeed: 2
 	}
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
@@ -46,29 +46,34 @@ export class TowerBomber extends Tower {
 	 * */
 	static stats: StatBlockCharacter = {
 		attack: {
-			speed: 1,
+			duration: 2000,
 			accuracy: 0.5,
-			damage: 2,
-			damageType: DamageTypes.crushing,
+			damage: 3,
+			damageType: DamageTypes.piercing,
 			rangeType: AttackRangeTypes.ranged,
-			range: 10
+			range: 12
 		},
 		projectile: {
-			effect: BombShot,
-			travelType: ProjectileTravelTypes.arc,
-			hitType: ProjectileHitTypes.splash,
-			speed: 15,
-			splashRadius: 3
+			projectile: RicochetProjectile,
+			effect: ShardProjectileEffect,
+			hitType: ProjectileHitTypes.ricochet,
+			flightDuration: 500,
+			splashRadius: 0
 		},
 	};
+
+	/**
+	 * Abstract Overrides
+	 */
+	projectileOriginY = 5;
 
 	/**
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerBomber.assetProperties, TowerBomber.spriteSheetRows, TowerBomber.AnimationAttributes);
+		super(main, TowerRicochet.assetProperties, TowerRicochet.spriteSheetRows, TowerRicochet.AnimationAttributes);
 
-		this.stats = new CharacterStats(TowerBomber.stats);
+		this.stats = new CharacterStats({ ...TowerRicochet.stats });
 
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;

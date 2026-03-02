@@ -8,6 +8,7 @@ import { UIRegions } from '../game/UIProperties';
 import { LoaderService } from '../core/LoaderService';
 import { ThreeDeeButton } from './_ThreeDeeButton';
 import { RunFailedPopup } from './RunFailedPopup';
+import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
 
 export class RunEndScreen extends Screen {
 	/**
@@ -48,6 +49,10 @@ export class RunEndScreen extends Screen {
 
 		this.startTick();
 		this.main.s('Camera').setupOrbitControls();
+
+		// Let's reset the run now
+		const sProgressData: ProgressDataService = this.main.s('ProgressData');
+		sProgressData.newRunResetProgress();
 
 		// Main Popup
 		const sUI: UIService = this.main.s('UI');

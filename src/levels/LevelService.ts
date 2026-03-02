@@ -1,9 +1,5 @@
 import { Level } from './Level';
 import { Main } from '../core/Main';
-import { levelDetails as sandboxLevel } from './levels/Level_Sandbox';
-import { levelDetails as level_0 } from './levels/Level_0';
-import { levelDetails as level_1_1 } from './levels/Level_1_1';
-import { levelDetails as level_1_2 } from './levels/Level_1_2';
 
 export class LevelService {
 	currentLevel: Level;
@@ -19,28 +15,42 @@ export class LevelService {
 	/**
 	 * Loads a level and logic
 	 * */
-	loadLevel(levelName: string) {
-		console.log('Load Level', levelName);
+	async loadLevel(levelID: string) {
+		console.log('Load Level', levelID);
 
-		switch (levelName) {
-			case '0_0':
-				this.currentLevel = new Level(level_0, this.main);
-				break;
-			case '1_1':
-				this.currentLevel = new Level(level_1_1, this.main);
-				break;
-			case '1_2':
-				this.currentLevel = new Level(level_1_2, this.main);
-				break;
-			default:
-				this.currentLevel = new Level(sandboxLevel, this.main);
-				break;
-		}
-
+		const levelDetails = await this.loadLevelData(levelID);
+		this.currentLevel = new Level(levelDetails, this.main);
 		return this.currentLevel;
 
 		// Fog of war
 		/*const sFog: FogOfWarService = this.main.s('FogOfWar');
 		sFog.createFogOfWar();*/
+	}
+
+	/**
+	 * Load the level data for a level
+	 */
+	async loadLevelData(levelID: string) {
+		let levelData;
+
+		switch (levelID) {
+			case '0_0':
+				levelData = await import(`./levels/Level_0`);
+				break;
+			case '1_1':
+				levelData = await import(`./levels/Level_1_1`);
+				break;
+			case '1_2':
+				levelData = await import(`./levels/Level_1_2`);
+				break;
+			case '2_1':
+				levelData = await import(`./levels/Level_2_1`);
+				break;
+			default:
+				levelData = await import(`./levels/Level_Sandbox`);
+				break;
+		}
+
+		return levelData.levelDetails;
 	}
 }

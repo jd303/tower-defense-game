@@ -170,7 +170,7 @@ export class OrbitController {
 				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.maxX, 0.5, this.cameraSettings.panClampBounds!.minZ) },
 				{ point: new THREE.Vector3(this.cameraSettings.panClampBounds!.minX, 0.5, this.cameraSettings.panClampBounds!.minZ) },
 			], 0, 0, true);
-			console.log(curvePath);
+
 			const outline = sPath.debugCreateOutlines(curvePath, 0x0000ff);
 			this.main.scene.add(outline);
 		}

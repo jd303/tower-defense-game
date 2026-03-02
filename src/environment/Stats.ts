@@ -1,6 +1,6 @@
 import { DamageTypeDefences, DamageTypes } from "../dataTypes/DamageTypes";
 import { MovementTypes } from "../dataTypes/MovementTypes";
-import { ProjectileHitTypes, ProjectileTravelTypes } from "./attacks/Projectile";
+import { ProjectileConstructor, ProjectileHitTypes } from "./projectiles/Projectile";
 import { EffectConstructor } from "./Effect";
 
 export class Stats {
@@ -167,7 +167,7 @@ interface CharacterInterceptionStats {
 }
 
 export interface CharacterAttackStats {
-	speed: number;
+	duration: number;
 	accuracy: number;
 	damage: number;
 	damageType: DamageTypes;
@@ -176,10 +176,10 @@ export interface CharacterAttackStats {
 }
 
 interface TowerProjectileDefinition {
+	projectile: ProjectileConstructor,
 	effect: EffectConstructor,
-	travelType: ProjectileTravelTypes,
 	hitType: ProjectileHitTypes;
-	speed: number;
+	flightDuration: number;
 	splashRadius: number;
 }
 
@@ -253,7 +253,7 @@ export interface StatBlockPowerModification {
 E.g. CORE:
 {
 	attack: {
-		speed: 1,
+		duration: 1,
 		damage: 12,
 		damageType: "Fire"
 	},
@@ -270,7 +270,7 @@ E.g. CORE:
 e.g MODIFIER (attack speed spell):
 {
 	attack: {
-		speed: 5
+		duration: 5
 	}
 }
 */

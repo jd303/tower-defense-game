@@ -235,9 +235,9 @@ export class Level {
 		sTick.end();
 
 		const sUI: UIService = this.main.s('UI');
-		sUI.removeEconomyUI();
-		sUI.removeTowersUI();
-		sUI.removePowersUI();
+		sUI.removeTopCenterUI();
+		sUI.removeBottomCenterUI();
+		sUI.removeBottomLeftUI();
 
 		// Write that we completed the stage
 		const sProgressData: ProgressDataService = this.main.s('ProgressData');
@@ -259,9 +259,9 @@ export class Level {
 		sTick.end();
 
 		const sUI: UIService = this.main.s('UI');
-		sUI.removeEconomyUI();
-		sUI.removeTowersUI();
-		sUI.removePowersUI();
+		sUI.removeTopCenterUI();
+		sUI.removeBottomCenterUI();
+		sUI.removeBottomLeftUI();
 
 		// Create a results popup
 		sUI.openPopup(RunEndLevelPopup, "LevelLost") as RunEndLevelPopup;
@@ -310,7 +310,7 @@ export class Level {
 		sDebug.addDebugNumber({
 			folder: '',
 			objectParent: sTick,
-			property: 'masterSpeed',
+			property: 'gameSpeed',
 			min: 0,
 			max: 10,
 			step: 0.01,

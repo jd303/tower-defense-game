@@ -23,9 +23,9 @@ export class MapService extends Service {
 }
 
 export type MapNode = {
-	ancestorConnections: MapNode[];
-	descendantConnections: MapNode[];
-	completed: boolean;
-	locked: boolean;
+	mapNodeID: number;
 	levelID: string;
+	ancestorConnections: string[];
+	x: number;
+	z: number;
 }

@@ -47,42 +47,32 @@ export class LevelCompletePopup extends Popup {
 	 * We need to know the level
 	 */
 	setResults(levelResults: LevelResults) {
-		const parent = this.getParent();
-		const resultsContainer = parent.querySelector("#level-results");
-
-		if (resultsContainer) {
-			resultsContainer.innerHTML = `
-				<div class="popup-flex-col">
-					<div><strong>Creeps</strong></div>
-					<div class="popup-flex-row">
-						<div class="popup-flex-col">
-							<div><strong>In Level</strong></div>
-							<div>${levelResults.creepsInLevel}</div>
-						</div>
-						<div class="popup-flex-col">
-							<div><strong>Seen</strong></div>
-							<div>${levelResults.creepsSeen}</div>
-						</div>
-						<div class="popup-flex-col">
-							<div><strong>Escaped</strong></div>
-							<div>${levelResults.creepsEscaped}</div>
-						</div>
+		this.populateByID("level-results", `
+			<div class="popup-flex-col">
+				<div><strong>Creeps</strong></div>
+				<div class="popup-flex-row">
+					<div class="popup-flex-col">
+						<div><strong>In Level</strong></div>
+						<div>${levelResults.creepsInLevel}</div>
+					</div>
+					<div class="popup-flex-col">
+						<div><strong>Seen</strong></div>
+						<div>${levelResults.creepsSeen}</div>
+					</div>
+					<div class="popup-flex-col">
+						<div><strong>Escaped</strong></div>
+						<div>${levelResults.creepsEscaped}</div>
 					</div>
 				</div>
-			`;
-		}
+			</div>
+		`);
 	}
 
 	/**
 	 * Adds click events
 	 */
 	addEventListeners() {
-		const parent = this.getParent();
-		const confirm = parent.querySelector("#btConfirm");
-
-		if (confirm) {
-			confirm.addEventListener('click', this.confirmQuit.bind(this));
-		}
+		this.addEventListenerById("btConfirm", this.confirmQuit.bind(this));
 	}
 
 	/**
@@ -93,11 +83,8 @@ export class LevelCompletePopup extends Popup {
 		window.location.hash = 'map';
 	}
 
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
-
-	openChild() { }
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 	disposeChild() { }
 }

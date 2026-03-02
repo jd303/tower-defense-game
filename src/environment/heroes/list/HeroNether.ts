@@ -15,15 +15,13 @@ export class Nether extends Hero {
 		assetType: 'hero',
 		assetName: 'Nether',
 		assetPath: 'assets/heroes/nether/spritesheet-nether.png',
-		assetScale: 6,
-		assetPositionY: 0
+		assetScale: 5
 	}
 	static heroProperties: HeroAssetProperties = {
 		iconUI: 'assets/heroes/nether/icon.ui.nether.png',
 		iconGallery: 'assets/heroes/nether/gallery-nether.png',
 		heroArt: 'assets/heroes/nether/hero-art-nether.png',
 	}
-	static assetPositionY: number = 0; // Matches the path
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "idle",
@@ -74,9 +72,9 @@ export class Nether extends Hero {
 			value: 1
 		},
 		attack: {
-			speed: 15,
-			accuracy: 1.0,
-			damage: 5,
+			duration: 1500,
+			accuracy: 0.5,
+			damage: 3,
 			damageType: DamageTypes.piercing,
 			rangeType: AttackRangeTypes.melee,
 			range: 0

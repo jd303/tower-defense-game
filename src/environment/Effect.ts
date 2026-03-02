@@ -2,7 +2,7 @@ import { Main } from '../core/Main';
 import { ModelAsset } from './assets/ModelAsset';
 
 export abstract class Effect extends ModelAsset {
-	abstract assetName: string;
+	static assetName: string = "effect";
 
 	/**
 	 * Constructor

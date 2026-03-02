@@ -10,8 +10,8 @@ import { MountainInitial } from '../props/Mountain_Initial';
 import { TreeFir } from '../props/trees/TreeFir';
 import { TreeBulbous } from '../props/trees/TreeBulbous';
 import { TowerArcher } from '../towers/TowerArcher';
-import { TowerBomber } from '../towers/TowerBomber';
-import { TowerMage } from '../towers/TowerMage';
+import { TowerBlast } from '../towers/TowerBlast';
+import { TowerOrb } from '../towers/TowerOrb';
 import { SpriteAsset } from './SpriteAsset';
 import { TreeTall } from '../props/trees/TreeTall';
 import { WaveSubtle } from '../props/WaveSubtle';
@@ -31,6 +31,8 @@ import { GrassNarrow } from '../props/grasses/GrassNarrow';
 import { GrassWide } from '../props/grasses/GrassWide';
 import { ShrubWide } from '../props/grasses/ShrubWide';
 import { Nether } from '../heroes/list/HeroNether';
+import { TowerRicochet } from '../towers/TowerRicochet';
+import { TowerBeam } from '../towers/TowerBeam';
 
 export class AssetGenerator {
 	/**
@@ -62,10 +64,14 @@ export class AssetGenerator {
 			// Towers
 			case 'TowerArcher':
 				return instatiateClass ? await new TowerArcher(main!) : TowerArcher;
-			case 'TowerBomber':
-				return instatiateClass ? await new TowerBomber(main!) : TowerBomber;
-			case 'TowerMage':
-				return instatiateClass ? await new TowerMage(main!) : TowerMage;
+			case 'TowerBlast':
+				return instatiateClass ? await new TowerBlast(main!) : TowerBlast;
+			case 'TowerOrb':
+				return instatiateClass ? await new TowerOrb(main!) : TowerOrb;
+			case 'TowerRicochet':
+				return instatiateClass ? await new TowerRicochet(main!) : TowerRicochet;
+			case 'TowerBeam':
+				return instatiateClass ? await new TowerBeam(main!) : TowerBeam;
 
 			// Heroes
 			case 'AldricEthersteel':

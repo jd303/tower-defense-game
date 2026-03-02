@@ -3,12 +3,13 @@ import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { StateMachine } from '../../core/StateMachine';
 import { TowerStates, TowerTransitions } from './TowerStates';
-import { Projectile, ProjectileHitTypes } from '../attacks/Projectile';
+import { Projectile, ProjectileHitTypes } from '../projectiles/Projectile';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
 import { InteractableOrders, InteractableTypes } from '../../game/InteractionService2';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { ShaderAnimationAttributes, SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
+import { StatBlockCharacter } from '../Stats';
 
 
 // Maybe split CharacterAsset out into TowerAsset as well, for this?
@@ -21,6 +22,7 @@ export abstract class Tower extends CharacterAsset {
 	/**
 	 * Static values
 	 */
+	static stats: StatBlockCharacter;
 	static towerProperties: TowerAssetProperties;
 	static cost: number;
 	static towerZoneWidth: number; // Determines how many zone placement tiles the tower blocks
@@ -31,12 +33,14 @@ export abstract class Tower extends CharacterAsset {
 	 * Status
 	 */
 	interactiveTypeName: InteractableTypes = "tower";
-	attackStateLength: number = 750;
 
 	/**
 	 * Objects
 	 * */
+	abstract projectileOriginY: number;
 	projectiles: Projectile[] = [];
+	projectileStubs: THREE.Group[] = []; // Stores any misfired stubs
+	projectileStubTimeouts: ReturnType<typeof setTimeout>[] = []; // Stores timeouts for misfired stubs
 
 	/**
 	 * States
@@ -52,8 +56,11 @@ export abstract class Tower extends CharacterAsset {
 		super(main, assetProperties, spriteSheetRows, animationAttributes);
 
 		this.stateMachine = this.setDefaultStates();
-		this.stateMachine.transition(TowerStates.scanning);
 		this.setInteractive();
+
+		setTimeout(() => {
+			this.stateMachine.transition(TowerStates.scanning);
+		}, 1000);
 	}
 
 	/**
@@ -68,13 +75,11 @@ export abstract class Tower extends CharacterAsset {
 			},
 			{
 				name: TowerStates.scanning,
-				//onEnter: this.lookForCreeps.bind(this),
+				onEnter: this.stateEnterScanning.bind(this),
 			},
 			{
 				name: TowerStates.attacking,
-				autoTransition: TowerTransitions.scanning,
-				autoTransitionTimeMS: 2750,
-				//onEnter: this.activateStandingPower.bind(this),
+				onEnter: this.stateEnterAttacking.bind(this),
 			},
 			{
 				name: TowerStates.activatingPower1,
@@ -113,7 +118,7 @@ export abstract class Tower extends CharacterAsset {
 	}
 
 	/**
-	 * Animate: Overwritten by Towers
+	 * Animate
 	 * */
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
@@ -123,23 +128,26 @@ export abstract class Tower extends CharacterAsset {
 
 			// If we have a target
 			if (creepsInRange.length) {
-				this.stateMachine.transition(TowerTransitions.attacking);
-
 				const isAccurate = Math.random() < this.stats.activeStats.attack!.accuracy;
 
-				const activeProjectile = new Projectile(
-					this.main,
-					this,
-					new THREE.Vector3(this.groupMain.position.x, 5, this.groupMain.position.z),
-					creepsInRange[0],
-					isAccurate,
-					this.stats.activeStats.projectile!.travelType,
-					this.stats.activeStats.projectile!.hitType,
-					new this.stats.activeStats.projectile!.effect(this.main),
-					this.stats.activeStats.projectile!.speed,
-				);
+				const activeProjectile = new this.stats.activeStats.projectile!.projectile({
+					main: this.main,
+					tower: this,
+					startingPoint: new THREE.Vector3(this.groupMain.position.x, this.projectileOriginY, this.groupMain.position.z),
+					target: creepsInRange[0],
+					isAccurate: isAccurate,
+					hitType: this.stats.activeStats.projectile!.hitType,
+					projectileAsset: this.stats.activeStats.projectile!.effect,
+					projectileFlightDuration: this.stats.activeStats.projectile!.flightDuration,
+				});
 
 				this.projectiles.push(activeProjectile);
+
+				// Set to attacking mode, and reset to scanning
+				this.stateMachine.transition(TowerTransitions.attacking);
+				setTimeout(() => {
+					this.stateMachine.transition(TowerTransitions.scanning);
+				}, this.stats.activeStats.attack?.duration);
 			}
 		}
 
@@ -156,6 +164,7 @@ export abstract class Tower extends CharacterAsset {
 
 		switch (projectile.hitType) {
 			case ProjectileHitTypes.direct:
+			case ProjectileHitTypes.ricochet:
 				projectile.target.resolveAttack(this.stats.activeStats.attack!);
 				break;
 			case ProjectileHitTypes.splash:
@@ -163,6 +172,16 @@ export abstract class Tower extends CharacterAsset {
 				targets.forEach(creep => creep.resolveAttack(this.stats.activeStats.attack!));
 				break;
 		}
+	}
+
+	/**
+	 * State enter
+	 */
+	stateEnterScanning() {
+		this.spriteSheetFrameManager.changeAnimation("scanning");
+	}
+	stateEnterAttacking() {
+		this.spriteSheetFrameManager.changeAnimation("attacking");
 	}
 
 	/**
@@ -177,7 +196,7 @@ export abstract class Tower extends CharacterAsset {
 	 * Disposes all projectiles
 	 */
 	disposeAllProjectiles() {
-		this.projectiles.forEach(projectile => projectile.dispose(true));
+		this.projectiles.forEach(projectile => projectile.dispose());
 		this.projectiles = [];
 	}
 

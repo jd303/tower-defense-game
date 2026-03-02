@@ -4,22 +4,22 @@ export const newUserData: UserLoadoutData = {
 	// Assets permanently unlocked (for discovering in runs)
 	permanentUnlocks: {
 		towers: ["TowerArcher"],
-		heroes: [],
-		powers: []
+		heroes: ["AldricEthersteel"],
+		powers: ["PowerHeroMotivation"]
 	},
 
 	// Available assets, per run
 	runDiscoveries: {
-		towers: [],
-		heroes: [],
-		powers: []
+		towers: ["TowerArcher"],
+		heroes: ["AldricEthersteel"],
+		powers: ["PowerHeroMotivation"]
 	},
 
 	// Temporary powerful modifiers, per run
 	runModifiers: [],
 
 	// Equipped heroes, and Chronoblip Hero Upgrade Purchases
-	heroesEquipped: [],
+	heroesEquipped: ["AldricEthersteel"],
 	heroUpgradePurchases: {
 		movement: 0,
 		power: 0,
@@ -27,7 +27,7 @@ export const newUserData: UserLoadoutData = {
 	},
 
 	// Equipped towers, and Chronoblip Tower Upgrade Purchases
-	towersEquipped: [],
+	towersEquipped: ["TowerArcher"],
 	towerUpgradePurchases: {
 		accuracy: 0,
 		power: 0,
@@ -36,7 +36,7 @@ export const newUserData: UserLoadoutData = {
 	},
 
 	// Equipped powers, and Chronoblip Power Upgrade Purchases
-	powersEquipped: [],
+	powersEquipped: ["PowerHeroMotivation"],
 	powerUpgradePurchases: {
 		cooldown: 0,
 		power: 0,
@@ -45,9 +45,9 @@ export const newUserData: UserLoadoutData = {
 
 	// Stored Economical data
 	economyData: {
-		money: { current: 0 },
-		hearts: { current: 0 },
-		power: { current: 0 }
+		money: { current: 250 },
+		hearts: { current: 25 },
+		power: { current: 100 }
 	},
 
 	// Chronos data
@@ -63,14 +63,14 @@ export const newUserData: UserLoadoutData = {
 export const tempUserLoadoutData: UserLoadoutData = {
 	// Assets permanently unlocked (for discovering in runs)
 	permanentUnlocks: {
-		towers: ["TowerArcher", "TowerMage", "TowerBomber"],
+		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
 
 	// Available assets, per run
 	runDiscoveries: {
-		towers: ["TowerArcher", "TowerMage", "TowerBomber"],
+		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
@@ -81,13 +81,13 @@ export const tempUserLoadoutData: UserLoadoutData = {
 	// Equipped heroes, and Chronoblip Hero Upgrade Purchases
 	heroesEquipped: ['Nether'],
 	heroUpgradePurchases: {
-		movement: 20,
+		movement: 0,
 		power: 0,
 		life: 0,
 	},
 
 	// Equipped towers, and Chronoblip Tower Upgrade Purchases
-	towersEquipped: ['TowerArcher', 'TowerBomber', 'TowerMage'],
+	towersEquipped: ['TowerArcher', 'TowerBlast', 'TowerOrb'],
 	towerUpgradePurchases: {
 		accuracy: 0,
 		power: 0,
@@ -106,13 +106,13 @@ export const tempUserLoadoutData: UserLoadoutData = {
 	// Stored Economical data
 	economyData: {
 		money: { current: 600 },
-		hearts: { current: 15 },
+		hearts: { current: 25 },
 		power: { current: 50 }
 	},
 
 	// Chronos Data
 	chronosData: {
-		chronoblips: 50,
+		chronoblips: 100,
 		chronobloops: 10,
 		chronoblobs: 5
 	}

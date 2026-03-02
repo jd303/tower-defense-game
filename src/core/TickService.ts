@@ -12,6 +12,10 @@ export class TickService extends Service {
 	tickSecCallbacksUI: TickCallback[] = [];
 	tickHalfSecCallbacksGame: TickCallback[] = [];
 	tickHalfSecCallbacksUI: TickCallback[] = [];
+	pauseCallbacksGame: TickCallback[] = [];
+	resumeCallbacksGame: TickCallback[] = [];
+	pauseCallbacksUI: TickCallback[] = [];
+	resumeCallbacksUI: TickCallback[] = [];
 	timersGame: Timer[] = [];
 	timersUI: Timer[] = [];
 
@@ -24,8 +28,8 @@ export class TickService extends Service {
 	/**
 	 * Debugs
 	 * */
-	private masterSpeed: TickSpeed = TickSpeed.default;
-	private previousMasterSpeed: TickSpeed = TickSpeed.default;
+	private gameSpeed: TickSpeed = TickSpeed.default;
+	private previousGameSpeed: TickSpeed = TickSpeed.default;
 
 	/**
 	 * Constructor
@@ -71,7 +75,7 @@ export class TickService extends Service {
 		// If running
 		if (!this.pausedTick) {
 			// Setup time properties
-			const deltaTime = this.clock.getDelta() * this.masterSpeed;
+			const deltaTime = this.clock.getDelta() * this.gameSpeed;
 			this.gameTime += deltaTime;
 			const { isTickSecond, isTickHalfSecond } = this.checkTickFraction(deltaTime);
 
@@ -111,7 +115,8 @@ export class TickService extends Service {
 	 * Runs animations on a given tick timeframe
 	 * */
 	runTickAnimations(callbacks: TickCallback[], elapsedTime: number, deltaTime: number, time: string = 'frame') {
-		callbacks.forEach((callback) => callback.callback.bind(this, { elapsedTime, deltaTime })());
+		const gameSpeed = this.gameSpeed;
+		callbacks.forEach((callback) => callback.callback.bind(this, { elapsedTime, deltaTime, gameSpeed })());
 	}
 
 	/**
@@ -142,6 +147,9 @@ export class TickService extends Service {
 	pauseTick() {
 		this.clock.stop();
 		this.pausedTick = true;
+
+		this.pauseCallbacksGame.forEach(cbRegistration => cbRegistration.callback());
+		this.pauseCallbacksUI.forEach(cbRegistration => cbRegistration.callback());
 	}
 
 	/**
@@ -150,6 +158,9 @@ export class TickService extends Service {
 	unpauseTick() {
 		this.clock.start();
 		this.pausedTick = false;
+
+		this.resumeCallbacksGame.forEach(cbRegistration => cbRegistration.callback());
+		this.resumeCallbacksUI.forEach(cbRegistration => cbRegistration.callback());
 	}
 
 	/**
@@ -157,10 +168,10 @@ export class TickService extends Service {
 	 * */
 	setGameSpeed(gameSpeed?: TickSpeed) {
 		if (gameSpeed || gameSpeed === 0) {
-			this.previousMasterSpeed = this.masterSpeed;
-			this.masterSpeed = gameSpeed;
+			this.previousGameSpeed = this.gameSpeed;
+			this.gameSpeed = gameSpeed;
 		} else {
-			this.masterSpeed = this.previousMasterSpeed;
+			this.gameSpeed = this.previousGameSpeed;
 		}
 	}
 
@@ -174,12 +185,20 @@ export class TickService extends Service {
 			if (time == TickTimeTypes.frame) destinationArray = this.tickFrameCallbacksGame;
 			if (time == TickTimeTypes.second) destinationArray = this.tickSecCallbacksGame;
 			if (time == TickTimeTypes.halfsecond) destinationArray = this.tickHalfSecCallbacksGame;
+
+			// And Events
+			if (time == TickTimeTypes.pause) destinationArray = this.pauseCallbacksGame;
+			if (time == TickTimeTypes.resume) destinationArray = this.resumeCallbacksGame;
 		}
 
 		if (!gameCallback) {
 			if (time == TickTimeTypes.frame) destinationArray = this.tickFrameCallbacksUI;
 			if (time == TickTimeTypes.second) destinationArray = this.tickSecCallbacksUI;
 			if (time == TickTimeTypes.halfsecond) destinationArray = this.tickHalfSecCallbacksUI;
+
+			// And Events
+			if (time == TickTimeTypes.pause) destinationArray = this.pauseCallbacksUI;
+			if (time == TickTimeTypes.resume) destinationArray = this.resumeCallbacksUI;
 		}
 
 		destinationArray.push(callback);
@@ -230,6 +249,7 @@ export class TickCallback {
 export interface TickTimeProperties {
 	elapsedTime: number;
 	deltaTime: number;
+	gameSpeed: number;
 }
 
 export enum TickSpeed {
@@ -247,4 +267,6 @@ export enum TickTimeTypes {
 	frame = "frame",
 	second = "second",
 	halfsecond = "halfsecond",
+	pause = "pause",
+	resume = "resume"
 }

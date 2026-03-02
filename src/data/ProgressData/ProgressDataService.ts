@@ -52,6 +52,14 @@ export class ProgressDataService {
 	}
 
 	/**
+	 * Resets progress on a new run
+	 */
+	async newRunResetProgress() {
+		this.progressData = new UserProgress(newUserData);
+		this.saveProgressData();
+	}
+
+	/**
 	 * Gets the user's Chronos / Upgrading data
 	 */
 	async getProgressData(): Promise<UserProgress> {

@@ -121,7 +121,7 @@ export class StateMachine {
 				let stateChangeCallback: Function;
 
 				switch (state.autoTransition) {
-					case StateMachineEvents.Stop:
+					case StateMachineEvents.ReleaseState:
 						stateChangeCallback = () => this.deactivateStateByName(stateName);
 						break;
 					default:
@@ -195,7 +195,7 @@ export enum StateTransitionTypes {
 }
 
 export enum StateMachineEvents {
-	Stop = 'stop',
+	ReleaseState = 'releasestate',
 	PauseAll = 'pauseAll',
 	SetTimer = 'setTimer',
 }

@@ -4,6 +4,7 @@ import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
 	levelId: "1_2",
+	levelName: "Mesa View",
 	difficulty: 2,
 	creepOptions: [
 		{ name: 'CreepTrollDink', chance: 0.4 },

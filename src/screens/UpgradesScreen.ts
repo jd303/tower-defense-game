@@ -124,7 +124,7 @@ export class UpgradesScreen extends Screen {
 	 */
 	createTowerFrame() {
 		const sInteraction: InteractionService2 = this.main.s('Interaction2');
-		const popupButton = new ThreeDeeButton(this.main, 'towers', 'assets/towers/archer/spritesheet-tower-archer.png');
+		const popupButton = new ThreeDeeButton(this.main, 'towers', 'assets/towers/archer/ui.icon.tower.archer.png');
 		popupButton.groupMain.position.x = -25;
 		this.popupButtons.push(popupButton);
 		this.main.scene.add(popupButton.groupMain);

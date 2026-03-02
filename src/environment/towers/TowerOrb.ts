@@ -1,24 +1,24 @@
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
-import { ProjectileHitTypes, ProjectileTravelTypes } from '../attacks/Projectile';
+import { ProjectileHitTypes } from '../projectiles/Projectile';
 import { DamageTypes } from '../../dataTypes/DamageTypes';
-import { MagicBolt } from '../effects/MagicBolt';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
+import { MagicProjectileEffect } from '../projectiles/effects/Magic.Projectile.Effect';
+import { MagicOrbProjectile } from '../projectiles/MagicOrb.Projectile';
 
-export class TowerMage extends Tower {
+export class TowerOrb extends Tower {
 	/**
 	 * Static details
 	 */
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'tower',
-		assetName: 'TowerMage',
-		assetPath: 'assets/towers/mage/spritesheet-tower-mage.png',
-		assetScale: 7,
-		assetPositionY: 0
+		assetName: 'TowerOrb',
+		assetPath: 'assets/towers/orb/spritesheet.tower.orb.png',
+		assetScale: 6
 	}
 	static towerProperties = {
-		icon: 'assets/models/towers/Tower.Mage.UI.icon.png',
+		icon: 'assets/towers/orb/ui.icon.tower.orb.png',
 		art: ''
 	}
 	static cost = 150;
@@ -46,7 +46,7 @@ export class TowerMage extends Tower {
 	 * */
 	static stats: StatBlockCharacter = {
 		attack: {
-			speed: 1,
+			duration: 2500,
 			accuracy: 1.0,
 			damage: 6,
 			damageType: DamageTypes.arcane,
@@ -54,21 +54,26 @@ export class TowerMage extends Tower {
 			range: 10
 		},
 		projectile: {
-			effect: MagicBolt,
-			travelType: ProjectileTravelTypes.homing,
+			projectile: MagicOrbProjectile,
+			effect: MagicProjectileEffect,
 			hitType: ProjectileHitTypes.direct,
-			speed: 2,
+			flightDuration: 2000,
 			splashRadius: 0
 		},
 	};
 
 	/**
+	 * Abstract Overrides
+	 */
+	projectileOriginY = 7;
+
+	/**
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerMage.assetProperties, TowerMage.spriteSheetRows, TowerMage.AnimationAttributes);
+		super(main, TowerOrb.assetProperties, TowerOrb.spriteSheetRows, TowerOrb.AnimationAttributes);
 
-		this.stats = new CharacterStats(TowerMage.stats);
+		this.stats = new CharacterStats(TowerOrb.stats);
 
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;

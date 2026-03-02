@@ -10,8 +10,7 @@ export class ShrubWide extends PropAsset {
 		assetType: 'prop',
 		assetName: 'ShrubWide',
 		assetPath: 'assets/spritesheets/environment/spritesheet-shrub-wide.png',
-		assetScale: 0.5,
-		assetPositionY: 0
+		assetScale: 0.5
 	}
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;

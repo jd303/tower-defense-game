@@ -6,7 +6,6 @@ export abstract class PropAsset extends SpriteAsset {
 	 * Setup Properties
 	 * */
 	static assetName: string;
-	static assetPositionY: number;
 	static assetScale: number;
 	static instancedMeshInstanceCount: number;
 

@@ -33,6 +33,7 @@ export class LevelPausePopup extends Popup {
 			<div>
 				<div><strong>Are you sure?</strong></div>
 				<button id="btConfirm">Confirm</button>
+				<button id="btCancel">Cancel</button>
 			</div>
 		`;
 
@@ -51,12 +52,8 @@ export class LevelPausePopup extends Popup {
 	 * Adds click events
 	 */
 	addEventListeners() {
-		const parent = this.getParent();
-		const confirm = parent.querySelector("#btConfirm");
-
-		if (confirm) {
-			confirm.addEventListener('click', this.confirmQuit.bind(this));
-		}
+		this.addEventListenerById("btConfirm", this.confirmQuit.bind(this));
+		this.addEventListenerById("btCancel", this.close.bind(this));
 	}
 
 	/**
@@ -68,11 +65,8 @@ export class LevelPausePopup extends Popup {
 		window.location.hash = 'map';
 	}
 
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
-
-	openChild() { }
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 	disposeChild() { }
 }

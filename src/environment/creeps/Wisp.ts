@@ -14,8 +14,7 @@ export class Wisp extends Creep {
 		assetType: 'creep',
 		assetName: 'CreepWisp',
 		assetPath: 'assets/spritesheets/creeps/spritesheet-wisp.png',
-		assetScale: 2,
-		assetPositionY: 0
+		assetScale: 2
 	}
 
 	static waveDifficulty = 1.5;
@@ -74,9 +73,9 @@ export class Wisp extends Creep {
 			value: 1
 		},
 		attack: {
-			speed: 10,
+			duration: 500,
 			accuracy: 1.0,
-			damage: 10,
+			damage: 1,
 			damageType: DamageTypes.arcane,
 			rangeType: AttackRangeTypes.melee,
 			range: 0

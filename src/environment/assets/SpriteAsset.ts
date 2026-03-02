@@ -23,7 +23,6 @@ export abstract class SpriteAsset extends Asset {
 	 */
 	loadCallbacks: (() => void)[] = [];
 	assetScale: number;
-	assetPositionY: number;
 	interactiveTypeName: InteractableTypes;
 	interactiveOrder: InteractableOrders;
 
@@ -34,6 +33,7 @@ export abstract class SpriteAsset extends Asset {
 	instancedMesh: InstancedMesh;
 	instancedMeshIndex: number;
 	instancedMeshPosition: THREE.Object3D;
+	instancedMeshPositionAdjustment: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 	instancedMeshAnimates: boolean;
 
 	/**
@@ -46,7 +46,6 @@ export abstract class SpriteAsset extends Asset {
 		this.instancedMeshPosition = positioner;
 		this.assetName = assetProperties.assetName;
 		this.assetScale = assetProperties.assetScale;
-		this.assetPositionY = assetProperties.assetPositionY;
 		this.spriteSheetRows = spriteSheetRows;
 		this.instancedMeshAnimates = animationAttributes.animates;
 		this.main.scene.add(this.groupMain);
@@ -186,7 +185,9 @@ export abstract class SpriteAsset extends Asset {
 	 */
 	setInstancedMeshPosition(position: THREE.Vector3, needsUpdate: boolean = false) {
 		try {
-			this.instancedMeshPosition.position.set(position.x, position.y + this.assetPositionY, position.z);
+			this.instancedMeshPosition.position.x = position.x + this.instancedMeshPositionAdjustment.x
+			this.instancedMeshPosition.position.y = position.y + this.instancedMeshPositionAdjustment.y
+			this.instancedMeshPosition.position.z = position.z + this.instancedMeshPositionAdjustment.z;
 			this.instancedMeshPosition.updateMatrix();
 			this.instancedMesh.iMesh.setMatrixAt(this.instancedMeshIndex, this.instancedMeshPosition.matrix);
 
@@ -283,7 +284,6 @@ export interface SpriteAssetProperties {
 	assetName: string;
 	assetPath: string;
 	assetScale: number;
-	assetPositionY: number;
 }
 
 /**

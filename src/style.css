@@ -1,7 +1,7 @@
 :root {
 	--z-index-game: 1;
 	--z-index-UI: 10;
-	--button-height: 50px;
+	--button-height: 60px;
 	--padding-standard: 20px;
 	--ui-distance-from-edge: 10px;
 }
@@ -54,9 +54,11 @@ UI ELEMENTS
 		position: absolute;
 
 		button {
-			border: 1px solid grey;
+			border: none;
 			height: var(--button-height);
 			box-sizing: border-box;
+			background-color: transparent;
+			
 
 			cursor: pointer;
 			pointer-events: all;
@@ -71,26 +73,30 @@ UI ELEMENTS
 		}
 	}
 
-	.region_menu {
+	.region_topLeft {
+		display: flex;
+		gap: calc(0.5 * var(--padding-standard));
 		top: 0;
 		left: var(--ui-distance-from-edge);
 	}
 
-	.region_towers, .region_powers {
+	.region_bottomCenter, .region_bottomLeft {
+		display: flex;
+		gap: calc(0.5 * var(--padding-standard));
 		bottom: var(--ui-distance-from-edge);
 		width: 100%;
 		height: var(--button-height);
-		text-align: center;
+		justify-content: center;
 	}
 
-	.region_powers {
+	.region_bottomLeft {
 		left: var(--ui-distance-from-edge);
 		width: 25%;
-		text-align: left;
+		justify-content: left;
 	}
 }
 
-.ui .region_economy {
+.ui .region_topCenter {
 	display: flex;
 	gap: 5px;
 	position: fixed;
@@ -102,7 +108,7 @@ UI ELEMENTS
 	margin: auto;
 }
 
-.ui .region_economy .label {
+.ui .region_topCenter .label {
 	width: 50px;
 	height: 50px;
 	color: #fff;

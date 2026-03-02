@@ -48,7 +48,6 @@ export class PopupManager {
 	readonly disposePopupByName = (name: string) => {
 		const deletedPopup = this.popups.find(popup => popup.name == name);
 		if (deletedPopup) {
-			deletedPopup.dispose();
 			this.popups = this.popups.filter(popup => popup !== deletedPopup);
 		}
 	}

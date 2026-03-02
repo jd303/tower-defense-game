@@ -6,6 +6,7 @@ import { EnvironmentColours } from '../core/LightingService';
 
 export interface LevelDefinition {
 	levelId: string;
+	levelName: string;
 	difficulty: number;
 	terrain: TerrainTypes;
 	environmentColour: { colour: keyof typeof EnvironmentColours, intensity: number },

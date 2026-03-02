@@ -138,12 +138,9 @@ export class UpgradePopup extends Popup {
 		sEvent.addListener("user_loadout_changed", "UpgradeListener", this.updateUpgradePurchases.bind(this));
 	}
 
-	openChild() { }
-
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 
 	/**
 	 * Disposes of events

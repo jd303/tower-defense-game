@@ -58,12 +58,8 @@ export class RunFailedPopup extends Popup {
 	 * Adds click events
 	 */
 	addEventListeners() {
-		const parent = this.getParent();
-		const confirm = parent.querySelector("#btConfirm");
-		const cancel = parent.querySelector("#btCancel");
-
-		if (confirm) confirm.addEventListener('click', this.confirmRestart.bind(this));
-		if (cancel) cancel.addEventListener('click', this.quitGameForNow.bind(this));
+		this.addEventListenerById("btConfirm", this.confirmRestart.bind(this));
+		this.addEventListenerById("btCancel", this.quitGameForNow.bind(this));
 	}
 
 	/**
@@ -78,11 +74,8 @@ export class RunFailedPopup extends Popup {
 		window.location.hash = '';
 	}
 
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
-
-	openChild() { }
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 	disposeChild() { }
 }

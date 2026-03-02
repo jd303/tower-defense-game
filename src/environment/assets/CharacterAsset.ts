@@ -1,4 +1,5 @@
 import THREE from "three";
+import TWEEN from '@tweenjs/tween.js';
 import { Main } from '../../core/Main';
 import { TickTimeProperties } from '../../core/TickService';
 import { EventHandlingResult, InteractableOrders, InteractionEvent, InteractionService2 } from '../../game/InteractionService2';
@@ -6,6 +7,7 @@ import { ShaderAnimationAttributes, SpriteAsset, SpriteAssetProperties, SpriteSh
 import { CharacterStats } from '../Stats';
 import { MovePathManager } from "../MovePathManager";
 import { AssetCommons } from "./Asset";
+import { TweenService } from "../../core/TweenService";
 
 export abstract class CharacterAsset extends SpriteAsset {
 	/**
@@ -132,6 +134,23 @@ export abstract class CharacterAsset extends SpriteAsset {
 	}
 	stateExitStunned() {
 		console.log("%c LEAVING STUNNED", 'color: pink');
+	}
+	stateEnterHurting() {
+		const sTween: TweenService = this.main.s('Tween');
+		this.instancedMeshPositionAdjustment = new THREE.Vector3(-0.25, 0, 0);
+		const to = new THREE.Vector3(0, 0, 0);
+
+		sTween.createTween({
+			name: 'character_wobble',
+			targetObject: this.instancedMeshPositionAdjustment,
+			modifiedPropertyObject: to,
+			durationMS: 250,
+			easing: TWEEN.Easing.Cubic.Out,
+			/*onUpdate: (_: any, elapsedTime: any) => {
+				console.log(_);
+			},
+			onComplete: () => { }*/
+		});
 	}
 
 	/**

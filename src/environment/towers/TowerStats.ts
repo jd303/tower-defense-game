@@ -1,5 +1,5 @@
 import { DamageTypes } from "../../dataTypes/DamageTypes";
-import { ProjectileHitTypes, ProjectileTravelTypes } from "../attacks/Projectile";
+import { ProjectileHitTypes } from "../projectiles/Projectile";
 import { EffectConstructor } from "../Effect";
 
 export class TowerStats {
@@ -19,7 +19,6 @@ export interface TowerAttackStats {
 
 export interface TowerProjectileDefinition {
 	effect: EffectConstructor,
-	travelType: ProjectileTravelTypes,
 	hitType: ProjectileHitTypes;
 	speed: number;
 }

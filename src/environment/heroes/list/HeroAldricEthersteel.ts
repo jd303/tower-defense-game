@@ -15,15 +15,13 @@ export class AldricEthersteel extends Hero {
 		assetType: 'hero',
 		assetName: 'AldricEthersteel',
 		assetPath: 'assets/heroes/aldricEthersteel/spritesheet-aldricethersteel.png',
-		assetScale: 6,
-		assetPositionY: 0
+		assetScale: 5
 	}
 	static heroProperties: HeroAssetProperties = {
 		iconUI: 'assets/heroes/aldricEthersteel/icon.ui.aldricethersteel.png',
 		iconGallery: 'assets/heroes/aldricEthersteel/gallery-aldricethersteel.png',
 		heroArt: 'assets/heroes/aldricEthersteel/hero-art-aldricethersteel.png',
 	}
-	static assetPositionY: number = 0; // Matches the path
 	static spriteSheetRows: SpriteSheetRow[] = [
 		{
 			name: "idle",
@@ -74,9 +72,9 @@ export class AldricEthersteel extends Hero {
 			value: 1
 		},
 		attack: {
-			speed: 15,
-			accuracy: 1.0,
-			damage: 5,
+			duration: 1000,
+			accuracy: 0.5,
+			damage: 1,
 			damageType: DamageTypes.piercing,
 			rangeType: AttackRangeTypes.melee,
 			range: 0

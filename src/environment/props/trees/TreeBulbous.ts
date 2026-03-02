@@ -10,8 +10,7 @@ export class TreeBulbous extends PropAsset {
 		assetType: 'prop',
 		assetName: 'TreeBulbous',
 		assetPath: 'assets/trees/spritesheet-tree-bulbous.png',
-		assetScale: 0.5,
-		assetPositionY: 0
+		assetScale: 0.5
 	}
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;

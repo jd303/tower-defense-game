@@ -39,7 +39,7 @@ export class InstancedMeshService {
 
 			if (instancedMesh) {
 				const positioner = new THREE.Object3D();
-				positioner.position.set(-100 + Math.random() * 5, assetClass.assetPositionY + assetClass.assetScale / 2, -90 + Math.random() * 5);
+				positioner.position.set(-100 + Math.random() * 5, assetClass.assetScale / 2, -90 + Math.random() * 5);
 				positioner.scale.set(assetClass.assetScale, assetClass.assetScale, assetClass.assetScale);
 				positioner.updateMatrix();
 

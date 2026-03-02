@@ -14,6 +14,7 @@ import { UserDataService } from '../data/UserData/UserDataService';
 import { MapService } from '../map/MapService';
 import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
 import { StorageService } from './StorageService';
+import { TweenService } from './TweenService';
 
 export class Main {
 	/**
@@ -64,6 +65,7 @@ export class Main {
 		this.registerService('UserData', new UserDataService(this));
 		this.registerService('ProgressData', new ProgressDataService(this));
 		this.registerService('Map', new MapService(this));
+		this.registerService('Tween', new TweenService(this));
 
 		// Watch the screen
 		this.windowSizer = new WindowService(this);
@@ -73,7 +75,7 @@ export class Main {
 		// Next up messages
 		console.log("%c OK, next up:", 'color: red');
 		console.log("%c Pathfind for the hero, so that they avoid mountains", 'color: red');
-		console.log("%c Improve BombShot geometry, and add an animation, to see if that works.", 'color: red');
+		console.log("%c Improve BombProjectileEffect geometry, and add an animation, to see if that works.", 'color: red');
 		console.log("%c Interaction Service; migrate UIService behaviours (but not button creation methods) to InteractionService.", 'color: red');
 		console.log("%c position notifier, for when placing towers (and possible placement definitions in levels)", 'color: red');
 		console.log("%c Projectile results: explosions, magic reactins, arrows left behind?", 'color: red');

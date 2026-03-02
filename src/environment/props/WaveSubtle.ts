@@ -10,8 +10,7 @@ export class WaveSubtle extends PropAsset {
 		assetType: 'prop',
 		assetName: 'WaveSubtle',
 		assetPath: 'assets/spritesheets/environment/spritesheet-wave-subtle.png',
-		assetScale: 2,
-		assetPositionY: 0
+		assetScale: 2
 	}
 	static instancedMeshInstanceCount: number = 500;
 	static instancedMeshAnimates: boolean = false;

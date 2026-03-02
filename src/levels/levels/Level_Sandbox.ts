@@ -4,7 +4,8 @@ import { Vector3 } from 'three';
 
 export const levelDetails: LevelDefinition = {
 	levelId: "Sandbox",
-	difficulty: 1,
+	levelName: "Sandbox",
+	difficulty: -1,
 	creepOptions: [
 		{
 			name: 'CreepTrollDink',

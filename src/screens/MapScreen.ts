@@ -6,8 +6,15 @@ import { LightingService } from '../core/LightingService';
 import { UIService } from '../game/UIService';
 import { UIRegions } from '../game/UIProperties';
 import { Interactable2, InteractableOrders, InteractionEvent, InteractionService2 } from '../game/InteractionService2';
-import { MapNode, MapService } from '../map/MapService';
+import { MapService } from '../map/MapService';
 import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
+import { MapLaunchPopup } from './MapLaunchPopup';
+import { MapNode } from '../map/MapPoints';
+import { UserDataService } from '../data/UserData/UserDataService';
+
+// TEMP DATA
+import { tempUserLoadoutData } from '../data/UserData/_userLoadoutData';
+import { UserLoadout } from '../data/UserData/UserLoadout';
 
 export class MapScreen extends Screen {
 	/**
@@ -127,6 +134,29 @@ export class MapScreen extends Screen {
 			window.location.hash = 'upgrades';
 		});
 		sUI.addButtonToUI(btUpgrades);
+
+		// Delete Data (TEMP) button
+		const btDeleteData = sUI.createIconButton('assets/ui/temp/ico.delete-data.temp.webp', UIRegions.TopLeft);
+		btDeleteData.addClickBehaviour(() => {
+			console.log("%c >>>>>>>>>>> CLEARING ALL DATA, RESETTING TO NEW USER", "color: aqua");
+			localStorage.clear();
+		});
+		sUI.addButtonToUI(btDeleteData);
+
+		// Unlock all data (TEMP) button
+		const btAllData = sUI.createIconButton('assets/ui/temp/ico.unlock-data.temp.webp', UIRegions.TopLeft);
+		btAllData.addClickBehaviour(async () => {
+			console.log("%c >>>>>>>>>>> UNLOCKING ALL DATA", "color: aqua");
+
+			const sProgressData: ProgressDataService = this.main.s('ProgressData');
+			const levels = ['0_0', '1_1', '1_2', '2_1', '2_2', '2_3', '2_4'];
+			levels.forEach(async (level) => await sProgressData.updateLevelCompletion(level, true));
+
+			const sUserData: UserDataService = this.main.s('UserData');
+			sUserData.userLoadout = new UserLoadout(tempUserLoadoutData);
+			sUserData.saveUserData();
+		});
+		sUI.addButtonToUI(btAllData);
 	}
 
 	/**
@@ -181,23 +211,32 @@ export class MapScreen extends Screen {
 
 			if (completed || unlocked) {
 				sInteraction.registerInteractable(new Interactable2('ui-component', InteractableOrders.default, mapMarker));
-				sInteraction.registerInteractableListener('ui-component', 'loadLevel', this.requestLoadLevel);
+				sInteraction.registerInteractableListener('ui-component', 'loadLevel', this.showLevelPopup.bind(this));
 			}
 		});
 	}
 
-	/**
-	 * Requests to load a level
-	 */
-	requestLoadLevel(event: InteractionEvent) {
-		console.error("Need to add confirmation of loading a level");
+	/** 
+	 * Shows level popup
+	*/
+	showLevelPopup(event: InteractionEvent) {
+		const sUI: UIService = this.main.s('UI');
+		const levelLoadPopup = sUI.openPopup(MapLaunchPopup, "MapLaunchPopup") as MapLaunchPopup;
 
-		window.location.hash = `game/${(event.raycasterInteraction.object as MapMarker).levelCode}`;
+		const levelCode = (event.raycasterInteraction.object as MapMarker).levelCode;
+		levelLoadPopup.registerLevelLoadFeatures(levelCode, this.requestLoadLevel);
 
 		return {
 			handled: true,
 			stopPropagation: true
 		}
+	}
+
+	/**
+	 * Requests to load a level
+	 */
+	requestLoadLevel(levelCode: string) {
+		window.location.hash = `game/${levelCode}`;
 	}
 
 	/**

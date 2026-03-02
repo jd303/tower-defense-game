@@ -10,8 +10,7 @@ export class TreeFir extends PropAsset {
 		assetType: 'prop',
 		assetName: 'TreeFir',
 		assetPath: 'assets/trees/spritesheet-tree-fir.png',
-		assetScale: 0.2,
-		assetPositionY: 0
+		assetScale: 0.2
 	}
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;

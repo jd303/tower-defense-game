@@ -16,8 +16,7 @@ export class PowerCatapultBarrageRock extends SpriteAsset {
 		assetType: 'power',
 		assetName: 'PowerCatapultBarrageRock',
 		assetPath: 'assets/spritesheets/powers/spritesheet-power-catapultbarrage.png',
-		assetScale: 5,
-		assetPositionY: 0
+		assetScale: 5
 	}
 	static instancedMeshInstanceCount = 5;
 	static instancedMeshAnimates: boolean = true;

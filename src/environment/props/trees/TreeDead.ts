@@ -10,8 +10,7 @@ export class TreeDead extends PropAsset {
 		assetType: 'prop',
 		assetName: 'TreeDead',
 		assetPath: 'assets/trees/spritesheet-tree-dead.png',
-		assetScale: 2,
-		assetPositionY: 0
+		assetScale: 2
 	}
 	static instancedMeshInstanceCount: number = 2000;
 	static instancedMeshAnimates: boolean = false;

@@ -13,8 +13,7 @@ export class Troll extends Creep {
 		assetType: 'creep',
 		assetName: 'CreepTroll',
 		assetPath: 'assets/spritesheets/creeps/spritesheet-troll.png',
-		assetScale: 3,
-		assetPositionY: 0
+		assetScale: 3
 	}
 	static waveDifficulty = 3;
 
@@ -67,7 +66,7 @@ export class Troll extends Creep {
 			value: 2
 		},
 		attack: {
-			speed: 10,
+			duration: 1500,
 			accuracy: 1.0,
 			damage: 10,
 			damageType: DamageTypes.crushing,

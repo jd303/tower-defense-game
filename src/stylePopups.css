@@ -1,13 +1,15 @@
 .popup {
 	position: fixed;
 	z-index: 1000;
-	top: 10px;
-	left: 10px;
+	top: 50%;
+	left: 50%;
+	min-width: 250px;
 	place-self: anchor-center;
 	align-self: anchor-center;
 	padding: var(--padding-standard);
 	background-color: #fff;
 
+	transform: translate(-50%, -50%);
 	pointer-events: auto;
 
 	&[data-open="false"] {

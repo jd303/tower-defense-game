@@ -1,7 +1,6 @@
 import { EventName, EventService } from '../core/EventService';
 import { Main } from '../core/Main';
 import { Service } from '../core/Service';
-import { Tower } from '../environment/towers/Tower';
 import { PopupConstructor } from '../popups/Popup';
 import { PopupManager } from '../popups/PopupManager';
 import { UIRegions } from './UIProperties';
@@ -17,21 +16,16 @@ export class UIService extends Service {
 	 * DOM Elements
 	 * */
 	rootUIElement: HTMLElement;
-	menuUIElement: HTMLElement;
-	towersUIElement: HTMLElement;
-	powersUIElement: HTMLElement;
+	topLeftUIElement: HTMLElement;
+	bottomCenterUIElement: HTMLElement;
+	bottomLeftUIElement: HTMLElement;
 	tlMenuUIElement: HTMLElement;
-	economyUIElement: HTMLElement;
+	topCenterUIElement: HTMLElement;
 
 	/**
 	 * All buttons, for state management
 	 * */
 	UIButtons: UIButton[] = [];
-
-	/**
-	 * Game Assets
-	 * */
-	towers: Tower[];
 
 	/**
 	 * Event Properties
@@ -49,22 +43,22 @@ export class UIService extends Service {
 
 		this.rootUIElement = document.createElement('div');
 		this.rootUIElement.classList.add('ui');
-		this.menuUIElement = document.createElement('div');
-		this.menuUIElement.classList.add('region_menu');
-		this.towersUIElement = document.createElement('div');
-		this.towersUIElement.classList.add('region_towers');
-		this.powersUIElement = document.createElement('div');
-		this.powersUIElement.classList.add('region_powers');
+		this.topLeftUIElement = document.createElement('div');
+		this.topLeftUIElement.classList.add('region_topLeft');
+		this.bottomCenterUIElement = document.createElement('div');
+		this.bottomCenterUIElement.classList.add('region_bottomCenter');
+		this.bottomLeftUIElement = document.createElement('div');
+		this.bottomLeftUIElement.classList.add('region_bottomLeft');
 		this.tlMenuUIElement = document.createElement('div');
 		this.tlMenuUIElement.classList.add('region_tlMenu');
-		this.economyUIElement = document.createElement('div');
-		this.economyUIElement.classList.add('region_economy');
+		this.topCenterUIElement = document.createElement('div');
+		this.topCenterUIElement.classList.add('region_topCenter');
 
-		this.rootUIElement.appendChild(this.menuUIElement);
-		this.rootUIElement.appendChild(this.towersUIElement);
-		this.rootUIElement.appendChild(this.powersUIElement);
+		this.rootUIElement.appendChild(this.topLeftUIElement);
+		this.rootUIElement.appendChild(this.bottomCenterUIElement);
+		this.rootUIElement.appendChild(this.bottomLeftUIElement);
 		this.rootUIElement.appendChild(this.tlMenuUIElement);
-		this.rootUIElement.appendChild(this.economyUIElement);
+		this.rootUIElement.appendChild(this.topCenterUIElement);
 
 		this.attach();
 	}
@@ -88,19 +82,16 @@ export class UIService extends Service {
 	addButtonToUI(button: UIButton) {
 		// Switch depending on the type
 		switch (button.region) {
-			// Towers
 			case UIRegions.BottomCenter:
-				this.towersUIElement.appendChild(button.element);
+				this.bottomCenterUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
-			// Towers
 			case UIRegions.BottomLeft:
-				this.powersUIElement.appendChild(button.element);
+				this.bottomLeftUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
-			// Menu
 			case UIRegions.TopLeft:
-				this.menuUIElement.appendChild(button.element);
+				this.topLeftUIElement.appendChild(button.element);
 				this.UIButtons.push(button);
 				break;
 		}
@@ -113,7 +104,7 @@ export class UIService extends Service {
 	 * */
 	addEconomyLabel(name: string, event: EventName) {
 		const label = this.createLabel(name, event);
-		this.economyUIElement.appendChild(label);
+		this.topCenterUIElement.appendChild(label);
 	}
 
 	/**
@@ -182,41 +173,41 @@ export class UIService extends Service {
 	}
 
 	/**
-	 * Removes Menu buttons and UI
+	 * Removes Top left buttons and UI
 	 * */
-	removeMenusUI() {
-		this.menuUIElement.innerHTML = "";
+	removeTopLeftUI() {
+		this.topLeftUIElement.innerHTML = "";
 	}
 
 	/**
-	 * Removes Tower buttons and UI
+	 * Removes Bottom Center buttons and UI
 	 * */
-	removeTowersUI() {
-		this.towersUIElement.innerHTML = "";
+	removeBottomCenterUI() {
+		this.bottomCenterUIElement.innerHTML = "";
 	}
 
 	/**
 	 * Removes Hero buttons and UI
 	 * */
-	removePowersUI() {
-		this.powersUIElement.innerHTML = "";
+	removeBottomLeftUI() {
+		this.bottomLeftUIElement.innerHTML = "";
 	}
 
 	/**
 	 * Removes Economy buttons and UI
 	 * */
-	removeEconomyUI() {
-		this.economyUIElement.innerHTML = "";
+	removeTopCenterUI() {
+		this.topCenterUIElement.innerHTML = "";
 	}
 
 	/**
 	 * Removes all elements from the UI and clears all interactions
 	 * */
 	clearUI() {
-		this.removeMenusUI();
-		this.removeTowersUI();
-		this.removePowersUI();
-		this.removeEconomyUI();
+		this.removeTopLeftUI();
+		this.removeBottomCenterUI();
+		this.removeBottomLeftUI();
+		this.removeTopCenterUI();
 	}
 }
 

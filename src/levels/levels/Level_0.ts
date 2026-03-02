@@ -4,6 +4,7 @@ import THREE, { Vector3 } from 'three';
 
 export const levelDetails: LevelDefinition = {
 	levelId: "0_0",
+	levelName: "Narrow Approach",
 	difficulty: 1,
 	creepOptions: [
 		{
@@ -64,7 +65,8 @@ export const levelDetails: LevelDefinition = {
 				{ point: new THREE.Vector3(-11.7858, 0, -9.7143) },
 				{ point: new THREE.Vector3(-7.5715, 0, -9.2857) },
 				{ point: new THREE.Vector3(-4.9286, 0, -3.4286) },
-				{ point: new THREE.Vector3(-24.2857, 0, -1.0714) }
+				{ point: new THREE.Vector3(-24.2857, 0, -1.0714) },
+				{ point: new THREE.Vector3(-23.0001, 0, -6.8572) }
 			]
 		},
 		{
@@ -76,7 +78,8 @@ export const levelDetails: LevelDefinition = {
 				{ point: new THREE.Vector3(35.7143, 0, 7.0714) },
 				{ point: new THREE.Vector3(26.7143, 0, 5.7857) },
 				{ point: new THREE.Vector3(18.7857, 0, -0.2143) },
-				{ point: new THREE.Vector3(10.5, 0, -11.0001) }
+				{ point: new THREE.Vector3(10.5, 0, -11.0001) },
+				{ point: new THREE.Vector3(24.8571, 0, -18.5) },
 			]
 		}
 	],
@@ -95,7 +98,8 @@ export const levelDetails: LevelDefinition = {
 				{ point: new THREE.Vector3(-49.3571, 0, -25.2858) },
 				{ point: new THREE.Vector3(-51.3571, 0, -12.7857) },
 				{ point: new THREE.Vector3(-68.1429, 0, -22.4285) },
-				{ point: new THREE.Vector3(-72.0001, 0, -28.9286) }
+				{ point: new THREE.Vector3(-72.0001, 0, -28.9286) },
+				{ point: new THREE.Vector3(-65.1429, 0, -32.6429) },
 			],
 			propSparseness: 5,
 			propScale: 2,
@@ -142,7 +146,8 @@ export const levelDetails: LevelDefinition = {
 				{ point: new THREE.Vector3(46.9286, 0, -21.8571) },
 				{ point: new THREE.Vector3(11.5, 0, -30.6429) },
 				{ point: new THREE.Vector3(6.5714, 0, -39.5) },
-				{ point: new THREE.Vector3(25.6429, 0, -41.9286) }
+				{ point: new THREE.Vector3(25.6429, 0, -41.9286) },
+				{ point: new THREE.Vector3(30.2143, 0, -52) },
 			],
 			propSparseness: 5,
 			propScale: 2,

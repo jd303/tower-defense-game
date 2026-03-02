@@ -1,5 +1,6 @@
 import { Main } from '../core/Main';
 import { Service } from '../core/Service';
+import { MapNode } from './MapPoints';
 
 export class MapService extends Service {
 	/**
@@ -20,59 +21,63 @@ export class MapService extends Service {
 }
 
 /**
- * A map node
- */
-export type MapNode = {
-	mapNodeId: number;
-	levelID: string;
-	ancestorConnections: string[];
-	descendantConnections: string[];
-	x: number;
-	z: number;
-}
-
-/**
  * Map Nodes for the game
  */
 const initialMapNodes: MapNode[] = [
 	{
-		mapNodeId: 0,
+		mapNodeID: 0,
 		levelID: 'Sandbox',
 		ancestorConnections: [],
-		descendantConnections: [],
 		x: -0.05,
 		z: 0
 	},
 	{
-		mapNodeId: 0,
+		mapNodeID: 0,
 		levelID: '0_0',
 		ancestorConnections: [],
-		descendantConnections: ['1_1', '1_2'],
 		x: 0,
 		z: 0.5
 	},
 	{
-		mapNodeId: 0,
+		mapNodeID: 0,
 		levelID: '1_1',
 		ancestorConnections: ['0_0'],
-		descendantConnections: [],
-		x: 0.05,
-		z: 0.25
-	},
-	{
-		mapNodeId: 0,
-		levelID: '1_2',
-		ancestorConnections: ['0_0'],
-		descendantConnections: [],
 		x: 0.05,
 		z: 0.75
 	},
 	{
-		mapNodeId: 0,
+		mapNodeID: 0,
+		levelID: '1_2',
+		ancestorConnections: ['0_0'],
+		x: 0.05,
+		z: 0.25
+	},
+	{
+		mapNodeID: 0,
 		levelID: '2_1',
 		ancestorConnections: ['1_1'],
-		descendantConnections: [],
-		x: 0.1,
-		z: 0.05
+		x: 0.15,
+		z: 0.95
+	},
+	{
+		mapNodeID: 0,
+		levelID: '2_2',
+		ancestorConnections: ['1_1'],
+		x: 0.15,
+		z: 0.65
+	},
+	{
+		mapNodeID: 0,
+		levelID: '2_3',
+		ancestorConnections: ['1_2'],
+		x: 0.15,
+		z: 0.4
+	},
+	{
+		mapNodeID: 0,
+		levelID: '2_4',
+		ancestorConnections: ['1_2'],
+		x: 0.15,
+		z: 0.1
 	}
 ]

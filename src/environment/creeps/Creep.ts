@@ -85,15 +85,16 @@ export abstract class Creep extends CharacterAsset {
 			},
 			{
 				name: CreepStates.hurting,
-				autoTransition: StateMachineEvents.Stop,
+				autoTransition: StateMachineEvents.ReleaseState,
 				autoTransitionTimeMS: 1000,
+				onEnter: this.stateEnterHurting.bind(this),
 			},
 			{
 				name: CreepStates.hurt,
 			},
 			{
 				name: CreepStates.healing,
-				autoTransition: StateMachineEvents.Stop,
+				autoTransition: StateMachineEvents.ReleaseState,
 				autoTransitionTimeMS: 1500,
 				onEnter: this.stateEnterHealing.bind(this),
 				onExit: this.stateExitHealing.bind(this)
@@ -171,7 +172,7 @@ export abstract class Creep extends CharacterAsset {
 		// Check any weaknesses or resistances, such as resistance to magic damage
 
 		// Adjust the creeps's health by this damage
-		const damage = this.stats.calculateDamage(attack.damage, attack.damageType)
+		const damage = this.stats.calculateDamage(attack.damage, attack.damageType);
 		this.adjustHealthByNumber(-1 * damage);
 	}
 
@@ -296,6 +297,13 @@ export abstract class Creep extends CharacterAsset {
 	 * Overridden functions
 	 * */
 	animate(timeProperties: TickTimeProperties) { }
+
+	/**
+	 * A Creep was hit
+	 */
+	stateEnterHit() {
+		this.stateMachine.activateStateByName('minor_hit');
+	}
 
 	/**
 	 * Resolves what happens at the end of a path

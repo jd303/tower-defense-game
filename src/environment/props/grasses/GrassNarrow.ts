@@ -10,8 +10,7 @@ export class GrassNarrow extends PropAsset {
 		assetType: 'prop',
 		assetName: 'GrassNarrow',
 		assetPath: 'assets/spritesheets/environment/spritesheet-grass-narrow.png',
-		assetScale: 0.5,
-		assetPositionY: 0
+		assetScale: 0.5
 	}
 	static instancedMeshInstanceCount: number = 5000;
 	static instancedMeshAnimates: boolean = false;

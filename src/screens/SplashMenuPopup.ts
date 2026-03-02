@@ -51,12 +51,7 @@ export class SplashMenuPopup extends Popup {
 	 * Adds click events
 	 */
 	addEventListeners() {
-		const parent = this.getParent();
-		const confirm = parent.querySelector("#btConfirm");
-
-		if (confirm) {
-			confirm.addEventListener('click', this.toMapScreen.bind(this));
-		}
+		this.addEventListenerById("btConfirm", this.toMapScreen.bind(this))
 	}
 
 	/**
@@ -67,11 +62,8 @@ export class SplashMenuPopup extends Popup {
 		window.location.hash = 'map';
 	}
 
-	// Let's just delete on close, for simplicity
-	closeChild() {
-		this.popupManager.disposePopupByName(this.name);
-	}
-
-	openChild() { }
+	// Abstracts
+	onOpen() { }
+	onClose() { }
 	disposeChild() { }
 }

@@ -4,6 +4,7 @@ import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
 	levelId: "1_1",
+	levelName: "Green Pass",
 	difficulty: 1,
 	terrain: TerrainTypes.sand,
 	environmentColour: {
