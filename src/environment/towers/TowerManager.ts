@@ -117,13 +117,11 @@ export class TowerManager {
 		const newTower = await AssetGenerator.createSpriteAsset(assetName, this.main) as Tower;
 		this.towers.push(newTower);
 
-		console.log("ADDING UPGRADES", this.towerUpgrades);
 		newTower.stats.addUpgrades(this.towerUpgrades);
 
 		setTimeout(() => {
 			console.log("!!!!!!! POOR TIMEOUT HERE !!!!!!!");
 			newTower.setPosition(new THREE.Vector3(point.x, point.y, point.z + 2));
-			console.log(newTower);
 		}, 500);
 
 		if (!this.defaultTowerClickEnabled) this.registerDefaultTowerListener();

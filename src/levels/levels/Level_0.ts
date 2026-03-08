@@ -6,6 +6,11 @@ export const levelDetails: LevelDefinition = {
 	levelId: "0_0",
 	levelName: "Narrow Approach",
 	difficulty: 1,
+	rewards: {
+		money: 200,
+		hearts: 0,
+		power: 0
+	},
 	creepOptions: [
 		{
 			name: 'CreepTrollDink',

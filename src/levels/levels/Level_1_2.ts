@@ -6,6 +6,11 @@ export const levelDetails: LevelDefinition = {
 	levelId: "1_2",
 	levelName: "Mesa View",
 	difficulty: 2,
+	rewards: {
+		money: 200,
+		hearts: 0,
+		power: 0
+	},
 	creepOptions: [
 		{ name: 'CreepTrollDink', chance: 0.4 },
 		{ name: 'CreepLupine', chance: 0.4 },

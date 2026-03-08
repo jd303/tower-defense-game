@@ -29,13 +29,12 @@ export class LevelCompletePopup extends Popup {
 				<h1>Level Complete</h1>
 			</div>
 			<div class="popup-flex-col">
-				Your Caravan continues to trundle another day
-			</div>
-			<div class="popup-flex-col" id="level-results">
-			</div>
-			<div>
-				<div><strong>Back to map screen?</strong></div>
-				<button id="btConfirm">Back</button>
+				<div>Your Caravan continues to trundle another day</div>
+				<div class="popup-flex-col" id="level-results"></div>
+				<div>
+					<div><strong>Back to map screen?</strong></div>
+					<button id="btConfirm">Back</button>
+				</div>
 			</div>
 		`;
 

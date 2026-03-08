@@ -3,7 +3,7 @@ import { Vector, Vector3 } from 'three';
 import { TickTimeProperties } from '../../core/TickService';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { PathService } from '../../game/PathService';
-import { Projectile, ProjectileArguments, ProjectileHitTypes } from './Projectile';
+import { Projectile, ProjectileArguments } from './Projectile';
 
 export class ArrowProjectile extends Projectile {
 	/**
@@ -17,7 +17,7 @@ export class ArrowProjectile extends Projectile {
 	/**
 	 * Creates a projectile path
 	 * */
-	createPath() {
+	setup() {
 		// Points 2 and 3 should be control points, not starting and target
 		this.projectilePath = new THREE.CurvePath();
 		let curveSegments: THREE.Curve<Vector>[] = [];

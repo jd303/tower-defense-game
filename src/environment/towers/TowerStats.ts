@@ -1,6 +1,5 @@
 import { DamageTypes } from "../../dataTypes/DamageTypes";
-import { ProjectileHitTypes } from "../projectiles/Projectile";
-import { EffectConstructor } from "../Effect";
+import { TowerProjectileDefinition } from "../Stats";
 
 export class TowerStats {
 	attack: TowerAttackStats;
@@ -15,12 +14,6 @@ export interface TowerAttackStats {
 	range: number;
 	radius: number;
 	accuracy: number;
-}
-
-export interface TowerProjectileDefinition {
-	effect: EffectConstructor,
-	hitType: ProjectileHitTypes;
-	speed: number;
 }
 
 export interface TowerAttacking {

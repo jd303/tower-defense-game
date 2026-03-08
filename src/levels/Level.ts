@@ -158,12 +158,13 @@ export class Level {
 		const sUserData: UserDataService = this.main.s('UserData');
 
 		const userEconomyData = await sUserData.getEconomyData();
-		sEconomy.setEconomyValue("money", userEconomyData.money.current);
-		sEvent.fire('commerce_money_changed', userEconomyData.money.current);
-		sEconomy.setEconomyValue("hearts", userEconomyData.hearts.current);
-		sEvent.fire("commerce_hearts_changed", userEconomyData.hearts.current);
-		sEconomy.setEconomyValue("power", userEconomyData.power.current);
-		sEvent.fire("commerce_power_changed", userEconomyData.power.current);
+		console.log(userEconomyData);
+		sEconomy.setEconomyValue("money", userEconomyData.money);
+		sEvent.fire('commerce_money_changed', userEconomyData.money);
+		sEconomy.setEconomyValue("hearts", userEconomyData.hearts);
+		sEvent.fire("commerce_hearts_changed", userEconomyData.hearts);
+		sEconomy.setEconomyValue("power", userEconomyData.power);
+		sEvent.fire("commerce_power_changed", userEconomyData.power);
 	}
 
 	/**
@@ -235,13 +236,18 @@ export class Level {
 		sTick.end();
 
 		const sUI: UIService = this.main.s('UI');
-		sUI.removeTopCenterUI();
 		sUI.removeBottomCenterUI();
 		sUI.removeBottomLeftUI();
 
 		// Write that we completed the stage
 		const sProgressData: ProgressDataService = this.main.s('ProgressData');
 		sProgressData.updateLevelCompletion(this.levelDetails.levelId, true);
+
+		// Grant user some level rewards
+		const sEconomy: EconomyService = this.main.s('Economy');
+		sEconomy.adjustEconomyValue('money', this.levelDetails.rewards.money);
+		sEconomy.adjustEconomyValue('hearts', this.levelDetails.rewards.hearts);
+		sEconomy.adjustEconomyValue('power', this.levelDetails.rewards.power);
 
 		// Create a results popup
 		const popup: LevelCompletePopup = sUI.openPopup(LevelCompletePopup, "LevelLost") as LevelCompletePopup;

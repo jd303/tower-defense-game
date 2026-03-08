@@ -25,7 +25,7 @@ export class RicochetProjectile extends Projectile {
 	/**
 	 * Creates a projectile path
 	 * */
-	createPath() {
+	setup() {
 		this.projectilePath = new THREE.CurvePath();
 		this.endPoint = (this.target as CharacterAsset).getExpectedPositionAt(this.projectileFlightDuration);
 

@@ -94,6 +94,9 @@ export class UpgradePopup extends Popup {
 			if (result) {
 				(sUserData.userLoadout as any)[this.loadoutUpgradeProperty][upgradeType] += 1;
 				sUserData.saveUserData();
+
+				const sEvent: EventService = this.main.s('Event');
+				sEvent.fire("chronos_changed", sUserData.userLoadout.chronosData);
 			}
 		}
 	}

@@ -3,11 +3,13 @@ import { PropZoneArguments } from '../environment/propManager/PropZone';
 import { TowerPlacementZoneDefinition } from '../environment/towers/TowerPlacementZone';
 import { CreepPathDefinition } from '../environment/creeps/CreepPath';
 import { EnvironmentColours } from '../core/LightingService';
+import { EconomyData } from '../game/EconomyService';
 
 export interface LevelDefinition {
 	levelId: string;
 	levelName: string;
 	difficulty: number;
+	rewards: EconomyData;
 	terrain: TerrainTypes;
 	environmentColour: { colour: keyof typeof EnvironmentColours, intensity: number },
 	paths: CreepPathDefinition[];

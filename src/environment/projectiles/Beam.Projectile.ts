@@ -20,15 +20,17 @@ export class BeamProjectile extends Projectile {
 	/**
 	 * Creates a projectile path
 	 * */
-	createPath() {
+	setup() {
 		const { lineCurve } = this.updatePath();
 		this.projectilePath = new THREE.CurvePath();
 		(this.projectileAssetInstance as BeamProjectileEffect).createLine(lineCurve);
 
 		// Move the groupMain as this seems to be off (unsure why, but this fixes)
-		this.projectileAssetInstance.groupMain.position.x = -1 * this.startingPoint.x;
-		this.projectileAssetInstance.groupMain.position.y = -1 * this.startingPoint.y;
-		this.projectileAssetInstance.groupMain.position.z = -1 * this.startingPoint.z;
+		this.projectileGroup.position.x = -1 * this.startingPoint.x;
+		this.projectileGroup.position.y = -1 * this.startingPoint.y;
+		this.projectileGroup.position.z = -1 * this.startingPoint.z;
+
+		console.log(this.projectileGroup);
 	}
 	updatePath() {
 		const projectilePath = new THREE.CurvePath();

@@ -124,13 +124,15 @@ export class WaveManager {
 				+ (Math.random() * -difficultyRandomOverlap)
 			);
 
-			const creepPathID = '1';
-			const creepPath = this.level.creepManager.creepPaths.find((path) => path.id == creepPathID);
+			const creepPathRandom = Math.floor(Math.random() * this.level.creepManager.creepPaths.length);
+			//const creepPathID = this.level.levelDetails.paths[creepPathRandom];
+			//const creepPath = this.level.creepManager.creepPaths.find((path) => path.id == creepPathID);
+			const creepPath = this.level.creepManager.creepPaths[creepPathRandom];
 
 			const wave = new Wave({
 				id: x,
 				waveStartTime: x == 0 && waveTime / 2 || waveTime,
-				pathID: creepPathID,
+				pathID: creepPath.id,
 				difficulty: 1,
 				creepNames: creeps.map(creep => creep.name)
 			});

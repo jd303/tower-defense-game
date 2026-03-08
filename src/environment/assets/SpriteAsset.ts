@@ -323,7 +323,7 @@ export class SpriteSheetFrameManager {
 			this.instancedMesh.geometry.attributes.cellsInRow.setX(this.owner.instancedMeshIndex, newRow.totalFrames);
 			this.instancedMesh.geometry.attributes.cellsInRow.needsUpdate = true;
 		} else {
-			console.error(`Cannot change to row ${rowName}`);
+			console.error(`Cannot change to animation row ${rowName}`);
 		}
 	}
 

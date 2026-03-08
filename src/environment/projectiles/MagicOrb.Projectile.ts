@@ -15,7 +15,7 @@ export class MagicOrbProjectile extends Projectile {
 	/**
 	 * Creates a projectile path
 	 * */
-	createPath() {
+	setup() {
 		// Points 2 and 3 should be control points, not starting and target
 		this.projectilePath = new THREE.CurvePath();
 		let curveSegments: THREE.Curve<Vector>[] = [];

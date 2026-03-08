@@ -50,6 +50,7 @@ export abstract class ModelAsset extends Asset {
 		this.mesh = new THREE.Mesh(geometry, material);
 		this.groupModel.scale.set(ModelAsset.assetScale, ModelAsset.assetScale, ModelAsset.assetScale);
 		this.groupModel.add(this.mesh);
+		this.mesh.name = this.assetName;
 		this.enableShadows();
 		this.addSelectionGeometry();
 	}

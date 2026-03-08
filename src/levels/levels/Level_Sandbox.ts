@@ -6,6 +6,11 @@ export const levelDetails: LevelDefinition = {
 	levelId: "Sandbox",
 	levelName: "Sandbox",
 	difficulty: -1,
+	rewards: {
+		money: 0,
+		hearts: 0,
+		power: 0
+	},
 	creepOptions: [
 		{
 			name: 'CreepTrollDink',

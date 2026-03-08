@@ -45,9 +45,9 @@ export const newUserData: UserLoadoutData = {
 
 	// Stored Economical data
 	economyData: {
-		money: { current: 250 },
-		hearts: { current: 25 },
-		power: { current: 100 }
+		money: 1000,
+		hearts: 25,
+		power: 250
 	},
 
 	// Chronos data
@@ -63,14 +63,14 @@ export const newUserData: UserLoadoutData = {
 export const tempUserLoadoutData: UserLoadoutData = {
 	// Assets permanently unlocked (for discovering in runs)
 	permanentUnlocks: {
-		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam"],
+		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
 
 	// Available assets, per run
 	runDiscoveries: {
-		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam"],
+		towers: ["TowerArcher", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
@@ -105,9 +105,9 @@ export const tempUserLoadoutData: UserLoadoutData = {
 
 	// Stored Economical data
 	economyData: {
-		money: { current: 600 },
-		hearts: { current: 25 },
-		power: { current: 50 }
+		money: 6000,
+		hearts: 50,
+		power: 2000
 	},
 
 	// Chronos Data

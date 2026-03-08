@@ -66,21 +66,22 @@ export abstract class Projectile {
 		this.isAccurate = isAccurate;
 		this.hitType = hitType;
 		this.projectileAssetInstance = projectileAsset instanceof Effect ? projectileAsset : new projectileAsset(main);
+		console.log("PAI1", this.projectileAssetInstance);
 		this.projectileFlightDuration = projectileFlightDuration;
-		this.projectileGroup = new THREE.Group();
-
-		this.projectileGroup.add(this.projectileAssetInstance.groupMain);
+		this.projectileGroup = this.projectileAssetInstance.groupMain;
 
 		this.projectileGroup.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
 		this.main.scene.add(this.projectileGroup);
-		this.createPath();
+		console.log("PAI", this.projectileAssetInstance);
+		console.log("TPG", this.projectileGroup.name, this.projectileGroup.children.length);
+		this.setup();
 		return this;
 	}
 
 	/**
-	 * Creates a projectile path
+	 * Setup the projectile, usually by creating a path
 	 * */
-	abstract createPath(): void;
+	abstract setup(): void;
 
 	/**
 	 * Calculates animation properties

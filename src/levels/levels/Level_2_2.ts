@@ -3,8 +3,8 @@ import { Vector3 } from 'three';
 import { LevelDefinition, TerrainTypes } from '../../dataTypes/LevelInterfaces';
 
 export const levelDetails: LevelDefinition = {
-	levelId: "2_1",
-	levelName: "East Winds",
+	levelId: "2_2",
+	levelName: "Lonely Cove",
 	difficulty: 3,
 	rewards: {
 		money: 200,

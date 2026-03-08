@@ -1,20 +1,21 @@
 import { EventService } from '../core/EventService';
 import { Main } from '../core/Main';
+import { UserDataService } from '../data/UserData/UserDataService';
 
 export class EconomyService {
 	/**
 	 * Player's economy data
 	 * */
 	economy: EconomyData = {
-		money: {
-			current: 0
-		},
-		hearts: {
-			current: 0
-		},
-		power: {
-			current: 0
-		}
+		money: 0,
+		hearts: 0,
+		power: 0
+	}
+
+	chronos: {
+		chronoblips: 0,
+		chronobloops: 0,
+		chronoblobs: 0
 	}
 
 	/**
@@ -35,11 +36,11 @@ export class EconomyService {
 	getEconomicValue(property: EconomyProperty) {
 		switch (property) {
 			case "money":
-				return this.economy.money.current;
+				return this.economy.money;
 			case "power":
-				return this.economy.power.current;
+				return this.economy.power;
 			case "hearts":
-				return this.economy.hearts.current;
+				return this.economy.hearts;
 		}
 	}
 
@@ -59,36 +60,49 @@ export class EconomyService {
 		let newValue = 0;
 		switch (property) {
 			case "money":
-				newValue = this.adjustValue(this.economy.money, value);
+				newValue = this.adjustValue(property, value);
 				sEvent.fire('commerce_money_changed', newValue);
-				return newValue;
+				break;
 			case "hearts":
-				newValue = this.adjustValue(this.economy.hearts, value);
+				newValue = this.adjustValue(property, value);
 				sEvent.fire('commerce_hearts_changed', newValue);
-				return newValue;
+				break;
 			case "power":
-				newValue = this.adjustValue(this.economy.power, value);
+				newValue = this.adjustValue(property, value);
 				sEvent.fire('commerce_power_changed', newValue);
-				return newValue;
+				break;
 		}
+
+		this.writeEconomy();
+
+		return newValue;
+	}
+
+	/**
+	 * Write the user's loadout / economy data
+	 */
+	writeEconomy() {
+		const sUserData: UserDataService = this.main.s('UserData');
+		sUserData.userLoadout.economyData = this.economy;
+		sUserData.saveUserData();
 	}
 
 	/**
 	 * Sets a value for a resource
 	 * */
 	private setValue(property: EconomyProperty, value: number) {
-		this.economy[property].current = value;
+		this.economy[property] = value;
 		return value;
 	}
 
 	/**
 	 * Sets a value for a resource
 	 * */
-	private adjustValue(property: any, value: number) {
-		if (value < 0 && property.current <= 0) return 0;
+	private adjustValue(property: EconomyProperty, value: number) {
+		if (value < 0 && this.economy[property] <= 0) return 0;
 		else {
-			property.current += value;
-			return property.current;
+			this.economy[property] += value;
+			return this.economy[property];
 		}
 	}
 }
@@ -101,15 +115,9 @@ export const EconomyProperties = [
 export type EconomyProperty = typeof EconomyProperties[number];
 
 export interface EconomyData {
-	money: {
-		current: number
-	}
-	hearts: {
-		current: number
-	}
-	power: {
-		current: number
-	}
+	money: number;
+	hearts: number;
+	power: number;
 }
 
 export interface ChronosData {

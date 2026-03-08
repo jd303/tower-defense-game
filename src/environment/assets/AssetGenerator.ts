@@ -33,6 +33,7 @@ import { ShrubWide } from '../props/grasses/ShrubWide';
 import { Nether } from '../heroes/list/HeroNether';
 import { TowerRicochet } from '../towers/TowerRicochet';
 import { TowerBeam } from '../towers/TowerBeam';
+import { TowerAura } from '../towers/TowerAura';
 
 export class AssetGenerator {
 	/**
@@ -72,6 +73,8 @@ export class AssetGenerator {
 				return instatiateClass ? await new TowerRicochet(main!) : TowerRicochet;
 			case 'TowerBeam':
 				return instatiateClass ? await new TowerBeam(main!) : TowerBeam;
+			case 'TowerAura':
+				return instatiateClass ? await new TowerAura(main!) : TowerAura;
 
 			// Heroes
 			case 'AldricEthersteel':

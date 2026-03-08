@@ -18,7 +18,6 @@ export class BeamProjectileEffect extends Effect {
 
 		let parent = this.groupModel.parent;
 		while (parent) {
-			console.log(parent);
 			parent = parent.parent;
 		}
 	}
@@ -27,12 +26,13 @@ export class BeamProjectileEffect extends Effect {
 	 * Creates our initial line
 	 */
 	createLine(curve: THREE.LineCurve3) {
-		console.log(curve.getSpacedPoints(2));
 		const points = curve.getSpacedPoints(this.linePointsDetail);
 		this.lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
 		this.line = new THREE.Line(this.lineGeometry, this.lineMaterial);
-		this.groupMain.add(this.line);
-		console.log(this.groupMain);
-		//this.main.scene.add(this.line);
+		this.groupModel.add(this.line);
+
+		const name = this.line.parent!.parent!.parent!.parent!.name;
+		console.log("TEST", name);
+		//this.groupMain.add(this.line);
 	}
 }

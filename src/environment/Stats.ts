@@ -175,7 +175,7 @@ export interface CharacterAttackStats {
 	range?: number;
 }
 
-interface TowerProjectileDefinition {
+export interface TowerProjectileDefinition {
 	projectile: ProjectileConstructor,
 	effect: EffectConstructor,
 	hitType: ProjectileHitTypes;

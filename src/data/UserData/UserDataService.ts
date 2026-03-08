@@ -173,24 +173,28 @@ export class UserDataService {
 	/**
 	 * Gets the user's Chronos / Upgrading data
 	 */
-	async requestAdjustChronos(chronosType: "chronoblips" | "chronobloops" | "chronoblobs", amount: number) {
+	async requestAdjustChronos(chronosType: "chronoblips" | "chronobloops" | "chronoblobs", amount: number, additive: boolean = true) {
 		const sStorage: StorageService = this.main.s('Storage');
 		const currentChronos = await this.getChronosData();
 
-		if (currentChronos[chronosType] + amount >= 0) {
-			this.userLoadout.chronosData[chronosType] += amount;
-
-			let result = await sStorage.write(this.storageKey, this.userLoadout.serialise());
-
-			if (result) {
-				const sEvent: EventService = this.main.s('Event');
-				sEvent.fire("chronos_changed", this.userLoadout.chronosData);
-
-				return true;
+		// Additive to current value
+		if (additive) {
+			if (currentChronos[chronosType] + amount >= 0) {
+				this.userLoadout.chronosData[chronosType] += amount;
 			}
-
-			return false;
 		}
+
+		// Not additive
+		else {
+			if (amount >= 0) {
+				currentChronos[chronosType] = amount;
+			}
+		}
+
+		// Write to disc
+		let result = await sStorage.write(this.storageKey, this.userLoadout.serialise());
+		if (result) return true;
+		else return false;
 	}
 
 	/**
@@ -217,6 +221,8 @@ export class UserDataService {
 		Object.keys(towerUpgrades).forEach((upgradeKey: string) => {
 			upgradeConverter.addUpgrade('tower', upgradeKey as TowerUpgradeProperty, towerUpgrades[upgradeKey as TowerUpgradeProperty]);
 		});
+
+		console.log(upgradeConverter.upgrades);
 
 		return upgradeConverter.upgrades;
 	}
@@ -321,7 +327,7 @@ class PurchaseUpgradeConverter {
 				break;
 			case "attackrate":
 				property = "attack";
-				subProperty = "speed";
+				subProperty = "duration";
 				break;
 		}
 

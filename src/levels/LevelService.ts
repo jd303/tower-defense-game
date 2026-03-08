@@ -46,6 +46,15 @@ export class LevelService {
 			case '2_1':
 				levelData = await import(`./levels/Level_2_1`);
 				break;
+			case '2_2':
+				levelData = await import(`./levels/Level_2_2`);
+				break;
+			case '2_3':
+				levelData = await import(`./levels/Level_2_3`);
+				break;
+			case '2_4':
+				levelData = await import(`./levels/Level_2_4`);
+				break;
 			default:
 				levelData = await import(`./levels/Level_Sandbox`);
 				break;

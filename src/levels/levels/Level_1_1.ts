@@ -6,6 +6,11 @@ export const levelDetails: LevelDefinition = {
 	levelId: "1_1",
 	levelName: "Green Pass",
 	difficulty: 1,
+	rewards: {
+		money: 200,
+		hearts: 0,
+		power: 0
+	},
 	terrain: TerrainTypes.sand,
 	environmentColour: {
 		colour: "outdoors",
