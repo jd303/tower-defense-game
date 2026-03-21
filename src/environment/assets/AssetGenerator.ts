@@ -12,6 +12,12 @@ import { TreeBulbous } from '../props/trees/TreeBulbous';
 import { TowerArcher } from '../towers/TowerArcher';
 import { TowerBlast } from '../towers/TowerBlast';
 import { TowerOrb } from '../towers/TowerOrb';
+import { TowerBoulder } from '../towers/TowerBoulder';
+import { TowerPulse } from '../towers/TowerPulse';
+import { TowerMine } from '../towers/TowerMine';
+import { TowerFlame } from '../towers/TowerFlame';
+import { TowerAirstrike } from '../towers/TowerAirstrike';
+import { TowerVolcanic } from '../towers/TowerVolcanic';
 import { SpriteAsset } from './SpriteAsset';
 import { TreeTall } from '../props/trees/TreeTall';
 import { WaveSubtle } from '../props/WaveSubtle';
@@ -75,6 +81,18 @@ export class AssetGenerator {
 				return instatiateClass ? await new TowerBeam(main!) : TowerBeam;
 			case 'TowerAura':
 				return instatiateClass ? await new TowerAura(main!) : TowerAura;
+			case 'TowerBoulder':
+				return instatiateClass ? await new TowerBoulder(main!) : TowerBoulder;
+			case 'TowerPulse':
+				return instatiateClass ? await new TowerPulse(main!) : TowerPulse;
+			case 'TowerMine':
+				return instatiateClass ? await new TowerMine(main!) : TowerMine;
+			case 'TowerFlame':
+				return instatiateClass ? await new TowerFlame(main!) : TowerFlame;
+			case 'TowerAirstrike':
+				return instatiateClass ? await new TowerAirstrike(main!) : TowerAirstrike;
+			case 'TowerVolcanic':
+				return instatiateClass ? await new TowerVolcanic(main!) : TowerVolcanic;
 
 			// Heroes
 			case 'AldricEthersteel':

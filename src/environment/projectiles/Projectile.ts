@@ -66,14 +66,11 @@ export abstract class Projectile {
 		this.isAccurate = isAccurate;
 		this.hitType = hitType;
 		this.projectileAssetInstance = projectileAsset instanceof Effect ? projectileAsset : new projectileAsset(main);
-		console.log("PAI1", this.projectileAssetInstance);
 		this.projectileFlightDuration = projectileFlightDuration;
 		this.projectileGroup = this.projectileAssetInstance.groupMain;
 
 		this.projectileGroup.position.set(startingPoint.x, startingPoint.y, startingPoint.z);
 		this.main.scene.add(this.projectileGroup);
-		console.log("PAI", this.projectileAssetInstance);
-		console.log("TPG", this.projectileGroup.name, this.projectileGroup.children.length);
 		this.setup();
 		return this;
 	}

@@ -56,7 +56,7 @@ export class TrollDink extends Creep {
 			arcane: 0,
 			poison: 0,
 			lightning: 0,
-			fire: -10,
+			fire: -5,
 		},
 		kill_rewards: {
 			economic_property: "money",

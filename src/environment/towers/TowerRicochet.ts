@@ -14,7 +14,7 @@ export class TowerRicochet extends Tower {
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'tower',
 		assetName: 'TowerRicochet',
-		assetPath: 'assets/towers/ricochet/spritesheet-tower-ricochet.png',
+		assetPath: 'assets/towers/ricochet/spritesheet.tower.ricochet.png',
 		assetScale: 5
 	}
 	static towerProperties = {

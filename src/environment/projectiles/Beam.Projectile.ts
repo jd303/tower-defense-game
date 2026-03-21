@@ -29,8 +29,6 @@ export class BeamProjectile extends Projectile {
 		this.projectileGroup.position.x = -1 * this.startingPoint.x;
 		this.projectileGroup.position.y = -1 * this.startingPoint.y;
 		this.projectileGroup.position.z = -1 * this.startingPoint.z;
-
-		console.log(this.projectileGroup);
 	}
 	updatePath() {
 		const projectilePath = new THREE.CurvePath();

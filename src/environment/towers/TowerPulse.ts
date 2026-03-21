@@ -4,29 +4,29 @@ import { ProjectileHitTypes } from '../projectiles/Projectile';
 import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
-import { AuraProjectile } from '../projectiles/Aura.Projectile';
-import { AuraProjectileEffect } from '../projectiles/effects/Aura.Projectile.Effect';
+import { PulseProjectileEffect } from '../projectiles/effects/Pulse.Projectile.Effect';
+import { PulseProjectile } from '../projectiles/Pulse.Projectile';
 
-export class TowerAura extends Tower {
+export class TowerPulse extends Tower {
 	/**
 	 * Static details
 	 */
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'tower',
-		assetName: 'TowerAura',
-		assetPath: 'assets/towers/aura/spritesheet.tower.aura.png',
-		assetScale: 5
+		assetName: 'TowerPulse',
+		assetPath: 'assets/towers/pulse/spritesheet.tower.pulse.png',
+		assetScale: 7
 	}
 	static towerProperties = {
-		icon: 'assets/towers/aura/ui.icon.tower.aura.png',
+		icon: 'assets/towers/pulse/ui.icon.tower.pulse.png',
 		art: ''
 	}
-	static cost = 125;
+	static cost = 200;
 	static towerZoneWidth = 0;
 	static ShaderMaterialProperties = {
 		uniforms: {
-			uFrameCols: { value: 1 },
-			uFrameRows: { value: 1 }
+			uFrameCols: { value: 4 },
+			uFrameRows: { value: 4 }
 		}
 	}
 	static AnimationAttributes = {
@@ -46,18 +46,18 @@ export class TowerAura extends Tower {
 	 * */
 	static stats: StatBlockCharacter = {
 		attack: {
-			duration: 2500,
-			accuracy: 0.33,
-			damage: 1,
+			duration: 2000,
+			accuracy: 1.0,
+			damage: 2,
 			damageType: DamageTypes.arcane,
 			rangeType: AttackRangeTypes.ranged,
-			range: 14
+			range: 15
 		},
 		projectile: {
-			projectile: AuraProjectile,
-			effect: AuraProjectileEffect,
+			projectile: PulseProjectile,
+			effect: PulseProjectileEffect,
 			hitType: ProjectileHitTypes.direct,
-			flightDuration: 500,
+			flightDuration: 500, // Takes half a second to fully expand and hit
 			splashRadius: 0
 		},
 	};
@@ -65,17 +65,16 @@ export class TowerAura extends Tower {
 	/**
 	 * Abstract Overrides
 	 */
-	projectileOriginY = 5;
+	projectileOriginY = 1.0;
 
 	/**
 	 * Constructor
 	 */
 	constructor(main: Main) {
-		super(main, TowerAura.assetProperties, TowerAura.spriteSheetRows, TowerAura.AnimationAttributes);
+		super(main, TowerPulse.assetProperties, TowerPulse.spriteSheetRows, TowerPulse.AnimationAttributes);
 
-		this.stats = new CharacterStats({ ...TowerAura.stats });
+		this.stats = new CharacterStats({ ...TowerPulse.stats });
 
-		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
 }
