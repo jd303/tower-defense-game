@@ -18,6 +18,7 @@ import { TowerMine } from '../towers/TowerMine';
 import { TowerFlame } from '../towers/TowerFlame';
 import { TowerAirstrike } from '../towers/TowerAirstrike';
 import { TowerVolcanic } from '../towers/TowerVolcanic';
+import { TowerBullet } from '../towers/TowerBullet';
 import { SpriteAsset } from './SpriteAsset';
 import { TreeTall } from '../props/trees/TreeTall';
 import { WaveSubtle } from '../props/WaveSubtle';
@@ -93,6 +94,8 @@ export class AssetGenerator {
 				return instatiateClass ? await new TowerAirstrike(main!) : TowerAirstrike;
 			case 'TowerVolcanic':
 				return instatiateClass ? await new TowerVolcanic(main!) : TowerVolcanic;
+			case 'TowerBullet':
+				return instatiateClass ? await new TowerBullet(main!) : TowerBullet;
 
 			// Heroes
 			case 'AldricEthersteel':

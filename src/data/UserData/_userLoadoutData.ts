@@ -3,14 +3,14 @@ import { UserLoadoutData } from "./UserLoadout";
 export const newUserData: UserLoadoutData = {
 	// Assets permanently unlocked (for discovering in runs)
 	permanentUnlocks: {
-		towers: ["TowerArcher", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerVolcanic"],
+		towers: ["TowerArcher", "TowerOrb"],
 		heroes: ["AldricEthersteel"],
 		powers: ["PowerHeroMotivation"]
 	},
 
 	// Available assets, per run
 	runDiscoveries: {
-		towers: ["TowerArcher", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerVolcanic"],
+		towers: ["TowerArcher", "TowerOrb"],
 		heroes: ["AldricEthersteel"],
 		powers: ["PowerHeroMotivation"]
 	},
@@ -27,7 +27,7 @@ export const newUserData: UserLoadoutData = {
 	},
 
 	// Equipped towers, and Chronoblip Tower Upgrade Purchases
-	towersEquipped: ["TowerArcher", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerVolcanic"],
+	towersEquipped: ["TowerArcher", "TowerOrb"],
 	towerUpgradePurchases: {
 		accuracy: 0,
 		power: 0,
@@ -63,14 +63,14 @@ export const newUserData: UserLoadoutData = {
 export const tempUserLoadoutData: UserLoadoutData = {
 	// Assets permanently unlocked (for discovering in runs)
 	permanentUnlocks: {
-		towers: ["TowerArcher", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerBoulder", "TowerPulse", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura", "TowerVolcanic"],
+		towers: ["TowerArcher", "TowerBullet", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerBoulder", "TowerPulse", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura", "TowerVolcanic"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
 
 	// Available assets, per run
 	runDiscoveries: {
-		towers: ["TowerArcher", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerBoulder", "TowerPulse", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura", "TowerVolcanic"],
+		towers: ["TowerArcher", "TowerBullet", "TowerMine", "TowerFlame", "TowerAirstrike", "TowerBoulder", "TowerPulse", "TowerOrb", "TowerBlast", "TowerRicochet", "TowerBeam", "TowerAura", "TowerVolcanic"],
 		heroes: ["AldricEthersteel", "Nether"],
 		powers: ['PowerCatapultBarrage', 'PowerTimeNoodleDistortion', 'PowerHeroMotivation', 'PowerTowerMotivation', 'PowerSpringDoorTrap']
 	},
@@ -87,7 +87,7 @@ export const tempUserLoadoutData: UserLoadoutData = {
 	},
 
 	// Equipped towers, and Chronoblip Tower Upgrade Purchases
-	towersEquipped: ['TowerMine', 'TowerFlame', 'TowerAirstrike', 'TowerVolcanic'],
+	towersEquipped: ['TowerMine', 'TowerFlame', 'TowerAirstrike', 'TowerVolcanic', 'TowerBullet'],
 	towerUpgradePurchases: {
 		accuracy: 0,
 		power: 0,
