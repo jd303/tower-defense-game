@@ -56,7 +56,7 @@ export class TowerPlacementZone {
 		const smoothPath = sPath.smoothPathByPoints(curvePath);
 		this.curvePath = sPath.convertFromCatmullRomCurve3(smoothPath, 100);
 		this.environmentTile = new EnvironmentTile(this.curvePath, this.main, TowerPlacementZone.environmentTileProperties);
-		this.main.scene.add(this.environmentTile.groupMain);
+		//this.main.scene.add(this.environmentTile.groupMain);
 
 		const shapePlacements = sPath.getShapePlacementsInCurve(this.curvePath, this.towerPlacementCommons.placementTileSize, 0.75);
 		this.placementTilePositions = shapePlacements.map((placement) => { return new TowerZoneShapePlacement(placement.xIndex, placement.zIndex, placement.point); });

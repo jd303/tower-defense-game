@@ -7,7 +7,7 @@ export class SplineBuilder {
 	/**
 	 * Constants
 	 */
-	yVal: number = 4;
+	yVal: number = 0.5;
 	bezierEnabled: boolean;
 
 	/**

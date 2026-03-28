@@ -22,6 +22,7 @@ import { UserDataService } from '../data/UserData/UserDataService';
 import { LevelCompletePopup } from '../screens/LevelCompletePopup';
 import { RunEndLevelPopup } from '../screens/RunEndLevelPopup';
 import { ProgressDataService } from '../data/ProgressData/ProgressDataService';
+import { LoaderService } from '../core/LoaderService';
 
 export class Level {
 	/**
@@ -83,7 +84,7 @@ export class Level {
 	 * Sets the level's terrain
 	 * @param terrainType 
 	 */
-	setTerrain(terrainType: TerrainTypes) {
+	async setTerrain(terrainType: TerrainTypes) {
 		if (this.terrain) {
 			this.terrain.removeFromScene();
 			this.terrain = null;
@@ -259,7 +260,8 @@ export class Level {
 	 */
 	levelFailed() {
 		const sCamera: CameraService = this.main.s('Camera');
-		sCamera.removeOrbitControls();
+		console.error("Disabled orbit controls removal, for level editing needs");
+		//sCamera.removeOrbitControls();
 
 		const sTick: TickService = this.main.s('Tick');
 		sTick.end();

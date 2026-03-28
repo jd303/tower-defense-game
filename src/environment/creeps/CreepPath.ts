@@ -267,12 +267,12 @@ export class CreepPath {
 	}
 
 	testOnlyCreateEdgings() {
-		/*const spriteManager = this.level.propManager;
+		const spriteManager = this.level.propManager;
 		spriteManager.registerProp({
 			assetName: "DirtEdge",
 			position: new THREE.Vector3(-80, 0, 0),
 			scale: new THREE.Vector3(1, 1, 1),
-		}, this.level.levelDetails);*/
+		}, this.level.levelDetails);
 	}
 
 	/**

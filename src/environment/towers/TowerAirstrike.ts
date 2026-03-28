@@ -60,7 +60,7 @@ export class TowerAirstrike extends Tower {
 			projectile: AirstrikeProjectile,
 			effect: AirstrikeProjectileEffect,
 			hitType: ProjectileHitTypes.direct,
-			flightDuration: 4000,
+			flightDuration: 1000,
 			splashRadius: 0
 		},
 	};
