@@ -69,16 +69,6 @@ export class CreepManager {
 	}
 
 	/**
-	 * Finds creeps within range of 
-	 */
-	findCreepsInRangeOf(testPosition: THREE.Vector3, range: number) {
-		return this.creeps.filter((creep: Creep) => {
-			const creepPosition = creep.groupMain.position;
-			return creepPosition.distanceTo(testPosition) <= range;
-		});
-	}
-
-	/**
 	 * Animate objects based on time
 	 */
 	tick(timeProperties: TickTimeProperties) {

@@ -9,8 +9,12 @@ import { FanBoltProjectileEffect } from '../projectiles/effects/FanBolt.Projecti
 import { FanBoltProjectile } from '../projectiles/FanBolt.Projectile';
 import { TickTimeProperties } from '../../core/TickService';
 import { TowerStates, TowerTransitions } from './TowerStates';
+import { PositionService } from '../PositionService';
 
 export class TowerFanBolt extends Tower {
+	/**
+	 * Static details
+	 */
 	static assetProperties: SpriteAssetProperties = {
 		assetType: 'tower',
 		assetName: 'TowerFanBolt',
@@ -37,10 +41,13 @@ export class TowerFanBolt extends Tower {
 		{ name: "idle", totalFrames: 1, currentFrame: 0 }
 	]
 
+	/**
+	 * Stats
+	 * */
 	static stats: StatBlockCharacter = {
 		attack: {
 			duration: 4000,
-			accuracy: 1.0,
+			accuracy: 0.6,
 			damage: 8,
 			damageType: DamageTypes.lightning,
 			rangeType: AttackRangeTypes.ranged,
@@ -55,22 +62,30 @@ export class TowerFanBolt extends Tower {
 		},
 	};
 
+	/**
+	 * Abstract Overrides and custom properties
+	 */
 	projectileOriginY = 8;
-
 	maxBolts = 3;
 	hoveringBolts: THREE.Mesh[] = [];
 	timeSinceLastBolt = 0;
 
+	/**
+	 * Constructor
+	 */
 	constructor(main: Main) {
 		super(main, TowerFanBolt.assetProperties, TowerFanBolt.spriteSheetRows, TowerFanBolt.AnimationAttributes);
 		this.stats = new CharacterStats({ ...TowerFanBolt.stats });
 		return this;
 	}
 
+	/**
+	 * Animate callback
+	 */
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
 
-		// 1. Bolt Regeneration
+		// Generate bolts
 		this.timeSinceLastBolt += timeProperties.deltaTime * 1000;
 		const cooldown = this.stats.activeStats.attack!.duration;
 
@@ -79,18 +94,20 @@ export class TowerFanBolt extends Tower {
 			this.generateHoveringBolt();
 		}
 
-		// 2. Animate Hovering Bolts (Fan Shape)
+		// Animate bolts
 		this.animateHoveringBolts(timeProperties);
 
-		// 3. Targeting and Firing
-		if (this.stateMachine.isInState(TowerStates.scanning) && this.hoveringBolts.length > 0) {
-			const creepsInRange = this.sLevel.currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
+		// Fire bolts
+		if (this.readyToPerformScan(timeProperties) && this.hoveringBolts.length > 0) {
+			const sPosition: PositionService = this.main.s('Position');
+			const creepsInRange = sPosition.getCreepsInRadiusFromPosition(position, this.stats.activeStats.attack!.range!);
 
 			if (creepsInRange.length) {
 				const target = creepsInRange[0];
 
 				// Fire all hovering bolts
 				this.hoveringBolts.forEach((boltMesh) => {
+					const isAccurate = Math.random() < this.stats.activeStats.attack!.accuracy;
 					const startPos = new THREE.Vector3();
 					boltMesh.getWorldPosition(startPos);
 
@@ -99,7 +116,7 @@ export class TowerFanBolt extends Tower {
 						tower: this,
 						startingPoint: startPos,
 						target: target,
-						isAccurate: true,
+						isAccurate: isAccurate,
 						hitType: this.stats.activeStats.projectile!.hitType,
 						projectileAsset: this.stats.activeStats.projectile!.effect,
 						projectileFlightDuration: this.stats.activeStats.projectile!.flightDuration,
@@ -126,17 +143,9 @@ export class TowerFanBolt extends Tower {
 		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
 	}
 
-	generateHoveringBolt() {
-		const geometry = new THREE.IcosahedronGeometry(0.8, 0);
-		const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-		const mesh = new THREE.Mesh(geometry, material);
-		// Spawn at tower origin before floating up
-		mesh.position.set(0, this.projectileOriginY, 0);
-
-		this.groupMain.add(mesh);
-		this.hoveringBolts.push(mesh);
-	}
-
+	/**
+	 * Animates bolts
+	 */
 	animateHoveringBolts(timeProperties: TickTimeProperties) {
 		const numBolts = this.hoveringBolts.length;
 		if (numBolts === 0) return;
@@ -162,5 +171,19 @@ export class TowerFanBolt extends Tower {
 			// Smooth movement towards hovering position
 			this.hoveringBolts[i].position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.1);
 		}
+	}
+
+	/**
+	 * When we generate a bolt
+	 */
+	generateHoveringBolt() {
+		const geometry = new THREE.IcosahedronGeometry(0.8, 0);
+		const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+		const mesh = new THREE.Mesh(geometry, material);
+		// Spawn at tower origin before floating up
+		mesh.position.set(0, this.projectileOriginY, 0);
+
+		this.groupMain.add(mesh);
+		this.hoveringBolts.push(mesh);
 	}
 }

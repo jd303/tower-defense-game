@@ -79,7 +79,6 @@ export class SpriteService {
 			
 			varying vec2 vUv;
 			varying vec3 vInstanceColour;
-			varying float vMirrorX;
 			
 			uniform float uTime;
 			uniform float uFrameCols;
@@ -87,7 +86,6 @@ export class SpriteService {
 
 			void main() {
 				vInstanceColour = instanceColor;
-				vMirrorX = mirrorX;
 
 				float col = 0.0;
 				float row = animationRow;
@@ -99,14 +97,15 @@ export class SpriteService {
 					col = floor(mod(timeScaled, cellsInRow)) * step(1.1, cellsInRow);
 				#endif
 
-				if (mirrorX > 0.5) {
-					col = (uFrameCols - 1.0) - col;
-				}
-
 				float frameWidth = 1.0 / uFrameCols;
 				float frameHeight = 1.0 / uFrameRows;
 
-				vUv.x = (uv.x + col) * frameWidth;
+				float localX = uv.x;
+				if (mirrorX > 0.5) {
+					localX = 1.0 - localX;
+				}
+
+				vUv.x = (localX + col) * frameWidth;
 				vUv.y = (uv.y + (uFrameRows - 1.0 - row)) * frameHeight;
 
 				#if BILLBOARD == 1
@@ -133,20 +132,9 @@ export class SpriteService {
 
 			varying vec2 vUv;
 			varying vec3 vInstanceColour;
-			varying float vMirrorX;
 
 			void main() {
 				vec2 uv = vUv;
-				
-				// Dead Code Elimination - only animate sprites that need it
-				#if USE_ANIMATION == 1
-						if (vMirrorX > 0.5) {
-							float frameWidth = fract(vUv.x) == vUv.x ? 1.0 : 1.0 / floor(1.0 / fract(vUv.x));
-							float frameStartX = floor(vUv.x / frameWidth) * frameWidth;
-							float localU = (vUv.x - frameStartX) / frameWidth;
-							uv.x = frameStartX + (1.0 - localU) * frameWidth;
-						}
-				#endif
 				
 				// Setup base colour
 				vec4 color = texture2D(uMap, uv);
@@ -248,8 +236,7 @@ export class SpriteSheet {
 		this.texture.wrapS = THREE.ClampToEdgeWrapping;
 		this.texture.wrapT = THREE.ClampToEdgeWrapping;
 		this.texture.magFilter = THREE.NearestFilter;
-		//this.texture.minFilter = THREE.NearestFilter; // Too sharp, but removes the black line
-		this.texture.minFilter = THREE.LinearMipMapLinearFilter; // smoother, but a black line to fix
+		this.texture.minFilter = THREE.LinearMipMapLinearFilter;
 
 		this.spriteMaterial = new THREE.SpriteMaterial({ map: this.texture });
 		this.sprite = new THREE.Sprite(this.spriteMaterial);

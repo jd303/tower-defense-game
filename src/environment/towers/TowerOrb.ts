@@ -78,4 +78,6 @@ export class TowerOrb extends Tower {
 		console.log('NEXT UP, REFACTOR TARGETING WITH A HALFSECOND TICK TIMING, FOR EFFICIENCY');
 		return this;
 	}
+
+
 }

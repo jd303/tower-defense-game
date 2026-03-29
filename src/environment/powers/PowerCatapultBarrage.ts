@@ -7,6 +7,7 @@ import { SpriteAsset } from '../assets/SpriteAsset';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
 import { PowerStats } from '../Stats';
 import { PowerCatapultBarrageRock } from './PowerCatapultBarrage_Rock';
+import { PositionService } from '../PositionService';
 
 export class PowerCatapultBarrage extends Power {
 	/**
@@ -163,8 +164,9 @@ export class PowerCatapultBarrage extends Power {
 		const rock = this.rocks[rockIndex];
 
 		// Apply damage
-		const creepsInShortRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusPrimary!);
-		let creepsInMidRange = this.level.creepManager.findCreepsInRangeOf(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusSecondary!);
+		const sPosition: PositionService = this.main.s('Position');
+		const creepsInShortRange = sPosition.getCreepsInRadiusFromPosition(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusPrimary!);
+		let creepsInMidRange = sPosition.getCreepsInRadiusFromPosition(rock.instancedMeshPosition.position, PowerCatapultBarrage.stats.activeStats.radiusSecondary!);
 		creepsInMidRange = creepsInMidRange.filter(midRangeCreep => !creepsInShortRange.find(shortRangeCreep => midRangeCreep == shortRangeCreep));
 		creepsInShortRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage!)));
 		creepsInMidRange.forEach(creep => creep.adjustHealthByNumber(-1 * Math.floor(PowerCatapultBarrage.stats.activeStats.damage! / 3)));

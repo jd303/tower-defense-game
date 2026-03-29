@@ -6,9 +6,6 @@ import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 import { AirstrikeProjectileEffect } from '../projectiles/effects/Airstrike.Projectile.Effect';
 import { AirstrikeProjectile } from '../projectiles/Airstrike.Projectile';
-import { TickTimeProperties } from '../../core/TickService';
-import * as THREE from 'three';
-import { TowerStates, TowerTransitions } from './TowerStates';
 
 export class TowerAirstrike extends Tower {
 	/**
@@ -77,46 +74,5 @@ export class TowerAirstrike extends Tower {
 		super(main, TowerAirstrike.assetProperties, TowerAirstrike.spriteSheetRows, TowerAirstrike.AnimationAttributes);
 		this.stats = new CharacterStats({ ...TowerAirstrike.stats });
 		return this;
-	}
-
-	/**
-	 * Override Animate to handle Randomized targeting
-	 * */
-	animate(timeProperties: TickTimeProperties) {
-		const position = this.groupMain.position;
-
-		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creepsInRange = this.main.s('Level').currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
-
-			// If we have targets
-			if (creepsInRange.length) {
-				const isAccurate = Math.random() < this.stats.activeStats.attack!.accuracy;
-
-				// Grab a random target
-				const target = creepsInRange[Math.floor(Math.random() * creepsInRange.length)];
-
-				const activeProjectile = new this.stats.activeStats.projectile!.projectile({
-					main: this.main,
-					tower: this,
-					startingPoint: new THREE.Vector3(this.groupMain.position.x, this.projectileOriginY, this.groupMain.position.z),
-					target: target,
-					isAccurate: isAccurate,
-					hitType: this.stats.activeStats.projectile!.hitType,
-					projectileAsset: this.stats.activeStats.projectile!.effect,
-					projectileFlightDuration: this.stats.activeStats.projectile!.flightDuration,
-				});
-
-				this.projectiles.push(activeProjectile);
-
-				// Set to attacking mode, and reset to scanning
-				this.stateMachine.transition(TowerTransitions.attacking);
-				setTimeout(() => {
-					this.stateMachine.transition(TowerTransitions.scanning);
-				}, this.stats.activeStats.attack?.duration);
-			}
-		}
-
-		// Animate Projectiles
-		this.projectiles.forEach((projectile) => projectile.animate(timeProperties));
 	}
 }

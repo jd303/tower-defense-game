@@ -168,7 +168,7 @@ export abstract class CharacterAsset extends SpriteAsset {
 		healthBarGroup.add(bgMesh);
 		healthBarGroup.add(fgMesh);
 		healthBarGroup.position.y = this.healthBarY;
-		healthBarGroup.position.z = 2;
+		healthBarGroup.position.z = 0.5;
 		this.healthBar = healthBarGroup;
 		this.groupMain.add(healthBarGroup);
 

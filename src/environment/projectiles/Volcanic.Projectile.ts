@@ -3,7 +3,7 @@ import { Vector, Vector3 } from 'three';
 import { TickTimeProperties } from '../../core/TickService';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { PathService } from '../../game/PathService';
-import { Projectile, ProjectileArguments, ProjectileHitTypes } from './Projectile';
+import { Projectile, ProjectileArguments } from './Projectile';
 
 export class VolcanicProjectile extends Projectile {
 	/**
@@ -34,10 +34,13 @@ export class VolcanicProjectile extends Projectile {
 		const midPoint = PathService.getPercentagePositionBetweenPoints(this.startingPoint, this.endPoint, 0.45);
 		midPoint.y = this.startingPoint.y + arcUp;
 
+		// The volcano is always inaccurate, at least a little
 		if (!this.isAccurate) {
-            // Volcanic jitter - much higher scatter than bomb! 
-			this.endPoint.x += Math.random() * 8 - 4;
-			this.endPoint.z += Math.random() * 8 - 4;
+			this.endPoint.x += Math.random() * 10 - 5;
+			this.endPoint.z += Math.random() * 10 - 5;
+		} else {
+			this.endPoint.x += Math.random() * 2 - 1;
+			this.endPoint.z += Math.random() * 2 - 1;
 		}
 
 		arcControlPoint1 = PathService.getPercentagePositionBetweenPoints(this.startingPoint, midPoint, 0.13);
@@ -84,43 +87,17 @@ export class VolcanicProjectile extends Projectile {
 
 		if (this.pathProgress >= 1) {
 			this.tower.disposeProjectile(this);
-
-			if (this.isAccurate || this.hitType == ProjectileHitTypes.splash) {
-				this.tower.resolveHit(this);
-			}
+			this.tower.resolveHit(this);
 		}
 	}
 
 	// Handles movement logic along the curve
 	animateProjectile(timeProperties: TickTimeProperties) {
-		const fastPosition = 0.7;
-		const slowPosition = 0.3;
-		const slowRange = 0.15;
-		const slowIntensity = 0.25; // lower is more intense
-		let speedMultiplier;
-
-		const distance = Math.abs(this.pathProgress - slowPosition);
-		if (this.pathProgress > fastPosition) {
-			speedMultiplier = 1.5;
-		} else if (distance >= slowRange) speedMultiplier = 1;
-		else {
-			const normalizedDistance = distance / slowRange;
-			const t = 0.5 + 0.5 * Math.cos(normalizedDistance * Math.PI);
-			speedMultiplier = slowIntensity + (1.0 - slowIntensity) * (1.0 - t);
-		}
-
-		let distanceMovedThisFrame = timeProperties.deltaTime * this.projectileFlightDuration * speedMultiplier;
+		let distanceMovedThisFrame = timeProperties.deltaTime * this.projectileFlightDuration;
 		let progressIncrement = distanceMovedThisFrame / this.pathLength;
 		this.pathProgress = Math.min(1, this.pathProgress + progressIncrement);
 
 		const point = this.projectilePath.getPoint(this.pathProgress) as Vector3;
 		this.projectileGroup.position.set(point.x, point.y, point.z);
-
-		// Now look where we're going
-		const lookAhead = Math.min(1, this.pathProgress + 0.01);
-		const targetPoint = this.projectilePath.getPoint(lookAhead);
-		if (targetPoint) {
-            this.projectileGroup.lookAt(targetPoint as THREE.Vector3);
-        }
 	}
 }

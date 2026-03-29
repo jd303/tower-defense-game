@@ -1,13 +1,13 @@
+import * as THREE from 'three';
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
-import { Projectile, ProjectileHitTypes } from '../projectiles/Projectile';
+import { ProjectileHitTypes } from '../projectiles/Projectile';
 import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
 import { FlameProjectileEffect } from '../projectiles/effects/Flame.Projectile.Effect';
 import { FlameProjectile } from '../projectiles/Flame.Projectile';
 import { TickTimeProperties } from '../../core/TickService';
-import * as THREE from 'three';
 import { TowerStates, TowerTransitions } from './TowerStates';
 import { PositionService } from '../PositionService';
 import { Creep } from '../creeps/Creep';
@@ -143,7 +143,7 @@ export class TowerFlame extends Tower {
 	 * Override Animate to handle Continuous fire
 	 * */
 	animate(timeProperties: TickTimeProperties) {
-		if (this.stateMachine.isInState(TowerStates.scanning)) {
+		if (this.readyToPerformScan(timeProperties)) {
 			// Find a target
 			const sPositioning: PositionService = this.main.s('Position');
 			const creepsInRange = sPositioning.getCreepsInRadiusFromPosition(this.groupMain.position, this.stats.activeStats.attack!.range!);

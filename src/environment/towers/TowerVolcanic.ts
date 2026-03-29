@@ -10,6 +10,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { VolcanicProjectileEffect } from '../projectiles/effects/Volcanic.Projectile.Effect';
 import { VolcanicProjectile } from '../projectiles/Volcanic.Projectile';
 import { Creep } from '../creeps/Creep';
+import { PositionService } from '../PositionService';
 
 export class TowerVolcanic extends Tower {
 	/**
@@ -74,10 +75,10 @@ export class TowerVolcanic extends Tower {
 	/**
 	 * Volcanic Mechanics
 	 */
-	maxProjectiles = 2;
+	maxProjectiles = 3;
 	rapidFireDelay = 150;
 	projectilesFiredThisRound = 0;
-	spewingTarget: Creep | null = null;
+	spewingTargets: Creep[] = [];
 	isSpewing = false;
 	spewTimer = 0;
 
@@ -96,23 +97,18 @@ export class TowerVolcanic extends Tower {
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
 
-		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creepsInRange = this.main.s('Level').currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
+		// Find targets
+		if (this.readyToPerformScan(timeProperties)) {
+			const sPosition: PositionService = this.main.s('Position');
+			this.spewingTargets = sPosition.getCreepsInRadiusFromPosition(position, this.stats.activeStats.attack!.range!);
 
 			// If we have targets
-			if (creepsInRange.length > 0) {
-				// Grab a random target
-				this.spewingTarget = creepsInRange[Math.floor(Math.random() * creepsInRange.length)];
-
-				// Start spewing
+			if (this.spewingTargets.length > 0) {
 				this.isSpewing = true;
 				this.spewTimer = 0;
 				this.projectilesFiredThisRound = 0;
-
-				// Set to attacking mode
 				this.stateMachine.transition(TowerTransitions.attacking);
 
-				// End attacking back to scanning after the main cooldown (duration)
 				setTimeout(() => {
 					this.stateMachine.transition(TowerTransitions.scanning);
 				}, this.stats.activeStats.attack?.duration);
@@ -124,19 +120,18 @@ export class TowerVolcanic extends Tower {
 			this.spewTimer -= (timeProperties.deltaTime * 1000);
 
 			if (this.spewTimer <= 0) {
-				if (this.projectilesFiredThisRound < this.maxProjectiles && this.spewingTarget) {
-					this.fireProjectileAt(this.spewingTarget);
+				if (this.projectilesFiredThisRound < this.maxProjectiles && this.spewingTargets.length) {
+					const spewingTarget = this.spewingTargets[Math.floor(Math.random() * this.spewingTargets.length)];
+					this.fireProjectileAt(spewingTarget);
 					this.projectilesFiredThisRound++;
 					this.spewTimer = this.rapidFireDelay;
 
 					// Stop spewing once we hit max
 					if (this.projectilesFiredThisRound >= this.maxProjectiles) {
 						this.isSpewing = false;
-						this.spewingTarget = null;
 					}
 				} else {
 					this.isSpewing = false;
-					this.spewingTarget = null;
 				}
 			}
 		}

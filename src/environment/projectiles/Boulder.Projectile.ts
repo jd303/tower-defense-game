@@ -46,14 +46,11 @@ export class BoulderProjectile extends Projectile {
 
 		// Rotate the mesh to simulate rolling
 		if (this.projectileAssetInstance?.mesh) {
-			// Calculate distance moved this frame based on total length and progress
-			// Speed = Math.PI * 2 / (radius) approx
 			this.projectileAssetInstance.mesh.rotation.x += timeProperties.deltaTime * 5;
 		}
 
 		// Check for hits
 		const sPositioning: PositionService = this.main.s('Position');
-		// Radius for collision detection (a bit larger than the visual sphere)
 		const collisionRadius = 2.0;
 
 		const creepsInRange = sPositioning.getCreepsInRadiusFromPosition(this.projectileGroup.position, collisionRadius);

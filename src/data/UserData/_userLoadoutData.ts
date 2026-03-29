@@ -87,7 +87,7 @@ export const tempUserLoadoutData: UserLoadoutData = {
 	},
 
 	// Equipped towers, and Chronoblip Tower Upgrade Purchases
-	towersEquipped: ['TowerMine', 'TowerFlame', 'TowerAirstrike', 'TowerVolcanic', 'TowerBullet', 'TowerFanBolt'],
+	towersEquipped: ['TowerMine', 'TowerFlame', 'TowerAirstrike', 'TowerVolcanic', 'TowerBullet', 'TowerFanBolt', 'TowerBoulder'],
 	towerUpgradePurchases: {
 		accuracy: 0,
 		power: 0,

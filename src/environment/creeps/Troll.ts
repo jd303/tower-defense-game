@@ -74,7 +74,7 @@ export class Troll extends Creep {
 			range: 0
 		}
 	});
-	healthBarY: 5;
+	healthBarY: 8;
 
 	/**
 	 * Constructor

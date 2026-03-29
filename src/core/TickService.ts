@@ -80,16 +80,18 @@ export class TickService extends Service {
 			const { isTickSecond, isTickHalfSecond } = this.checkTickFraction(deltaTime);
 
 			// Tick Game Callback
-			this.runTickAnimations(this.tickFrameCallbacksGame, this.gameTime, deltaTime);
-			this.runGameTimers();
-			if (isTickSecond) this.runTickAnimations(this.tickSecCallbacksGame, this.gameTime, deltaTime, 'Sec');
-			if (isTickHalfSecond) this.runTickAnimations(this.tickHalfSecCallbacksGame, this.gameTime, deltaTime, 'Halfsec');
+			this.runTickAnimations(this.tickFrameCallbacksGame, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
+			if (isTickSecond) this.runTickAnimations(this.tickSecCallbacksGame, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
+			if (isTickHalfSecond) this.runTickAnimations(this.tickHalfSecCallbacksGame, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
 
 			// Tick UI Callback
-			this.runTickAnimations(this.tickFrameCallbacksUI, this.gameTime, deltaTime);
+			this.runTickAnimations(this.tickFrameCallbacksUI, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
+			if (isTickSecond) this.runTickAnimations(this.tickSecCallbacksUI, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
+			if (isTickHalfSecond) this.runTickAnimations(this.tickHalfSecCallbacksUI, this.gameTime, deltaTime, isTickSecond, isTickHalfSecond);
+
+			// Run Timer-class-based objects
+			this.runGameTimers();
 			this.runUITimers();
-			if (isTickSecond) this.runTickAnimations(this.tickSecCallbacksUI, this.gameTime, deltaTime, 'Sec');
-			if (isTickHalfSecond) this.runTickAnimations(this.tickHalfSecCallbacksUI, this.gameTime, deltaTime, 'Halfsec');
 		}
 
 		// Render
@@ -114,9 +116,9 @@ export class TickService extends Service {
 	/**
 	 * Runs animations on a given tick timeframe
 	 * */
-	runTickAnimations(callbacks: TickCallback[], elapsedTime: number, deltaTime: number, time: string = 'frame') {
+	runTickAnimations(callbacks: TickCallback[], elapsedTime: number, deltaTime: number, isTickSecond: boolean, isTickHalfSecond: boolean) {
 		const gameSpeed = this.gameSpeed;
-		callbacks.forEach((callback) => callback.callback.bind(this, { elapsedTime, deltaTime, gameSpeed })());
+		callbacks.forEach((callback) => callback.callback.bind(this, { elapsedTime, deltaTime, gameSpeed, isTickSecond, isTickHalfSecond })());
 	}
 
 	/**
@@ -250,6 +252,8 @@ export interface TickTimeProperties {
 	elapsedTime: number;
 	deltaTime: number;
 	gameSpeed: number;
+	isTickSecond: boolean;
+	isTickHalfSecond: boolean;
 }
 
 export enum TickSpeed {

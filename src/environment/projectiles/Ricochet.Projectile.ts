@@ -4,6 +4,7 @@ import { TickTimeProperties } from '../../core/TickService';
 import { Projectile, ProjectileArguments } from './Projectile';
 import { CharacterAsset } from '../assets/CharacterAsset';
 import { LevelService } from '../../levels/LevelService';
+import { PositionService } from '../PositionService';
 
 export class RicochetProjectile extends Projectile {
 	static ricochetDistance: number = 5;
@@ -61,8 +62,8 @@ export class RicochetProjectile extends Projectile {
 
 				// Ricochet baby
 				if (this.ricochetTimes < this.maximumRichochetTimes) {
-					const sLevel: LevelService = this.main.s('Level');
-					const creepsInRange = sLevel.currentLevel.creepManager.findCreepsInRangeOf(this.endPoint, RicochetProjectile.ricochetDistance);
+					const sPosition: PositionService = this.main.s('Position');
+					const creepsInRange = sPosition.getCreepsInRadiusFromPosition(this.endPoint, RicochetProjectile.ricochetDistance);
 					const newCreepTarget = creepsInRange.find(creep => creep !== this.target);
 
 					if (newCreepTarget) {

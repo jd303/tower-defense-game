@@ -80,7 +80,7 @@ export class AldricEthersteel extends Hero {
 			range: 0
 		}
 	});
-	healthBarY: 2;
+	healthBarY: 8;
 
 	/**
 	 * Spritesheet & InstancedMesh properties

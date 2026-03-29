@@ -2,6 +2,7 @@ import THREE from 'three';
 import { TickTimeProperties } from '../../core/TickService';
 import { Projectile, ProjectileArguments } from './Projectile';
 import { LevelService } from '../../levels/LevelService';
+import { PositionService } from '../PositionService';
 
 export class AuraProjectile extends Projectile {
 	/**
@@ -33,8 +34,8 @@ export class AuraProjectile extends Projectile {
 		if (this.pathProgress >= 1) {
 			this.tower.disposeProjectile(this);
 
-			const sLevel: LevelService = this.main.s('Level');
-			const allCreepsInRange = sLevel.currentLevel.creepManager.findCreepsInRangeOf(this.tower.groupMain.position, this.tower.stats.activeStats.attack!.range!);
+			const sPosition: PositionService = this.main.s('Position');
+			const allCreepsInRange = sPosition.getCreepsInRadiusFromPosition(this.tower.groupMain.position, this.tower.stats.activeStats.attack!.range!);
 
 			allCreepsInRange.forEach(creep => {
 				this.target = creep;

@@ -123,8 +123,9 @@ export abstract class Tower extends CharacterAsset {
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
 
-		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creepsInRange = this.sLevel.currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
+		if (this.readyToPerformScan(timeProperties)) {
+			const sPosition: PositionService = this.main.s('Position');
+			const creepsInRange = sPosition.getCreepsInRadiusFromPosition(position, this.stats.activeStats.attack!.range!);
 
 			// If we have a target
 			if (creepsInRange.length) {
@@ -156,6 +157,13 @@ export abstract class Tower extends CharacterAsset {
 	}
 
 	/**
+	 * Determines if the tower is ready to perform a scan
+	 */
+	readyToPerformScan(timeProperties: TickTimeProperties) {
+		return timeProperties.isTickHalfSecond && this.stateMachine.isInState(TowerStates.scanning);
+	}
+
+	/**
 	 * Resolve a hit
 	 * */
 	resolveHit(projectile: Projectile) {
@@ -168,7 +176,7 @@ export abstract class Tower extends CharacterAsset {
 				projectile.target.resolveAttack(this.stats.activeStats.attack!);
 				break;
 			case ProjectileHitTypes.splash:
-				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.target.groupMain.position, this.stats.activeStats.projectile!.splashRadius);
+				targets = sPositioning.getCreepsInRadiusFromPosition(projectile.projectileGroup.position, this.stats.activeStats.projectile!.splashRadius);
 				targets.forEach(creep => creep.resolveAttack(this.stats.activeStats.attack!));
 				break;
 		}

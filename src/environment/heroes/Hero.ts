@@ -59,7 +59,7 @@ export abstract class Hero extends CharacterAsset {
 	healthBar: THREE.Group | null;
 	healthBarGroupName: string = 'healthbargroup';
 	healthBarName: string = 'healthbar';
-	healthBarY: number = 1;
+	healthBarY: number = 8;
 
 	/**
 	 * Combat States

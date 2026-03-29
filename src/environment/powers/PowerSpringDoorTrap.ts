@@ -5,6 +5,7 @@ import { Power, PowerCommons } from './Power';
 import { TickCallback, TickService, TickTimeProperties } from '../../core/TickService';
 import { PathService } from '../../game/PathService';
 import { PowerStats } from '../Stats';
+import { PositionService } from '../PositionService';
 
 export class PowerSpringDoorTrap extends Power {
 	/**
@@ -79,7 +80,8 @@ export class PowerSpringDoorTrap extends Power {
 		}, 1500);
 
 		// Determine which creeps were affected
-		const creepsAffected = this.level.creepManager.findCreepsInRangeOf(this.position, PowerSpringDoorTrap.radiusOfEffect);
+		const sPosition: PositionService = this.main.s('Position');
+		const creepsAffected = sPosition.getCreepsInRadiusFromPosition(this.position, PowerSpringDoorTrap.radiusOfEffect);
 
 		const sPath: PathService = this.main.s('Path');
 		creepsAffected.forEach(creep => {

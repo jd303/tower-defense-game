@@ -1,6 +1,6 @@
 import { Tower } from './Tower';
 import { Main } from '../../core/Main';
-import { Projectile, ProjectileHitTypes } from '../projectiles/Projectile';
+import { ProjectileHitTypes } from '../projectiles/Projectile';
 import { DamageTypes } from '../../dataTypes/DamageTypes';
 import { SpriteAssetProperties, SpriteSheetRow } from '../assets/SpriteAsset';
 import { AttackRangeTypes, StatBlockCharacter, CharacterStats } from '../Stats';
@@ -8,10 +8,9 @@ import { MineProjectileEffect } from '../projectiles/effects/Mine.Projectile.Eff
 import { MineProjectile } from '../projectiles/Mine.Projectile';
 import { TickTimeProperties } from '../../core/TickService';
 import * as THREE from 'three';
-import { TowerStates, TowerTransitions } from './TowerStates';
+import { TowerTransitions } from './TowerStates';
 import { PositionService } from '../PositionService';
 import { CreepPath } from '../creeps/CreepPath';
-import { Creep } from '../creeps/Creep';
 import { LevelService } from '../../levels/LevelService';
 
 export class TowerMine extends Tower {
@@ -104,7 +103,6 @@ export class TowerMine extends Tower {
 		// Gather all potential points on paths
 		const potentialPoints: THREE.Vector3[] = [];
 		const towerPos = this.groupMain.position;
-		console.log(towerPos, this.instancedMesh.iMesh.position);
 
 		creepPaths.forEach((creepPath: CreepPath) => {
 			const points = creepPath.corePath.path.getSpacedPoints(100);
@@ -131,7 +129,7 @@ export class TowerMine extends Tower {
 	 * Override Animate to handle laying and detonating mines
 	 * */
 	animate(timeProperties: TickTimeProperties) {
-		if (this.stateMachine.isInState(TowerStates.scanning) && this.mineLocations.length > 0) {
+		if (this.readyToPerformScan(timeProperties) && this.mineLocations.length > 0) {
 
 			if (this.projectiles.length < this.maxMines) {
 				const randomLoc = this.mineLocations[Math.floor(Math.random() * this.mineLocations.length)];

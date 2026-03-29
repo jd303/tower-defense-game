@@ -48,19 +48,19 @@ export class TowerBoulder extends Tower {
 	 * */
 	static stats: StatBlockCharacter = {
 		attack: {
-			duration: 2500, // Attacks slowly
-			accuracy: 1.0, // Boulder always rolls in a straight line
-			damage: 4, // Initial damage
+			duration: 2500,
+			accuracy: 1.0,
+			damage: 4,
 			damageType: DamageTypes.crushing,
 			rangeType: AttackRangeTypes.ranged,
-			range: 20 // Rolls quite far
+			range: 20
 		},
 		projectile: {
 			projectile: BoulderProjectile,
 			effect: BoulderProjectileEffect,
 			hitType: ProjectileHitTypes.direct,
-			flightDuration: 2000, // Takes 2 seconds to roll its whole range
-			splashRadius: 0 // Damage hits are handled by the projectile itself intersecting
+			flightDuration: 2000,
+			splashRadius: 0
 		},
 	};
 

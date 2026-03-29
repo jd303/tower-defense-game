@@ -74,7 +74,7 @@ export class TrollDink extends Creep {
 			range: 0
 		}
 	});
-	healthBarY: 3.5;
+	healthBarY: 6;
 
 	/**
 	 * Constructor

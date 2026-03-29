@@ -10,6 +10,7 @@ import { TowerStates, TowerTransitions } from './TowerStates';
 import { Creep } from '../creeps/Creep';
 import { BulletProjectileEffect } from '../projectiles/effects/Bullet.Projectile.Effect';
 import { BulletProjectile } from '../projectiles/Bullet.Projectile';
+import { PositionService } from '../PositionService';
 
 export class TowerBullet extends Tower {
 	/**
@@ -96,8 +97,9 @@ export class TowerBullet extends Tower {
 	animate(timeProperties: TickTimeProperties) {
 		const position = this.groupMain.position;
 
-		if (this.stateMachine.isInState(TowerStates.scanning)) {
-			const creepsInRange = this.main.s('Level').currentLevel.creepManager.findCreepsInRangeOf(position, this.stats.activeStats.attack!.range!);
+		if (this.readyToPerformScan(timeProperties)) {
+			const sPosition: PositionService = this.main.s('Position');
+			const creepsInRange = sPosition.getCreepsInRadiusFromPosition(position, this.stats.activeStats.attack!.range!);
 
 			// If we have targets
 			if (creepsInRange.length > 0) {
