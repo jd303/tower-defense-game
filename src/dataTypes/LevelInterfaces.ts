@@ -11,6 +11,7 @@ export interface LevelDefinition {
 	difficulty: number;
 	rewards: EconomyData;
 	terrain: TerrainTypes;
+	backgroundImagePath?: string;
 	environmentColour: { colour: keyof typeof EnvironmentColours, intensity: number },
 	paths: CreepPathDefinition[];
 	creepOptions: LevelCreepOption[];

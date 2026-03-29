@@ -54,11 +54,18 @@ export class CreepPath {
 		this.id = pathDefinition.id;
 		this.level = level;
 		this.main = main;
+
+		this.groupMain = new THREE.Group();
+		this.groupMain.name = 'CreepPath';
+
 		this.setCorePath(pathDefinition.pathPoints);
-		this.createPathGeometry(pathDefinition);
-		this.createPathGeometryEdges(pathDefinition);
 		this.createEdgePaths();
-		this.testOnlyCreateEdgings();
+
+		if (pathDefinition.pathGeometry !== PathGeometryTypes.none) {
+			this.createPathGeometry(pathDefinition);
+			this.createPathGeometryEdges(pathDefinition);
+			this.testOnlyCreateEdgings();
+		}
 
 		this.setInteractive();
 
@@ -142,8 +149,6 @@ export class CreepPath {
 		pathMesh.name = 'creepPath';
 
 		// Create group
-		this.groupMain = new THREE.Group();
-		this.groupMain.name = 'CreepPath';
 		this.groupMain.add(pathMesh);
 
 		// Add shadows

@@ -153,9 +153,9 @@ export class LevelEditor {
 	 */
 	switchLevelTerrain() {
 		if (this.level?.terrain?.terrainType == TerrainTypes.grass) {
-			this.level.setTerrain(TerrainTypes.sand);
+			this.level.setTerrain({ terrainType: TerrainTypes.sand });
 		} else {
-			this.level.setTerrain(TerrainTypes.grass);
+			this.level.setTerrain({ terrainType: TerrainTypes.grass });
 		}
 	}
 

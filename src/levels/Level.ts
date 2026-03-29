@@ -76,7 +76,7 @@ export class Level {
 
 		if (this.main.debugMode) this.setupDebugs(levelDetails);
 
-		this.setTerrain(levelDetails.terrain);
+		this.setTerrain({ terrainType: levelDetails.terrain, backgroundImagePath: levelDetails.backgroundImagePath });
 		this.setupLevel();
 	}
 
@@ -84,12 +84,12 @@ export class Level {
 	 * Sets the level's terrain
 	 * @param terrainType 
 	 */
-	async setTerrain(terrainType: TerrainTypes) {
+	async setTerrain(terrainOptions: { terrainType: TerrainTypes, backgroundImagePath?: string }) {
 		if (this.terrain) {
-			this.terrain.removeFromScene();
+			this.terrain.dispose();
 			this.terrain = null;
 		}
-		this.terrain = new Terrain(terrainType, this.main);
+		this.terrain = new Terrain({ terrainType: terrainOptions.terrainType, backgroundImagePath: terrainOptions.backgroundImagePath }, this.main);
 		this.terrain.addToScene();
 	}
 
@@ -355,7 +355,7 @@ export class Level {
 	 */
 	disposeLevel() {
 		console.log("%c Disposing the Level has not been fully tested.  Check registered objects in debugger", "color: red");
-		this.terrain?.removeFromScene();
+		this.terrain?.dispose();
 		this.terrain = null;
 
 		this.waveManager.disposeWaves();

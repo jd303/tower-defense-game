@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { TerrainTypes } from '../dataTypes/LevelInterfaces';
 import { Main } from '../core/Main';
 import { Interactable2, InteractableOrders } from '../game/InteractionService2';
+import { LoaderService } from '../core/LoaderService';
+import { Level } from '../levels/Level';
 
 export class Terrain {
 	/**
@@ -16,16 +18,50 @@ export class Terrain {
 	 * Three Objects
 	 * */
 	groupMain: THREE.Group;
+	backgroundImageTexture: THREE.Texture;
+	backgroundImageGeometry: THREE.PlaneGeometry;
+	backgroundImageMaterial: THREE.Material;
+	backgroundImageMesh: THREE.Mesh | null;
 
 	/**
 	 * Constructor
 	 * */
-	constructor(terrainType: TerrainTypes, main: Main) {
+	constructor(terrainOptions: { terrainType: TerrainTypes, backgroundImagePath?: string }, main: Main) {
 		this.main = main;
-		this.terrainType = terrainType;
+		this.terrainType = terrainOptions.terrainType;
 		this.groupMain = new THREE.Group();
 		this.groupMain.name = "Terrain";
 
+		if (terrainOptions.backgroundImagePath) {
+			this.createBackgroundImage(terrainOptions.backgroundImagePath!);
+		}
+
+		this.createBackgroundPlane(terrainOptions.terrainType);
+		this.setInteractive();
+
+		return this;
+	}
+
+	/**
+	 * Creates a background image, if the level has one
+	 */
+	async createBackgroundImage(backgroundImagePath: string) {
+		const sLoader: LoaderService = this.main.s('Loader');
+		this.backgroundImageTexture = await sLoader.loadTexture(backgroundImagePath);
+		this.backgroundImageTexture.colorSpace = THREE.SRGBColorSpace;
+		this.backgroundImageGeometry = new THREE.PlaneGeometry(Level.levelWidth, Level.levelWidth * 0.65);
+		this.backgroundImageMaterial = new THREE.MeshBasicMaterial({ map: this.backgroundImageTexture });
+		this.backgroundImageMesh = new THREE.Mesh(this.backgroundImageGeometry, this.backgroundImageMaterial);
+		this.backgroundImageMesh.rotation.x = -Math.PI / 2;
+		this.backgroundImageMesh.position.y = 0.01;
+
+		this.groupMain.add(this.backgroundImageMesh);
+	}
+
+	/**
+	 * Creates a background image, if the level has one
+	 */
+	async createBackgroundPlane(terrainType: TerrainTypes) {
 		// Determin the terrain type
 		let material;
 		switch (terrainType) {
@@ -43,10 +79,6 @@ export class Terrain {
 		this.groupMain.add(mesh);
 
 		mesh.rotation.x = -Math.PI * 0.5;
-
-		this.setInteractive();
-
-		return this;
 	}
 
 	/**
@@ -59,8 +91,13 @@ export class Terrain {
 	/**
 	 * Removes from the scene and removes the terrain item
 	 */
-	removeFromScene() {
+	dispose() {
 		this.main.scene.remove(this.groupMain);
+
+		this.backgroundImageTexture?.dispose();
+		this.backgroundImageGeometry?.dispose();
+		this.backgroundImageMaterial?.dispose();
+		this.backgroundImageMesh = null;
 	}
 
 	/**

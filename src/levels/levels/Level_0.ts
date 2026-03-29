@@ -18,6 +18,7 @@ export const levelDetails: LevelDefinition = {
 		}
 	],
 	terrain: TerrainTypes.grass,
+	backgroundImagePath: "assets/backgrounds/level_0.jpg",
 	environmentColour: {
 		colour: "outdoors",
 		intensity: 1.0
@@ -25,7 +26,7 @@ export const levelDetails: LevelDefinition = {
 	paths: [
 		{
 			id: "1",
-			pathGeometry: PathGeometryTypes.dirt,
+			pathGeometry: PathGeometryTypes.none,
 			pathPoints: [{
 				"incomingControlPoint": new Vector3(77.7857, 0.5, -27.1429),
 				"point": new Vector3(74.8571, 0.5, -23.0714),
@@ -69,7 +70,7 @@ export const levelDetails: LevelDefinition = {
 		},
 		{
 			id: "2",
-			pathGeometry: PathGeometryTypes.dirt,
+			pathGeometry: PathGeometryTypes.none,
 			pathPoints: [
 				{
 					"incomingControlPoint": new Vector3(75.6429, 0.5, 31.8571),

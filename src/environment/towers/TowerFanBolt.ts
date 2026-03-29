@@ -39,7 +39,7 @@ export class TowerFanBolt extends Tower {
 
 	static stats: StatBlockCharacter = {
 		attack: {
-			duration: 1000,
+			duration: 4000,
 			accuracy: 1.0,
 			damage: 8,
 			damageType: DamageTypes.lightning,
@@ -75,7 +75,7 @@ export class TowerFanBolt extends Tower {
 		const cooldown = this.stats.activeStats.attack!.duration;
 
 		if (this.timeSinceLastBolt >= cooldown && this.hoveringBolts.length < this.maxBolts) {
-			this.timeSinceLastBolt -= cooldown; // Alternatively reset to 0, but this handles overflow gracefully
+			this.timeSinceLastBolt = 0;
 			this.generateHoveringBolt();
 		}
 
@@ -112,6 +112,7 @@ export class TowerFanBolt extends Tower {
 					if ((boltMesh.material as THREE.Material).dispose) (boltMesh.material as THREE.Material).dispose();
 				});
 
+				this.hoveringBolts.forEach((boltMesh) => { this.groupMain.remove(boltMesh); });
 				this.hoveringBolts = [];
 
 				this.stateMachine.transition(TowerTransitions.attacking);
